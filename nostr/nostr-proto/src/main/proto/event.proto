@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package nostr;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_package = "org.tbk.nostr.proto";
+option java_outer_classname = "NostrProtos";
+option java_multiple_files = true;
+
+/*{
+  "id": <32-bytes lowercase hex-encoded sha256 of the serialized event data>,
+  "pubkey": <32-bytes lowercase hex-encoded public key of the event creator>,
+  "created_at": <unix timestamp in seconds>,
+  "kind": <integer between 0 and 65535>,
+  "tags": [
+    [<arbitrary string>...],
+    // ...
+  ],
+  "content": <arbitrary string>,
+  "sig": <64-bytes lowercase hex of the signature of the sha256 hash of the serialized event data, which is the same as the "id" field>
+}*/
+message Event {
+  bytes id = 1 [json_name = "id"];
+  bytes pubkey = 2 [json_name = "pubkey"];
+  uint64 created_at = 3 [json_name = "created_at"];
+  uint32 kind = 4 [json_name = "kind"];
+  repeated TagValue tags = 5 [json_name = "tags"];
+  string content = 6 [json_name = "content"];
+  bytes sig = 7 [json_name = "sig"];
+}
+
+message TagValue {
+  string name = 1 [json_name = "name"];
+  repeated string values = 2 [json_name = "values"];
+}
+
+message Request {
+  oneof kind {
+    EventRequest event = 1 [json_name = "event"];
+    ReqRequest req = 2 [json_name = "req"];
+    CloseRequest close = 3 [json_name = "close"];
+  }
+}
+
+// ["EVENT", <event JSON as defined above>], used to publish events.
+message EventRequest {
+  Event event = 1 [json_name = "event"];
+}
+
+// ["REQ", <id>, <filter JSON>...], used to request events and subscribe to new updates.
+message ReqRequest {
+  string id = 1 [json_name = "id"];
+  repeated Filter filters = 2 [json_name = "filters"];
+}
+
+// ["CLOSE", <id>], used to stop previous subscriptions.
+message CloseRequest {
+  string id = 1 [json_name = "id"];
+}
+
+/*{
+  "ids": <a list of event ids>,
+  "authors": <a list of lowercase pubkeys, the pubkey of an event must be one of these>,
+  "kinds": <a list of a kind numbers>,
+  "#<single-letter (a-zA-Z)>": <a list of tag values, for #e — a list of event ids, for #p — a list of pubkeys, etc.>,
+  "since": <an integer unix timestamp in seconds, events must be newer than this to pass>,
+  "until": <an integer unix timestamp in seconds, events must be older than this to pass>,
+  "limit": <maximum number of events relays SHOULD return in the initial query>
+}*/
+// {"kinds":[0,1,2,3],"authors":["afb74cc9241ed793301b54d3871ca4851dfb2c22e4f0d6ddb8c8fabdba222df1"]},
+// {"kinds":[1,4],"#p":["afb74cc9241ed793301b54d3871ca4851dfb2c22e4f0d6ddb8c8fabdba222df1"]},
+// {"kinds":[4],"authors":["afb74cc9241ed793301b54d3871ca4851dfb2c22e4f0d6ddb8c8fabdba222df1"]]
+message Filter {
+  repeated bytes ids = 1 [json_name = "ids"];
+  repeated bytes authors = 2 [json_name = "authors"];
+  repeated uint32 kinds = 3 [json_name = "kinds"];
+  repeated TagValue tags = 4 [json_name = "tags"];
+  uint64 since = 5 [json_name = "since"];
+  uint64 until = 6 [json_name = "until"];
+  uint32 limit = 7 [json_name = "limit"];
+}
+
+/*
+["EVENT", <subscription_id>, <event JSON as defined above>], used to send events requested by clients.
+["OK", <event_id>, <true|false>, <message>], used to indicate acceptance or denial of an EVENT message.
+["EOSE", <subscription_id>], used to indicate the end of stored events and the beginning of events newly received in real-time.
+["CLOSED", <subscription_id>, <message>], used to indicate that a subscription was ended on the server side.
+["NOTICE", <message>]
+ */
+
+message Response {
+  oneof kind {
+    EventResponse event = 1 [json_name = "event"];
+    OkResponse ok = 2 [json_name = "ok"];
+    EoseResponse eose = 3 [json_name = "eose"];
+    ClosedResponse closed = 4 [json_name = "closed"];
+    NoticeResponse notice = 5 [json_name = "notice"];
+  }
+}
+
+message EventResponse {
+  string subscription_id = 1 [json_name = "subscription_id"];
+  Event event = 2 [json_name = "event"];
+}
+
+message OkResponse {
+  bytes event_id = 1 [json_name = "event_id"];
+  bool success = 2 [json_name = "success"];
+  string message = 3 [json_name = "message"];
+}
+
+message EoseResponse {
+  string subscription_id = 1 [json_name = "subscription_id"];
+}
+
+message ClosedResponse {
+  string subscription_id = 1 [json_name = "subscription_id"];
+  string message = 2 [json_name = "message"];
+}
+
+message NoticeResponse {
+  string message = 1 [json_name = "message"];
+}

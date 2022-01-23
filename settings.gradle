@@ -1,0 +1,10 @@
+rootProject.name = 'nostr-spring-boot-starter'
+
+include 'nostr:nostr-base'
+include 'nostr:nostr-core'
+include 'nostr:nostr-client'
+include 'nostr:nostr-identity'
+include 'nostr:nostr-proto'
+include 'nostr:nostr-proto-json'
+include 'nostr:nostr-template'
+include 'nostr:nostr-example-application'

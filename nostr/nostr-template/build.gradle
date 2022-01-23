@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr template package'
+
+dependencies {
+    api project(':nostr:nostr-base')
+    api project(':nostr:nostr-proto')
+    implementation project(':nostr:nostr-core')
+    implementation project(':nostr:nostr-proto-json')
+
+    api "io.projectreactor:reactor-core"
+
+    implementation "com.google.guava:guava:${guavaVersion}"
+
+    implementation 'org.springframework:spring-messaging'
+    implementation 'org.springframework:spring-websocket'
+
+    testImplementation project(':nostr:nostr-identity')
+
+    integTestImplementation 'org.springframework.boot:spring-boot-starter-web'
+    integTestImplementation 'org.springframework.boot:spring-boot-docker-compose'
+}

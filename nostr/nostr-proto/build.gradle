@@ -1,0 +1,10 @@
+plugins {
+    id 'java'
+}
+
+apply from: "${project.rootDir}/proto.gradle"
+
+description = 'nostr proto package'
+
+dependencies {
+}

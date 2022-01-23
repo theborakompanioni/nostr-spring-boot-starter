@@ -1,0 +1,8 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr base package'
+
+dependencies {
+}
