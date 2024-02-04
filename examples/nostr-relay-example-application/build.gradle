@@ -1,0 +1,19 @@
+apply plugin: 'org.springframework.boot'
+
+description = 'nostr relay example application package'
+
+dependencies {
+    implementation project(':nostr:nostr-core')
+    implementation project(':nostr:nostr-client')
+    implementation project(':nostr:nostr-proto')
+
+    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
+    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
+
+    implementation 'io.projectreactor:reactor-core'
+
+    implementation 'org.springframework:spring-messaging'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+}

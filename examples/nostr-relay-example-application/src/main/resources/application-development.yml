@@ -1,0 +1,22 @@
+app.name: tbk-nostr-spring-boot-starter-demo
+app.description: A spring boot nostr demo application
+
+spring.application.name: 'tbk-nostr-spring-boot-starter-demo'
+spring.http.log-request-details: true
+
+server.port: 8080
+server.use-forward-headers: true
+server.compression.enabled: true
+
+management.server.port: 9001
+
+# LOGGING
+logging.file.path: ./var/log
+logging.file.name: application-dev.log
+logging.config: classpath:logback-development.xml
+logging.level.org.springframework: INFO
+logging.level.org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
+logging.level.web: DEBUG
+logging.level.org.tbk.nostr: DEBUG
+
+
