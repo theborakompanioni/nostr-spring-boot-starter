@@ -1,0 +1,17 @@
+app.name: tbk-nostr-spring-boot-starter-demo (test)
+app.description: A spring boot nostr demo application
+
+spring.application.name: 'tbk-nostr-spring-boot-starter-demo-test'
+spring.http.log-request-details: true
+
+logging.file.name: application-test.log
+logging.level.org.tbk.nostr: TRACE
+
+spring.docker.compose:
+  enabled: true
+  file: ../../docker/regtest/nostr/docker-compose.yml
+  stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
+  skip.in-tests: false
+
+org.tbk.nostr.example:
+  relay-uri: 'ws://localhost:7000'

@@ -17,8 +17,7 @@ public class NostrExampleApplicationTest {
 
     @Autowired(required = false)
     private ApplicationContext applicationContext;
-
-
+    
     @Autowired(required = false)
     private NostrClientService sut;
 

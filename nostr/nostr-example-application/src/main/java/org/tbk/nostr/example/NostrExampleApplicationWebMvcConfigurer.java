@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ConditionalOnWebApplication
 @EnableWebMvc
 @Configuration(proxyBeanMethods = false)
-public class NostrExampleApplicationWebMvcConfigurer implements WebMvcConfigurer {
+class NostrExampleApplicationWebMvcConfigurer implements WebMvcConfigurer {
 
     private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
             "classpath:/META-INF/resources/",

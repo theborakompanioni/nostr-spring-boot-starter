@@ -22,20 +22,26 @@ import org.tbk.nostr.proto.ReqRequest;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @SpringBootApplication
 public class NostrExampleApplication {
+    static {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        Locale.setDefault(Locale.ENGLISH);
+    }
 
-    private static final String ODELL_PUBKEY = "04c915daefee38317fa734444acee390a8269fe5810b2241e5e6dd343dfbecc9"; // npub1qny3tkh0acurzla8x3zy4nhrjz5zd8l9sy9jys09umwng00manysew95gx
+    // npub1qny3tkh0acurzla8x3zy4nhrjz5zd8l9sy9jys09umwng00manysew95gx
+    private static final String ODELL_PUBKEY = "04c915daefee38317fa734444acee390a8269fe5810b2241e5e6dd343dfbecc9";
 
     public static void main(String[] args) {
         new SpringApplicationBuilder()
                 .sources(NostrExampleApplication.class)
                 .listeners(applicationPidFileWriter(), webServerPortFileWriter())
                 .web(WebApplicationType.NONE)
-                .profiles("development", "local")
                 .run(args);
     }
 
@@ -48,21 +54,8 @@ public class NostrExampleApplication {
     }
 
     @Bean
-    public RelayUri relayUri() {
-        return RelayUri.of(URI.create("wss://nostr-pub.wellorder.net"));
-    }
-
-    @Bean(destroyMethod = "shutDown")
-    public NostrClientService nostrClientService(RelayUri relayUri) throws TimeoutException {
-        SimpleNostrClientService simpleReactiveNostrClient = new SimpleNostrClientService(relayUri);
-        simpleReactiveNostrClient.startAsync();
-        simpleReactiveNostrClient.awaitRunning(Duration.ofSeconds(60));
-        return simpleReactiveNostrClient;
-    }
-
-    @Bean
     @Profile("!test")
-    public ApplicationRunner odellEvents(NostrClientService reactiveNostrRelayClient) {
+    ApplicationRunner odellEvents(NostrClientService reactiveNostrRelayClient) {
         return args -> {
             SubscriptionId subscriptionId = MoreSubscriptionIds.random();
 
@@ -88,7 +81,7 @@ public class NostrExampleApplication {
 
     @Bean
     @Profile("!test")
-    public ApplicationRunner allTextNotesSinceNow(NostrClientService reactiveNostrRelayClient) {
+    ApplicationRunner allTextNotesSinceNow(NostrClientService reactiveNostrRelayClient) {
         return args -> {
             SubscriptionId subscriptionId = MoreSubscriptionIds.random();
 
