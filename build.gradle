@@ -110,10 +110,6 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven {
-            // needed for java-nostr package
-            url "https://jitpack.io"
-        }
     }
 
     dependencyManagement {

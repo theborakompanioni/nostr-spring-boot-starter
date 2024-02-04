@@ -7,22 +7,13 @@ dependencies {
     implementation project(':nostr:nostr-client')
     implementation project(':nostr:nostr-proto')
 
-    implementation 'io.projectreactor:reactor-core'
-
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.springframework:spring-messaging'
-
-    implementation 'org.eclipse.jetty.websocket:websocket-client:9.4.53.v20231009'
-    implementation 'org.eclipse.jetty.websocket:websocket-server:9.4.53.v20231009'
-    implementation 'io.netty:netty-all:4.1.106.Final'
-
     implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
     implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
 
-    // currently not needed
-    // implementation 'org.bitcoindevkit:bdk-jvm:0.2.2'
-    // implementation 'org.lightningdevkit:ldk-java:0.0.104.1'
+    implementation 'io.projectreactor:reactor-core'
+
+    implementation 'org.springframework:spring-messaging'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }

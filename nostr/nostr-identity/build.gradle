@@ -5,11 +5,10 @@ plugins {
 description = 'nostr identity package'
 
 dependencies {
+    api project(':nostr:nostr-proto')
     implementation project(':nostr:nostr-proto-json')
 
-    api project(':nostr:nostr-proto')
     api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
-
     implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
 
     implementation "com.google.guava:guava:${guavaVersion}"
