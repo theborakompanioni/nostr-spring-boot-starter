@@ -3,6 +3,26 @@
 nostr-spring-boot-starter
 ===
 
+## Development
+
+### Requirements
+- java >=21
+- docker
+
+### Build
+```shell script
+./gradlew build -x test
+```
+
+### Test
+```shell script
+./gradlew test integrationTest --rerun-tasks --no-parallel
+```
+
+## Contributing
+All contributions and ideas are always welcome. For any question, bug or feature request,
+please create an [issue](https://github.com/theborakompanioni/nostr-spring-boot-starter/issues).
+Before you start, please read the [contributing guidelines](contributing.md).
 
 ## Resources
 
