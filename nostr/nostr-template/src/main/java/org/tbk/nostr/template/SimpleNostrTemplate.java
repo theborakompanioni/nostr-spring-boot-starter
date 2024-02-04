@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.WebSocketSession;
@@ -33,11 +34,15 @@ import static java.util.Objects.requireNonNull;
 public class SimpleNostrTemplate implements NostrTemplate {
 
     private final RelayUri relay;
+
     private final WebSocketClient webSocketClient;
+
+    private final WebSocketHttpHeaders headers;
 
     public SimpleNostrTemplate(RelayUri relay) {
         this.relay = requireNonNull(relay);
         this.webSocketClient = new StandardWebSocketClient();
+        this.headers = new WebSocketHttpHeaders();
     }
 
     @Override
@@ -94,31 +99,116 @@ public class SimpleNostrTemplate implements NostrTemplate {
     public Flux<Event> fetchEvents(ReqRequest request) {
         AtomicReference<WebSocketSession> sessionRef = new AtomicReference<>();
         return Flux.<Event>create(sink -> {
-            WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
             try {
                 sessionRef.set(webSocketClient.execute(new TextWebSocketHandler() {
+                    @Override
+                    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+                        sink.complete();
+                    }
                     @Override
                     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
                         log.debug("handleTextMessage: {}", message.getPayload());
 
                         try {
                             Response response = JsonReader.fromJsonResponse(message.getPayload());
-                            if (response.getKindCase() == Response.KindCase.EVENT) {
-                                EventResponse eventResponse = response.getEvent();
-                                if (eventResponse.getSubscriptionId().equals(request.getId())) {
-                                    Event event = eventResponse.getEvent();
-                                    if (MoreEvents.isValid(event)) {
-                                        sink.next(event);
+                            switch (response.getKindCase()){
+                                case EVENT -> {
+                                    EventResponse eventResponse = response.getEvent();
+                                    if (!eventResponse.getSubscriptionId().equals(request.getId())) {
+                                        log.warn("{} on unexpected subscription received. Ignoring.", response.getKindCase());
                                     } else {
-                                        sink.error(new IllegalArgumentException("Invalid event data"));
+                                        Event event = eventResponse.getEvent();
+                                        if (MoreEvents.isValid(event)) {
+                                            sink.next(event);
+                                        } else {
+                                            sink.error(new IllegalArgumentException("Invalid event data"));
+                                        }
                                     }
                                 }
+                                case EOSE -> {
+                                    EoseResponse eoseResponse = response.getEose();
+                                    if (!eoseResponse.getSubscriptionId().equals(request.getId())) {
+                                        log.warn("{} on unexpected subscription received. Ignoring.", response.getKindCase());
+                                    } else {
+                                        sink.complete();
+                                    }
+                                }
+                                case CLOSED -> {
+                                    ClosedResponse closedResponse = response.getClosed();
+                                    if (!closedResponse.getSubscriptionId().equals(request.getId())) {
+                                        log.warn("{} on unexpected subscription received. Ignoring.", response.getKindCase());
+                                    } else {
+                                        sink.complete();
+                                    }
+                                }
+                                case OK, NOTICE, COUNT, KIND_NOT_SET -> {
+                                    log.warn("Unexpected message received (type := {}). Ignoring.", response.getKindCase());
+                                }
                             }
-                            if (response.getKindCase() == Response.KindCase.EOSE) {
-                                EoseResponse eoseResponse = response.getEose();
+                        } catch (Exception e) {
+                            log.warn("Error in handleTextMessage while handling '{}': {}", message, e.getMessage());
+                            sink.error(e);
+                        }
+                    }
+                }, headers, relay.getUri()).get());
 
-                                if (eoseResponse.getSubscriptionId().equals(request.getId())) {
-                                    sink.complete();
+                TextMessage message = new TextMessage(JsonWriter.toJson(request));
+
+                log.debug("Sending message: {}", message.getPayload());
+                sessionRef.get().sendMessage(message);
+            } catch (InterruptedException | ExecutionException | IOException e) {
+                sink.error(e);
+            }
+        }).doFinally(signalType -> {
+            log.debug("Closing websocket session on signal type: {}", signalType);
+            closeQuietly(sessionRef.get());
+        });
+    }
+
+    @Override
+    public Flux<CountResult> countEvents(CountRequest request) {
+
+        AtomicReference<WebSocketSession> sessionRef = new AtomicReference<>();
+        return Flux.<CountResult>create(sink -> {
+            try {
+                sessionRef.set(webSocketClient.execute(new TextWebSocketHandler() {
+                    @Override
+                    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+                        sink.complete();
+                    }
+                    @Override
+                    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                        log.debug("handleTextMessage: {}", message.getPayload());
+
+                        try {
+                            Response response = JsonReader.fromJsonResponse(message.getPayload());
+                            switch (response.getKindCase()){
+                                case COUNT -> {
+                                    CountResponse countResponse = response.getCount();
+                                    if (!countResponse.getSubscriptionId().equals(request.getId())) {
+                                        log.warn("{} on unexpected subscription received. Ignoring.", response.getKindCase());
+                                    } else {
+                                        sink.next(countResponse.getResult());
+                                    }
+                                }
+                                case EOSE -> {
+                                    EoseResponse eoseResponse = response.getEose();
+                                    if (!eoseResponse.getSubscriptionId().equals(request.getId())) {
+                                        log.warn("{} on unexpected subscription received. Ignoring.", response.getKindCase());
+                                    } else {
+                                        sink.complete();
+                                    }
+                                }
+                                case CLOSED -> {
+                                    ClosedResponse closedResponse = response.getClosed();
+                                    if (!closedResponse.getSubscriptionId().equals(request.getId())) {
+                                        log.warn("{} on unexpected subscription received. Ignoring.", response.getKindCase());
+                                    } else {
+                                        sink.complete();
+                                    }
+                                }
+                                case OK, NOTICE, EVENT, KIND_NOT_SET -> {
+                                    log.warn("Unexpected message received (type := {}). Ignoring.", response.getKindCase());
                                 }
                             }
                         } catch (Exception e) {
@@ -146,9 +236,13 @@ public class SimpleNostrTemplate implements NostrTemplate {
         AtomicReference<WebSocketSession> sessionRef = new AtomicReference<>();
 
         return Mono.<OkResponse>create(sink -> {
-            WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
             try {
                 sessionRef.set(webSocketClient.execute(new TextWebSocketHandler() {
+                    @Override
+                    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+                        sink.success();
+                    }
+
                     @Override
                     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
                         log.debug("handleTextMessage: {}", message.getPayload());

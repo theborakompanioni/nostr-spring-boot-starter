@@ -5,10 +5,7 @@ import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.PrivateKey;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.identity.MoreIdentities;
-import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.EventRequest;
-import org.tbk.nostr.proto.Filter;
-import org.tbk.nostr.proto.ReqRequest;
+import org.tbk.nostr.proto.*;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
@@ -56,7 +53,9 @@ class JsonWriterTest {
     void itShouldWriteReqRequest0() throws IOException {
         ReqRequest reqRequest = ReqRequest.newBuilder()
                 .setId("subscription_id")
-                .addFilters(Filter.newBuilder().addIds(ByteString.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36")).build())
+                .addFilters(Filter.newBuilder()
+                        .addIds(ByteString.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"))
+                        .build())
                 .build();
 
         String json = JsonWriter.toJson(reqRequest);
@@ -65,6 +64,29 @@ class JsonWriterTest {
         assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
                 [
                   "REQ",
+                  "subscription_id",
+                  {
+                    "ids": ["5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"]
+                  }
+                ]
+                """)));
+    }
+
+    @Test
+    void itShouldWriteCountRequest0() throws IOException {
+        CountRequest countRequest = CountRequest.newBuilder()
+                .setId("subscription_id")
+                .addFilters(Filter.newBuilder()
+                        .addIds(ByteString.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"))
+                        .build())
+                .build();
+
+        String json = JsonWriter.toJson(countRequest);
+
+        assertThat(json, is(notNullValue()));
+        assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
+                [
+                  "COUNT",
                   "subscription_id",
                   {
                     "ids": ["5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"]

@@ -42,6 +42,7 @@ message Request {
     EventRequest event = 1 [json_name = "event"];
     ReqRequest req = 2 [json_name = "req"];
     CloseRequest close = 3 [json_name = "close"];
+    CountRequest count = 4 [json_name = "count"];
   }
 }
 
@@ -59,6 +60,12 @@ message ReqRequest {
 // ["CLOSE", <id>], used to stop previous subscriptions.
 message CloseRequest {
   string id = 1 [json_name = "id"];
+}
+
+// ["COUNT", <subscription_id>, <filters JSON>...]
+message CountRequest {
+  string id = 1 [json_name = "id"];
+  repeated Filter filters = 2 [json_name = "filters"];
 }
 
 /*{
@@ -98,6 +105,7 @@ message Response {
     EoseResponse eose = 3 [json_name = "eose"];
     ClosedResponse closed = 4 [json_name = "closed"];
     NoticeResponse notice = 5 [json_name = "notice"];
+    CountResponse count = 6 [json_name = "count"];
   }
 }
 
@@ -123,4 +131,14 @@ message ClosedResponse {
 
 message NoticeResponse {
   string message = 1 [json_name = "message"];
+}
+
+message CountResponse {
+  string subscription_id = 1 [json_name = "subscription_id"];
+  CountResult result = 2 [json_name = "result"];
+}
+
+message CountResult {
+  uint64 count = 1 [json_name = "count"];
+  bool approximate = 2 [json_name = "approximate"];
 }

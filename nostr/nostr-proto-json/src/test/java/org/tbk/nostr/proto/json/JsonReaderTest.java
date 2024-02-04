@@ -196,4 +196,41 @@ class JsonReaderTest {
         assertThat(ok.getSuccess(), is(true));
         assertThat(ok.getMessage(), is(""));
     }
+
+    @Test
+    void itShouldParseCountResponse0() {
+        Response res = JsonReader.fromJsonResponse("""
+                ["COUNT", "subscription_id", {
+                  "count" : 21
+                }]
+                """);
+
+        assertThat(res, is(notNullValue()));
+        assertThat(res.getKindCase(), is(Response.KindCase.COUNT));
+        assertThat(res.getCount(), is(notNullValue()));
+
+        CountResponse count = res.getCount();
+        assertThat(count.getSubscriptionId(), is("subscription_id"));
+        assertThat(count.getResult().getCount(), is(21L));
+        assertThat(count.getResult().getApproximate(), is(false));
+    }
+
+    @Test
+    void itShouldParseCountResponse1() {
+        Response res = JsonReader.fromJsonResponse("""
+                ["COUNT", "subscription_id", {
+                  "count" : 42,
+                  "approximate" : true
+                }]
+                """);
+
+        assertThat(res, is(notNullValue()));
+        assertThat(res.getKindCase(), is(Response.KindCase.COUNT));
+        assertThat(res.getCount(), is(notNullValue()));
+
+        CountResponse count = res.getCount();
+        assertThat(count.getSubscriptionId(), is("subscription_id"));
+        assertThat(count.getResult().getCount(), is(42L));
+        assertThat(count.getResult().getApproximate(), is(true));
+    }
 }

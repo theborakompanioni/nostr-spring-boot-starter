@@ -102,6 +102,20 @@ public final class JsonReader {
                                         .build())
                                 .build();
                     }
+                    // ["COUNT", <subscription_id>, {"count": <integer>}]
+                    case COUNT -> {
+                        if (array.length < 3) {
+                            throw new IllegalArgumentException("Could not parse passed arg");
+                        }
+                        String subscriptionId = String.valueOf(array[1]);
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> countMap = (Map<String, Object>) array[2];
+                        yield response.setCount(CountResponse.newBuilder()
+                                        .setSubscriptionId(subscriptionId)
+                                        .setResult(countFromMap(countMap, CountResult.newBuilder()))
+                                        .build())
+                                .build();
+                    }
                     case KIND_NOT_SET -> throw new IllegalArgumentException("Kind not set");
                 };
             } else {
@@ -126,19 +140,26 @@ public final class JsonReader {
         }
     }
 
-    private static Event eventFromMap(Map<String, Object> eventMap, Event.Builder event) {
+    private static CountResult countFromMap(Map<String, Object> map, CountResult.Builder count) {
+        return count
+                .setCount(Long.parseLong(String.valueOf(map.get("count"))))
+                .setApproximate(Boolean.parseBoolean(String.valueOf(map.getOrDefault("approximate", false))))
+                .build();
+    }
+
+    private static Event eventFromMap(Map<String, Object> map, Event.Builder event) {
         @SuppressWarnings("unchecked")
-        List<List<String>> tags = Optional.ofNullable((List<Object>) eventMap.get("tags"))
+        List<List<String>> tags = Optional.ofNullable((List<Object>) map.get("tags"))
                 .orElseGet(Collections::emptyList).stream()
                 .map(it -> (List<String>) it).toList();
         return event
-                .setId(ByteString.fromHex(String.valueOf(eventMap.get("id"))))
-                .setPubkey(ByteString.fromHex(String.valueOf(eventMap.get("pubkey"))))
-                .setCreatedAt(Long.parseLong(String.valueOf(eventMap.get("created_at"))))
-                .setKind(Integer.parseInt(String.valueOf(eventMap.get("kind"))))
+                .setId(ByteString.fromHex(String.valueOf(map.get("id"))))
+                .setPubkey(ByteString.fromHex(String.valueOf(map.get("pubkey"))))
+                .setCreatedAt(Long.parseLong(String.valueOf(map.get("created_at"))))
+                .setKind(Integer.parseInt(String.valueOf(map.get("kind"))))
                 .addAllTags(tagsFromList(tags))
-                .setContent(String.valueOf(eventMap.get("content")))
-                .setSig(ByteString.fromHex(String.valueOf(eventMap.get("sig"))))
+                .setContent(String.valueOf(map.get("content")))
+                .setSig(ByteString.fromHex(String.valueOf(map.get("sig"))))
                 .build();
     }
 

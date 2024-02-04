@@ -1,16 +1,17 @@
 package org.tbk.nostr.template;
 
 import com.google.protobuf.ByteString;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.util.MoreSubscriptionIds;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
-import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.OkResponse;
+import org.tbk.nostr.proto.*;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
@@ -187,5 +188,49 @@ class NostrTemplateApplicationTest {
         assertThat(fetchedEvents, hasSize(eventIds.size()));
         assertThat(fetchedEvents, hasItem(event0));
         assertThat(fetchedEvents, hasItem(event1));
+    }
+
+    @Test
+    @Disabled("scsibug/nostr-rs-relay does not support COUNT (NIP-45).. have not found a single relay that does..")
+    void itShouldCountSuccessfully0() {
+        Signer signer0 = SimpleSigner.random();
+        Signer signer1 = SimpleSigner.random();
+
+        CountResult countBefore = sut.countEvents(CountRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addAuthors(ByteString.fromHex(signer0.getPublicKey().value.toHex()))
+                                .addAuthors(ByteString.fromHex(signer1.getPublicKey().value.toHex()))
+                                .build())
+                        .build())
+                .next()
+                .block(Duration.ofSeconds(5));
+
+        assertThat(countBefore, is(notNullValue()));
+        assertThat(countBefore.getCount(), is(0L));
+
+        Event event0 = MoreEvents.createFinalizedTextMessage(signer0, "GM");
+        Event event1 = MoreEvents.createFinalizedTextMessage(signer1, "GN");
+
+        OkResponse ok0 = sut.send(event0).block(Duration.ofSeconds(5));
+        assertThat(ok0, is(notNullValue()));
+        assertThat(ok0.getSuccess(), is(true));
+
+        OkResponse ok1 = sut.send(event1).block(Duration.ofSeconds(5));
+        assertThat(ok1, is(notNullValue()));
+        assertThat(ok1.getSuccess(), is(true));
+
+        CountResult countAfter = sut.countEvents(CountRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addAuthors(ByteString.fromHex(signer0.getPublicKey().value.toHex()))
+                                .addAuthors(ByteString.fromHex(signer1.getPublicKey().value.toHex()))
+                                .build())
+                        .build())
+                .next()
+                .block(Duration.ofSeconds(5));
+
+        assertThat(countAfter, is(notNullValue()));
+        assertThat(countAfter.getCount(), is(2L));
     }
 }

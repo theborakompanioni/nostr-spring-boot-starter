@@ -31,7 +31,8 @@ public final class JsonWriter {
             case Request.KindCase.EVENT -> toJson(val.getEvent());
             case Request.KindCase.REQ -> toJson(val.getReq());
             case Request.KindCase.CLOSE -> toJson(val.getClose());
-            case KIND_NOT_SET -> throw new IllegalArgumentException("Kind not set");
+            case Request.KindCase.COUNT -> toJson(val.getCount());
+            case Request.KindCase.KIND_NOT_SET -> throw new IllegalArgumentException("Kind not set");
         };
     }
 
@@ -64,14 +65,22 @@ public final class JsonWriter {
     }
 
     public static String toJson(ReqRequest val) {
+        return toJsonWithSubscriptionIdAndFilter("REQ", val.getId(), val.getFiltersList());
+    }
+
+    public static String toJson(CountRequest val) {
+        return toJsonWithSubscriptionIdAndFilter("COUNT", val.getId(), val.getFiltersList());
+    }
+
+    private static String toJsonWithSubscriptionIdAndFilter(String cmd, String subscriptionId, List<Filter> filters) {
         try {
             ArrayComposer<JSONComposer<String>> arrayComposer = json
                     .composeString()
                     .startArray()
-                    .add("REQ")
-                    .add(val.getId());
+                    .add(cmd)
+                    .add(subscriptionId);
 
-            for (Filter it : val.getFiltersList()) {
+            for (Filter it : filters) {
                 arrayComposer.addObject(asMap(it));
             }
             return arrayComposer.end().finish();
@@ -79,7 +88,6 @@ public final class JsonWriter {
             throw new RuntimeException(e);
         }
     }
-
 
     /**
      * See: <a href="https://github.com/nostr-protocol/nips/blob/master/01.md">NIP-01</a>
