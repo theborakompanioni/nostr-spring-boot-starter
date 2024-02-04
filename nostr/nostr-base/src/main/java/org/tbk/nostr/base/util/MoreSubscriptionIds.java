@@ -34,7 +34,10 @@ public final class MoreSubscriptionIds {
             throw new IllegalArgumentException("minLength must be greater than or equal to 1");
         }
         if (maxLength > 64) {
-            throw new IllegalArgumentException("minLength must be lower than or equal to 64");
+            throw new IllegalArgumentException("maxLength must be lower than or equal to 64");
+        }
+        if (minLength > maxLength) {
+            throw new IllegalArgumentException("minLength must be lower than or equal to maxLength");
         }
         return RANDOM.nextInt(minLength, maxLength + 1);
     }
