@@ -1,0 +1,11 @@
+app.name: tbk-nostr-spring-boot-starter-demo (test)
+app.description: A spring boot nostr demo application
+
+spring.application.name: 'tbk-nostr-spring-boot-starter-demo-test'
+spring.http.log-request-details: true
+
+logging.file.name: application-test.log
+logging.level.org.tbk.nostr: TRACE
+
+org.tbk.nostr.example:
+  relay-uri: 'ws://localhost:7000'

@@ -5,9 +5,9 @@ spring.application.name: 'tbk-nostr-spring-boot-starter-demo'
 spring.http.log-request-details: false
 
 spring.lifecycle.timeout-per-shutdown-phase: 30s
+spring.threads.virtual.enabled: true
 
 server.port: 8080
-server.use-forward-headers: true
 server.compression.enabled: true
 server.shutdown: graceful
 
@@ -18,7 +18,6 @@ logging.file.path: ./var/log
 logging.file.name: application.log
 logging.config: classpath:logback.xml
 logging.level.org.springframework: INFO
-logging.level.org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
 #logging.level.web: DEBUG
 
 org.tbk.nostr.example:
