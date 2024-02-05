@@ -148,10 +148,7 @@ public final class JsonWriter {
                 .put("pubkey", HexFormat.of().formatHex(event.getPubkey().toByteArray()))
                 .put("created_at", event.getCreatedAt())
                 .put("kind", event.getKind())
-                .put("tags", event.getTagsList().stream()
-                        .map(it -> Stream.concat(Stream.of(it.getName()), it.getValuesList().stream()).toList())
-                        .toList()
-                )
+                .put("tags", listFromTags(event.getTagsList()))
                 .put("content", event.getContent())
                 .put("sig", HexFormat.of().formatHex(event.getSig().toByteArray()))
                 .build();
