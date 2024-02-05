@@ -1,7 +1,10 @@
 package org.tbk.nostr.identity;
 
-import fr.acinq.bitcoin.DeterministicWallet;
+import fr.acinq.bitcoin.MnemonicCode;
 import fr.acinq.bitcoin.PrivateKey;
+import org.tbk.nostr.nip6.Nip6;
+
+import java.util.List;
 
 public final class MoreIdentities {
 
@@ -13,13 +16,31 @@ public final class MoreIdentities {
         return fromSeed(MoreRandom.randomByteArray(256));
     }
 
-    public static PrivateKey fromSeed(byte[] seed) {
-        DeterministicWallet.ExtendedPrivateKey extendedPrivateKey = DeterministicWallet.generate(seed);
-        return extendedPrivateKey.getPrivateKey();
-    }
-
     public static PrivateKey fromHex(String hex) {
         return PrivateKey.fromHex(hex);
     }
 
+    public static PrivateKey of(byte[] data) {
+        return new PrivateKey(data);
+    }
+
+    public static PrivateKey fromSeed(byte[] seed) {
+        return Nip6.fromSeed(seed);
+    }
+
+    public static PrivateKey fromMnemonic(String mnemonic) {
+        return fromMnemonic(mnemonic, "");
+    }
+
+    public static PrivateKey fromMnemonic(String mnemonic, String passphrase) {
+        return fromSeed(MnemonicCode.toSeed(mnemonic, passphrase));
+    }
+
+    public static PrivateKey fromMnemonic(List<String> mnemonic) {
+        return fromMnemonic(mnemonic, "");
+    }
+
+    public static PrivateKey fromMnemonic(List<String> mnemonic, String passphrase) {
+        return fromSeed(MnemonicCode.toSeed(mnemonic, passphrase));
+    }
 }

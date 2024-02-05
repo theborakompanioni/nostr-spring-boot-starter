@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 public class SimpleSigner implements Signer {
 
     public static SimpleSigner random() {
-        return new SimpleSigner(MoreIdentities.random());
+        return fromPrivateKey(MoreIdentities.random());
     }
 
     public static SimpleSigner fromHex(String hex) {
