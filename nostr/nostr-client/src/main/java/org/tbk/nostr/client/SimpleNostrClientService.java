@@ -92,7 +92,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         verifySession();
 
         return Flux.<TextMessage>from(s -> publisher.subscribe(FlowAdapters.toFlowSubscriber(s)))
-                .map(it -> JsonReader.fromJsonResponse(it.getPayload()))
+                .map(it -> JsonReader.fromJson(it.getPayload(), Response.newBuilder()))
                 .handle(filterSubscriptionResponses(id))
                 .handle((it, sink) -> {
                     switch (it.getKindCase()) {

@@ -112,7 +112,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
                         .addAllAuthors(idsAsBytes)
                         .build())
                 .build())
-                .map(it -> JsonReader.fromJsonMetadata(it.getContent()))
+                .map(it -> JsonReader.fromJson(it.getContent(), Metadata.newBuilder()))
                 .next();
     }
 
@@ -132,7 +132,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
                         log.debug("handleTextMessage: {}", message.getPayload());
 
                         try {
-                            Response response = JsonReader.fromJsonResponse(message.getPayload());
+                            Response response = JsonReader.fromJson(message.getPayload(), Response.newBuilder());
                             switch (response.getKindCase()) {
                                 case EVENT -> {
                                     EventResponse eventResponse = response.getEvent();
@@ -174,7 +174,9 @@ public class SimpleNostrTemplate implements NostrTemplate {
                     }
                 }, headers, relay.getUri()).get());
 
-                TextMessage message = new TextMessage(JsonWriter.toJson(request));
+                TextMessage message = new TextMessage(JsonWriter.toJson(Request.newBuilder()
+                        .setReq(request)
+                        .build()));
 
                 log.debug("Sending message: {}", message.getPayload());
                 sessionRef.get().sendMessage(message);
@@ -204,7 +206,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
                         log.debug("handleTextMessage: {}", message.getPayload());
 
                         try {
-                            Response response = JsonReader.fromJsonResponse(message.getPayload());
+                            Response response = JsonReader.fromJson(message.getPayload(), Response.newBuilder());
                             switch (response.getKindCase()) {
                                 case COUNT -> {
                                     CountResponse countResponse = response.getCount();
@@ -241,7 +243,9 @@ public class SimpleNostrTemplate implements NostrTemplate {
                     }
                 }, headers, relay.getUri()).get());
 
-                TextMessage message = new TextMessage(JsonWriter.toJson(request));
+                TextMessage message = new TextMessage(JsonWriter.toJson(Request.newBuilder()
+                        .setCount(request)
+                        .build()));
 
                 log.debug("Sending message: {}", message.getPayload());
                 sessionRef.get().sendMessage(message);
@@ -285,7 +289,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
                         log.debug("handleTextMessage: {}", message.getPayload());
 
                         try {
-                            Response response = JsonReader.fromJsonResponse(message.getPayload());
+                            Response response = JsonReader.fromJson(message.getPayload(), Response.newBuilder());
                             if (response.getKindCase() == Response.KindCase.OK) {
                                 OkResponse ok = response.getOk();
                                 if (eventIds.contains(ok.getEventId())) {
@@ -304,11 +308,11 @@ public class SimpleNostrTemplate implements NostrTemplate {
                 }, headers, relay.getUri()).get());
 
                 for (Event event : events) {
-                    EventRequest req = EventRequest.newBuilder()
-                            .setEvent(event)
-                            .build();
-
-                    TextMessage message = new TextMessage(JsonWriter.toJson(req));
+                    TextMessage message = new TextMessage(JsonWriter.toJson(Request.newBuilder()
+                            .setEvent(EventRequest.newBuilder()
+                                    .setEvent(event)
+                                    .build())
+                            .build()));
 
                     log.debug("Sending message: {}", message.getPayload());
                     sessionRef.get().sendMessage(message);

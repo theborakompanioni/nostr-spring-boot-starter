@@ -30,7 +30,6 @@ dependencies {
     implementation "org.jmolecules.integrations:jmolecules-spring"
     implementation "org.jmolecules.integrations:jmolecules-jackson"
 
-    implementation 'org.springframework:spring-messaging'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'

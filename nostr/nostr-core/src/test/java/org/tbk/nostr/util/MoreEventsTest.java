@@ -80,7 +80,7 @@ class MoreEventsTest {
                 }
                 """;
 
-        Event event = JsonReader.fromJsonEvent(json);
+        Event event = JsonReader.fromJson(json, Event.newBuilder());
         byte[] eventId = MoreEvents.eventId(event.toBuilder());
 
         assertThat(eventId, is(HexFormat.of().parseHex("c8e47b51d77915ff4a00c0b00eec9563d2b588cdfa13b75a74751e7f4fec4d9f")));
@@ -112,7 +112,7 @@ class MoreEventsTest {
                 }
                 """;
 
-        Event event = JsonReader.fromJsonEvent(json);
+        Event event = JsonReader.fromJson(json, Event.newBuilder());
         byte[] eventId = MoreEvents.eventId(event.toBuilder());
 
         assertThat(eventId, is(HexFormat.of().parseHex("7f0fdf9021cbde815007340d603b43e61ddecac58a337165974b74eb843ba4bc")));

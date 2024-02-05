@@ -6,18 +6,17 @@ import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.*;
 
 import java.net.URI;
-import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class JsonReaderTest {
+class JsonResponseReaderTest {
 
     @Test
     void itShouldParseEventResponse0() {
-        Response res = JsonReader.fromJsonResponse("""
-                ["EVENT", "subscription_id", {
+        Response res = JsonReader.fromJson("""
+                [ "EVENT", "subscription_id", {
                   "id" : "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e",
                   "pubkey" : "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
                   "created_at" : 1,
@@ -25,10 +24,9 @@ class JsonReaderTest {
                   "tags" : [ ],
                   "content" : "GM",
                   "sig" : ""
-                }]
-                """);
+                } ]
+                """, Response.newBuilder());
 
-        assertThat(res, is(notNullValue()));
         assertThat(res.getKindCase(), is(Response.KindCase.EVENT));
         assertThat(res.getEvent(), is(notNullValue()));
 
@@ -45,8 +43,8 @@ class JsonReaderTest {
 
     @Test
     void itShouldParseEventResponse1() {
-        Response res = JsonReader.fromJsonResponse("""
-                ["EVENT", "subscription_id", {
+        Response res = JsonReader.fromJson("""
+                [ "EVENT", "subscription_id", {
                   "id" : "be5ef9d88cdc0a935e805894fb0feee59d048a6671d750d45ebd5de58a021763",
                   "pubkey" : "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
                   "created_at" : 1,
@@ -59,10 +57,9 @@ class JsonReaderTest {
                   ],
                   "content" : "GM",
                   "sig" : ""
-                }]
-                """);
+                } ]
+                """, Response.newBuilder());
 
-        assertThat(res, is(notNullValue()));
         assertThat(res.getKindCase(), is(Response.KindCase.EVENT));
         assertThat(res.getEvent(), is(notNullValue()));
 
@@ -78,8 +75,33 @@ class JsonReaderTest {
     }
 
     @Test
-    void itShouldParseEventResponseWithEmptyId() {
-        Event event = JsonReader.fromJsonEvent("""
+    void itShouldFailToParseEmptyEvent() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            JsonReader.fromJson("{}", Event.newBuilder());
+        });
+    }
+
+
+    @Test
+    void itShouldParseEventWithEmptyFields() {
+        Event event = JsonReader.fromJson("""
+                {
+                  "id" : "",
+                  "pubkey" : "",
+                  "created_at" : 0,
+                  "kind" : 0,
+                  "tags" : [ ],
+                  "content" : "",
+                  "sig" : ""
+                }
+                """, Event.newBuilder());
+
+        assertThat(event.getId(), is(ByteString.EMPTY));
+    }
+
+    @Test
+    void itShouldParseEventWithEmptyId() {
+        Event event = JsonReader.fromJson("""
                 {
                   "id" : "",
                   "pubkey" : "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
@@ -89,15 +111,14 @@ class JsonReaderTest {
                   "content" : "GM",
                   "sig" : ""
                 }
-                """);
+                """, Event.newBuilder());
 
-        assertThat(event, is(notNullValue()));
         assertThat(event.getId(), is(ByteString.EMPTY));
     }
 
     @Test
-    void itShouldParseEventResponseWithInvalidId() {
-        Event event = JsonReader.fromJsonEvent("""
+    void itShouldParseEventWithInvalidId() {
+        Event event = JsonReader.fromJson("""
                 {
                   "id" : "c0ffeebabe",
                   "pubkey" : "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
@@ -107,15 +128,14 @@ class JsonReaderTest {
                   "content" : "GM",
                   "sig" : ""
                 }
-                """);
+                """, Event.newBuilder());
 
-        assertThat(event, is(notNullValue()));
         assertThat(event.getId(), is(ByteString.fromHex("c0ffeebabe")));
     }
 
     @Test
-    void itShouldParseEventResponseWithInvalidPubkey() {
-        Event event = JsonReader.fromJsonEvent("""
+    void itShouldParseEventWithInvalidPubkey() {
+        Event event = JsonReader.fromJson("""
                 {
                   "id" : "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e",
                   "pubkey" : "c0ffeebabe",
@@ -125,34 +145,33 @@ class JsonReaderTest {
                   "content" : "GM",
                   "sig" : ""
                 }
-                """);
+                """, Event.newBuilder());
 
-        assertThat(event, is(notNullValue()));
         assertThat(event.getPubkey(), is(ByteString.fromHex("c0ffeebabe")));
     }
 
     @Test
-    void itShouldParseEventResponseWithMissingTags() {
-        Event event = JsonReader.fromJsonEvent("""
-                {
-                  "id" : "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e",
-                  "pubkey" : "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
-                  "created_at" : 1,
-                  "kind" : 1,
-                  "content" : "GM",
-                  "sig" : ""
-                }
-                """);
-
-        assertThat(event, is(notNullValue()));
-        assertThat(event.getTagsList(), is(Collections.emptyList()));
+    void itShouldFailToParseEventWithProperty() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            JsonReader.fromJson("""
+                    {
+                      "id" : "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e",
+                      "pubkey" : "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
+                      "created_at" : 1,
+                      "kind" : 1,
+                      "tags" : [ ],
+                      "sig" : ""
+                    }
+                    """, Event.newBuilder());
+        });
     }
 
     @Test
     void itShouldParseNoticeResponse() {
-        Response res = JsonReader.fromJsonResponse("[\"NOTICE\", \"message\"]");
+        Response res = JsonReader.fromJson("""
+                [ "NOTICE", "message" ]
+                """, Response.newBuilder());
 
-        assertThat(res, is(notNullValue()));
         assertThat(res.getKindCase(), is(Response.KindCase.NOTICE));
         assertThat(res.getNotice(), is(notNullValue()));
 
@@ -162,9 +181,10 @@ class JsonReaderTest {
 
     @Test
     void itShouldParseClosedResponse() {
-        Response res = JsonReader.fromJsonResponse("[\"CLOSED\", \"subscription_id\", \"message\"]");
+        Response res = JsonReader.fromJson("""
+                [ "CLOSED", "subscription_id", "message" ]
+                """, Response.newBuilder());
 
-        assertThat(res, is(notNullValue()));
         assertThat(res.getKindCase(), is(Response.KindCase.CLOSED));
         assertThat(res.getClosed(), is(notNullValue()));
 
@@ -175,9 +195,10 @@ class JsonReaderTest {
 
     @Test
     void itShouldParseEoseResponse() {
-        Response res = JsonReader.fromJsonResponse("[\"EOSE\", \"subscription_id\"]");
+        Response res = JsonReader.fromJson("""
+                [ "EOSE", "subscription_id" ]
+                """, Response.newBuilder());
 
-        assertThat(res, is(notNullValue()));
         assertThat(res.getKindCase(), is(Response.KindCase.EOSE));
         assertThat(res.getEose(), is(notNullValue()));
 
@@ -187,9 +208,10 @@ class JsonReaderTest {
 
     @Test
     void itShouldParseOkResponse() {
-        Response res = JsonReader.fromJsonResponse("[\"OK\", \"5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36\", true, \"\"]");
+        Response res = JsonReader.fromJson("""
+                [ "OK", "5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36", true, "" ]
+                """, Response.newBuilder());
 
-        assertThat(res, is(notNullValue()));
         assertThat(res.getKindCase(), is(Response.KindCase.OK));
         assertThat(res.getOk(), is(notNullValue()));
 
@@ -201,13 +223,12 @@ class JsonReaderTest {
 
     @Test
     void itShouldParseCountResponse0() {
-        Response res = JsonReader.fromJsonResponse("""
-                ["COUNT", "subscription_id", {
+        Response res = JsonReader.fromJson("""
+                [ "COUNT", "subscription_id", {
                   "count" : 21
-                }]
-                """);
+                } ]
+                """, Response.newBuilder());
 
-        assertThat(res, is(notNullValue()));
         assertThat(res.getKindCase(), is(Response.KindCase.COUNT));
         assertThat(res.getCount(), is(notNullValue()));
 
@@ -219,14 +240,13 @@ class JsonReaderTest {
 
     @Test
     void itShouldParseCountResponse1() {
-        Response res = JsonReader.fromJsonResponse("""
-                ["COUNT", "subscription_id", {
+        Response res = JsonReader.fromJson("""
+                [ "COUNT", "subscription_id", {
                   "count" : 42,
                   "approximate" : true
-                }]
-                """);
+                } ]
+                """, Response.newBuilder());
 
-        assertThat(res, is(notNullValue()));
         assertThat(res.getKindCase(), is(Response.KindCase.COUNT));
         assertThat(res.getCount(), is(notNullValue()));
 
@@ -238,15 +258,14 @@ class JsonReaderTest {
 
     @Test
     void itShouldParseMetadata0() {
-        Metadata metadata = JsonReader.fromJsonMetadata("""
+        Metadata metadata = JsonReader.fromJson("""
                 {
                   "name": "name",
                   "about": "about",
                   "picture": "https://www.example.com/example.png"
                 }
-                """);
+                """, Metadata.newBuilder());
 
-        assertThat(metadata, is(notNullValue()));
         assertThat(metadata.getName(), is("name"));
         assertThat(metadata.getAbout(), is("about"));
         assertThat(metadata.getPicture(), is(URI.create("https://www.example.com/example.png")));
@@ -254,44 +273,40 @@ class JsonReaderTest {
 
     @Test
     void itShouldParseMetadata1() {
-        Metadata metadata0 = JsonReader.fromJsonMetadata("{}");
+        Metadata metadata0 = JsonReader.fromJson("{}", Metadata.newBuilder());
 
-        assertThat(metadata0, is(notNullValue()));
         assertThat(metadata0.getName(), is(nullValue()));
         assertThat(metadata0.getAbout(), is(nullValue()));
         assertThat(metadata0.getPicture(), is(nullValue()));
 
-        Metadata metadata1 = JsonReader.fromJsonMetadata("""
+        Metadata metadata1 = JsonReader.fromJson("""
                 {
                   "name": "name"
                 }
-                """);
+                """, Metadata.newBuilder());
 
-        assertThat(metadata1, is(notNullValue()));
         assertThat(metadata1.getName(), is("name"));
         assertThat(metadata1.getAbout(), is(nullValue()));
         assertThat(metadata1.getPicture(), is(nullValue()));
 
 
-        Metadata metadata2 = JsonReader.fromJsonMetadata("""
+        Metadata metadata2 = JsonReader.fromJson("""
                 {
                   "about": "about"
                 }
-                """);
+                """, Metadata.newBuilder());
 
-        assertThat(metadata2, is(notNullValue()));
         assertThat(metadata2.getName(), is(nullValue()));
         assertThat(metadata2.getAbout(), is("about"));
         assertThat(metadata2.getPicture(), is(nullValue()));
 
 
-        Metadata metadata3 = JsonReader.fromJsonMetadata("""
+        Metadata metadata3 = JsonReader.fromJson("""
                 {
                   "picture": "https://www.example.com/example.png"
                 }
-                """);
+                """, Metadata.newBuilder());
 
-        assertThat(metadata3, is(notNullValue()));
         assertThat(metadata3.getName(), is(nullValue()));
         assertThat(metadata3.getAbout(), is(nullValue()));
         assertThat(metadata3.getPicture(), is(URI.create("https://www.example.com/example.png")));
@@ -301,11 +316,11 @@ class JsonReaderTest {
     @Test
     void itShouldParseMetadata2FailOnInvalidPictureUri() {
         assertThrows(IllegalArgumentException.class, () -> {
-            JsonReader.fromJsonMetadata("""
+            JsonReader.fromJson("""
                     {
                       "picture": "not a valid uri"
                     }
-                    """);
+                    """, Metadata.newBuilder());
         });
     }
 }
