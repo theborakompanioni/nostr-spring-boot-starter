@@ -1,22 +1,22 @@
 package org.tbk.nostr.proto.json;
 
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.protobuf.ByteString;
+import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.tbk.nostr.proto.json.Json.json;
+
 public final class JsonReader {
-    private static final JSON json = JSON.std
-            .with(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS)
-            .with(JSON.Feature.PRETTY_PRINT_OUTPUT);
 
     private JsonReader() {
         throw new UnsupportedOperationException();
@@ -140,6 +140,18 @@ public final class JsonReader {
         }
     }
 
+    public static Metadata fromJsonMetadata(String json) {
+        return fromJson(json, Metadata.newBuilder());
+    }
+
+    public static Metadata fromJson(String val, Metadata.Builder metadata) {
+        try {
+            return metadataFromMap(json.mapFrom(val), metadata);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static CountResult countFromMap(Map<String, Object> map, CountResult.Builder count) {
         return count
                 .setCount(Long.parseLong(String.valueOf(map.get("count"))))
@@ -160,6 +172,22 @@ public final class JsonReader {
                 .addAllTags(tagsFromList(tags))
                 .setContent(String.valueOf(map.get("content")))
                 .setSig(ByteString.fromHex(String.valueOf(map.get("sig"))))
+                .build();
+    }
+
+
+    private static Metadata metadataFromMap(Map<String, Object> map, Metadata.Builder metadata) {
+        return metadata
+                .name(Optional.ofNullable(map.get("name"))
+                        .map(String::valueOf)
+                        .orElse(null))
+                .about(Optional.ofNullable(map.get("about"))
+                        .map(String::valueOf)
+                        .orElse(null))
+                .picture(Optional.ofNullable(map.get("picture"))
+                        .map(String::valueOf)
+                        .map(URI::create)
+                        .orElse(null))
                 .build();
     }
 

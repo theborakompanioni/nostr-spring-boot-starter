@@ -1,10 +1,10 @@
 package org.tbk.nostr.proto.json;
 
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONComposer;
 import com.fasterxml.jackson.jr.ob.comp.ArrayComposer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.*;
 
 import java.io.IOException;
@@ -12,15 +12,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.tbk.nostr.proto.json.Json.json;
+import static org.tbk.nostr.proto.json.Json.jsonForSigning;
+
 public final class JsonWriter {
-
-    private static final JSON json = JSON.std
-            .with(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS)
-            .with(JSON.Feature.PRETTY_PRINT_OUTPUT);
-
-    private static final JSON jsonForSigning = JSON.std
-            .with(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS)
-            .without(JSON.Feature.PRETTY_PRINT_OUTPUT);
 
     private JsonWriter() {
         throw new UnsupportedOperationException();
@@ -71,6 +66,22 @@ public final class JsonWriter {
     public static String toJson(CountRequest val) {
         return toJsonWithSubscriptionIdAndFilter("COUNT", val.getId(), val.getFiltersList());
     }
+
+    public static String toJson(Metadata val) {
+        try {
+            return json
+                    .composeString()
+                    .startObject()
+                    .put("name", val.getName())
+                    .put("about", val.getAbout())
+                    .put("picture", val.getPicture().toString())
+                    .end()
+                    .finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private static String toJsonWithSubscriptionIdAndFilter(String cmd, String subscriptionId, List<Filter> filters) {
         try {

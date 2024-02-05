@@ -2,13 +2,15 @@ package org.tbk.nostr.proto.json;
 
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Test;
+import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.*;
 
+import java.net.URI;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class JsonReaderTest {
 
@@ -232,5 +234,78 @@ class JsonReaderTest {
         assertThat(count.getSubscriptionId(), is("subscription_id"));
         assertThat(count.getResult().getCount(), is(42L));
         assertThat(count.getResult().getApproximate(), is(true));
+    }
+
+    @Test
+    void itShouldParseMetadata0() {
+        Metadata metadata = JsonReader.fromJsonMetadata("""
+                {
+                  "name": "name",
+                  "about": "about",
+                  "picture": "https://www.example.com/example.png"
+                }
+                """);
+
+        assertThat(metadata, is(notNullValue()));
+        assertThat(metadata.getName(), is("name"));
+        assertThat(metadata.getAbout(), is("about"));
+        assertThat(metadata.getPicture(), is(URI.create("https://www.example.com/example.png")));
+    }
+
+    @Test
+    void itShouldParseMetadata1() {
+        Metadata metadata0 = JsonReader.fromJsonMetadata("{}");
+
+        assertThat(metadata0, is(notNullValue()));
+        assertThat(metadata0.getName(), is(nullValue()));
+        assertThat(metadata0.getAbout(), is(nullValue()));
+        assertThat(metadata0.getPicture(), is(nullValue()));
+
+        Metadata metadata1 = JsonReader.fromJsonMetadata("""
+                {
+                  "name": "name"
+                }
+                """);
+
+        assertThat(metadata1, is(notNullValue()));
+        assertThat(metadata1.getName(), is("name"));
+        assertThat(metadata1.getAbout(), is(nullValue()));
+        assertThat(metadata1.getPicture(), is(nullValue()));
+
+
+        Metadata metadata2 = JsonReader.fromJsonMetadata("""
+                {
+                  "about": "about"
+                }
+                """);
+
+        assertThat(metadata2, is(notNullValue()));
+        assertThat(metadata2.getName(), is(nullValue()));
+        assertThat(metadata2.getAbout(), is("about"));
+        assertThat(metadata2.getPicture(), is(nullValue()));
+
+
+        Metadata metadata3 = JsonReader.fromJsonMetadata("""
+                {
+                  "picture": "https://www.example.com/example.png"
+                }
+                """);
+
+        assertThat(metadata3, is(notNullValue()));
+        assertThat(metadata3.getName(), is(nullValue()));
+        assertThat(metadata3.getAbout(), is(nullValue()));
+        assertThat(metadata3.getPicture(), is(URI.create("https://www.example.com/example.png")));
+    }
+
+
+    @Test
+    void itShouldParseMetadata2FailOnInvalidPictureUri() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            JsonReader.fromJsonMetadata("""
+                    {
+                      "picture": "not a valid uri"
+                    }
+                    """);
+        });
     }
 }

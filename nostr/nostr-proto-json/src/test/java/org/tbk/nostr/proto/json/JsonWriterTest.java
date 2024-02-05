@@ -4,12 +4,14 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.PrivateKey;
 import org.junit.jupiter.api.Test;
+import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
 import java.io.IOException;
+import java.net.URI;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -289,6 +291,25 @@ class JsonWriterTest {
                   "#e": ["e0", "e1", "e2"],
                   "#p": ["p0", "p1", "p2"],
                   "#Z": ["Z0", "Z1", "Z3"]
+                }
+                """)));
+    }
+
+    @Test
+    void itShouldWriteMetadata0() throws IOException {
+        Metadata metadata = Metadata.newBuilder()
+                .name("name")
+                .about("about")
+                .picture(URI.create("https://www.example.com/example.png"))
+                .build();
+
+        String json = JsonWriter.toJson(metadata);
+
+        assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
+                {
+                  "name": "name",
+                  "about": "about",
+                  "picture": "https://www.example.com/example.png"
                 }
                 """)));
     }
