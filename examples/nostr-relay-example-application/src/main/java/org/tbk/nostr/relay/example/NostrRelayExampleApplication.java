@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.util.MoreEvents;
@@ -51,7 +52,7 @@ public class NostrRelayExampleApplication {
             Event bootingEvent = MoreEvents.createFinalizedTextMessage(signer, "Booting...");
             eventEntityService.createEvent(bootingEvent);
 
-            Event bootedEvent = MoreEvents.finalize(signer, MoreEvents.createTextMessage(signer, "Booted.")
+            Event bootedEvent = MoreEvents.finalize(signer, Nip1.createTextMessage(signer.getPublicKey(), "Booted.")
                     .addTags(MoreTags.e(EventId.of(bootingEvent.getId().toByteArray())))
             );
             eventEntityService.createEvent(bootedEvent);

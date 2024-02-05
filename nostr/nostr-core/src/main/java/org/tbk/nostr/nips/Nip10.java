@@ -26,20 +26,16 @@ public final class Nip10 {
 
         final String value;
 
-        public TagValue tag(EventId eventId, @Nullable RelayUri recommendedRelay) {
-            if (recommendedRelay == null) {
-                return this.tag(eventId);
-            }
-            return MoreTags.e(eventId, recommendedRelay).toBuilder()
-                    .addValues(this.value)
-                    .build();
+        public TagValue tag(EventId eventId) {
+            return tag(eventId, null);
         }
 
-        public TagValue tag(EventId eventId) {
-            return MoreTags.e(eventId).toBuilder()
-                    .addValues("")
-                    .addValues(this.value)
-                    .build();
+        public TagValue tag(EventId eventId, @Nullable RelayUri recommendedRelay) {
+            if (recommendedRelay == null) {
+                return MoreTags.e(eventId.toHex(), "", this.value);
+            } else {
+                return MoreTags.e(eventId.toHex(), recommendedRelay.getUri().toString(), this.value);
+            }
         }
     }
 }

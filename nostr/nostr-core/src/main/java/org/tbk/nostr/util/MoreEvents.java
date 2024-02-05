@@ -7,6 +7,7 @@ import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.identity.Signer;
+import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.json.JsonWriter;
 
@@ -70,23 +71,7 @@ public final class MoreEvents {
         return event;
     }
 
-    public static Event.Builder createTextMessage(Signer signer, String content) {
-        return createTextMessage(signer.getPublicKey(), content);
-    }
-
-    public static Event.Builder createTextMessage(XonlyPublicKey publicKey, String content) {
-        return MoreEvents.withEventId(Event.newBuilder()
-                .setCreatedAt(Instant.now().getEpochSecond())
-                .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
-                .setKind(1)
-                .setContent(content));
-    }
-
     public static Event createFinalizedTextMessage(Signer signer, String content) {
-        return finalize(signer, Event.newBuilder()
-                .setCreatedAt(Instant.now().getEpochSecond())
-                .setPubkey(ByteString.fromHex(signer.getPublicKey().value.toHex()))
-                .setKind(1)
-                .setContent(content));
+        return finalize(signer, Nip1.createTextMessage(signer.getPublicKey(), content));
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.json.JsonReader;
 
@@ -122,7 +123,7 @@ class MoreEventsTest {
 
     @Test
     void itShouldVerifyGeneratedEvent0() {
-        Event event = MoreEvents.finalize(testSigner, MoreEvents.createTextMessage(testSigner.getPublicKey(), "GM"));
+        Event event = MoreEvents.finalize(testSigner, Nip1.createTextMessage(testSigner.getPublicKey(), "GM"));
         Event verifiedEvent = MoreEvents.verify(event);
         assertThat(verifiedEvent, is(notNullValue()));
     }

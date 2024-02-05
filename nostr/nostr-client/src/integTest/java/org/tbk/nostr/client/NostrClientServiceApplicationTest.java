@@ -42,7 +42,7 @@ class NostrClientServiceApplicationTest {
     void itShouldPublishNoteSuccessfully() {
         Signer signer = SimpleSigner.random();
 
-        Event event = signer.sign(MoreEvents.createTextMessage(signer.getPublicKey(), "GM")).build();
+        Event event = MoreEvents.createFinalizedTextMessage(signer, "GM");
 
         sut.send(event).block(Duration.ofSeconds(5));
     }
@@ -51,7 +51,7 @@ class NostrClientServiceApplicationTest {
     void itShouldPublishNoteAndRetrieveSuccessfully() {
         Signer signer = SimpleSigner.random();
 
-        Event event = signer.sign(MoreEvents.createTextMessage(signer.getPublicKey(), "GM")).build();
+        Event event = MoreEvents.createFinalizedTextMessage(signer, "GM");
 
         sut.send(event).block(Duration.ofSeconds(5));
 
