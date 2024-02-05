@@ -1,6 +1,7 @@
 package org.tbk.nostr.template;
 
 import com.google.protobuf.ByteString;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -136,6 +137,27 @@ class NostrTemplateApplicationTest {
     }
 
     @Test
+    void itShouldSendMultipleEventsSuccessfully0() {
+        Signer signer0 = SimpleSigner.random();
+        Signer signer1 = SimpleSigner.random();
+
+        Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
+        Event event1 = MoreEvents.createFinalizedTextNote(signer1, "GN");
+
+        Set<Event> events = Set.of(event0, event1);
+        List<OkResponse> oks = sut.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks, hasSize(events.size()));
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(true));
+            assertThat(ok.getEventId(), either(is(event0.getId())).or(is(event1.getId())));
+        }
+    }
+
+    @Test
     void itShouldFetchMultipleEventsByIdsSuccessfully0() {
         Signer signer0 = SimpleSigner.random();
         Signer signer1 = SimpleSigner.random();
@@ -143,21 +165,26 @@ class NostrTemplateApplicationTest {
         Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
         Event event1 = MoreEvents.createFinalizedTextNote(signer1, "GN");
 
-        OkResponse ok0 = sut.send(event0).block(Duration.ofSeconds(5));
-        assertThat(ok0, is(notNullValue()));
-        assertThat(ok0.getSuccess(), is(true));
+        Set<Event> events = Set.of(event0, event1);
+        List<OkResponse> oks = sut.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
 
-        OkResponse ok1 = sut.send(event1).block(Duration.ofSeconds(5));
-        assertThat(ok1, is(notNullValue()));
-        assertThat(ok1.getSuccess(), is(true));
+        assertThat(oks, hasSize(events.size()));
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(true));
+        }
 
-        List<EventId> eventIds = Stream.of(ok0, ok1).map(OkResponse::getEventId)
+        List<EventId> eventIds = oks.stream()
+                .map(OkResponse::getEventId)
                 .map(it -> EventId.of(it.toByteArray()))
                 .toList();
 
         List<Event> fetchedEvents = sut.fetchEventsByIds(eventIds)
                 .collectList()
                 .block(Duration.ofSeconds(5));
+
         assertThat(fetchedEvents, is(notNullValue()));
         assertThat(fetchedEvents, hasSize(eventIds.size()));
         assertThat(fetchedEvents, hasItem(event0));
@@ -172,15 +199,19 @@ class NostrTemplateApplicationTest {
         Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
         Event event1 = MoreEvents.createFinalizedTextNote(signer1, "GN");
 
-        OkResponse ok0 = sut.send(event0).block(Duration.ofSeconds(5));
-        assertThat(ok0, is(notNullValue()));
-        assertThat(ok0.getSuccess(), is(true));
+        Set<Event> events = Set.of(event0, event1);
+        List<OkResponse> oks = sut.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
 
-        OkResponse ok1 = sut.send(event1).block(Duration.ofSeconds(5));
-        assertThat(ok1, is(notNullValue()));
-        assertThat(ok1.getSuccess(), is(true));
+        assertThat(oks, hasSize(events.size()));
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(true));
+        }
 
-        List<EventId> eventIds = Stream.of(ok0, ok1).map(OkResponse::getEventId)
+        List<EventId> eventIds = oks.stream()
+                .map(OkResponse::getEventId)
                 .map(it -> EventId.of(it.toByteArray()))
                 .toList();
 
@@ -278,12 +309,6 @@ class NostrTemplateApplicationTest {
                 .picture(URI.create("https://www.example.com/example.png"))
                 .build();
 
-        Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata0);
-
-        OkResponse ok0 = sut.send(event0).block(Duration.ofSeconds(5));
-        assertThat(ok0, is(notNullValue()));
-        assertThat(ok0.getSuccess(), is(true));
-
         Metadata metadata1 = Metadata.newBuilder()
                 .name("name1")
                 .about("about1")
@@ -292,14 +317,23 @@ class NostrTemplateApplicationTest {
 
         assertThat("sanity check", metadata1, not(is(metadata0)));
 
+
+        Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata0);
         Event event1 = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata1)
-                // some relays reject events as duplicate if kind/created_at of same pubkey.. so lame -_-
+                // some relays reject events as duplicate if kind/created_at of same pubkey... so lame -_-
                 .setCreatedAt(event0.getCreatedAt() + 1)
         );
 
-        OkResponse ok1 = sut.send(event1).block(Duration.ofSeconds(5));
-        assertThat(ok1, is(notNullValue()));
-        assertThat(ok1.getSuccess(), is(true));
+        Set<Event> events = Set.of(event0, event1);
+        List<OkResponse> oks = sut.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks, hasSize(events.size()));
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(true));
+        }
 
         Metadata fetchedMetadata = sut.fetchMetadataByAuthor(signer.getPublicKey())
                 .blockOptional(Duration.ofSeconds(5))

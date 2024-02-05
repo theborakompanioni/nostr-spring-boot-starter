@@ -7,18 +7,21 @@ import org.tbk.nostr.proto.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface NostrTemplate {
     Mono<OkResponse> send(Event event);
 
+    Flux<OkResponse> send(Collection<Event> events);
+
     Mono<Event> fetchEventById(EventId id);
 
-    Flux<Event> fetchEventsByIds(List<EventId> ids);
+    Flux<Event> fetchEventsByIds(Collection<EventId> ids);
 
     Flux<Event> fetchEventByAuthor(XonlyPublicKey publicKey);
 
-    Flux<Event> fetchEventsByAuthors(List<XonlyPublicKey> publicKeys);
+    Flux<Event> fetchEventsByAuthors(Collection<XonlyPublicKey> publicKeys);
 
     Mono<Metadata> fetchMetadataByAuthor(XonlyPublicKey publicKey);
 

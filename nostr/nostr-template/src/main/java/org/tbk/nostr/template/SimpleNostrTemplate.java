@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -52,7 +53,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     @Override
-    public Flux<Event> fetchEventsByIds(List<EventId> ids) {
+    public Flux<Event> fetchEventsByIds(Collection<EventId> ids) {
         if (ids.isEmpty()) {
             return Flux.empty();
         }
@@ -77,7 +78,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     @Override
-    public Flux<Event> fetchEventsByAuthors(List<XonlyPublicKey> publicKeys) {
+    public Flux<Event> fetchEventsByAuthors(Collection<XonlyPublicKey> publicKeys) {
         if (publicKeys.isEmpty()) {
             return Flux.empty();
         }
@@ -255,14 +256,28 @@ public class SimpleNostrTemplate implements NostrTemplate {
 
     @Override
     public Mono<OkResponse> send(Event event) {
+        return send(Collections.singleton(event)).next();
+    }
+
+    @Override
+    public Flux<OkResponse> send(Collection<Event> eventList) {
         AtomicReference<WebSocketSession> sessionRef = new AtomicReference<>();
 
-        return Mono.<OkResponse>create(sink -> {
+        return Flux.<OkResponse>create(sink -> {
+            Set<Event> events = Set.copyOf(eventList);
+
+            Set<ByteString> eventIds = events.stream()
+                    .map(Event::getId)
+                    .collect(Collectors.toSet());
+
+            int eventCount = eventIds.size();
+            ConcurrentHashMap<ByteString, OkResponse> received = new ConcurrentHashMap<>();
+
             try {
                 sessionRef.set(webSocketClient.execute(new TextWebSocketHandler() {
                     @Override
                     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-                        sink.success();
+                        sink.complete();
                     }
 
                     @Override
@@ -273,8 +288,12 @@ public class SimpleNostrTemplate implements NostrTemplate {
                             Response response = JsonReader.fromJsonResponse(message.getPayload());
                             if (response.getKindCase() == Response.KindCase.OK) {
                                 OkResponse ok = response.getOk();
-                                if (Arrays.equals(event.getId().toByteArray(), ok.getEventId().toByteArray())) {
-                                    sink.success(ok);
+                                if (eventIds.contains(ok.getEventId())) {
+                                    received.put(ok.getEventId(), ok);
+                                    sink.next(ok);
+                                    if (received.size() == eventCount) {
+                                        sink.complete();
+                                    }
                                 }
                             }
                         } catch (Exception e) {
@@ -284,14 +303,16 @@ public class SimpleNostrTemplate implements NostrTemplate {
                     }
                 }, headers, relay.getUri()).get());
 
-                EventRequest req = EventRequest.newBuilder()
-                        .setEvent(event)
-                        .build();
+                for (Event event : events) {
+                    EventRequest req = EventRequest.newBuilder()
+                            .setEvent(event)
+                            .build();
 
-                TextMessage message = new TextMessage(JsonWriter.toJson(req));
+                    TextMessage message = new TextMessage(JsonWriter.toJson(req));
 
-                log.debug("Sending message: {}", message.getPayload());
-                sessionRef.get().sendMessage(message);
+                    log.debug("Sending message: {}", message.getPayload());
+                    sessionRef.get().sendMessage(message);
+                }
             } catch (InterruptedException | ExecutionException | IOException e) {
                 sink.error(e);
             }
