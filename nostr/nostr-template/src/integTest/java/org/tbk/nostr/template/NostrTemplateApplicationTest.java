@@ -8,16 +8,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.util.MoreSubscriptionIds;
+import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.util.MoreEvents;
+import org.tbk.nostr.util.MoreSubscriptionIds;
 import org.tbk.nostr.util.MoreTags;
 
+import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -232,5 +236,75 @@ class NostrTemplateApplicationTest {
 
         assertThat(countAfter, is(notNullValue()));
         assertThat(countAfter.getCount(), is(2L));
+    }
+
+    @Test
+    void itShouldFetchMetadataEventSuccessfully0() {
+        Signer signer = SimpleSigner.random();
+
+        Optional<Metadata> metadataOrEmpty = sut.fetchMetadataByAuthor(signer.getPublicKey()).blockOptional(Duration.ofSeconds(5));
+        assertThat(metadataOrEmpty, is(Optional.empty()));
+    }
+
+    @Test
+    void itShouldFetchMetadataEventSuccessfully1() {
+        Signer signer = SimpleSigner.random();
+
+        Metadata metadata = Metadata.newBuilder()
+                .name("name")
+                .about("about")
+                .picture(URI.create("https://www.example.com/example.png"))
+                .build();
+        Event event = MoreEvents.createFinalizedMetadata(signer, metadata);
+
+        OkResponse ok = sut.send(event).block(Duration.ofSeconds(5));
+        assertThat(ok, is(notNullValue()));
+        assertThat(ok.getSuccess(), is(true));
+
+        Metadata fetchedMetadata = sut.fetchMetadataByAuthor(signer.getPublicKey())
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedMetadata, is(metadata));
+    }
+
+    @Test
+    void itShouldFetchMetadataEventSuccessfully2OnlyLatestMetadata() {
+        Signer signer = SimpleSigner.random();
+
+        Metadata metadata0 = Metadata.newBuilder()
+                .name("name")
+                .about("about")
+                .picture(URI.create("https://www.example.com/example.png"))
+                .build();
+
+        Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata0);
+
+        OkResponse ok0 = sut.send(event0).block(Duration.ofSeconds(5));
+        assertThat(ok0, is(notNullValue()));
+        assertThat(ok0.getSuccess(), is(true));
+
+        Metadata metadata1 = Metadata.newBuilder()
+                .name("name1")
+                .about("about1")
+                .picture(URI.create("https://www.example.com/example1.png"))
+                .build();
+
+        assertThat("sanity check", metadata1, not(is(metadata0)));
+
+        Event event1 = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata1)
+                // some relays reject events as duplicate if kind/created_at of same pubkey.. so lame -_-
+                .setCreatedAt(event0.getCreatedAt() + 1)
+        );
+
+        OkResponse ok1 = sut.send(event1).block(Duration.ofSeconds(5));
+        assertThat(ok1, is(notNullValue()));
+        assertThat(ok1.getSuccess(), is(true));
+
+        Metadata fetchedMetadata = sut.fetchMetadataByAuthor(signer.getPublicKey())
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedMetadata, is(metadata1));
     }
 }

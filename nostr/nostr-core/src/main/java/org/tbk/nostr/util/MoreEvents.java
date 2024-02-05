@@ -6,6 +6,7 @@ import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
@@ -73,5 +74,9 @@ public final class MoreEvents {
 
     public static Event createFinalizedTextNote(Signer signer, String content) {
         return finalize(signer, Nip1.createTextNote(signer.getPublicKey(), content));
+    }
+
+    public static Event createFinalizedMetadata(Signer signer, Metadata metadata) {
+        return finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata));
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.proto.*;
@@ -96,6 +97,25 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     @Override
+    public Mono<Metadata> fetchMetadataByAuthor(XonlyPublicKey publicKey) {
+        Set<ByteString> idsAsBytes = Set.of(publicKey).stream()
+                .map(it -> ByteString.fromHex(publicKey.value.toHex()))
+                .collect(Collectors.toSet());
+
+        SubscriptionId subscriptionId = createUniqueSubscriptionId(idsAsBytes);
+
+        return fetchEvents(ReqRequest.newBuilder()
+                .setId(subscriptionId.getId())
+                .addFilters(Filter.newBuilder()
+                        .addKinds(0)
+                        .addAllAuthors(idsAsBytes)
+                        .build())
+                .build())
+                .map(it -> JsonReader.fromJsonMetadata(it.getContent()))
+                .next();
+    }
+
+    @Override
     public Flux<Event> fetchEvents(ReqRequest request) {
         AtomicReference<WebSocketSession> sessionRef = new AtomicReference<>();
         return Flux.<Event>create(sink -> {
@@ -105,13 +125,14 @@ public class SimpleNostrTemplate implements NostrTemplate {
                     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
                         sink.complete();
                     }
+
                     @Override
                     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
                         log.debug("handleTextMessage: {}", message.getPayload());
 
                         try {
                             Response response = JsonReader.fromJsonResponse(message.getPayload());
-                            switch (response.getKindCase()){
+                            switch (response.getKindCase()) {
                                 case EVENT -> {
                                     EventResponse eventResponse = response.getEvent();
                                     if (!eventResponse.getSubscriptionId().equals(request.getId())) {
@@ -176,13 +197,14 @@ public class SimpleNostrTemplate implements NostrTemplate {
                     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
                         sink.complete();
                     }
+
                     @Override
                     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
                         log.debug("handleTextMessage: {}", message.getPayload());
 
                         try {
                             Response response = JsonReader.fromJsonResponse(message.getPayload());
-                            switch (response.getKindCase()){
+                            switch (response.getKindCase()) {
                                 case COUNT -> {
                                     CountResponse countResponse = response.getCount();
                                     if (!countResponse.getSubscriptionId().equals(request.getId())) {

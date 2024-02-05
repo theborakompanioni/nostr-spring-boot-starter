@@ -2,12 +2,14 @@ package org.tbk.nostr.util;
 
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Test;
+import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.json.JsonReader;
 
+import java.net.URI;
 import java.util.HexFormat;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -129,6 +131,17 @@ class MoreEventsTest {
     @Test
     void itShouldVerifyGeneratedEvent1() {
         Event event = MoreEvents.createFinalizedTextNote(testSigner, "GM");
+        Event verifiedEvent = MoreEvents.verify(event);
+        assertThat(verifiedEvent, is(notNullValue()));
+    }
+
+    @Test
+    void itShouldVerifyGeneratedMetadata0() {
+        Event event = MoreEvents.createFinalizedMetadata(testSigner, Metadata.newBuilder()
+                .name("name")
+                .about("about")
+                .picture(URI.create("https://www.example.com/example.png"))
+                .build());
         Event verifiedEvent = MoreEvents.verify(event);
         assertThat(verifiedEvent, is(notNullValue()));
     }
