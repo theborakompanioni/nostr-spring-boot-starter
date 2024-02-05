@@ -70,6 +70,10 @@ public final class MoreEvents {
         return event;
     }
 
+    public static Event.Builder createTextMessage(Signer signer, String content) {
+        return createTextMessage(signer.getPublicKey(), content);
+    }
+
     public static Event.Builder createTextMessage(XonlyPublicKey publicKey, String content) {
         return MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())

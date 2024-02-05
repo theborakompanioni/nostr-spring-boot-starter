@@ -10,6 +10,9 @@ import static java.util.Objects.requireNonNull;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 public final class RelayUri {
+    public static RelayUri of(String uri) {
+        return of(URI.create(uri));
+    }
 
     public static RelayUri of(URI uri) {
         return new RelayUri(uri);
