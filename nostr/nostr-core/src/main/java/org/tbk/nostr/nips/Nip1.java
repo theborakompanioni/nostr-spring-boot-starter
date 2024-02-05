@@ -15,7 +15,7 @@ public final class Nip1 {
         throw new UnsupportedOperationException();
     }
 
-    public static Event.Builder createTextMessage(XonlyPublicKey publicKey, String content) {
+    public static Event.Builder createTextNote(XonlyPublicKey publicKey, String content) {
         return MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())
                 .setPubkey(ByteString.fromHex(publicKey.value.toHex()))

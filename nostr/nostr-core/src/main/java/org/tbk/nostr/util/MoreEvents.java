@@ -71,7 +71,7 @@ public final class MoreEvents {
         return event;
     }
 
-    public static Event createFinalizedTextMessage(Signer signer, String content) {
-        return finalize(signer, Nip1.createTextMessage(signer.getPublicKey(), content));
+    public static Event createFinalizedTextNote(Signer signer, String content) {
+        return finalize(signer, Nip1.createTextNote(signer.getPublicKey(), content));
     }
 }

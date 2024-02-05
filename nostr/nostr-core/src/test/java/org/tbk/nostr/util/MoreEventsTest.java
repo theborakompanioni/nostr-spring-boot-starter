@@ -1,9 +1,7 @@
 package org.tbk.nostr.util;
 
 import com.google.protobuf.ByteString;
-import fr.acinq.bitcoin.*;
 import org.junit.jupiter.api.Test;
-import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
@@ -123,14 +121,14 @@ class MoreEventsTest {
 
     @Test
     void itShouldVerifyGeneratedEvent0() {
-        Event event = MoreEvents.finalize(testSigner, Nip1.createTextMessage(testSigner.getPublicKey(), "GM"));
+        Event event = MoreEvents.finalize(testSigner, Nip1.createTextNote(testSigner.getPublicKey(), "GM"));
         Event verifiedEvent = MoreEvents.verify(event);
         assertThat(verifiedEvent, is(notNullValue()));
     }
 
     @Test
     void itShouldVerifyGeneratedEvent1() {
-        Event event = MoreEvents.createFinalizedTextMessage(testSigner, "GM");
+        Event event = MoreEvents.createFinalizedTextNote(testSigner, "GM");
         Event verifiedEvent = MoreEvents.verify(event);
         assertThat(verifiedEvent, is(notNullValue()));
     }

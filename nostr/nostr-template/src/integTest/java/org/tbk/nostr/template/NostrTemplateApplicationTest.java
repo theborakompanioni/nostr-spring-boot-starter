@@ -43,7 +43,7 @@ class NostrTemplateApplicationTest {
     void itShouldPublishSimpleEventSuccessfully0() {
         Signer signer = SimpleSigner.random();
 
-        Event event = MoreEvents.createFinalizedTextMessage(signer, "GM");
+        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
 
         OkResponse ok = sut.send(event).block(Duration.ofSeconds(5));
         assertThat(ok, is(notNullValue()));
@@ -136,8 +136,8 @@ class NostrTemplateApplicationTest {
         Signer signer0 = SimpleSigner.random();
         Signer signer1 = SimpleSigner.random();
 
-        Event event0 = MoreEvents.createFinalizedTextMessage(signer0, "GM");
-        Event event1 = MoreEvents.createFinalizedTextMessage(signer1, "GN");
+        Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
+        Event event1 = MoreEvents.createFinalizedTextNote(signer1, "GN");
 
         OkResponse ok0 = sut.send(event0).block(Duration.ofSeconds(5));
         assertThat(ok0, is(notNullValue()));
@@ -165,8 +165,8 @@ class NostrTemplateApplicationTest {
         Signer signer0 = SimpleSigner.random();
         Signer signer1 = SimpleSigner.random();
 
-        Event event0 = MoreEvents.createFinalizedTextMessage(signer0, "GM");
-        Event event1 = MoreEvents.createFinalizedTextMessage(signer1, "GN");
+        Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
+        Event event1 = MoreEvents.createFinalizedTextNote(signer1, "GN");
 
         OkResponse ok0 = sut.send(event0).block(Duration.ofSeconds(5));
         assertThat(ok0, is(notNullValue()));
@@ -209,8 +209,8 @@ class NostrTemplateApplicationTest {
         assertThat(countBefore, is(notNullValue()));
         assertThat(countBefore.getCount(), is(0L));
 
-        Event event0 = MoreEvents.createFinalizedTextMessage(signer0, "GM");
-        Event event1 = MoreEvents.createFinalizedTextMessage(signer1, "GN");
+        Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
+        Event event1 = MoreEvents.createFinalizedTextNote(signer1, "GN");
 
         OkResponse ok0 = sut.send(event0).block(Duration.ofSeconds(5));
         assertThat(ok0, is(notNullValue()));

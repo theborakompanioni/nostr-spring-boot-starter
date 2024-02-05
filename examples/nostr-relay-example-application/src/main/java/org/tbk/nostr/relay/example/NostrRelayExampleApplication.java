@@ -49,10 +49,10 @@ public class NostrRelayExampleApplication {
     ApplicationRunner insertApplicationStartupEvent(EventEntityService eventEntityService) {
         return args -> {
             Signer signer = SimpleSigner.random();
-            Event bootingEvent = MoreEvents.createFinalizedTextMessage(signer, "Booting...");
+            Event bootingEvent = MoreEvents.createFinalizedTextNote(signer, "Booting...");
             eventEntityService.createEvent(bootingEvent);
 
-            Event bootedEvent = MoreEvents.finalize(signer, Nip1.createTextMessage(signer.getPublicKey(), "Booted.")
+            Event bootedEvent = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "Booted.")
                     .addTags(MoreTags.e(EventId.of(bootingEvent.getId().toByteArray())))
             );
             eventEntityService.createEvent(bootedEvent);
