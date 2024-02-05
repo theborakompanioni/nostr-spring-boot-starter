@@ -1,4 +1,4 @@
-package org.tbk.nostr.base.util;
+package org.tbk.nostr.util;
 
 
 import org.tbk.nostr.base.SubscriptionId;

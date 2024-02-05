@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.base.SubscriptionId;
-import org.tbk.nostr.base.util.MoreSubscriptionIds;
+import org.tbk.nostr.util.MoreSubscriptionIds;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;

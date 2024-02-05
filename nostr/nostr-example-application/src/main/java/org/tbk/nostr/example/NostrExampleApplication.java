@@ -11,20 +11,16 @@ import org.springframework.boot.web.context.WebServerPortFileWriter;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.base.SubscriptionId;
-import org.tbk.nostr.base.util.MoreSubscriptionIds;
+import org.tbk.nostr.util.MoreSubscriptionIds;
 import org.tbk.nostr.client.NostrClientService;
-import org.tbk.nostr.client.SimpleNostrClientService;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.ReqRequest;
 
-import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @SpringBootApplication
