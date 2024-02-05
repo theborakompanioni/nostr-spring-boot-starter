@@ -19,3 +19,17 @@ logging.file.name: application.log
 logging.config: classpath:logback.xml
 logging.level.org.springframework: INFO
 #logging.level.web: DEBUG
+
+spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application.db?foreign_keys=true'
+spring.datasource.driver-class-name: org.sqlite.JDBC
+spring.datasource.hikari.pool-name: SQLitePool
+spring.datasource.hikari.connection-timeout: 30000 #maximum number of milliseconds that a client will wait for a connection
+spring.datasource.hikari.connection-test-query: 'SELECT 1'
+spring.datasource.hikari.minimum-idle: 1 #minimum number of idle connections maintained by HikariCP in a connection pool
+spring.datasource.hikari.maximum-pool-size: 1 #maximum pool size
+spring.datasource.hikari.idle-timeout: 45000 #maximum idle time for connection
+spring.datasource.hikari.max-lifetime: 60000 # maximum lifetime in milliseconds of a connection in the pool after it is closed.
+spring.datasource.hikari.auto-commit: true #default auto-commit behavior.
+
+spring.jpa.properties.hibernate.dialect: org.hibernate.community.dialect.SQLiteDialect
+spring.jpa.properties.hibernate.jdbc.time_zone: UTC

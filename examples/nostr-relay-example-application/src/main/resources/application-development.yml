@@ -12,3 +12,10 @@ logging.level.org.springframework: INFO
 logging.level.org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
 logging.level.web: DEBUG
 logging.level.org.tbk.nostr: DEBUG
+logging.level.org.tbk.nostr.relay.example.domain.event: TRACE
+
+spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application-dev.db?foreign_keys=true'
+
+spring.jpa.properties.hibernate.format_sql: true
+spring.jpa.properties.hibernate.show_sql: false
+
