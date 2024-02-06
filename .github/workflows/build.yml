@@ -52,7 +52,7 @@ jobs:
         run: ./gradlew test
 
       - name: Integration Test
-        run: ./gradlew integrationTest
+        run: ./gradlew integrationTest --no-parallel
 
       - name: Publish Candidate
         if: |
