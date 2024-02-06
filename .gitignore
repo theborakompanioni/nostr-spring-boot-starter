@@ -86,6 +86,8 @@ application.pid
 application.port
 application-management.port
 *.db
+*.db-shm
+*.db-wal
 *.tmp
 **/*-local.yml
 **/*.local.md

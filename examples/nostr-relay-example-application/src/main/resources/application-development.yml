@@ -14,7 +14,7 @@ logging.level.web: DEBUG
 logging.level.org.tbk.nostr: DEBUG
 logging.level.org.tbk.nostr.relay.example.domain.event: TRACE
 
-spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application-dev.db?foreign_keys=true'
+spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application-dev.db?foreign_keys=true&journal_mode=WAL&synchronous=OFF&temp_store=MEMORY&page_size=32768&mmap_size=30000000000'
 
 spring.jpa.properties.hibernate.format_sql: true
 spring.jpa.properties.hibernate.show_sql: false
