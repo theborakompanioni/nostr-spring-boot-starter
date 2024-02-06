@@ -6,8 +6,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@ConditionalOnWebApplication
 @EnableWebMvc
+@ConditionalOnWebApplication
 @Configuration(proxyBeanMethods = false)
 class NostrRelayExampleWebMvcConfigurer implements WebMvcConfigurer {
 

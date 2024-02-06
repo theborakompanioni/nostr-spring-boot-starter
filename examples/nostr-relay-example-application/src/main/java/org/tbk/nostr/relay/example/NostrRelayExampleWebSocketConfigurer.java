@@ -11,8 +11,8 @@ import org.springframework.web.socket.handler.LoggingWebSocketHandlerDecorator;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketHandler;
 
-@ConditionalOnWebApplication
 @EnableWebSocket
+@ConditionalOnWebApplication
 @Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
 class NostrRelayExampleWebSocketConfigurer implements WebSocketConfigurer {

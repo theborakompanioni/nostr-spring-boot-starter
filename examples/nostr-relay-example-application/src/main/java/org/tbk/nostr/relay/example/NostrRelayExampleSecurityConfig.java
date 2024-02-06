@@ -2,6 +2,7 @@ package org.tbk.nostr.relay.example;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 
 @Slf4j
 @EnableWebSecurity
+@ConditionalOnWebApplication
 @Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
 class NostrRelayExampleSecurityConfig implements WebSecurityCustomizer {
