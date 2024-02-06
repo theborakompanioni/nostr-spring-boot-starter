@@ -6,7 +6,7 @@ WIP
 ## Run
 
 ```shell
-./gradlew -p examples/nostr-relay-example-application bootRun
+./gradlew -p examples/nostr-relay-example-application bootRun --args="--server.port=7000 --debug"
 ```
 
 ## Resources

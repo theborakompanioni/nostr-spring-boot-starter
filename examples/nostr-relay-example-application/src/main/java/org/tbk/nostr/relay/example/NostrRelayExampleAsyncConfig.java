@@ -10,7 +10,7 @@ import java.util.concurrent.Executor;
 
 @EnableAsync
 @Configuration(proxyBeanMethods = false)
-class NostrRelayExampleApplicationAsyncConfig implements AsyncConfigurer {
+class NostrRelayExampleAsyncConfig implements AsyncConfigurer {
 
     @Override
     public Executor getAsyncExecutor() {
