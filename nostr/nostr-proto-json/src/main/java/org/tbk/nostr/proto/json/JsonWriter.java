@@ -22,7 +22,7 @@ public final class JsonWriter {
         return JsonRequestWriter.toJson(val);
     }
 
-    public static String toJsonForSigning(Event.Builder event) {
+    public static String toJsonForSigning(EventOrBuilder event) {
         return JsonRequestWriter.toJsonForSigning(event);
     }
 

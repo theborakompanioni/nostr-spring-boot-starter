@@ -98,7 +98,7 @@ public class NostrSpecificationTest {
 
         assertThat(ok.getEventId(), is(invalidEvent.getId()));
         assertThat(ok.getSuccess(), is(false));
-        assertThat(ok.getMessage(), is("Error: Invalid signature."));
+        assertThat(ok.getMessage(), is("Error: Invalid id."));
     }
 
     @Test

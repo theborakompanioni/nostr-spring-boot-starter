@@ -1,6 +1,7 @@
 package org.tbk.nostr.util;
 
 import com.google.protobuf.ByteString;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
@@ -13,8 +14,7 @@ import java.net.URI;
 import java.util.HexFormat;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 class MoreEventsTest {
     private static final Signer testSigner = SimpleSigner.fromPrivateKeyHex("958c7ed568943914f3763e1034883710d8d33eb2ad20b41b0db7babff50a238e");
@@ -133,6 +133,164 @@ class MoreEventsTest {
         Event event = MoreEvents.createFinalizedTextNote(testSigner, "GM");
         Event verifiedEvent = MoreEvents.verify(event);
         assertThat(verifiedEvent, is(notNullValue()));
+    }
+
+    @Test
+    void itShouldFailVerifyInvalidEvent0Id() {
+        Event verifiedEvent = MoreEvents.verify(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent), is(true));
+
+        Event invalidEvent = verifiedEvent.toBuilder()
+                .setId(ByteString.fromHex("00".repeat(32)))
+                .build();
+
+        assertThat(MoreEvents.isValid(invalidEvent), is(false));
+
+        try {
+            MoreEvents.verify(invalidEvent);
+            Assertions.fail("Should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Invalid id."));
+        }
+    }
+
+    @Test
+    void itShouldFailVerifyInvalidEvent1CreatedAt() {
+        Event verifiedEvent = MoreEvents.verify(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent), is(true));
+
+        Event invalidEvent = verifiedEvent.toBuilder()
+                .setCreatedAt(verifiedEvent.getCreatedAt() + 1)
+                .build();
+
+        assertThat(MoreEvents.isValid(invalidEvent), is(false));
+
+        try {
+            MoreEvents.verify(invalidEvent);
+            Assertions.fail("Should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Invalid id."));
+        }
+    }
+
+    @Test
+    void itShouldFailVerifyInvalidEvent2Kind() {
+        Event verifiedEvent = MoreEvents.verify(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent), is(true));
+
+        Event invalidEvent = verifiedEvent.toBuilder()
+                .setKind(verifiedEvent.getKind() + 1)
+                .build();
+
+        assertThat(MoreEvents.isValid(invalidEvent), is(false));
+
+        try {
+            MoreEvents.verify(invalidEvent);
+            Assertions.fail("Should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Invalid id."));
+        }
+    }
+
+    @Test
+    void itShouldFailVerifyInvalidEvent3Content() {
+        Event verifiedEvent = MoreEvents.verify(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent), is(true));
+
+        Event invalidEvent = verifiedEvent.toBuilder()
+                .setContent(verifiedEvent.getContent() + "!")
+                .build();
+
+        assertThat(MoreEvents.isValid(invalidEvent), is(false));
+
+        try {
+            MoreEvents.verify(invalidEvent);
+            Assertions.fail("Should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Invalid id."));
+        }
+    }
+
+    @Test
+    void itShouldFailVerifyInvalidEvent4Tags() {
+        Event verifiedEvent = MoreEvents.verify(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent), is(true));
+
+        Event invalidEvent = verifiedEvent.toBuilder()
+                .addTags(MoreTags.e(verifiedEvent))
+                .build();
+
+        assertThat(MoreEvents.isValid(invalidEvent), is(false));
+
+        try {
+            MoreEvents.verify(invalidEvent);
+            Assertions.fail("Should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Invalid id."));
+        }
+    }
+
+    @Test
+    void itShouldFailVerifyInvalidEvent5DifferentPubkey() {
+        Event verifiedEvent0 = MoreEvents.verify(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent0), is(true));
+
+        Event invalidEvent = verifiedEvent0.toBuilder()
+                .setPubkey(ByteString.fromHex(SimpleSigner.random().getPublicKey().value.toHex()))
+                .build();
+
+        assertThat(MoreEvents.isValid(invalidEvent), is(false));
+
+        try {
+            MoreEvents.verify(invalidEvent);
+            Assertions.fail("Should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Invalid id."));
+        }
+    }
+
+    @Test
+    void itShouldFailVerifyInvalidEvent6InvalidPubkey() {
+        Event verifiedEvent = MoreEvents.verify(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent), is(true));
+
+        Event invalidEvent = verifiedEvent.toBuilder()
+                .setPubkey(ByteString.fromHex("00".repeat(32)))
+                .build();
+
+        assertThat(MoreEvents.isValid(invalidEvent), is(false));
+
+        try {
+            MoreEvents.verify(invalidEvent);
+            Assertions.fail("Should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Invalid public key."));
+        }
+    }
+
+    @Test
+    void itShouldFailVerifyInvalidEvent7InvalidSig() {
+        Event verifiedEvent0 = MoreEvents.verify(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent0), is(true));
+
+        Event verifiedEvent1 = MoreEvents.verify(MoreEvents.createFinalizedTextNote(testSigner, verifiedEvent0.getContent() + "!"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent1), is(true));
+
+        assertThat("sanity check - id differs", verifiedEvent1.getId(), not(is(verifiedEvent0.getId())));
+        assertThat("sanity check - sig differs", verifiedEvent1.getSig(), not(is(verifiedEvent0.getSig())));
+
+        Event invalidEvent = verifiedEvent1.toBuilder()
+                .setSig(verifiedEvent0.getSig())
+                .build();
+
+        assertThat(MoreEvents.isValid(invalidEvent), is(false));
+
+        try {
+            MoreEvents.verify(invalidEvent);
+            Assertions.fail("Should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Invalid signature."));
+        }
     }
 
     @Test

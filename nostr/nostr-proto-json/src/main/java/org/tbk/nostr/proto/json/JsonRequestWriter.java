@@ -63,7 +63,7 @@ final class JsonRequestWriter {
      * ]
      * </code>
      */
-    static String toJsonForSigning(Event.Builder e) {
+    static String toJsonForSigning(EventOrBuilder e) {
         try {
             return jsonForSigning.composeString()
                     .startArray()

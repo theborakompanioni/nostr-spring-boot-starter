@@ -4,6 +4,8 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nips.Nip10;
+import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.TagValue;
 
 import javax.annotation.Nullable;
@@ -13,6 +15,21 @@ public final class MoreTags {
 
     private MoreTags() {
         throw new UnsupportedOperationException();
+    }
+
+    public static TagValue e(Event event) {
+        return  e(EventId.of(event.getId().toByteArray()));
+    }
+    public static TagValue e(Event event, Nip10.Marker marker) {
+        return e(EventId.of(event.getId().toByteArray()), marker);
+    }
+
+    public static TagValue e(Event event, RelayUri recommendedRelay) {
+        return e(EventId.of(event.getId().toByteArray()), recommendedRelay);
+    }
+
+    public static TagValue e(Event event, @Nullable RelayUri recommendedRelay, Nip10.Marker marker) {
+        return e(EventId.of(event.getId().toByteArray()), recommendedRelay, marker);
     }
 
     public static TagValue e(EventId eventId) {
