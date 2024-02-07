@@ -17,6 +17,7 @@ import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties.RelayO
 import reactor.core.publisher.Flux;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -26,8 +27,11 @@ import static java.util.Objects.requireNonNull;
 @Service
 @Transactional
 public class EventEntityServiceImpl implements EventEntityService {
-
     private static final Sort sortByCreatedAtDesc = Sort.by(Sort.Direction.DESC, "createdAt");
+
+    private static final Comparator<EventEntity> compareByCreatedAtDesc = Comparator.
+            <EventEntity>comparingLong(it -> it.getCreatedAt().getEpochSecond())
+            .reversed();
 
     private final EventEntities events;
 
@@ -85,9 +89,14 @@ public class EventEntityServiceImpl implements EventEntityService {
             }
         }
 
-        return Flux.fromStream(streamBuilder.build().stream()
-                .flatMap(it -> it)
-                .distinct());
+        Stream<EventEntity> stream = streamBuilder.build().stream()
+                .reduce(Stream.empty(), Stream::concat);
+
+        if (filterWithLimit.isEmpty()) {
+            return Flux.fromStream(stream);
+        } else {
+            return Flux.fromStream(stream.distinct().sorted(compareByCreatedAtDesc));
+        }
     }
 
     @Async

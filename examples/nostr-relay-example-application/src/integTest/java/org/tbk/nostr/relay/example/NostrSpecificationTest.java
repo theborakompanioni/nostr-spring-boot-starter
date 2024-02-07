@@ -23,8 +23,10 @@ import org.tbk.nostr.util.MoreSubscriptionIds;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -55,6 +57,30 @@ public class NostrSpecificationTest {
 
         assertThat(ok.getEventId(), is(event.getId()));
         assertThat(ok.getSuccess(), is(true));
+        assertThat(ok.getMessage(), is(""));
+    }
+
+    @Test
+    void itShouldNotifyOnDuplicateEvent() {
+        Signer signer = SimpleSigner.random();
+
+        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
+
+        OkResponse ok0 = nostrTemplate.send(event)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok0.getEventId(), is(event.getId()));
+        assertThat(ok0.getSuccess(), is(true));
+        assertThat(ok0.getMessage(), is(""));
+
+        OkResponse ok1 = nostrTemplate.send(event)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok1.getEventId(), is(event.getId()));
+        assertThat(ok1.getSuccess(), is(false));
+        assertThat(ok1.getMessage(), is("Error: Duplicate event."));
     }
 
     @Test
@@ -69,11 +95,7 @@ public class NostrSpecificationTest {
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-
-        assertThat(oks.size(), is(events.size()));
-        oks.forEach(ok -> {
-            assertThat(ok.getSuccess(), is(true));
-        });
+        assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
 
         Event fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(eventMatching.getId().toByteArray()))
                 .blockOptional(Duration.ofSeconds(5))
@@ -94,11 +116,7 @@ public class NostrSpecificationTest {
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-
-        assertThat(oks.size(), is(events.size()));
-        oks.forEach(ok -> {
-            assertThat(ok.getSuccess(), is(true));
-        });
+        assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
 
         List<Event> fetchedEvents = nostrTemplate.fetchEventByAuthor(signer0.getPublicKey())
                 .collectList()
@@ -131,11 +149,7 @@ public class NostrSpecificationTest {
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-
-        assertThat(oks.size(), is(events.size()));
-        oks.forEach(ok -> {
-            assertThat(ok.getSuccess(), is(true));
-        });
+        assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
 
         List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
                         .setId(MoreSubscriptionIds.random().getId())
@@ -173,11 +187,7 @@ public class NostrSpecificationTest {
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-
-        assertThat(oks.size(), is(events.size()));
-        oks.forEach(ok -> {
-            assertThat(ok.getSuccess(), is(true));
-        });
+        assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
 
         List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
                         .setId(MoreSubscriptionIds.random().getId())
@@ -215,11 +225,7 @@ public class NostrSpecificationTest {
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-
-        assertThat(oks.size(), is(events.size()));
-        oks.forEach(ok -> {
-            assertThat(ok.getSuccess(), is(true));
-        });
+        assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
 
         List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
                         .setId(MoreSubscriptionIds.random().getId())
@@ -253,11 +259,7 @@ public class NostrSpecificationTest {
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-
-        assertThat(oks.size(), is(events.size()));
-        oks.forEach(ok -> {
-            assertThat(ok.getSuccess(), is(true));
-        });
+        assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
 
         Filter eventsFilter = Filter.newBuilder()
                 .addAllIds(events.stream()
@@ -286,6 +288,87 @@ public class NostrSpecificationTest {
                 .orElseThrow();
 
         assertThat(fetchedEventsLimited.size(), is(limit));
+    }
 
+    @Test
+    void itShouldFetchEventsSortedSuccessfully0WithSingleFilter() {
+        Signer signer = SimpleSigner.random();
+
+        Instant now = Instant.now();
+
+        Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
+                .setCreatedAt(now.getEpochSecond()));
+        Event event1Newer = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
+                .setCreatedAt(event0.getCreatedAt() + 1));
+        Event event2Older = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
+                .setCreatedAt(event0.getCreatedAt() - 1));
+
+        List<Event> events = List.of(event0, event1Newer, event2Older);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
+
+        Filter eventsFilter = Filter.newBuilder()
+                .addAllIds(events.stream()
+                        .map(Event::getId)
+                        .toList())
+                .build();
+
+        List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(eventsFilter)
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEvents, hasSize(events.size()));
+        assertThat(fetchedEvents.get(0), is(event1Newer));
+        assertThat(fetchedEvents.get(1), is(event0));
+        assertThat(fetchedEvents.get(2), is(event2Older));
+    }
+
+    @Test
+    void itShouldFetchEventsSortedSuccessfully0WithMultiFilter() {
+        Signer signer = SimpleSigner.random();
+
+        Instant now = Instant.now();
+
+        Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
+                .setCreatedAt(now.getEpochSecond()));
+        Event event1Newer = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
+                .setCreatedAt(event0.getCreatedAt() + 1));
+        Event event2Older = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
+                .setCreatedAt(event0.getCreatedAt() - 1));
+
+        List<Event> events = List.of(event0, event1Newer, event2Older);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
+
+        Filter.Builder eventsFilterBuilder = Filter.newBuilder()
+                .addAllIds(events.stream()
+                        .map(Event::getId)
+                        .toList());
+
+        List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(eventsFilterBuilder.setLimit(1))
+                        .addFilters(eventsFilterBuilder.setLimit(2))
+                        .addFilters(eventsFilterBuilder.setLimit(3))
+                        .addFilters(eventsFilterBuilder)
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEvents, hasSize(events.size()));
+        assertThat(fetchedEvents.get(0), is(event1Newer));
+        assertThat(fetchedEvents.get(1), is(event0));
+        assertThat(fetchedEvents.get(2), is(event2Older));
     }
 }
