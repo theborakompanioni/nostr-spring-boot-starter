@@ -32,8 +32,8 @@ class NostrRelayExampleApplicationConfig {
     }
 
     @Bean
-    ReqRequestHandler exampleReqRequestHandler() {
-        return new ExampleReqRequestHandlerImpl();
+    ReqRequestHandler exampleReqRequestHandler(EventEntityService eventEntityService) {
+        return new ExampleReqRequestHandlerImpl(eventEntityService);
     }
 
     @Bean

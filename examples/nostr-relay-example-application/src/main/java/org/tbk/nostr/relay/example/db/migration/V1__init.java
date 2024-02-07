@@ -23,7 +23,7 @@ public class V1__init extends BaseJavaMigration {
                     sig blob NOT NULL,
                     -- other metadata
                     first_seen_at integer NOT NULL,
-                    deleted integer,
+                    deleted_at integer,
                     expires_at integer
                 ) STRICT, WITHOUT ROWID;
                 """;
