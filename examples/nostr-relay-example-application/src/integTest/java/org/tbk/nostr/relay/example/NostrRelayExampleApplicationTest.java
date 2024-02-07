@@ -1,5 +1,6 @@
 package org.tbk.nostr.relay.example;
 
+import fr.acinq.bitcoin.PrivateKey;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +43,15 @@ public class NostrRelayExampleApplicationTest {
     @Test
     void itShouldReceiveStartupEvents() {
         assertThat("sanity check", applicationProperties.isStartupEventsEnabled(), is(true));
+        assertThat("sanity check", applicationProperties.getIdentity().isPresent(), is(true));
 
         NostrTemplate nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
 
-        XonlyPublicKey applicationPubkey = MoreIdentities.fromSeed(applicationProperties.getIdentity().getSeed()).xOnlyPublicKey();
+        XonlyPublicKey applicationPubkey = applicationProperties.getIdentity()
+                .map(NostrRelayExampleApplicationProperties.IdentityProperties::getSeed)
+                .map(MoreIdentities::fromSeed)
+                .map(PrivateKey::xOnlyPublicKey)
+                .orElseThrow();
 
         List<Event> events = nostrTemplate.fetchEventByAuthor(applicationPubkey)
                 .collectList()

@@ -1,33 +1,43 @@
 package org.tbk.nostr.relay.example.domain.event;
 
-import fr.acinq.bitcoin.ByteVector32;
-import fr.acinq.bitcoin.XonlyPublicKey;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.jmolecules.ddd.annotation.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
-import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
+import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties.RelayOptionsProperties;
 import reactor.core.publisher.Flux;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class EventEntityServiceImpl implements EventEntityService {
 
-    @NonNull
+    private static final Sort sortByCreatedAtDesc = Sort.by(Sort.Direction.DESC, "createdAt");
+
     private final EventEntities events;
+
+    private final PageRequest defaultPageRequest;
+
+    public EventEntityServiceImpl(EventEntities events, RelayOptionsProperties relayOptions) {
+        requireNonNull(relayOptions);
+        this.events = requireNonNull(events);
+        this.defaultPageRequest = PageRequest.of(0, relayOptions.getInitialQueryLimit(), sortByCreatedAtDesc);
+    }
 
     @Override
     public EventEntity createEvent(Event event) {
@@ -36,53 +46,48 @@ public class EventEntityServiceImpl implements EventEntityService {
 
     @Override
     public Flux<EventEntity> find(List<Filter> filters) {
-        List<Specification<EventEntity>> filterSpecifications = filters.stream()
-                .map(EventEntityServiceImpl::toSpecification)
+        List<Filter> filterWithoutLimit = filters.stream()
+                .filter(it -> !it.hasField(Filter.getDescriptor().findFieldByNumber(Filter.LIMIT_FIELD_NUMBER)))
+                .toList();
+        List<Filter> filterWithLimit = filters.stream()
+                .filter(it -> it.hasField(Filter.getDescriptor().findFieldByNumber(Filter.LIMIT_FIELD_NUMBER)))
                 .toList();
 
-        Specification<EventEntity> specification = Specification.allOf(
-                Specification.anyOf(filterSpecifications),
-                EventEntitySpecifications.isNotDeleted(),
-                EventEntitySpecifications.isNotExpired()
-        );
+        ImmutableList.Builder<Stream<EventEntity>> streamBuilder = ImmutableList.builder();
 
-        return Flux.fromIterable(events.findAll(specification));
-    }
+        // filters without limits can be combined
+        if (!filterWithoutLimit.isEmpty()) {
+            List<Specification<EventEntity>> filterSpecifications = filterWithoutLimit.stream()
+                    .map(EventEntitySpecifications::fromFilter)
+                    .toList();
 
-    private static Specification<EventEntity> toSpecification(Filter filter) {
-        Specification<EventEntity> idsSpecification = Specification.anyOf(filter.getIdsList().stream()
-                .map(it -> EventId.of(it.toByteArray()))
-                .map(EventEntitySpecifications::hasId)
-                .toList());
+            Specification<EventEntity> specification = Specification.allOf(
+                    Specification.anyOf(filterSpecifications),
+                    EventEntitySpecifications.isNotDeleted(),
+                    EventEntitySpecifications.isNotExpired()
+            );
 
-        Specification<EventEntity> authorsSpecification = Specification.anyOf(filter.getAuthorsList().stream()
-                .map(it -> new XonlyPublicKey(new ByteVector32(it.toByteArray())))
-                .map(EventEntitySpecifications::hasPubkey)
-                .toList());
+            Page<EventEntity> page = events.findAll(specification, defaultPageRequest);
+            streamBuilder.add(page.stream());
+        }
 
-        Specification<EventEntity> kindsSpecification = Specification.anyOf(filter.getKindsList().stream()
-                .map(EventEntitySpecifications::hasKind)
-                .toList());
+        // filter with limits must have their own queries (for the custom limit to be applied)
+        if (!filterWithLimit.isEmpty()) {
+            for (Filter filter : filterWithLimit) {
+                Specification<EventEntity> specification = Specification.allOf(
+                        EventEntitySpecifications.fromFilter(filter),
+                        EventEntitySpecifications.isNotDeleted(),
+                        EventEntitySpecifications.isNotExpired()
+                );
+                PageRequest pageRequest = PageRequest.of(0, filter.getLimit(), sortByCreatedAtDesc);
+                Page<EventEntity> page = events.findAll(specification, pageRequest);
+                streamBuilder.add(page.stream());
+            }
+        }
 
-        Specification<EventEntity> sinceSpecification = Optional.of(filter.getSince())
-                .filter(it -> it > 0L)
-                .map(Instant::ofEpochSecond)
-                .map(EventEntitySpecifications::isCreatedAfterInclusive)
-                .orElseGet(() -> Specification.where(null));
-
-        Specification<EventEntity> untilSpecification = Optional.of(filter.getUntil())
-                .filter(it -> it > 0L)
-                .map(Instant::ofEpochSecond)
-                .map(EventEntitySpecifications::isCreatedBeforeInclusive)
-                .orElseGet(() -> Specification.where(null));
-
-        return Specification.allOf(
-                idsSpecification,
-                authorsSpecification,
-                kindsSpecification,
-                sinceSpecification,
-                untilSpecification
-        );
+        return Flux.fromStream(streamBuilder.build().stream()
+                .flatMap(it -> it)
+                .distinct());
     }
 
     @Async

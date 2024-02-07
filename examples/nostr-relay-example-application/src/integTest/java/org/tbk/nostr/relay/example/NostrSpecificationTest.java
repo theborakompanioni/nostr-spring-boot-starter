@@ -239,4 +239,53 @@ public class NostrSpecificationTest {
         Event fetchedEvent0 = fetchedEvents.getFirst();
         assertThat(fetchedEvent0, is(eventMatching));
     }
+
+    @Test
+    void itShouldFetchEventsWithLimitSuccessfully0() {
+        Signer signer = SimpleSigner.random();
+
+        Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM0");
+        Event event1 = MoreEvents.createFinalizedTextNote(signer, "GM1");
+        Event event2 = MoreEvents.createFinalizedTextNote(signer, "GM2");
+
+        List<Event> events = List.of(event0, event1, event2);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks.size(), is(events.size()));
+        oks.forEach(ok -> {
+            assertThat(ok.getSuccess(), is(true));
+        });
+
+        Filter eventsFilter = Filter.newBuilder()
+                .addAllIds(events.stream()
+                        .map(Event::getId)
+                        .toList())
+                .build();
+        List<Event> fetchedEventsAll = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(eventsFilter)
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEventsAll.size(), is(events.size()));
+
+        int limit = events.size() - 1;
+        List<Event> fetchedEventsLimited = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(eventsFilter.toBuilder()
+                                .setLimit(limit)
+                                .build())
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEventsLimited.size(), is(limit));
+
+    }
 }

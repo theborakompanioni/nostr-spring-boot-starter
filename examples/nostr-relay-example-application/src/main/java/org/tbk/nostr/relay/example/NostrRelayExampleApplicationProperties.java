@@ -3,9 +3,11 @@ package org.tbk.nostr.relay.example;
 import fr.acinq.bitcoin.MnemonicCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import javax.annotation.Nullable;
@@ -18,24 +20,23 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor(onConstructor = @__(@ConstructorBinding))
 public class NostrRelayExampleApplicationProperties implements Validator {
+    private static final RelayOptionsProperties DEFAULT_RELAY_OPTIONS = new RelayOptionsProperties();
 
+    @Nullable
     private IdentityProperties identity;
 
     // initial message sent to users on websocket connection established
+    @Nullable
     private String greeting;
 
+    @Nullable
     private Boolean startupEventsEnabled;
 
-    @Override
-    public boolean supports(Class<?> clazz) {
-        return clazz == NostrRelayExampleApplicationProperties.class;
-    }
+    @Nullable
+    private RelayOptionsProperties relayOptions;
 
-    @Override
-    public void validate(Object target, Errors errors) {
-        NostrRelayExampleApplicationProperties properties = (NostrRelayExampleApplicationProperties) target;
-
-        // empty on purpose
+    public Optional<IdentityProperties> getIdentity() {
+        return Optional.ofNullable(identity);
     }
 
     public Optional<String> getGreeting() {
@@ -46,8 +47,37 @@ public class NostrRelayExampleApplicationProperties implements Validator {
         return Optional.ofNullable(startupEventsEnabled);
     }
 
+    public RelayOptionsProperties getRelayOptions() {
+        return Optional.ofNullable(relayOptions).orElse(DEFAULT_RELAY_OPTIONS);
+    }
+
     public boolean isStartupEventsEnabled() {
         return getStartupEventsEnabled().orElse(true);
+    }
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return clazz == NostrRelayExampleApplicationProperties.class;
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        NostrRelayExampleApplicationProperties properties = (NostrRelayExampleApplicationProperties) target;
+
+        if (properties.isStartupEventsEnabled() && properties.getIdentity().isEmpty()) {
+            String errorMessage = "'startupEventsEnabled' cannot be used if 'identity' is empty";
+            errors.rejectValue("startupEventsEnabled", "startupEventsEnabled.invalid", errorMessage);
+        }
+
+        properties.getIdentity().ifPresent(it -> {
+            errors.pushNestedPath("identity");
+            ValidationUtils.invokeValidator(it, it, errors);
+            errors.popNestedPath();
+        });
+
+        errors.pushNestedPath("relayOptions");
+        ValidationUtils.invokeValidator(properties.getRelayOptions(), properties.getRelayOptions(), errors);
+        errors.popNestedPath();
     }
 
     @Getter
@@ -59,6 +89,13 @@ public class NostrRelayExampleApplicationProperties implements Validator {
         @Nullable
         private String passphrase;
 
+        public byte[] getSeed() {
+            return MnemonicCode.toSeed(getMnemonics(), getPassphrase().orElse(""));
+        }
+
+        public Optional<String> getPassphrase() {
+            return Optional.ofNullable(passphrase);
+        }
 
         @Override
         public boolean supports(Class<?> clazz) {
@@ -77,13 +114,58 @@ public class NostrRelayExampleApplicationProperties implements Validator {
                 errors.rejectValue("mnemonics", "mnemonics.invalid", errorMessage);
             }
         }
+    }
 
-        public byte[] getSeed() {
-            return MnemonicCode.toSeed(getMnemonics(), getPassphrase().orElse(""));
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor(onConstructor = @__(@ConstructorBinding))
+    public static class RelayOptionsProperties implements Validator {
+
+        private static final int INITIAL_QUERY_LIMIT_DEFAULT = 100;
+
+        private static final int MAX_LIMIT_PER_FILTER_DEFAULT = 1_000;
+
+        private static final int MAX_FILTER_COUNT_DEFAULT = 21;
+
+        private Integer initialQueryLimit;
+
+        private Integer maxLimitPerFilter;
+
+        private Integer maxFilterCount;
+
+        public int getInitialQueryLimit() {
+            return Optional.ofNullable(initialQueryLimit).orElse(INITIAL_QUERY_LIMIT_DEFAULT);
         }
 
-        public Optional<String> getPassphrase() {
-            return Optional.ofNullable(passphrase);
+        public int getMaxLimitPerFilter() {
+            return Optional.ofNullable(maxLimitPerFilter).orElse(MAX_LIMIT_PER_FILTER_DEFAULT);
+        }
+
+        public int getMaxFilterCount() {
+            return Optional.ofNullable(maxFilterCount).orElse(MAX_FILTER_COUNT_DEFAULT);
+        }
+
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return clazz == RelayOptionsProperties.class;
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            RelayOptionsProperties properties = (RelayOptionsProperties) target;
+
+            if (properties.getInitialQueryLimit() <= 0) {
+                String errorMessage = "'initialQueryLimit' must be greater than zero";
+                errors.rejectValue("initialQueryLimit", "initialQueryLimit.invalid", errorMessage);
+            }
+            if (properties.getMaxLimitPerFilter() <= 0) {
+                String errorMessage = "'maxLimitPerFilter' must be greater than zero";
+                errors.rejectValue("maxLimitPerFilter", "maxLimitPerFilter.invalid", errorMessage);
+            }
+            if (properties.getMaxFilterCount() <= 0) {
+                String errorMessage = "'maxFilterCount' must be greater than zero";
+                errors.rejectValue("maxFilterCount", "maxFilterCount.invalid", errorMessage);
+            }
         }
     }
 
