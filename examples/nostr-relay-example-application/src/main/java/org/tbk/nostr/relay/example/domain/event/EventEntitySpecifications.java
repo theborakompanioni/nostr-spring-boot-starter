@@ -19,6 +19,14 @@ final class EventEntitySpecifications {
         return (event, cq, cb) -> cb.equal(event.get("id").get("id"), eventId.toHex());
     }
 
+    static Specification<EventEntity> isCreatedBeforeInclusive(Instant now) {
+        return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("createdAt"), now);
+    }
+
+    static Specification<EventEntity> isCreatedAfterInclusive(Instant now) {
+        return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("createdAt"), now);
+    }
+
     static Specification<EventEntity> isNotExpired() {
         return isNotExpired(Instant.now());
     }

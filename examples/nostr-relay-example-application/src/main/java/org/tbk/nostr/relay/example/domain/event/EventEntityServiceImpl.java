@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -63,10 +64,24 @@ public class EventEntityServiceImpl implements EventEntityService {
                 .map(EventEntitySpecifications::hasKind)
                 .toList());
 
+        Specification<EventEntity> sinceSpecification = Optional.of(filter.getSince())
+                .filter(it -> it > 0L)
+                .map(Instant::ofEpochSecond)
+                .map(EventEntitySpecifications::isCreatedAfterInclusive)
+                .orElseGet(() -> Specification.where(null));
+
+        Specification<EventEntity> untilSpecification = Optional.of(filter.getUntil())
+                .filter(it -> it > 0L)
+                .map(Instant::ofEpochSecond)
+                .map(EventEntitySpecifications::isCreatedBeforeInclusive)
+                .orElseGet(() -> Specification.where(null));
+
         return Specification.allOf(
                 idsSpecification,
                 authorsSpecification,
-                kindsSpecification
+                kindsSpecification,
+                sinceSpecification,
+                untilSpecification
         );
     }
 
