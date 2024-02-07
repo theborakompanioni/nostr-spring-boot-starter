@@ -5,7 +5,6 @@ import fr.acinq.bitcoin.ByteVector;
 import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
-import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nips.Nip1;
@@ -49,24 +48,24 @@ public final class MoreEvents {
         }
     }
 
-    public static Event verify(Event event) {
-        ByteVector32 eventId = ByteVector32.fromValidHex(EventId.of(event.getId().toByteArray()).toHex());
+    public static Event verify(Event event) throws IllegalArgumentException {
+        ByteVector32 eventId = new ByteVector32(eventId(event.toBuilder()));
         XonlyPublicKey publicKey = new XonlyPublicKey(ByteVector32.fromValidHex(HexFormat.of().formatHex(event.getPubkey().toByteArray())));
 
         if (!publicKey.getPublicKey().isValid()) {
-            throw new IllegalArgumentException("Invalid public key");
+            throw new IllegalArgumentException("Invalid public key.");
         }
         if (event.getKind() < 0 || event.getKind() > 65_535) {
-            throw new IllegalArgumentException("Invalid kind");
+            throw new IllegalArgumentException("Invalid kind.");
         }
         if (event.getCreatedAt() < 0L) {
-            throw new IllegalArgumentException("Invalid created timestamp");
+            throw new IllegalArgumentException("Invalid created timestamp.");
         }
 
         ByteVector signature = ByteVector.fromHex(HexFormat.of().formatHex(event.getSig().toByteArray()));
         boolean isValidSignature = Crypto.verifySignatureSchnorr(eventId, signature, publicKey);
         if (!isValidSignature) {
-            throw new IllegalArgumentException("Invalid signature");
+            throw new IllegalArgumentException("Invalid signature.");
 
         }
         return event;

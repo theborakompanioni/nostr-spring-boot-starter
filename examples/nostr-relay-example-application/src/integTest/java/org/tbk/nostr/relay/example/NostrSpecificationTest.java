@@ -23,7 +23,6 @@ import org.tbk.nostr.util.MoreSubscriptionIds;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -81,6 +80,25 @@ public class NostrSpecificationTest {
         assertThat(ok1.getEventId(), is(event.getId()));
         assertThat(ok1.getSuccess(), is(false));
         assertThat(ok1.getMessage(), is("Error: Duplicate event."));
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent() {
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent = MoreEvents.createFinalizedTextNote(signer, "GM").toBuilder()
+                .setContent("Changed!")
+                .build();
+
+        assertThat(MoreEvents.isValid(invalidEvent), is(false));
+
+        OkResponse ok = nostrTemplate.send(invalidEvent)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok.getEventId(), is(invalidEvent.getId()));
+        assertThat(ok.getSuccess(), is(false));
+        assertThat(ok.getMessage(), is("Error: Invalid signature."));
     }
 
     @Test

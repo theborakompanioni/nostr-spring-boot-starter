@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.EventRequest;
-import org.tbk.nostr.proto.NoticeResponse;
+import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.relay.example.nostr.handler.EventRequestHandler;
@@ -19,14 +19,19 @@ public class VerifyingEventRequestHandlerDecorator implements EventRequestHandle
 
     @Override
     public void handleEventMessage(WebSocketSession session, EventRequest event) throws Exception {
-        if (MoreEvents.isValid(event.getEvent())) {
-            delegate.handleEventMessage(session, event);
-        } else {
+        try {
+            MoreEvents.verify(event.getEvent());
+        } catch (IllegalArgumentException e) {
             session.sendMessage(new TextMessage(JsonWriter.toJson(Response.newBuilder()
-                    .setNotice(NoticeResponse.newBuilder()
-                            .setMessage("Error: %s".formatted("Invalid event."))
+                    .setOk(OkResponse.newBuilder()
+                            .setEventId(event.getEvent().getId())
+                            .setSuccess(false)
+                            .setMessage("Error: %s".formatted(e.getMessage()))
                             .build())
                     .build())));
+            return;
         }
+
+        delegate.handleEventMessage(session, event);
     }
 }
