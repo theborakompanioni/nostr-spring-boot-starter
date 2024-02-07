@@ -11,7 +11,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.identity.Signer;
-import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
@@ -46,13 +45,21 @@ public class NostrRelayExampleApplication {
     }
 
     @Bean
-    ApplicationRunner insertApplicationStartupEvent(EventEntityService eventEntityService) {
+    ApplicationRunner insertStartupEvents(NostrRelayExampleApplicationProperties properties,
+                                          Signer serverSigner,
+                                          EventEntityService eventEntityService) {
         return args -> {
-            Signer signer = SimpleSigner.random();
-            Event bootingEvent = MoreEvents.createFinalizedTextNote(signer, "Booting...");
+            if (!properties.isStartupEventsEnabled()) {
+                log.trace("Skip inserting startup events: Disabled.");
+                return;
+            }
+
+            log.info("Inserting startup events...");
+
+            Event bootingEvent = MoreEvents.createFinalizedTextNote(serverSigner, "Booting...");
             eventEntityService.createEvent(bootingEvent);
 
-            Event bootedEvent = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "Booted.")
+            Event bootedEvent = MoreEvents.finalize(serverSigner, Nip1.createTextNote(serverSigner.getPublicKey(), "Booted.")
                     .addTags(MoreTags.e(EventId.of(bootingEvent.getId().toByteArray())))
             );
             eventEntityService.createEvent(bootedEvent);

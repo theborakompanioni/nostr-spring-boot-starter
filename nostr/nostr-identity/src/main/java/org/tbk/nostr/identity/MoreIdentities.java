@@ -4,6 +4,7 @@ import fr.acinq.bitcoin.MnemonicCode;
 import fr.acinq.bitcoin.PrivateKey;
 import org.tbk.nostr.nip6.Nip6;
 
+import java.util.HexFormat;
 import java.util.List;
 
 public final class MoreIdentities {
@@ -22,6 +23,10 @@ public final class MoreIdentities {
 
     public static PrivateKey of(byte[] data) {
         return new PrivateKey(data);
+    }
+
+    public static PrivateKey fromSeedHex(String hex) {
+        return fromSeed(HexFormat.of().parseHex(hex));
     }
 
     public static PrivateKey fromSeed(byte[] seed) {

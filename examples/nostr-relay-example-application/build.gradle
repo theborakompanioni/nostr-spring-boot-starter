@@ -39,4 +39,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    testImplementation project(':nostr:nostr-template')
 }

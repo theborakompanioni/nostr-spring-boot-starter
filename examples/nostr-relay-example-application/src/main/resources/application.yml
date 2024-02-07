@@ -33,3 +33,9 @@ spring.datasource.hikari.auto-commit: true #default auto-commit behavior.
 
 spring.jpa.properties.hibernate.dialect: org.hibernate.community.dialect.SQLiteDialect
 spring.jpa.properties.hibernate.jdbc.time_zone: UTC
+
+org.tbk.nostr.relay.example:
+  greeting: 'GM'
+  identity:
+    mnemonics: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+    passphrase: ''
