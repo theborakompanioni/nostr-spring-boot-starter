@@ -25,8 +25,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -83,14 +82,14 @@ public class NostrSpecificationTest {
     }
 
     @Test
-    void itShouldNotifyOnInvalidEvent() {
+    void itShouldNotifyOnInvalidEvent0Id() {
         Signer signer = SimpleSigner.random();
 
         Event invalidEvent = MoreEvents.createFinalizedTextNote(signer, "GM").toBuilder()
                 .setContent("Changed!")
                 .build();
 
-        assertThat(MoreEvents.isValid(invalidEvent), is(false));
+        assertThat("sanity check", MoreEvents.isValid(invalidEvent), is(false));
 
         OkResponse ok = nostrTemplate.send(invalidEvent)
                 .blockOptional(Duration.ofSeconds(5))
@@ -99,6 +98,34 @@ public class NostrSpecificationTest {
         assertThat(ok.getEventId(), is(invalidEvent.getId()));
         assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), is("Error: Invalid id."));
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent1Sig() {
+        Signer signer = SimpleSigner.random();
+
+        Event verifiedEvent0 = MoreEvents.verify(MoreEvents.createFinalizedTextNote(signer, "GM"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent0), is(true));
+
+        Event verifiedEvent1 = MoreEvents.verify(MoreEvents.createFinalizedTextNote(signer, verifiedEvent0.getContent() + "!"));
+        assertThat("sanity check", MoreEvents.isValid(verifiedEvent1), is(true));
+
+        assertThat("sanity check - id differs", verifiedEvent1.getId(), not(is(verifiedEvent0.getId())));
+        assertThat("sanity check - sig differs", verifiedEvent1.getSig(), not(is(verifiedEvent0.getSig())));
+
+        Event invalidEvent = verifiedEvent1.toBuilder()
+                .setSig(verifiedEvent0.getSig())
+                .build();
+
+        assertThat("sanity check", MoreEvents.isValid(invalidEvent), is(false));
+
+        OkResponse ok = nostrTemplate.send(invalidEvent)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok.getEventId(), is(invalidEvent.getId()));
+        assertThat(ok.getSuccess(), is(false));
+        assertThat(ok.getMessage(), is("Error: Invalid signature."));
     }
 
     @Test
