@@ -7,7 +7,6 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
@@ -34,7 +33,6 @@ import static org.hamcrest.Matchers.is;
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test", "load-test"})
-@DirtiesContext
 public class NostrRelayLoadTest {
 
     @LocalServerPort

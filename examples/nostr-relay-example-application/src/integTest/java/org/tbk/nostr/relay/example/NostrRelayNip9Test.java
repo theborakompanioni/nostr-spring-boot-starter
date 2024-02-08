@@ -1,11 +1,9 @@
 package org.tbk.nostr.relay.example;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.RelayUri;
@@ -27,7 +25,6 @@ import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test", "nip9-test"})
-@DirtiesContext
 public class NostrRelayNip9Test {
 
     @LocalServerPort
@@ -68,6 +65,7 @@ public class NostrRelayNip9Test {
         assertThat(ok1.getSuccess(), is(true));
 
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
+                .delaySubscription(Duration.ofSeconds(1))
                 .blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
     }
@@ -98,6 +96,7 @@ public class NostrRelayNip9Test {
         assertThat(ok0.getSuccess(), is(true));
 
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
+                .delaySubscription(Duration.ofSeconds(1))
                 .blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
     }

@@ -7,8 +7,11 @@ spring.http.log-request-details: false
 logging.file.name: application-test.log
 logging.level.org.tbk.nostr: TRACE
 
-#spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application-test.db?foreign_keys=true&journal_mode=WAL&synchronous=OFF&temp_store=MEMORY&page_size=32768&mmap_size=30000000000'
+#spring.datasource.url: 'jdbc:sqlite::memory:?foreign_keys=true'
 spring.datasource.url: 'jdbc:sqlite:file:memory_test?mode=memory&foreign_keys=true'
+#spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application-test.db?foreign_keys=true&journal_mode=WAL&synchronous=OFF&temp_store=MEMORY&page_size=32768&mmap_size=30000000000'
+#spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application-test.db?foreign_keys=true'
+
 spring.datasource.hikari.maximum-pool-size: 1 #needed when using "in-memory" db!
 
 org.tbk.nostr.relay.example:
