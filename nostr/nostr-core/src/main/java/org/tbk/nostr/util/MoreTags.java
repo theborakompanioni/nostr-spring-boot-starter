@@ -1,15 +1,16 @@
 package org.tbk.nostr.util;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
+import lombok.NonNull;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nips.Nip10;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.TagValue;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.List;
 
 public final class MoreTags {
 
@@ -17,9 +18,16 @@ public final class MoreTags {
         throw new UnsupportedOperationException();
     }
 
-    public static TagValue e(Event event) {
-        return  e(EventId.of(event.getId().toByteArray()));
+    public static List<TagValue> filterTagsByName(String name, Event event) {
+        return event.getTagsList().stream()
+                .filter(it -> name.equals(it.getName()))
+                .toList();
     }
+
+    public static TagValue e(Event event) {
+        return e(EventId.of(event.getId().toByteArray()));
+    }
+
     public static TagValue e(Event event, Nip10.Marker marker) {
         return e(EventId.of(event.getId().toByteArray()), marker);
     }

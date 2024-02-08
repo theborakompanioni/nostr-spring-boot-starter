@@ -4,6 +4,8 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.protobuf.ByteString;
+import fr.acinq.bitcoin.ByteVector32;
+import fr.acinq.bitcoin.XonlyPublicKey;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -12,6 +14,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.jmolecules.ddd.types.AggregateRoot;
 import org.jmolecules.ddd.types.Identifier;
 import org.springframework.data.domain.AbstractAggregateRoot;
+import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 
@@ -76,6 +79,14 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
         registerEvent(new EventEntityEvents.CreatedEvent(this.id));
     }
 
+    public EventId asEventId() {
+        return EventId.fromHex(this.id.getId());
+    }
+
+    public XonlyPublicKey asPublicKey() {
+        return new XonlyPublicKey(ByteVector32.fromValidHex(this.pubkey));
+    }
+
     public boolean isDeleted() {
         return deletedAt != null;
     }
@@ -85,7 +96,12 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
     }
 
     public EventEntity markDeleted() {
-        this.deletedAt = Instant.now();
+        return markDeleted(Instant.now());
+    }
+
+
+    public EventEntity markDeleted(Instant now) {
+        this.deletedAt = now;
         registerEvent(new EventEntityEvents.MarkDeletedEvent(this.id));
         return this;
     }

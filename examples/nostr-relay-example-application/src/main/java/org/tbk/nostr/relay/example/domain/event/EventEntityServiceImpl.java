@@ -1,24 +1,28 @@
 package org.tbk.nostr.relay.example.domain.event;
 
 import com.google.common.collect.ImmutableList;
+import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.extern.slf4j.Slf4j;
 import org.jmolecules.ddd.annotation.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
+import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties.RelayOptionsProperties;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -49,7 +53,35 @@ public class EventEntityServiceImpl implements EventEntityService {
     }
 
     @Override
-    public Flux<EventEntity> find(List<Filter> filters) {
+    public Mono<EventEntity> findById(EventEntity.EventEntityId eventId) {
+        return Mono.justOrEmpty(events.findById(eventId));
+    }
+
+    @Override
+    public Page<EventEntity> findAll(Specification<EventEntity> specs, Pageable page) {
+        return events.findAll(specs, page);
+    }
+
+    @Override
+    public Flux<EventId> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author) {
+        Specification<EventEntity> deletionSpecification = Specification.anyOf(deletableEventIds.stream()
+                        .map(EventEntitySpecifications::hasId)
+                        .collect(Collectors.toList()))
+                .and(EventEntitySpecifications.hasPubkey(author))
+                .and(Specification.not(EventEntitySpecifications.hasKind(5)))
+                .and(EventEntitySpecifications.isNotDeleted());
+
+        List<EventEntity> deletableEvents = events.findAll(deletionSpecification);
+
+        Instant now = Instant.now();
+        List<EventEntity> deletabledEntities = events.saveAll(deletableEvents.stream().map(it -> it.markDeleted(now)).toList());
+
+        return Flux.fromIterable(deletabledEntities)
+                .map(it -> EventId.fromHex(it.getId().getId()));
+    }
+
+    @Override
+    public Flux<EventEntity> findAll(Collection<Filter> filters) {
         List<Filter> filterWithoutLimit = filters.stream()
                 .filter(it -> !it.hasField(Filter.getDescriptor().findFieldByNumber(Filter.LIMIT_FIELD_NUMBER)))
                 .toList();
@@ -100,17 +132,8 @@ public class EventEntityServiceImpl implements EventEntityService {
     }
 
     @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @TransactionalEventListener
     void on(EventEntityEvents.CreatedEvent created) {
-        EventEntity entity = events.findById(created.eventId())
-                .orElseThrow(() -> new IllegalStateException("Could not find EventEntity from CreatedEvent"));
-
-        log.trace("Successfully saved event {}", entity.getId().getId());
-
-        if (entity.isExpired(Instant.now())) {
-            events.save(entity.markDeleted());
-        }
+        log.trace("Successfully saved event {}", created.eventId().getId());
     }
 
     @Async

@@ -21,7 +21,7 @@ public class ExampleReqRequestHandlerImpl implements ReqRequestHandler {
 
     @Override
     public void handleReqMessage(WebSocketSession session, ReqRequest req) throws Exception {
-        eventEntityService.find(req.getFiltersList())
+        eventEntityService.findAll(req.getFiltersList())
                 .subscribe(it -> {
                     try {
                         session.sendMessage(new TextMessage(JsonWriter.toJson(Response.newBuilder()
