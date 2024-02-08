@@ -28,19 +28,23 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
 
     private final EventEntityId id;
 
+    @Column(name = "pubkey", nullable = false, updatable = false)
     private final String pubkey;
 
+    @Column(name = "kind", nullable = false, updatable = false)
     private final int kind;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private final Instant createdAt;
 
     @JoinColumn(name = "event_id", updatable = false)
     @OrderColumn(name = "position", updatable = false)
     private final List<TagEntity> tags = new ArrayList<>();
 
+    @Column(name = "content", nullable = false, updatable = false)
     private final String content;
 
+    @Column(name = "sig", nullable = false, updatable = false)
     private final byte[] sig;
 
     @CreationTimestamp
@@ -88,11 +92,6 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
     public boolean isExpired(Instant now) {
         return expiresAt != null && expiresAt.isBefore(now);
     }
-
-    public EventEntity markDeleted() {
-        return markDeleted(Instant.now());
-    }
-
 
     public EventEntity markDeleted(Instant now) {
         this.deletedAt = now;

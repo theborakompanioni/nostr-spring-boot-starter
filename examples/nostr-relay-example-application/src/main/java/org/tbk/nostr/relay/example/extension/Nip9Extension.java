@@ -15,6 +15,7 @@ import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.relay.example.domain.event.EventEntity;
 import org.tbk.nostr.relay.example.domain.event.EventEntityEvents;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
+import org.tbk.nostr.relay.example.domain.event.EventEntitySpecifications;
 import org.tbk.nostr.util.MoreTags;
 
 import java.util.List;
@@ -45,7 +46,26 @@ public class Nip9Extension {
 
         if (Nip9.isDeletionEvent(event)) {
             doOnDeletionEventCreated(entity, event);
+        } else {
+            onNonDeletionEventCreated(entity);
         }
+    }
+
+    private void onNonDeletionEventCreated(EventEntity entity) {
+        boolean deletionEventFound = hasDeletionEvent(entity);
+        if (deletionEventFound) {
+            log.debug("Found existing deletion event for newly created event {}", entity.getId().getId());
+            eventEntityService.markDeleted(List.of(entity.asEventId()), entity.asPublicKey())
+                    .collectList()
+                    .blockOptional()
+                    .orElseThrow(() -> new IllegalStateException("Could not delete all events"));
+        }
+    }
+
+    private boolean hasDeletionEvent(EventEntity entity) {
+        return eventEntityService.exists(EventEntitySpecifications.hasTagWithFirstValue('e', entity.getId().getId())
+                .and(EventEntitySpecifications.hasPubkey(entity.asPublicKey()))
+                .and(EventEntitySpecifications.hasKind(Nip9.kind())));
     }
 
     private void doOnDeletionEventCreated(EventEntity entity, Event event) {

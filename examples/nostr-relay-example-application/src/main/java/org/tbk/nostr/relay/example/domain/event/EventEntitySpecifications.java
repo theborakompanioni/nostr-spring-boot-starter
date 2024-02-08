@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
 import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.XonlyPublicKey;
+import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Filter;
@@ -59,6 +60,16 @@ public final class EventEntitySpecifications {
 
     public static Specification<EventEntity> isDeleted() {
         return (root, cq, cb) -> cb.isNotNull(root.get("deletedAt"));
+    }
+
+    public static Specification<EventEntity> hasTagWithFirstValue(char tagName, String eventId) {
+        return (root, query, criteriaBuilder) -> {
+            Join<TagEntity, EventEntity> eventTags = root.join("tags");
+            return criteriaBuilder.and(
+                    criteriaBuilder.equal(eventTags.get("name"), String.valueOf(tagName)),
+                    criteriaBuilder.equal(eventTags.get("value0"), eventId)
+            );
+        };
     }
 
     private static final Descriptors.FieldDescriptor untilFieldDescription = Filter.getDescriptor().findFieldByNumber(Filter.UNTIL_FIELD_NUMBER);

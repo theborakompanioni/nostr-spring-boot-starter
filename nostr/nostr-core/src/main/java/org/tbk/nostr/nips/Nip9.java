@@ -23,6 +23,10 @@ public final class Nip9 {
         throw new UnsupportedOperationException();
     }
 
+    public static int kind() {
+        return DELETION_EVENT_KIND;
+    }
+
     public static Event.Builder createDeletionEvent(XonlyPublicKey publicKey, List<EventId> eventId) {
         return createDeletionEvent(publicKey, null, eventId);
     }
@@ -39,4 +43,5 @@ public final class Nip9 {
     public static boolean isDeletionEvent(EventOrBuilder event) {
         return event.getKind() == DELETION_EVENT_KIND;
     }
+
 }

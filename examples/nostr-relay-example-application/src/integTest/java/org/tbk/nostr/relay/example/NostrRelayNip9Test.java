@@ -71,7 +71,6 @@ public class NostrRelayNip9Test {
     }
 
     @Test
-    @Disabled("TODO")
     void itShouldDeleteExistingEventSuccessfully1IfDeletionEventAlreadyExists() {
         Signer signer = SimpleSigner.random();
 

@@ -27,5 +27,7 @@ public interface EventEntityService {
 
     Page<EventEntity> findAll(Specification<EventEntity> specs, Pageable page);
 
+    boolean exists(Specification<EventEntity> specs);
+
     Flux<EventId> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author);
 }

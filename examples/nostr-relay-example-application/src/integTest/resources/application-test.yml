@@ -11,4 +11,4 @@ logging.level.org.tbk.nostr: TRACE
 spring.datasource.url: 'jdbc:sqlite::memory:?foreign_keys=true'
 
 org.tbk.nostr.relay.example:
-  greeting: 'GM (test)'
+  greeting: null

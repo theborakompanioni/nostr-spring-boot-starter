@@ -11,9 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
@@ -63,6 +61,11 @@ public class EventEntityServiceImpl implements EventEntityService {
     @Override
     public Page<EventEntity> findAll(Specification<EventEntity> specs, Pageable page) {
         return events.findAll(specs, page);
+    }
+
+    @Override
+    public boolean exists(Specification<EventEntity> specs) {
+        return events.exists(specs);
     }
 
     @Override
