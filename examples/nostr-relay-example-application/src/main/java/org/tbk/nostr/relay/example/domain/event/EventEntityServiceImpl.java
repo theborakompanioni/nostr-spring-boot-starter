@@ -4,13 +4,16 @@ import com.google.common.collect.ImmutableList;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.extern.slf4j.Slf4j;
 import org.jmolecules.ddd.annotation.Service;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
@@ -132,11 +135,13 @@ public class EventEntityServiceImpl implements EventEntityService {
     }
 
     @Async
+    @EventListener
     void on(EventEntityEvents.CreatedEvent created) {
         log.trace("Successfully saved event {}", created.eventId().getId());
     }
 
     @Async
+    @EventListener
     void on(EventEntityEvents.MarkDeletedEvent markDeleted) {
         log.debug("Successfully marked event as deleted: {} ", markDeleted.eventId().getId());
     }

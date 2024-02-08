@@ -1,14 +1,14 @@
 package org.tbk.nostr.relay.example.domain.event;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Value;
 import org.hibernate.annotations.CreationTimestamp;
 import org.jmolecules.ddd.types.AggregateRoot;
@@ -16,15 +16,11 @@ import org.jmolecules.ddd.types.Identifier;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.TagValue;
 
-import java.io.IOException;
 import java.time.Instant;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 @Getter
 @Table(name = "event")
@@ -39,7 +35,9 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
     @Column(name = "created_at")
     private final Instant createdAt;
 
-    private final String tags;
+    @JoinColumn(name = "event_id", updatable = false)
+    @OrderColumn(name = "position", updatable = false)
+    private final List<TagEntity> tags = new ArrayList<>();
 
     private final String content;
 
@@ -68,12 +66,8 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
         this.content = event.getContent();
         this.sig = event.getSig().toByteArray();
 
-        try {
-            this.tags = event.getTagsCount() == 0 ? null : JSON.std.composeString()
-                    .addObject(listFromTags(event.getTagsList()))
-                    .finish();
-        } catch (IOException e) {
-            throw new RuntimeException("Could not serialize tags", e);
+        for (int i = 0; i < event.getTagsCount(); i++) {
+            this.tags.add(new TagEntity(event.getTags(i), this.id, i));
         }
 
         registerEvent(new EventEntityEvents.CreatedEvent(this.id));
@@ -108,14 +102,13 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
 
     public Event toNostrEvent() {
         return Event.newBuilder()
-                .setId(ByteString.fromHex(id.getId()))
+                .setId(ByteString.fromHex(this.id.getId()))
                 .setPubkey(ByteString.fromHex(this.pubkey))
                 .setCreatedAt(this.createdAt.getEpochSecond())
                 .setKind(this.kind)
-                .addAllTags(Optional.ofNullable(tags)
-                        .map(EventEntity::tagsFromJsonArray)
-                        .map(EventEntity::tagsFromList)
-                        .orElseGet(Collections::emptyList))
+                .addAllTags(this.tags.stream()
+                        .map(TagEntity::toNostrTag)
+                        .toList())
                 .setContent(this.getContent())
                 .setSig(ByteString.copyFrom(this.sig))
                 .build();
@@ -123,48 +116,11 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
 
     @Value(staticConstructor = "of")
     public static class EventEntityId implements Identifier {
-        public static EventEntityId create(Event event) {
+        static EventEntityId create(Event event) {
             return EventEntityId.of(HexFormat.of().formatHex(event.getId().toByteArray()));
         }
 
+        @NonNull
         String id;
-    }
-
-
-    private static List<List<String>> tagsFromJsonArray(String json) {
-        try {
-            @SuppressWarnings("unchecked")
-            List<List<String>> tags = (List<List<String>>) JSON.std.anyFrom(json);
-            return tags;
-        } catch (IOException e) {
-            throw new RuntimeException("Could not deserialize tags", e);
-        }
-    }
-
-    private static List<TagValue> tagsFromList(List<List<String>> tags) {
-        return ImmutableList.<TagValue>builder()
-                .addAll(tags.stream().filter(it -> !it.isEmpty())
-                        .map(it -> TagValue.newBuilder()
-                                .setName(it.getFirst())
-                                .addAllValues(Iterables.skip(it, 1))
-                                .build())
-                        .toList())
-                .build();
-    }
-
-    private static String tagsToJsonArray(List<TagValue> tags) {
-        try {
-            return JSON.std.composeString()
-                    .addObject(listFromTags(tags))
-                    .finish();
-        } catch (IOException e) {
-            throw new RuntimeException("Could not serialize tags", e);
-        }
-    }
-
-    private static List<List<String>> listFromTags(List<TagValue> tags) {
-        return tags.stream()
-                .map(it -> Stream.concat(Stream.of(it.getName()), it.getValuesList().stream()).toList())
-                .toList();
     }
 }

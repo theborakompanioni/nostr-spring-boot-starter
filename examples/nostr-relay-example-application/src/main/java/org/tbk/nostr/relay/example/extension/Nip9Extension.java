@@ -37,8 +37,6 @@ public class Nip9Extension {
                 .blockOptional()
                 .orElseThrow(() -> new IllegalStateException("Could not find EventEntity from CreatedEvent"));
 
-        log.trace("Successfully saved event {}", entity.getId().getId());
-
         afterEventCreated(entity);
     }
 

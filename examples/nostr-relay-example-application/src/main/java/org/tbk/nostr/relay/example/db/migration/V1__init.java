@@ -28,7 +28,22 @@ public class V1__init extends BaseJavaMigration {
                 ) STRICT, WITHOUT ROWID;
                 """;
 
-        for (String sql : List.of(sql1)) {
+        String sql2 = """
+                create table if not exists event_tag (
+                    id text PRIMARY KEY,
+                    event_id text NOT NULL,
+                    position integer NOT NULL,
+                    name text NOT NULL,
+                    value0 text NULL,
+                    value1 text NULL,
+                    value2 text NULL,
+                    other_values text NULL,
+                    FOREIGN KEY(event_id) REFERENCES event(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE(event_id, position)
+                ) STRICT, WITHOUT ROWID;
+                """;
+
+        for (String sql : List.of(sql1, sql2)) {
             try (PreparedStatement statement = context.getConnection().prepareStatement(sql)) {
                 statement.execute();
             }

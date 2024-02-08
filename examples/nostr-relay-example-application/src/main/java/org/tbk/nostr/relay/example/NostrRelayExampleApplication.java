@@ -17,8 +17,11 @@ import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.function.Supplier;
 
 @Slf4j
 @SpringBootApplication
@@ -48,6 +51,7 @@ public class NostrRelayExampleApplication {
     ApplicationRunner insertStartupEvents(NostrRelayExampleApplicationProperties properties,
                                           Signer serverSigner,
                                           EventEntityService eventEntityService) {
+        Instant now = Instant.now();
         return args -> {
             if (!properties.isStartupEventsEnabled()) {
                 log.trace("Skip inserting startup events: Disabled.");
@@ -59,8 +63,10 @@ public class NostrRelayExampleApplication {
             Event bootingEvent = MoreEvents.createFinalizedTextNote(serverSigner, "Booting...");
             eventEntityService.createEvent(bootingEvent);
 
+            Supplier<Duration> startupDuration = () -> Duration.ofMillis(Instant.now().toEpochMilli() - now.toEpochMilli());
             Event bootedEvent = MoreEvents.finalize(serverSigner, Nip1.createTextNote(serverSigner.getPublicKey(), "Booted.")
                     .addTags(MoreTags.e(EventId.of(bootingEvent.getId().toByteArray())))
+                    .addTags(MoreTags.named("alt", "Took %s".formatted(startupDuration.get())))
             );
             eventEntityService.createEvent(bootedEvent);
         };
