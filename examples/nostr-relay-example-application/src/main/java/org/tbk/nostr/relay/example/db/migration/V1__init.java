@@ -5,7 +5,10 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Stream;
 
 @Component
 public class V1__init extends BaseJavaMigration {
@@ -43,7 +46,21 @@ public class V1__init extends BaseJavaMigration {
                 ) STRICT, WITHOUT ROWID;
                 """;
 
-        for (String sql : List.of(sql1, sql2)) {
+        String abc = "abcdefghijklmnopqrstuvwxyz";
+        List<String> singleLetterTagsIndexSqlList = Stream.concat(
+                        Arrays.stream(abc.toLowerCase(Locale.US).split("")),
+                        Arrays.stream(abc.toUpperCase(Locale.US).split(""))
+                ).map(it -> """
+                        CREATE INDEX idx_event_tag_%s_%s ON event_tag(name = '%s', value0);
+                        """.formatted(Character.isUpperCase(it.charAt(0)) ? "upper" : "lower", it, it))
+                .toList();
+
+        List<String> sqls = Stream.concat(
+                Stream.of(sql1, sql2),
+                singleLetterTagsIndexSqlList.stream()
+        ).toList();
+
+        for (String sql : sqls) {
             try (PreparedStatement statement = context.getConnection().prepareStatement(sql)) {
                 statement.execute();
             }

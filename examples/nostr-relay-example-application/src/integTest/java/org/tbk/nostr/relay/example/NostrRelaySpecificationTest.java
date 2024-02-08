@@ -19,6 +19,7 @@ import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreSubscriptionIds;
+import org.tbk.nostr.util.MoreTags;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -146,6 +147,36 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(fetchedEvent0, is(eventMatching));
+        assertThat(fetchedEvent0, is(eventMatching));
+    }
+
+    @Test
+    void itShouldFetchEventByIdSuccessfully1Verify() {
+        Signer signer = SimpleSigner.random();
+
+        Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
+                .addTags(MoreTags.named("e", "00".repeat(32)))
+                .addTags(MoreTags.named("e", "00".repeat(32)))
+                .addTags(MoreTags.named("any", "1"))
+                .addTags(MoreTags.named("any", "2"))
+                .addTags(MoreTags.named("any", "3"))
+                .addTags(MoreTags.named("z", "1"))
+                .addTags(MoreTags.named("Z", "2"))
+                .addTags(MoreTags.named("z", "1"))
+                .addTags(MoreTags.named("Z", "2"))
+                .addTags(MoreTags.named("s")));
+
+        OkResponse ok0 = nostrTemplate.send(event0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok0.getEventId(), is(event0.getId()));
+        assertThat(ok0.getSuccess(), is(true));
+
+        Event fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(event0.getId().toByteArray()))
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(fetchedEvent0, is(event0));
+        assertThat(MoreEvents.isValid(fetchedEvent0), is(true));
     }
 
     @Test
