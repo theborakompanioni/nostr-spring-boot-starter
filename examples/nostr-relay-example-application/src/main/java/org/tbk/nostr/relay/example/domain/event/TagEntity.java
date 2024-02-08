@@ -4,7 +4,6 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.google.protobuf.ProtocolStringList;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
@@ -17,24 +16,14 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 @Getter
-@Table(name = "event_tag", uniqueConstraints = {
-        @UniqueConstraint(name = "", columnNames = {"event_id", "position"})
-})
+@Table(name = "event_tag")
 public class TagEntity implements Entity<EventEntity, TagEntity.TagEntityId> {
 
     @NonNull
     private final TagEntityId id;
-
-    @NonNull
-    @Column(name = "event_id", nullable = false, updatable = false)
-    private final String eventId;
-
-    @Column(name = "position", updatable = false)
-    private final int position;
 
     @NonNull
     @Column(name = "name", nullable = false, updatable = false)
@@ -62,9 +51,7 @@ public class TagEntity implements Entity<EventEntity, TagEntity.TagEntityId> {
      * @param tag must not be {@literal null}.
      */
     TagEntity(TagValue tag, EventEntity.EventEntityId eventId, int position) {
-        this.id = TagEntityId.create();
-        this.eventId = eventId.getId();
-        this.position = position;
+        this.id = TagEntityId.create(eventId.getId(), position);
         this.name = tag.getName();
 
         ProtocolStringList values = tag.getValuesList();
@@ -72,6 +59,14 @@ public class TagEntity implements Entity<EventEntity, TagEntity.TagEntityId> {
         this.value1 = values.stream().skip(1).findFirst().orElse(null);
         this.value2 = values.stream().skip(2).findFirst().orElse(null);
         this.otherValues = tagsToJsonArray(values.stream().skip(3).toList());
+    }
+
+    public String getEventId() {
+        return this.id.getEventId();
+    }
+
+    public int getPosition() {
+        return this.id.getPosition();
     }
 
     public TagValue toNostrTag() {
@@ -91,12 +86,16 @@ public class TagEntity implements Entity<EventEntity, TagEntity.TagEntityId> {
     @Value(staticConstructor = "of")
     public static class TagEntityId implements Identifier {
 
-        static TagEntityId create() {
-            return TagEntityId.of(UUID.randomUUID().toString());
+        static TagEntityId create(String eventId, int position) {
+            return TagEntityId.of(eventId, position);
         }
 
         @NonNull
-        String id;
+        @Column(name = "event_id", nullable = false, updatable = false)
+        String eventId;
+
+        @Column(name = "position", updatable = false)
+        int position;
     }
 
     private static List<String> tagsFromJsonArray(@Nullable String json) {

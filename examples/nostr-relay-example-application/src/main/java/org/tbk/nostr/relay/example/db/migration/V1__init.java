@@ -33,7 +33,6 @@ public class V1__init extends BaseJavaMigration {
 
         String sql2 = """
                 create table if not exists event_tag (
-                    id text PRIMARY KEY,
                     event_id text NOT NULL,
                     position integer NOT NULL,
                     name text NOT NULL,
@@ -42,7 +41,7 @@ public class V1__init extends BaseJavaMigration {
                     value2 text NULL,
                     other_values text NULL,
                     FOREIGN KEY(event_id) REFERENCES event(id) ON DELETE CASCADE ON UPDATE CASCADE,
-                    UNIQUE(event_id, position)
+                    PRIMARY KEY (event_id, position)
                 ) STRICT, WITHOUT ROWID;
                 """;
 
