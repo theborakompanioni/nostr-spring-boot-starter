@@ -1,0 +1,5 @@
+logging.file.name: application-nip9-test.log
+logging.level.org.tbk.nostr: INFO
+
+spring.datasource.url: 'jdbc:sqlite:file:memory_nip9_test?mode=memory&foreign_keys=true'
+spring.datasource.hikari.maximum-pool-size: 1 #needed when using "in-memory" db!

@@ -1,0 +1,8 @@
+logging.file.name: application-load-test.log
+logging.level.org.tbk.nostr: INFO
+
+spring.datasource.url: 'jdbc:sqlite:file:memory_load_test?mode=memory&foreign_keys=true'
+spring.datasource.hikari.maximum-pool-size: 1 #needed when using "in-memory" db!
+
+#spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application-load-test.db?foreign_keys=true&journal_mode=WAL&temp_store=MEMORY&page_size=32768&mmap_size=30000000000'
+#spring.datasource.hikari.maximum-pool-size: 1
