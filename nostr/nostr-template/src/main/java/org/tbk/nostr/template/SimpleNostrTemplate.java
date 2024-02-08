@@ -140,7 +140,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
                                         log.warn("{} on unexpected subscription received. Ignoring.", response.getKindCase());
                                     } else {
                                         Event event = eventResponse.getEvent();
-                                        if (MoreEvents.isValid(event)) {
+                                        if (MoreEvents.isValidSignature(event)) {
                                             sink.next(event);
                                         } else {
                                             sink.error(new IllegalArgumentException("Invalid event data"));

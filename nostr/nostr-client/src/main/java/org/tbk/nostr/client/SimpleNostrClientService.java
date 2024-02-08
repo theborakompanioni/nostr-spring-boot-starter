@@ -5,7 +5,6 @@ import com.google.common.util.concurrent.AbstractScheduledService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,7 +113,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
                         }
                         case EVENT -> {
                             Event event = it.getEvent().getEvent();
-                            if (MoreEvents.isValid(event)) {
+                            if (MoreEvents.isValidSignature(event)) {
                                 sink.next(event);
                             }
                         }

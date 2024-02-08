@@ -19,7 +19,10 @@ import org.tbk.nostr.relay.example.nostr.handler.*;
 import org.tbk.nostr.relay.example.nostr.support.DefaultUnknownRequestHandler;
 import org.tbk.nostr.relay.example.nostr.support.MaxFilterCountReqRequestHandlerDecorator;
 import org.tbk.nostr.relay.example.nostr.support.MaxLimitPerFilterReqRequestHandlerDecorator;
-import org.tbk.nostr.relay.example.nostr.support.VerifyingEventRequestHandlerDecorator;
+import org.tbk.nostr.relay.example.nostr.support.ValidatingEventHandlerDecorator;
+import org.tbk.nostr.relay.example.nostr.support.validating.EventValidator;
+
+import java.util.List;
 
 @Slf4j
 @Configuration(proxyBeanMethods = false)
@@ -58,8 +61,12 @@ class NostrRelayExampleApplicationConfig {
     }
 
     @Bean
-    EventRequestHandler exampleEventRequestHandler(EventEntityService eventEntityService) {
-        return new ExampleEventRequestHandlerImpl(eventEntityService);
+    EventRequestHandler exampleEventRequestHandler(EventEntityService eventEntityService,
+                                                   List<EventValidator> validators) {
+        return new ValidatingEventHandlerDecorator(
+                new ExampleEventRequestHandlerImpl(eventEntityService),
+                validators
+        );
     }
 
     @Bean
@@ -87,7 +94,7 @@ class NostrRelayExampleApplicationConfig {
         return new ExampleNostrWebSocketHandlerImpl(
                 properties,
                 reqRequestHandler,
-                new VerifyingEventRequestHandlerDecorator(eventRequestHandler),
+                eventRequestHandler,
                 closeRequestHandler,
                 countRequestHandler,
                 unknownRequestHandler

@@ -5,7 +5,6 @@ import fr.acinq.bitcoin.ByteVector;
 import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
-import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nips.Nip1;
@@ -42,24 +41,16 @@ public final class MoreEvents {
         return signer.sign(event).build();
     }
 
-    public static boolean isValid(Event event) {
+    public static boolean isValidSignature(Event event) {
         try {
-            verify(event);
+            verifySignature(event);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    public static Event verify(Event event) throws IllegalArgumentException {
-
-        if (event.getKind() < 0 || event.getKind() > 65_535) {
-            throw new IllegalArgumentException("Invalid kind.");
-        }
-        if (event.getCreatedAt() < 0L) {
-            throw new IllegalArgumentException("Invalid created timestamp.");
-        }
-
+    public static Event verifySignature(Event event) throws IllegalArgumentException {
         XonlyPublicKey publicKey = new XonlyPublicKey(ByteVector32.fromValidHex(HexFormat.of().formatHex(event.getPubkey().toByteArray())));
         if (!publicKey.getPublicKey().isValid()) {
             throw new IllegalArgumentException("Invalid public key.");

@@ -90,7 +90,7 @@ public class NostrRelaySpecificationTest {
                 .setContent("Changed!")
                 .build();
 
-        assertThat("sanity check", MoreEvents.isValid(invalidEvent), is(false));
+        assertThat("sanity check", MoreEvents.isValidSignature(invalidEvent), is(false));
 
         OkResponse ok = nostrTemplate.send(invalidEvent)
                 .blockOptional(Duration.ofSeconds(5))
@@ -102,14 +102,57 @@ public class NostrRelaySpecificationTest {
     }
 
     @Test
-    void itShouldNotifyOnInvalidEvent1Sig() {
+    void itShouldNotifyOnInvalidEvent1Kind() {
         Signer signer = SimpleSigner.random();
 
-        Event verifiedEvent0 = MoreEvents.verify(MoreEvents.createFinalizedTextNote(signer, "GM"));
-        assertThat("sanity check", MoreEvents.isValid(verifiedEvent0), is(true));
+        Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0").setKind(-1));
+        Event invalidEvent2 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1").setKind(65_536));
 
-        Event verifiedEvent1 = MoreEvents.verify(MoreEvents.createFinalizedTextNote(signer, verifiedEvent0.getContent() + "!"));
-        assertThat("sanity check", MoreEvents.isValid(verifiedEvent1), is(true));
+        List<Event> events = List.of(invalidEvent1, invalidEvent2);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks.size(), is(events.size()));
+
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("Error: Invalid kind."));
+        }
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent2CreatedAt() {
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")).toBuilder()
+                .setCreatedAt(-1L)
+                .build();
+
+        List<Event> events = List.of(invalidEvent1);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks.size(), is(events.size()));
+
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("Error: Invalid created timestamp."));
+        }
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent3Sig() {
+        Signer signer = SimpleSigner.random();
+
+        Event verifiedEvent0 = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(signer, "GM"));
+        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent0), is(true));
+
+        Event verifiedEvent1 = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(signer, verifiedEvent0.getContent() + "!"));
+        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent1), is(true));
 
         assertThat("sanity check - id differs", verifiedEvent1.getId(), not(is(verifiedEvent0.getId())));
         assertThat("sanity check - sig differs", verifiedEvent1.getSig(), not(is(verifiedEvent0.getSig())));
@@ -118,7 +161,7 @@ public class NostrRelaySpecificationTest {
                 .setSig(verifiedEvent0.getSig())
                 .build();
 
-        assertThat("sanity check", MoreEvents.isValid(invalidEvent), is(false));
+        assertThat("sanity check", MoreEvents.isValidSignature(invalidEvent), is(false));
 
         OkResponse ok = nostrTemplate.send(invalidEvent)
                 .blockOptional(Duration.ofSeconds(5))
@@ -176,7 +219,7 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(fetchedEvent0, is(event0));
-        assertThat(MoreEvents.isValid(fetchedEvent0), is(true));
+        assertThat(MoreEvents.isValidSignature(fetchedEvent0), is(true));
     }
 
     @Test
