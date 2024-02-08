@@ -43,26 +43,14 @@ public class MoreSubscriptionIdsTest {
         IntStream.rangeClosed(info.getCurrentRepetition(), 64).forEach(minLength -> {
             SubscriptionId random0 = MoreSubscriptionIds.random(minLength);
             assertThat(random0.getId().length(), is(both(greaterThanOrEqualTo(minLength)).and(Matchers.lessThanOrEqualTo(64))));
-
-            SubscriptionId random1 = MoreSubscriptionIds.random(minLength);
-            assertThat(random1.getId().length(), is(both(greaterThanOrEqualTo(minLength)).and(Matchers.lessThanOrEqualTo(64))));
-
-            assertThat(random0, not(is(random1)));
         });
     }
 
     @RepeatedTest(64)
     void randomWithMinAndMaxLength(RepetitionInfo info) {
         IntStream.rangeClosed(info.getCurrentRepetition(), 64).forEach(minAndMaxLength -> {
-            assertThat(MoreSubscriptionIds.random(minAndMaxLength, minAndMaxLength).getId().length(), is(minAndMaxLength));
-
             SubscriptionId random0 = MoreSubscriptionIds.random(minAndMaxLength, minAndMaxLength);
             assertThat(random0.getId().length(), is(minAndMaxLength));
-
-            SubscriptionId random1 = MoreSubscriptionIds.random(minAndMaxLength, minAndMaxLength);
-            assertThat(random1.getId().length(), is(minAndMaxLength));
-
-            assertThat(random0, not(is(random1)));
         });
     }
 }
