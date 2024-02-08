@@ -18,6 +18,7 @@ import org.tbk.nostr.proto.ReqRequest;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
+import org.tbk.nostr.util.MoreKinds;
 import org.tbk.nostr.util.MoreSubscriptionIds;
 import org.tbk.nostr.util.MoreTags;
 
@@ -90,7 +91,7 @@ public class NostrRelaySpecificationTest {
                 .setContent("Changed!")
                 .build();
 
-        assertThat("sanity check", MoreEvents.isValidSignature(invalidEvent), is(false));
+        assertThat("sanity check", MoreEvents.hasValidSignature(invalidEvent), is(false));
 
         OkResponse ok = nostrTemplate.send(invalidEvent)
                 .blockOptional(Duration.ofSeconds(5))
@@ -105,10 +106,10 @@ public class NostrRelaySpecificationTest {
     void itShouldNotifyOnInvalidEvent1Kind() {
         Signer signer = SimpleSigner.random();
 
-        Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0").setKind(-1));
-        Event invalidEvent2 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1").setKind(65_536));
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0").setKind(-1));
+        Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1").setKind(65_536));
 
-        List<Event> events = List.of(invalidEvent1, invalidEvent2);
+        List<Event> events = List.of(invalidEvent0, invalidEvent1);
         List<OkResponse> oks = nostrTemplate.send(events)
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
@@ -126,11 +127,11 @@ public class NostrRelaySpecificationTest {
     void itShouldNotifyOnInvalidEvent2CreatedAt() {
         Signer signer = SimpleSigner.random();
 
-        Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")).toBuilder()
+        Event verifiedEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")).toBuilder()
                 .setCreatedAt(-1L)
                 .build();
 
-        List<Event> events = List.of(invalidEvent1);
+        List<Event> events = List.of(verifiedEvent0);
         List<OkResponse> oks = nostrTemplate.send(events)
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
@@ -149,10 +150,10 @@ public class NostrRelaySpecificationTest {
         Signer signer = SimpleSigner.random();
 
         Event verifiedEvent0 = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(signer, "GM"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent0), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent0), is(true));
 
         Event verifiedEvent1 = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(signer, verifiedEvent0.getContent() + "!"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent1), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent1), is(true));
 
         assertThat("sanity check - id differs", verifiedEvent1.getId(), not(is(verifiedEvent0.getId())));
         assertThat("sanity check - sig differs", verifiedEvent1.getSig(), not(is(verifiedEvent0.getSig())));
@@ -161,7 +162,7 @@ public class NostrRelaySpecificationTest {
                 .setSig(verifiedEvent0.getSig())
                 .build();
 
-        assertThat("sanity check", MoreEvents.isValidSignature(invalidEvent), is(false));
+        assertThat("sanity check", MoreEvents.hasValidSignature(invalidEvent), is(false));
 
         OkResponse ok = nostrTemplate.send(invalidEvent)
                 .blockOptional(Duration.ofSeconds(5))
@@ -170,6 +171,122 @@ public class NostrRelaySpecificationTest {
         assertThat(ok.getEventId(), is(invalidEvent.getId()));
         assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), is("Error: Invalid signature."));
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent3InvalidETag() {
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
+                .addTags(MoreTags.e("")));
+        Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1")
+                .addTags(MoreTags.e("zz".repeat(32))));
+        Event invalidEvent2 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM2")
+                .addTags(MoreTags.e("00".repeat(16))));
+        Event invalidEvent3 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM3")
+                .addTags(MoreTags.e("zz".repeat(32)))
+                .addTags(MoreTags.e("00".repeat(16))));
+
+        List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2, invalidEvent3);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks.size(), is(events.size()));
+
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("Error: Invalid tag 'e'."));
+        }
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent4InvalidPTag() {
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
+                .addTags(MoreTags.p("")));
+        Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1")
+                .addTags(MoreTags.p("zz".repeat(32))));
+        Event invalidEvent2 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM2")
+                .addTags(MoreTags.p("00".repeat(16))));
+        Event invalidEvent3 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM3")
+                .addTags(MoreTags.p("zz".repeat(32)))
+                .addTags(MoreTags.p("00".repeat(16))));
+        Event invalidEvent4 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM4")
+                .addTags(MoreTags.p("00".repeat(32))));
+
+        List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2, invalidEvent3, invalidEvent4);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks.size(), is(events.size()));
+
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("Error: Invalid tag 'p'."));
+        }
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent5InvalidATag() {
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
+                .addTags(MoreTags.a("")));
+        Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1")
+                .addTags(MoreTags.a(MoreKinds.minValue() - 1, signer.getPublicKey())));
+        Event invalidEvent2 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM2")
+                .addTags(MoreTags.a(MoreKinds.maxValue() + 1, signer.getPublicKey())));
+        Event invalidEvent3 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM3")
+                .addTags(MoreTags.a("", signer.getPublicKey().value.toHex())));
+        Event invalidEvent4 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM4")
+                .addTags(MoreTags.a("NaN", signer.getPublicKey().value.toHex())));
+        Event invalidEvent5 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM5")
+                .addTags(MoreTags.a("%d:%s".formatted(1, "00".repeat(32)))));
+        Event invalidEvent6 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM6")
+                .addTags(MoreTags.a(":")));
+
+        List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2, invalidEvent3, invalidEvent4, invalidEvent5, invalidEvent6);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks.size(), is(events.size()));
+
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("Error: Invalid tag 'a'."));
+        }
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent6InvalidTagName() {
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
+                .addTags(MoreTags.named("")));
+        Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1")
+                .addTags(MoreTags.named("", "test")));
+        Event invalidEvent2 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM2")
+                .addTags(MoreTags.named("0".repeat(257))));
+
+        List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks.size(), is(events.size()));
+
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("Error: Invalid tag name."));
+        }
     }
 
     @Test
@@ -200,6 +317,7 @@ public class NostrRelaySpecificationTest {
         Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
                 .addTags(MoreTags.named("e", "00".repeat(32)))
                 .addTags(MoreTags.named("e", "00".repeat(32)))
+                .addTags(MoreTags.named("a", "%d:%s".formatted(MoreKinds.maxValue(), signer.getPublicKey().value.toHex())))
                 .addTags(MoreTags.named("any", "1"))
                 .addTags(MoreTags.named("any", "2"))
                 .addTags(MoreTags.named("any", "3"))
@@ -219,7 +337,7 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(fetchedEvent0, is(event0));
-        assertThat(MoreEvents.isValidSignature(fetchedEvent0), is(true));
+        assertThat(MoreEvents.hasValidSignature(fetchedEvent0), is(true));
     }
 
     @Test

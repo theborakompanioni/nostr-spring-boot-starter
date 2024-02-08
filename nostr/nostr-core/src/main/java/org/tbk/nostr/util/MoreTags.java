@@ -1,7 +1,6 @@
 package org.tbk.nostr.util;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
-import lombok.NonNull;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nips.Nip10;
@@ -77,6 +76,29 @@ public final class MoreTags {
      */
     public static TagValue p(String... values) {
         return named("p", values);
+    }
+
+    public static TagValue a(int kind, XonlyPublicKey publicKey) {
+        return a("%d:%s".formatted(kind, publicKey));
+    }
+
+    public static TagValue a(int kind, XonlyPublicKey publicKey, String dTagValue) {
+        return a("%d:%s:%s".formatted(kind, publicKey, dTagValue));
+    }
+
+    public static TagValue a(int kind, XonlyPublicKey publicKey, RelayUri recommendedRelay) {
+        return a("%d:%s".formatted(kind, publicKey), recommendedRelay.getUri().toString());
+    }
+
+    public static TagValue a(int kind, XonlyPublicKey publicKey, String dTagValue, RelayUri recommendedRelay) {
+        return a("%d:%s%s".formatted(kind, publicKey, dTagValue), recommendedRelay.getUri().toString());
+    }
+
+    /**
+     * Prefer typed versions, e.g. {@link #a(int, XonlyPublicKey)}, {@link #a(int, XonlyPublicKey, RelayUri)},
+     */
+    public static TagValue a(String... values) {
+        return named("a", values);
     }
 
     public static TagValue named(String name, String... values) {

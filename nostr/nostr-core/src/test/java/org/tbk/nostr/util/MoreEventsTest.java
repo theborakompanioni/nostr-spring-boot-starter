@@ -138,13 +138,13 @@ class MoreEventsTest {
     @Test
     void itShouldFailVerifyInvalidEvent0Id() {
         Event verifiedEvent = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent), is(true));
 
         Event invalidEvent = verifiedEvent.toBuilder()
                 .setId(ByteString.fromHex("00".repeat(32)))
                 .build();
 
-        assertThat(MoreEvents.isValidSignature(invalidEvent), is(false));
+        assertThat(MoreEvents.hasValidSignature(invalidEvent), is(false));
 
         try {
             MoreEvents.verifySignature(invalidEvent);
@@ -157,13 +157,13 @@ class MoreEventsTest {
     @Test
     void itShouldFailVerifyInvalidEvent1CreatedAt() {
         Event verifiedEvent = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent), is(true));
 
         Event invalidEvent = verifiedEvent.toBuilder()
                 .setCreatedAt(verifiedEvent.getCreatedAt() + 1)
                 .build();
 
-        assertThat(MoreEvents.isValidSignature(invalidEvent), is(false));
+        assertThat(MoreEvents.hasValidSignature(invalidEvent), is(false));
 
         try {
             MoreEvents.verifySignature(invalidEvent);
@@ -176,13 +176,13 @@ class MoreEventsTest {
     @Test
     void itShouldFailVerifyInvalidEvent2Kind() {
         Event verifiedEvent = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent), is(true));
 
         Event invalidEvent = verifiedEvent.toBuilder()
                 .setKind(verifiedEvent.getKind() + 1)
                 .build();
 
-        assertThat(MoreEvents.isValidSignature(invalidEvent), is(false));
+        assertThat(MoreEvents.hasValidSignature(invalidEvent), is(false));
 
         try {
             MoreEvents.verifySignature(invalidEvent);
@@ -195,13 +195,13 @@ class MoreEventsTest {
     @Test
     void itShouldFailVerifyInvalidEvent3Content() {
         Event verifiedEvent = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent), is(true));
 
         Event invalidEvent = verifiedEvent.toBuilder()
                 .setContent(verifiedEvent.getContent() + "!")
                 .build();
 
-        assertThat(MoreEvents.isValidSignature(invalidEvent), is(false));
+        assertThat(MoreEvents.hasValidSignature(invalidEvent), is(false));
 
         try {
             MoreEvents.verifySignature(invalidEvent);
@@ -214,13 +214,13 @@ class MoreEventsTest {
     @Test
     void itShouldFailVerifyInvalidEvent4Tags() {
         Event verifiedEvent = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent), is(true));
 
         Event invalidEvent = verifiedEvent.toBuilder()
                 .addTags(MoreTags.e(verifiedEvent))
                 .build();
 
-        assertThat(MoreEvents.isValidSignature(invalidEvent), is(false));
+        assertThat(MoreEvents.hasValidSignature(invalidEvent), is(false));
 
         try {
             MoreEvents.verifySignature(invalidEvent);
@@ -233,13 +233,13 @@ class MoreEventsTest {
     @Test
     void itShouldFailVerifyInvalidEvent5DifferentPubkey() {
         Event verifiedEvent0 = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent0), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent0), is(true));
 
         Event invalidEvent = verifiedEvent0.toBuilder()
                 .setPubkey(ByteString.fromHex(SimpleSigner.random().getPublicKey().value.toHex()))
                 .build();
 
-        assertThat(MoreEvents.isValidSignature(invalidEvent), is(false));
+        assertThat(MoreEvents.hasValidSignature(invalidEvent), is(false));
 
         try {
             MoreEvents.verifySignature(invalidEvent);
@@ -252,13 +252,13 @@ class MoreEventsTest {
     @Test
     void itShouldFailVerifyInvalidEvent6InvalidPubkey() {
         Event verifiedEvent = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent), is(true));
 
         Event invalidEvent = verifiedEvent.toBuilder()
                 .setPubkey(ByteString.fromHex("00".repeat(32)))
                 .build();
 
-        assertThat(MoreEvents.isValidSignature(invalidEvent), is(false));
+        assertThat(MoreEvents.hasValidSignature(invalidEvent), is(false));
 
         try {
             MoreEvents.verifySignature(invalidEvent);
@@ -271,10 +271,10 @@ class MoreEventsTest {
     @Test
     void itShouldFailVerifyInvalidEvent7InvalidSig() {
         Event verifiedEvent0 = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(testSigner, "GM"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent0), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent0), is(true));
 
         Event verifiedEvent1 = MoreEvents.verifySignature(MoreEvents.createFinalizedTextNote(testSigner, verifiedEvent0.getContent() + "!"));
-        assertThat("sanity check", MoreEvents.isValidSignature(verifiedEvent1), is(true));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent1), is(true));
 
         assertThat("sanity check - id differs", verifiedEvent1.getId(), not(is(verifiedEvent0.getId())));
         assertThat("sanity check - sig differs", verifiedEvent1.getSig(), not(is(verifiedEvent0.getSig())));
@@ -283,7 +283,7 @@ class MoreEventsTest {
                 .setSig(verifiedEvent0.getSig())
                 .build();
 
-        assertThat(MoreEvents.isValidSignature(invalidEvent), is(false));
+        assertThat(MoreEvents.hasValidSignature(invalidEvent), is(false));
 
         try {
             MoreEvents.verifySignature(invalidEvent);

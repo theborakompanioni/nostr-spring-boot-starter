@@ -12,8 +12,8 @@ public interface EventValidator extends Validator {
 
     default void validate(Object target, Errors errors) {
         Assert.isTrue(supports(target.getClass()), "Given class not supported.");
-        this.validate((Event) target, errors);
+        this.validateEvent((Event) target, errors);
     }
 
-    void validate(Event target, Errors errors);
+    void validateEvent(Event target, Errors errors);
 }

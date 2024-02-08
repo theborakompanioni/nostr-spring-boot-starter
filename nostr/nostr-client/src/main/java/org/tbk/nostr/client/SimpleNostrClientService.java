@@ -113,7 +113,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
                         }
                         case EVENT -> {
                             Event event = it.getEvent().getEvent();
-                            if (MoreEvents.isValidSignature(event)) {
+                            if (MoreEvents.hasValidSignature(event)) {
                                 sink.next(event);
                             }
                         }

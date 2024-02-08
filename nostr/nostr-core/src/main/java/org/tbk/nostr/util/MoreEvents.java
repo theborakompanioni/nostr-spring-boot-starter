@@ -41,7 +41,7 @@ public final class MoreEvents {
         return signer.sign(event).build();
     }
 
-    public static boolean isValidSignature(Event event) {
+    public static boolean hasValidSignature(Event event) {
         try {
             verifySignature(event);
             return true;
@@ -51,7 +51,7 @@ public final class MoreEvents {
     }
 
     public static Event verifySignature(Event event) throws IllegalArgumentException {
-        XonlyPublicKey publicKey = new XonlyPublicKey(ByteVector32.fromValidHex(HexFormat.of().formatHex(event.getPubkey().toByteArray())));
+        XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
         if (!publicKey.getPublicKey().isValid()) {
             throw new IllegalArgumentException("Invalid public key.");
         }
