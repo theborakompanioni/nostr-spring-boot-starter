@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHttpHeaders;
@@ -31,7 +32,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,14 +73,25 @@ public class SimpleNostrTemplate implements NostrTemplate {
     @Override
     public Mono<RelayInfoDocument> fetchRelayInfoDocument(URI uri) {
         return Mono.fromCallable(() -> {
-            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder().GET()
-                    .header("Accept", "application/nostr+json");
+            HttpRequest request = HttpRequest.newBuilder().GET()
+                    .header("Accept", "application/nostr+json")
+                    .uri(uri)
+                    .build();
 
             try (HttpClient client = HttpClient.newHttpClient()) {
-                HttpRequest request = requestBuilder.uri(uri).build();
-                return client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+                return client.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8));
             }
-        }).map(it -> RelayInfoDocument.fromJson(it.body()));
+        }).map(it -> {
+            if (!HttpStatus.valueOf(it.statusCode()).is2xxSuccessful()) {
+                throw new RuntimeException(new IOException("Unexpected status code."));
+            }
+
+            try {
+                return RelayInfoDocument.fromJson(it.body());
+            } catch (Exception e) {
+                throw new RuntimeException(new IOException("Unexpected data in response body."));
+            }
+        });
     }
 
     @Override
