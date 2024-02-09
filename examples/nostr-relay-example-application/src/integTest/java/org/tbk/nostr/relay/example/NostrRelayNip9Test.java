@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test", "nip9-test"})
-//@ActiveProfiles("test")
 public class NostrRelayNip9Test {
 
     @LocalServerPort

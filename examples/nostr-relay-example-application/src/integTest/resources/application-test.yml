@@ -26,3 +26,5 @@ spring.docker.compose:
 
 org.tbk.nostr.relay.example:
   greeting: null
+  async-executor:
+    max-pool-size: 10

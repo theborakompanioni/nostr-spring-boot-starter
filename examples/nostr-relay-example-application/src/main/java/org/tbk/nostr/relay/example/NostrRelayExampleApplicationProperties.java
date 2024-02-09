@@ -21,6 +21,7 @@ import java.util.Optional;
 @AllArgsConstructor(onConstructor = @__(@ConstructorBinding))
 public class NostrRelayExampleApplicationProperties implements Validator {
     private static final RelayOptionsProperties DEFAULT_RELAY_OPTIONS = new RelayOptionsProperties();
+    private static final AsyncExecutorProperties DEFAULT_ASYNC_EXECUTOR = new AsyncExecutorProperties();
 
     @Nullable
     private IdentityProperties identity;
@@ -34,6 +35,9 @@ public class NostrRelayExampleApplicationProperties implements Validator {
 
     @Nullable
     private RelayOptionsProperties relayOptions;
+
+    @Nullable
+    private AsyncExecutorProperties asyncExecutor;
 
     public Optional<IdentityProperties> getIdentity() {
         return Optional.ofNullable(identity);
@@ -49,6 +53,10 @@ public class NostrRelayExampleApplicationProperties implements Validator {
 
     public RelayOptionsProperties getRelayOptions() {
         return Optional.ofNullable(relayOptions).orElse(DEFAULT_RELAY_OPTIONS);
+    }
+
+    public AsyncExecutorProperties getAsyncExecutor() {
+        return Optional.ofNullable(asyncExecutor).orElse(DEFAULT_ASYNC_EXECUTOR);
     }
 
     public boolean isStartupEventsEnabled() {
@@ -112,6 +120,33 @@ public class NostrRelayExampleApplicationProperties implements Validator {
             } catch (Exception e) {
                 String errorMessage = "'mnemonics' must be a valid mnemonic phrase";
                 errors.rejectValue("mnemonics", "mnemonics.invalid", errorMessage);
+            }
+        }
+    }
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor(onConstructor = @__(@ConstructorBinding))
+    public static class AsyncExecutorProperties implements Validator {
+
+        private static final int MAX_POOL_SIZE_DEFAULT = 1;
+
+        private Integer maxPoolSize;
+
+        public int getMaxPoolSize() {
+            return Optional.ofNullable(maxPoolSize).orElse(MAX_POOL_SIZE_DEFAULT);
+        }
+        @Override
+        public boolean supports(Class<?> clazz) {
+            return clazz == AsyncExecutorProperties.class;
+        }
+
+        @Override
+        public void validate(Object target, Errors errors) {
+            AsyncExecutorProperties properties = (AsyncExecutorProperties) target;
+
+            if (properties.getMaxPoolSize() <= 0) {
+                String errorMessage = "'maxPoolSize' must be greater than zero";
+                errors.rejectValue("maxPoolSize", "maxPoolSize.invalid", errorMessage);
             }
         }
     }

@@ -40,3 +40,5 @@ org.tbk.nostr.relay.example:
   identity:
     mnemonics: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
     passphrase: ''
+  async-executor:
+    max-pool-size: 1 # sqlite needs a single thread

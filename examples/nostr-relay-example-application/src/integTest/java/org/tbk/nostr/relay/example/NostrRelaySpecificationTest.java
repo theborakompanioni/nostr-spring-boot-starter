@@ -31,7 +31,6 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test", "spec-test"})
-//@ActiveProfiles("test")
 public class NostrRelaySpecificationTest {
 
     @LocalServerPort

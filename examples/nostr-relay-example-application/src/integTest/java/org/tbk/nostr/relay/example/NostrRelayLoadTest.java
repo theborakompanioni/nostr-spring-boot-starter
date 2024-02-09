@@ -33,7 +33,6 @@ import static org.hamcrest.Matchers.is;
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test", "load-test"})
-//@ActiveProfiles("test")
 public class NostrRelayLoadTest {
 
     @LocalServerPort
