@@ -18,8 +18,7 @@ import java.time.Duration;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -41,10 +40,18 @@ public class NostrRelayExampleApplicationTest {
     }
 
     @Test
-    void itShouldReceiveStartupEvents() {
-        assertThat("sanity check", applicationProperties.isStartupEventsEnabled(), is(true));
-        assertThat("sanity check", applicationProperties.getIdentity().isPresent(), is(true));
+    void itShouldLoadProperties() {
+        assertThat(applicationProperties.isStartupEventsEnabled(), is(true));
+        assertThat(applicationProperties.getIdentity().isPresent(), is(true));
+        assertThat(applicationProperties.getAsyncExecutor().getMaxPoolSize(), is(10));
+        assertThat(applicationProperties.getRelayOptions().getGreeting().isPresent(), is(false));
+        assertThat(applicationProperties.getRelayOptions().getInitialQueryLimit(), is(210));
+        assertThat(applicationProperties.getRelayOptions().getMaxLimitPerFilter(), is(2100));
+        assertThat(applicationProperties.getRelayOptions().getMaxFilterCount(), is(42));
+    }
 
+    @Test
+    void itShouldReceiveStartupEvents() {
         NostrTemplate nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
 
         XonlyPublicKey applicationPubkey = applicationProperties.getIdentity()

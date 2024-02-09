@@ -2,6 +2,7 @@ package org.tbk.nostr.relay.example;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,6 +29,9 @@ public class NostrRelaySqliteTest {
     @LocalServerPort
     private int serverPort;
 
+    @Autowired
+    private NostrRelayExampleApplicationProperties applicationProperties;
+
     private NostrTemplate nostrTemplate;
 
     @BeforeEach
@@ -35,6 +39,11 @@ public class NostrRelaySqliteTest {
         if (this.nostrTemplate == null) {
             this.nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
         }
+    }
+
+    @Test
+    void itShouldLoadProperties() {
+        assertThat(applicationProperties.getAsyncExecutor().getMaxPoolSize(), is(1));
     }
 
     @Test

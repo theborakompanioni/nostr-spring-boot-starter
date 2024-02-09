@@ -26,10 +26,6 @@ public class NostrRelayExampleApplicationProperties implements Validator {
     @Nullable
     private IdentityProperties identity;
 
-    // initial message sent to users on websocket connection established
-    @Nullable
-    private String greeting;
-
     @Nullable
     private Boolean startupEventsEnabled;
 
@@ -41,10 +37,6 @@ public class NostrRelayExampleApplicationProperties implements Validator {
 
     public Optional<IdentityProperties> getIdentity() {
         return Optional.ofNullable(identity);
-    }
-
-    public Optional<String> getGreeting() {
-        return Optional.ofNullable(greeting);
     }
 
     public Optional<Boolean> getStartupEventsEnabled() {
@@ -123,6 +115,7 @@ public class NostrRelayExampleApplicationProperties implements Validator {
             }
         }
     }
+
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor(onConstructor = @__(@ConstructorBinding))
@@ -135,6 +128,7 @@ public class NostrRelayExampleApplicationProperties implements Validator {
         public int getMaxPoolSize() {
             return Optional.ofNullable(maxPoolSize).orElse(MAX_POOL_SIZE_DEFAULT);
         }
+
         @Override
         public boolean supports(Class<?> clazz) {
             return clazz == AsyncExecutorProperties.class;
@@ -162,11 +156,19 @@ public class NostrRelayExampleApplicationProperties implements Validator {
 
         private static final int MAX_FILTER_COUNT_DEFAULT = 21;
 
+        // initial message sent to users on websocket connection established
+        @Nullable
+        private String greeting;
+
         private Integer initialQueryLimit;
 
         private Integer maxLimitPerFilter;
 
         private Integer maxFilterCount;
+
+        public Optional<String> getGreeting() {
+            return Optional.ofNullable(greeting).filter(it -> !it.isEmpty());
+        }
 
         public int getInitialQueryLimit() {
             return Optional.ofNullable(initialQueryLimit).orElse(INITIAL_QUERY_LIMIT_DEFAULT);

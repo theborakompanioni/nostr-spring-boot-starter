@@ -86,13 +86,14 @@ class NostrRelayExampleApplicationConfig {
     }
 
     @Bean
-    NostrWebSocketHandler nostrRelayExampleWebSocketHandler(ReqRequestHandler reqRequestHandler,
+    NostrWebSocketHandler nostrRelayExampleWebSocketHandler(RelayOptionsProperties relayOptions,
+                                                            ReqRequestHandler reqRequestHandler,
                                                             EventRequestHandler eventRequestHandler,
                                                             CloseRequestHandler closeRequestHandler,
                                                             CountRequestHandler countRequestHandler,
                                                             UnknownRequestHandler unknownRequestHandler) {
         return new ExampleNostrWebSocketHandlerImpl(
-                properties,
+                relayOptions,
                 reqRequestHandler,
                 eventRequestHandler,
                 closeRequestHandler,

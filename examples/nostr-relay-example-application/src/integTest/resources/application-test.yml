@@ -24,6 +24,10 @@ spring.docker.compose:
   skip.in-tests: false
 
 org.tbk.nostr.relay.example:
-  greeting: null
   async-executor:
     max-pool-size: 10
+  relay-options:
+    greeting: null
+    initial-query-limit: 210
+    max-limit-per-filter: 2100
+    max-filter-count: 42
