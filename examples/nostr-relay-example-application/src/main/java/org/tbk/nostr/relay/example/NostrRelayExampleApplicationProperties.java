@@ -149,6 +149,7 @@ public class NostrRelayExampleApplicationProperties implements Validator {
     @NoArgsConstructor
     @AllArgsConstructor(onConstructor = @__(@ConstructorBinding))
     public static class RelayOptionsProperties implements Validator {
+        private static final String DEFAULT_WEBSOCKET_PATH = "/";
 
         private static final int INITIAL_QUERY_LIMIT_DEFAULT = 100;
 
@@ -156,15 +157,25 @@ public class NostrRelayExampleApplicationProperties implements Validator {
 
         private static final int MAX_FILTER_COUNT_DEFAULT = 21;
 
+        @Nullable
+        private String websocketPath;
+
         // initial message sent to users on websocket connection established
         @Nullable
         private String greeting;
 
+        @Nullable
         private Integer initialQueryLimit;
 
+        @Nullable
         private Integer maxLimitPerFilter;
 
+        @Nullable
         private Integer maxFilterCount;
+
+        public String getWebsocketPath() {
+            return Optional.ofNullable(websocketPath).orElse(DEFAULT_WEBSOCKET_PATH);
+        }
 
         public Optional<String> getGreeting() {
             return Optional.ofNullable(greeting).filter(it -> !it.isEmpty());

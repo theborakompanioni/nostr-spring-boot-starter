@@ -11,6 +11,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.handler.LoggingWebSocketHandlerDecorator;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
+import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties.RelayOptionsProperties;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketHandler;
 
 @EnableWebSocket
@@ -20,11 +21,14 @@ import org.tbk.nostr.relay.example.nostr.NostrWebSocketHandler;
 class NostrRelayExampleWebSocketConfigurer implements WebSocketConfigurer {
 
     @NonNull
+    private final RelayOptionsProperties relayOptions;
+
+    @NonNull
     private final NostrWebSocketHandler nostrWebSocketHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new LoggingWebSocketHandlerDecorator(nostrWebSocketHandler), "/")
+        registry.addHandler(new LoggingWebSocketHandlerDecorator(nostrWebSocketHandler), relayOptions.getWebsocketPath())
                 .addInterceptors(new HttpSessionHandshakeInterceptor())
                 .setAllowedOrigins("*");
     }
