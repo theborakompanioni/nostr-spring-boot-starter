@@ -2,6 +2,8 @@ package org.tbk.nostr.relay.example.impl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -39,24 +41,21 @@ public class ExampleEventRequestHandlerImpl implements EventRequestHandler {
     }
 
     private static OkResponse.Builder handleEventMessageException(Exception e, OkResponse.Builder okBuilder) {
-        if (e instanceof JpaSystemException jpaSystemException) {
+        if (e instanceof JpaSystemException jse) {
             okBuilder.setMessage("Error: %s".formatted("Undefined storage error."));
 
-            Throwable mostSpecificCause = jpaSystemException.getMostSpecificCause();
+            Throwable mostSpecificCause = jse.getMostSpecificCause();
             if (mostSpecificCause instanceof SQLiteException sqliteException) {
                 okBuilder.setMessage("Error: %s".formatted("Storage error (%d).".formatted(sqliteException.getResultCode().code)));
                 switch (sqliteException.getResultCode()) {
-                    case SQLITE_CONSTRAINT_UNIQUE,
-                            SQLITE_CONSTRAINT_PRIMARYKEY -> {
-                        okBuilder.setMessage("Error: %s".formatted("Duplicate event."));
-                    }
-                    case SQLITE_CONSTRAINT_CHECK -> {
-                        okBuilder.setMessage("Error: %s".formatted("Check failed."));
-                    }
+                    case SQLITE_CONSTRAINT_UNIQUE, SQLITE_CONSTRAINT_PRIMARYKEY ->
+                            okBuilder.setMessage("Error: %s".formatted("Duplicate event."));
+                    case SQLITE_CONSTRAINT_CHECK -> okBuilder.setMessage("Error: %s".formatted("Check failed."));
                 }
             }
+        } else if (e instanceof DataIntegrityViolationException dive) {
+            okBuilder.setMessage("Error: %s".formatted("Duplicate event."));
         } else {
-
             okBuilder.setMessage("Error: %s".formatted("Unknown reason."));
         }
 
