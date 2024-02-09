@@ -11,10 +11,13 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.base.SubscriptionId;
+import org.tbk.nostr.nip11.RelayInfoDocument;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.proto.json.JsonReader;
 import org.tbk.nostr.proto.json.JsonWriter;
@@ -23,7 +26,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
+import javax.net.ssl.SSLException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -45,6 +54,32 @@ public class SimpleNostrTemplate implements NostrTemplate {
         this.relay = requireNonNull(relay);
         this.webSocketClient = new StandardWebSocketClient();
         this.headers = new WebSocketHttpHeaders();
+    }
+
+    @Override
+    public Mono<RelayInfoDocument> fetchRelayInfoDocument() {
+        return Mono.defer(() -> {
+            UriComponents https = UriComponentsBuilder.fromUri(this.relay.getUri())
+                    .scheme("https").build();
+            return fetchRelayInfoDocument(https.toUri());
+        }).onErrorResume(SSLException.class, throwable -> {
+            UriComponents http = UriComponentsBuilder.fromUri(this.relay.getUri())
+                    .scheme("http").build();
+            return fetchRelayInfoDocument(http.toUri());
+        });
+    }
+
+    @Override
+    public Mono<RelayInfoDocument> fetchRelayInfoDocument(URI uri) {
+        return Mono.fromCallable(() -> {
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder().GET()
+                    .header("Accept", "application/nostr+json");
+
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                HttpRequest request = requestBuilder.uri(uri).build();
+                return client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            }
+        }).map(it -> RelayInfoDocument.fromJson(it.body()));
     }
 
     @Override

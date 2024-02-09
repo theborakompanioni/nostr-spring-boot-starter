@@ -1,7 +1,6 @@
 package org.tbk.nostr.template;
 
 import com.google.protobuf.ByteString;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nip11.RelayInfoDocument;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.util.MoreEvents;
@@ -42,6 +42,15 @@ class NostrTemplateApplicationTest {
     void contextLoads() {
         assertThat(applicationContext, is(notNullValue()));
         assertThat(sut, is(notNullValue()));
+    }
+
+    @Test
+    @Disabled("nostr-rs-relay currently does not deliver a Relay Information Document")
+    void itShouldFetchRelayInfoDocumentSuccessfully0() {
+        RelayInfoDocument relayInfo = sut.fetchRelayInfoDocument()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(relayInfo, is(notNullValue()));
     }
 
     @Test

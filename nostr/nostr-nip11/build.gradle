@@ -2,16 +2,12 @@ plugins {
     id 'java'
 }
 
-description = 'nostr identity package'
+description = 'nostr nip11 package'
 
 dependencies {
+    implementation project(':nostr:nostr-core')
+    
     api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
 
-    api 'io.projectreactor:reactor-core'
-
     implementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
-
-    implementation "com.google.guava:guava:${guavaVersion}"
-
-    testImplementation project(':nostr:nostr-core')
 }
