@@ -1,10 +1,9 @@
-package org.tbk.nostr.relay.example.extension;
+package org.tbk.nostr.relay.example.extension.nip9;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -23,9 +22,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
-public class Nip9Extension {
+class Nip9EventEntityPostProcessor {
 
     @NonNull
     private final EventEntityService eventEntityService;

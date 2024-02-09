@@ -8,7 +8,7 @@ import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties.RelayO
 
 @Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
-public class Nip11Extension {
+class Nip11Extension {
 
     @NonNull
     private final RelayOptionsProperties relayOptions;

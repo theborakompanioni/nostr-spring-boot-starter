@@ -17,7 +17,7 @@ import java.util.List;
 
 
 @RequiredArgsConstructor
-public final class RelayInfoWriterFilter implements Filter {
+class RelayInfoWriterFilter implements Filter {
     private static final String APPLICATION_JSON_NOSTR_VALUE = new MediaType("application", "nostr+json").toString();
     private static final List<String> supportedSchemes = List.of("http", "https");
 
