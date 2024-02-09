@@ -4,10 +4,13 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nips.Nip10;
+import org.tbk.nostr.nips.Nip40;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
@@ -99,6 +102,14 @@ public final class MoreTags {
      */
     public static TagValue a(String... values) {
         return named("a", values);
+    }
+
+    public static TagValue expiration(Duration duration) {
+        return Nip40.expiration(duration);
+    }
+
+    public static TagValue expiration(Instant instant) {
+        return Nip40.expiration(instant);
     }
 
     public static TagValue named(String name, String... values) {

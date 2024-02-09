@@ -55,7 +55,7 @@ public class Nip9Extension {
         boolean deletionEventFound = hasDeletionEvent(entity);
         if (deletionEventFound) {
             log.debug("Found existing deletion event for newly created event {}", entity.getId().getId());
-            eventEntityService.markDeleted(List.of(entity.asEventId()), entity.asPublicKey())
+            eventEntityService.markDeleted(List.of(entity.getId().toEventId()), entity.asPublicKey())
                     .collectList()
                     .blockOptional()
                     .orElseThrow(() -> new IllegalStateException("Could not delete all events"));

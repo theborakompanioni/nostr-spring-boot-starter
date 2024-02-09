@@ -2,6 +2,7 @@ package org.tbk.nostr.relay.example.domain.event;
 
 import com.google.common.collect.ImmutableList;
 import fr.acinq.bitcoin.XonlyPublicKey;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.jmolecules.ddd.annotation.Service;
 import org.springframework.context.event.EventListener;
@@ -84,6 +85,14 @@ public class EventEntityServiceImpl implements EventEntityService {
 
         return Flux.fromIterable(deletabledEntities)
                 .map(it -> EventId.fromHex(it.getId().getId()));
+    }
+
+    @Override
+    public EventEntity markExpiresAt(EventId eventId, Instant expiresAt) {
+        EventEntity entity = events.findById(EventEntity.EventEntityId.of(eventId.toHex()))
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find event with id " + eventId.toHex()));
+
+        return events.save(entity.markExpiresAt(expiresAt));
     }
 
     @Override

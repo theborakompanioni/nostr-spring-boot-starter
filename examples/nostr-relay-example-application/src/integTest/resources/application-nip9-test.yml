@@ -1,4 +1,0 @@
-spring.application.name: 'tbk-nostr-relay-nip9-test'
-
-logging.file.name: application-nip9-test.log
-logging.level.org.tbk.nostr: INFO

@@ -10,6 +10,7 @@ import org.tbk.nostr.proto.Filter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,4 +31,6 @@ public interface EventEntityService {
     boolean exists(Specification<EventEntity> specs);
 
     Flux<EventId> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author);
+
+    EventEntity markExpiresAt(EventId eventId, Instant expiresAt);
 }

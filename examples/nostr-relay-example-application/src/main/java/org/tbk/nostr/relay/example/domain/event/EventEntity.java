@@ -79,10 +79,6 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
         registerEvent(new EventEntityEvents.CreatedEvent(this.id));
     }
 
-    public EventId asEventId() {
-        return EventId.fromHex(this.id.getId());
-    }
-
     public XonlyPublicKey asPublicKey() {
         return new XonlyPublicKey(ByteVector32.fromValidHex(this.pubkey));
     }
@@ -95,9 +91,14 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
         return expiresAt != null && expiresAt.isBefore(now);
     }
 
-    public EventEntity markDeleted(Instant now) {
+    EventEntity markDeleted(Instant now) {
         this.deletedAt = now;
         registerEvent(new EventEntityEvents.MarkDeletedEvent(this.id));
+        return this;
+    }
+
+    EventEntity markExpiresAt(Instant expiresAt) {
+        this.expiresAt = expiresAt;
         return this;
     }
 
@@ -123,5 +124,9 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
 
         @NonNull
         String id;
+
+        public EventId toEventId() {
+            return EventId.fromHex(this.id);
+        }
     }
 }
