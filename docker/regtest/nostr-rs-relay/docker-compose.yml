@@ -5,7 +5,7 @@ services:
   # https://github.com/scsibug/nostr-rs-relay
   relay:
     image: scsibug/nostr-rs-relay:latest
-    container_name: nostr-spring-boot-starter-relay
+    container_name: nostr-spring-boot-starter-nostr-rs-relay
     restart: unless-stopped
     ports:
       - "7000:8080"

@@ -41,4 +41,6 @@ dependencies {
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
     testImplementation project(':nostr:nostr-template')
+    integTestImplementation "org.postgresql:postgresql:${postgresqlVersion}"
+    integTestImplementation 'org.springframework.boot:spring-boot-docker-compose'
 }

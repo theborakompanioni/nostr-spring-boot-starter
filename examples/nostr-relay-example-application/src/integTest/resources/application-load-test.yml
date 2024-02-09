@@ -1,8 +1,21 @@
 logging.file.name: application-load-test.log
 logging.level.org.tbk.nostr: INFO
 
-spring.datasource.url: 'jdbc:sqlite:file:memory_load_test?mode=memory&foreign_keys=true'
-spring.datasource.hikari.maximum-pool-size: 1 #needed when using "in-memory" db!
+#spring.datasource.url: 'jdbc:sqlite:file:memory_load_test?mode=memory&foreign_keys=true'
+#spring.datasource.hikari.maximum-pool-size: 1 #needed when using "in-memory" db!
 
 #spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application-load-test.db?foreign_keys=true&journal_mode=WAL&temp_store=MEMORY&page_size=32768&mmap_size=30000000000'
 #spring.datasource.hikari.maximum-pool-size: 1
+
+spring.datasource.url: 'jdbc:postgres://regtest_nostr_relay0:regtest_nostr_relay0@regtest_db:15432/regtest_nostr_relay0'
+spring.datasource.driver-class-name: org.postgresql.Driver
+spring.datasource.hikari.pool-name: PostgresPool
+spring.datasource.hikari.maximum-pool-size: 10
+
+spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+
+spring.docker.compose:
+  enabled: true
+  file: ../../docker/regtest/pg/docker-compose.yml
+  stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
+  skip.in-tests: false

@@ -3,10 +3,7 @@ package org.tbk.nostr.relay.example.domain.event;
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.XonlyPublicKey;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OrderColumn;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
@@ -16,6 +13,7 @@ import org.jmolecules.ddd.types.Identifier;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.relay.example.db.converter.MoreConverter;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -35,6 +33,7 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
     private final int kind;
 
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Convert(converter = MoreConverter.InstantConverter.class)
     private final Instant createdAt;
 
     @JoinColumn(name = "event_id", updatable = false)
@@ -49,12 +48,15 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
 
     @CreationTimestamp
     @Column(name = "first_seen_at")
+    @Convert(converter = MoreConverter.InstantConverter.class)
     private Instant firstSeenAt;
 
     @Column(name = "deleted_at")
+    @Convert(converter = MoreConverter.InstantConverter.class)
     private Instant deletedAt;
 
     @Column(name = "expires_at")
+    @Convert(converter = MoreConverter.InstantConverter.class)
     private Instant expiresAt;
 
     /**

@@ -2,6 +2,6 @@ logging.level.org.tbk.nostr.template: TRACE
 
 spring.docker.compose:
   enabled: true
-  file: ../../docker/regtest/nostr/docker-compose.yml
+  file: ../../docker/regtest/nostr-rs-relay/docker-compose.yml
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
   skip.in-tests: false
