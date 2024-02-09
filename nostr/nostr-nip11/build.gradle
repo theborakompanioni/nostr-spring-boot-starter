@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr identity package'
+
+dependencies {
+    api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
+
+    api 'io.projectreactor:reactor-core'
+
+    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
+
+    implementation "com.google.guava:guava:${guavaVersion}"
+
+    testImplementation project(':nostr:nostr-core')
+}

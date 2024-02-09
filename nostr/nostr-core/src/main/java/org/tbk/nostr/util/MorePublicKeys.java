@@ -4,6 +4,8 @@ import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.proto.Event;
 
+import java.util.HexFormat;
+
 public final class MorePublicKeys {
 
     private MorePublicKeys() {
@@ -26,6 +28,10 @@ public final class MorePublicKeys {
 
     public static XonlyPublicKey fromBytes(byte[] raw) throws IllegalArgumentException {
         return new XonlyPublicKey(new ByteVector32(raw));
+    }
+
+    public static XonlyPublicKey fromHex(String hex) throws IllegalArgumentException {
+        return fromBytes(HexFormat.of().parseHex(hex));
     }
 
 }
