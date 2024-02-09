@@ -1,4 +1,7 @@
+spring.application.name: 'tbk-nostr-relay-load-test'
+
 logging.file.name: application-load-test.log
 logging.level.org.tbk.nostr: INFO
 
-spring.datasource.hikari.maximum-pool-size: 20
+#spring.datasource.hikari.maximum-pool-size: 20
+org.tbk.nostr.relay.example-async-executor.max-pool-size: 10

@@ -1,2 +1,4 @@
+spring.application.name: 'tbk-nostr-relay-spec-test'
+
 logging.file.name: application-spec-test.log
 logging.level.org.tbk.nostr: INFO

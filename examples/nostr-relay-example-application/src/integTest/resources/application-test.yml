@@ -1,7 +1,7 @@
 app.name: tbk-nostr-spring-boot-starter-demo (test)
-app.description: A spring boot nostr demo application
+app.description: A spring boot nostr demo application test
 
-spring.application.name: 'tbk-nostr-spring-boot-starter-demo-test'
+spring.application.name: 'tbk-nostr-relay-test'
 spring.http.log-request-details: false
 
 logging.file.name: application-test.log
@@ -22,7 +22,6 @@ spring.docker.compose:
   file: ../../docker/regtest/pg/docker-compose.yml
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
   skip.in-tests: false
-
 
 org.tbk.nostr.relay.example:
   greeting: null
