@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
+import org.junit.jupiter.api.Test;
+import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventRequest;
@@ -15,6 +17,7 @@ import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.util.MoreTags;
 
 import java.time.Instant;
+import java.util.HexFormat;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -33,7 +36,7 @@ class Nip13Test {
     }
 
     @RepeatedTest(21)
-    void mineEvent0(RepetitionInfo info) {
+    void itShouldMineEvent0(RepetitionInfo info) {
         int targetDifficulty = 0;
 
         String content = "GM-%d-%d".formatted(targetDifficulty, info.getCurrentRepetition());
@@ -49,7 +52,7 @@ class Nip13Test {
     }
 
     @RepeatedTest(21)
-    void mineEvent1(RepetitionInfo info) {
+    void itShouldMineEvent1(RepetitionInfo info) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         int targetDifficulty = 1;
 
@@ -71,7 +74,7 @@ class Nip13Test {
     }
 
     @RepeatedTest(21)
-    void mineEvent8(RepetitionInfo info) {
+    void itShouldMineEvent8(RepetitionInfo info) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         int targetDifficulty = 8;
 
@@ -93,7 +96,7 @@ class Nip13Test {
     }
 
     @RepeatedTest(16)
-    void mineEventN(RepetitionInfo info) {
+    void itShouldMineEventN(RepetitionInfo info) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         int targetDifficulty = info.getCurrentRepetition();
 
@@ -126,7 +129,7 @@ class Nip13Test {
      */
     @RepeatedTest(3)
     @Disabled("Enable on demand - should not execute on every test suite run")
-    void mineEventManually(RepetitionInfo info) {
+    void itShouldMineEventManually(RepetitionInfo info) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         int targetDifficulty = 21;
 
@@ -149,5 +152,59 @@ class Nip13Test {
         log.info("{}", JsonWriter.toJson(Request.newBuilder()
                 .setEvent(EventRequest.newBuilder().setEvent(event).build())
                 .build()));
+    }
+
+    @Test
+    void itShouldCalculateDifficulty0EventId() {
+        assertThat(Nip13.calculateDifficulty(EventId.fromHex("7f0fdf9021cbde815007340d603b43e61ddecac58a337165974b74eb843ba4bc")), is(1L));
+        assertThat(Nip13.calculateDifficulty(EventId.fromHex("078c03419eed66e9a5ce7c8f7ac6e83e2952b600755781ac75da9950259b8bfa")), is(5L));
+        assertThat(Nip13.calculateDifficulty(EventId.fromHex("000006d8c378af1779d2feebc7603a125d99eca0ccf1085959b307f64e5dd358")), is(21L));
+        assertThat(Nip13.calculateDifficulty(EventId.fromHex("00000000000009fb3d037ce2fcb5bd2a84914f98e6f13352495bbc5b708d162c")), is(52L));
+        assertThat(Nip13.calculateDifficulty(EventId.fromHex("0000000000000000000000000000000c25e1493f5a8465fd71802790e2a58a32")), is(124L));
+        assertThat(Nip13.calculateDifficulty(EventId.fromHex("00000000000000000000000000000000000000000000002a6fbf90a18e816d60")), is(186L));
+    }
+
+    @RepeatedTest(128)
+    void itShouldCalculateDifficulty1VariableLength(RepetitionInfo info) {
+        int i = info.getCurrentRepetition();
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("00".repeat(i))), is(i * 8L));
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("0f".repeat(i))), is(4L));
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("ff".repeat(i))), is(0L));
+    }
+
+    @Test
+    void itShouldCalculateDifficulty2Static() {
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("00")), is(8L)); // 0000 0000
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("01")), is(7L)); // 0000 0001
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("02")), is(6L)); // 0000 0010
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("03")), is(6L)); // 0000 0011
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("04")), is(5L)); // 0000 0100
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("05")), is(5L)); // 0000 0101
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("06")), is(5L)); // 0000 0110
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("07")), is(5L)); // 0000 0111
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("08")), is(4L)); // 0000 1000
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("09")), is(4L)); // 0000 1001
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("0a")), is(4L)); // 0000 1010
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("0b")), is(4L)); // 0000 1011
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("0c")), is(4L)); // 0000 1100
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("0d")), is(4L)); // 0000 1101
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("0e")), is(4L)); // 0000 1110
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("0f")), is(4L)); // 0000 1111
+        // ...
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("1f")), is(3L)); // 0001
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("2f")), is(2L)); // 0010
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("3f")), is(2L)); // 0011
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("4f")), is(1L)); // 0100
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("5f")), is(1L)); // 0101
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("6f")), is(1L)); // 0110
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("7f")), is(1L)); // 0111
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("8f")), is(0L)); // 1000
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("9f")), is(0L)); // 1001
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("af")), is(0L)); // 1010
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("bf")), is(0L)); // 1011
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("cf")), is(0L)); // 1100
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("df")), is(0L)); // 1101
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("ef")), is(0L)); // 1110
+        assertThat(Nip13.calculateDifficulty(HexFormat.of().parseHex("ff")), is(0L)); // 1111
     }
 }
