@@ -15,6 +15,6 @@ spring.jpa.properties.hibernate.dialect: org.hibernate.community.dialect.SQLiteD
 spring.docker.compose:
   enabled: false
 
-org.tbk.nostr.relay.example:
+org.tbk.nostr.example.relay:
   async-executor:
     max-pool-size: 1

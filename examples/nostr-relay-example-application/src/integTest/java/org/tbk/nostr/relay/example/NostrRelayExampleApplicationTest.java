@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.relay.example.nostr.NostrRelayProperties;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.template.SimpleNostrTemplate;
 
@@ -34,10 +35,14 @@ public class NostrRelayExampleApplicationTest {
     @Autowired(required = false)
     private NostrRelayExampleApplicationProperties applicationProperties;
 
+    @Autowired(required = false)
+    private NostrRelayProperties relayProperties;
+
     @Test
     void contextLoads() {
         assertThat(applicationContext, is(notNullValue()));
         assertThat(applicationProperties, is(notNullValue()));
+        assertThat(relayProperties, is(notNullValue()));
     }
 
     @Test
@@ -45,10 +50,11 @@ public class NostrRelayExampleApplicationTest {
         assertThat(applicationProperties.isStartupEventsEnabled(), is(true));
         assertThat(applicationProperties.getIdentity().isPresent(), is(true));
         assertThat(applicationProperties.getAsyncExecutor().getMaxPoolSize(), is(10));
-        assertThat(applicationProperties.getRelayOptions().getGreeting().isPresent(), is(false));
-        assertThat(applicationProperties.getRelayOptions().getInitialQueryLimit(), is(210));
-        assertThat(applicationProperties.getRelayOptions().getMaxLimitPerFilter(), is(2100));
-        assertThat(applicationProperties.getRelayOptions().getMaxFilterCount(), is(42));
+        assertThat(applicationProperties.getGreeting().isPresent(), is(false));
+        assertThat(applicationProperties.getInitialQueryLimit(), is(210));
+
+        assertThat(relayProperties.getMaxLimitPerFilter(), is(2100));
+        assertThat(relayProperties.getMaxFilterCount(), is(42));
     }
 
     @Test

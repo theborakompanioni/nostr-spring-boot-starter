@@ -5,7 +5,7 @@ logging.level.org.tbk.nostr: INFO
 
 org.tbk.nostr.nip11:
   enabled: true
-  path: ${org.tbk.nostr.relay.example.relay-options.websocket-path}
+  path: ${org.tbk.nostr.relay.websocket-path}
   relay-info:
     name: ${spring.application.name}
     description: The Times 03/Jan/2009 Chancellor on brink of second bailout for banks

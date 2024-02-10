@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example;
+package org.tbk.nostr.relay.example.nostr;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -11,24 +11,24 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.handler.LoggingWebSocketHandlerDecorator;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
-import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties.RelayOptionsProperties;
+import org.tbk.nostr.relay.example.nostr.NostrRelayProperties;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketHandlerDispatcher;
 
 @EnableWebSocket
 @ConditionalOnWebApplication
 @Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
-class NostrRelayExampleWebSocketConfigurer implements WebSocketConfigurer {
+class NostrRelayWebSocketConfigurer implements WebSocketConfigurer {
 
     @NonNull
-    private final RelayOptionsProperties relayOptions;
+    private final NostrRelayProperties relayProperties;
 
     @NonNull
     private final NostrWebSocketHandlerDispatcher nostrWebSocketHandlerDispatcher;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new LoggingWebSocketHandlerDecorator(nostrWebSocketHandlerDispatcher), relayOptions.getWebsocketPath())
+        registry.addHandler(new LoggingWebSocketHandlerDecorator(nostrWebSocketHandlerDispatcher), relayProperties.getWebsocketPath())
                 .addInterceptors(new HttpSessionHandshakeInterceptor())
                 .setAllowedOrigins("*");
     }

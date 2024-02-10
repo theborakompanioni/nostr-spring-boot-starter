@@ -30,7 +30,7 @@ public class ValidatingEventRequestHandlerInterceptor implements NostrRequestHan
         return true;
     }
 
-    public boolean handleEventMessage(WebSocketSession session, EventRequest request) throws Exception {
+    private boolean handleEventMessage(WebSocketSession session, EventRequest request) throws Exception {
         Event event = request.getEvent();
         BindException errors = new BindException(event, "event");
 
