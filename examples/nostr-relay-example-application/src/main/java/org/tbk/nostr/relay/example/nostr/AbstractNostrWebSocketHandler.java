@@ -1,5 +1,6 @@
 package org.tbk.nostr.relay.example.nostr;
 
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -9,26 +10,7 @@ import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonReader;
 import org.tbk.nostr.proto.json.JsonWriter;
 
-public abstract class AbstractNostrWebSocketHandler extends TextWebSocketHandler implements NostrWebSocketHandler {
-    @Override
-    protected final void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        Request request = null;
-        try {
-            request = JsonReader.fromJson(message.getPayload(), Request.newBuilder());
-        } catch (Exception e) {
-            handleJsonParseException(session, message, e);
-        }
-
-        if (request != null) {
-            switch (request.getKindCase()) {
-                case EVENT -> handleEventMessage(session, request.getEvent());
-                case REQ -> handleReqMessage(session, request.getReq());
-                case CLOSE -> handleCloseMessage(session, request.getClose());
-                case COUNT -> handleCountMessage(session, request.getCount());
-                case KIND_NOT_SET -> handleUnknownMessage(session, request);
-            }
-        }
-    }
+public abstract class AbstractNostrWebSocketHandler implements NostrWebSocketHandler {
 
     @Override
     public void handleJsonParseException(WebSocketSession session, TextMessage message, Exception e) throws Exception {
@@ -38,4 +20,13 @@ public abstract class AbstractNostrWebSocketHandler extends TextWebSocketHandler
                         .build())
                 .build())));
     }
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    }
+
 }

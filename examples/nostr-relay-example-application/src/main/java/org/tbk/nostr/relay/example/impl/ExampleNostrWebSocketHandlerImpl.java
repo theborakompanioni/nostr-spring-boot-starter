@@ -6,7 +6,7 @@ import org.tbk.nostr.proto.NoticeResponse;
 import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties.RelayOptionsProperties;
-import org.tbk.nostr.relay.example.nostr.NostrRequestHandlerSupport;
+import org.tbk.nostr.relay.example.nostr.support.NostrRequestHandlerSupport;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 
 import static java.util.Objects.requireNonNull;
