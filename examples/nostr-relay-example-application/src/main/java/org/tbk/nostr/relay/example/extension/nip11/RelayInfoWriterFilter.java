@@ -3,33 +3,38 @@ package org.tbk.nostr.relay.example.extension.nip11;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.tbk.nostr.nip11.RelayInfoDocument;
-import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties.RelayOptionsProperties;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
-import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 
-@RequiredArgsConstructor
 class RelayInfoWriterFilter implements Filter {
     private static final String APPLICATION_JSON_NOSTR_VALUE = new MediaType("application", "nostr+json").toString();
-    private static final List<String> supportedSchemes = List.of("http", "https");
 
-    private final RelayOptionsProperties relayOptions;
+    private final String path;
+
+    private final String json;
+    private final int contentLength;
+
+    public RelayInfoWriterFilter(String path, RelayInfoDocument relayInfoDocument) {
+        this.path = requireNonNull(path);
+        this.json = requireNonNull(relayInfoDocument).toJson();
+        this.contentLength = this.json.getBytes(StandardCharsets.UTF_8).length;
+    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         if (servletRequest instanceof HttpServletRequest httpServletRequest &&
             servletResponse instanceof HttpServletResponse httpServletResponse) {
             if (isRelayInfoDocumentRequest(httpServletRequest)) {
-                RelayInfoDocument relayInfo = RelayInfoDocument.newBuilder().build();
-                writeRelayInfoDocument(httpServletResponse, relayInfo);
+                writeRelayInfoDocument(httpServletResponse);
                 return;
             }
         }
@@ -37,19 +42,13 @@ class RelayInfoWriterFilter implements Filter {
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
-
-    private void writeRelayInfoDocument(HttpServletResponse response, RelayInfoDocument relayInfo) throws IOException {
-        String json = relayInfo.toJson();
+    private void writeRelayInfoDocument(HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setContentLength(json.getBytes(StandardCharsets.UTF_8).length);
+        response.setContentLength(contentLength);
         response.getWriter().write(json);
     }
 
     private boolean isRelayInfoDocumentRequest(HttpServletRequest request) {
-        boolean isSupportedScheme = supportedSchemes.contains(request.getScheme().toLowerCase());
-        if (!isSupportedScheme) {
-            return false;
-        }
         boolean isGetRequest = HttpMethod.GET.name().equalsIgnoreCase(request.getMethod());
         if (!isGetRequest) {
             return false;
@@ -58,7 +57,7 @@ class RelayInfoWriterFilter implements Filter {
         if (isWebSocketHandshakeRequest) {
             return false;
         }
-        boolean isWebsocketPath = matches(request, relayOptions.getWebsocketPath());
+        boolean isWebsocketPath = matches(request, this.path);
         if (!isWebsocketPath) {
             return false;
         }

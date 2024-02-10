@@ -174,11 +174,13 @@ public class NostrRelayExampleApplicationProperties implements Validator {
         private Integer maxFilterCount;
 
         public String getWebsocketPath() {
-            return Optional.ofNullable(websocketPath).orElse(DEFAULT_WEBSOCKET_PATH);
+            return Optional.ofNullable(websocketPath)
+                    .filter(it -> !it.isBlank())
+                    .orElse(DEFAULT_WEBSOCKET_PATH);
         }
 
         public Optional<String> getGreeting() {
-            return Optional.ofNullable(greeting).filter(it -> !it.isEmpty());
+            return Optional.ofNullable(greeting).filter(it -> !it.isBlank());
         }
 
         public int getInitialQueryLimit() {
@@ -216,5 +218,4 @@ public class NostrRelayExampleApplicationProperties implements Validator {
             }
         }
     }
-
 }

@@ -9,9 +9,12 @@ import lombok.Singular;
 import lombok.Value;
 import org.tbk.nostr.util.MorePublicKeys;
 
-import java.io.IOException;
+import javax.annotation.Nullable;
 import java.net.URI;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * {
@@ -34,6 +37,7 @@ public class RelayInfoDocument {
      * A relay may select a name for use in client software.
      * This is a string, and SHOULD be less than 30 characters to avoid client truncation.
      */
+    @Nullable
     String name;
 
     /**
@@ -41,6 +45,7 @@ public class RelayInfoDocument {
      * It is recommended that this contain no markup, formatting or line breaks for word wrapping, and simply use
      * double newline characters to separate paragraphs. There are no limitations on length.
      */
+    @Nullable
     String description;
 
     /**
@@ -49,6 +54,7 @@ public class RelayInfoDocument {
      * address to send encrypted direct messages to a system administrator. Expected uses of this address are to
      * report abuse or illegal content, file bug reports, or request other technical assistance.
      */
+    @Nullable
     XonlyPublicKey pubkey;
 
     /**
@@ -56,6 +62,7 @@ public class RelayInfoDocument {
      * Use of a Nostr public key and direct message SHOULD be preferred over this. Contents of this field SHOULD be a
      * URI, using schemes such as mailto or https to provide users with a means of contact.
      */
+    @Nullable
     String contact;
 
     /**
@@ -70,37 +77,15 @@ public class RelayInfoDocument {
      * The relay server implementation MAY be provided in the software attribute.
      * If present, this MUST be a URL to the project's homepage.
      */
+    @Nullable
     URI software;
 
     /**
      * The relay MAY choose to publish its software version as a string attribute. The string format is defined by the
      * relay implementation. It is recommended this be a version number or commit identifier.
      */
+    @Nullable
     String version;
-
-    public Optional<String> getName() {
-        return Optional.ofNullable(name);
-    }
-
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
-    }
-
-    public Optional<XonlyPublicKey> getPubkey() {
-        return Optional.ofNullable(pubkey);
-    }
-
-    public Optional<String> getContact() {
-        return Optional.ofNullable(contact);
-    }
-
-    public Optional<URI> getSoftware() {
-        return Optional.ofNullable(software);
-    }
-
-    public Optional<String> getVersion() {
-        return Optional.ofNullable(version);
-    }
 
     public String toJson() {
         return RelayInfoDocument.toJson(this);
@@ -110,16 +95,30 @@ public class RelayInfoDocument {
         try {
             ObjectComposer<JSONComposer<String>> jsonComposer = json.composeString().startObject();
 
-            doc.getName().ifPresent(it -> put(jsonComposer, "name", it));
-            doc.getDescription().ifPresent(it -> put(jsonComposer, "description", it));
-            doc.getPubkey().ifPresent(it -> put(jsonComposer, "pubkey", it.value.toHex()));
-            doc.getContact().ifPresent(it -> put(jsonComposer, "contact", it));
+            if (doc.name != null) {
+                jsonComposer.put("name", doc.name);
+            }
+            if (doc.description != null) {
+                jsonComposer.put("description", doc.description);
+            }
+            if (doc.pubkey != null) {
+                jsonComposer.put("pubkey", doc.pubkey.value.toHex());
+            }
+            if (doc.contact != null) {
+                jsonComposer.put("contact", doc.contact);
+            }
+
             jsonComposer.putObject("supported_nips", doc.getSupportedNips());
-            doc.getSoftware().ifPresent(it -> put(jsonComposer, "software", it));
-            doc.getVersion().ifPresent(it -> put(jsonComposer, "version", it));
+
+            if (doc.software != null) {
+                jsonComposer.put("software", doc.software.toString());
+            }
+            if (doc.version != null) {
+                jsonComposer.putObject("version", doc.version);
+            }
             return jsonComposer.end().finish();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while serializing object to json", e);
         }
     }
 
@@ -130,8 +129,8 @@ public class RelayInfoDocument {
     static RelayInfoDocument fromJson(String val, RelayInfoDocument.Builder builder) {
         try {
             return fromMap(json.mapFrom(val), builder);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while parsing object from json", e);
         }
     }
 
@@ -147,7 +146,7 @@ public class RelayInfoDocument {
 
         return builder
                 .name(name == null ? null : String.valueOf(name))
-                .description(description == null ? null : String.valueOf(description) )
+                .description(description == null ? null : String.valueOf(description))
                 .pubkey(pubkey == null ? null : MorePublicKeys.fromHex(String.valueOf(pubkey)))
                 .contact(contact == null ? null : String.valueOf(contact))
                 .supportedNips(supportedNips == null ? Collections.emptyList() : supportedNips.stream()
@@ -156,13 +155,5 @@ public class RelayInfoDocument {
                 .software(software == null ? null : URI.create(String.valueOf(software)))
                 .version(version == null ? null : String.valueOf(version))
                 .build();
-    }
-
-    private static void put(ObjectComposer<JSONComposer<String>> jsonComposer, String name, Object value) {
-        try {
-            jsonComposer.putObject(name, value);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

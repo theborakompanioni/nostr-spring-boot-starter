@@ -1,7 +1,4 @@
-app.name: tbk-nostr-spring-boot-starter-demo
-app.description: A spring boot nostr demo application
-
-spring.application.name: 'tbk-nostr-spring-boot-starter-demo'
+spring.application.name: 'tbk-nostr-relay'
 spring.http.log-request-details: false
 
 spring.lifecycle.timeout-per-shutdown-phase: 30s
@@ -42,7 +39,18 @@ org.tbk.nostr.relay.example:
   async-executor:
     max-pool-size: 1 # sqlite needs a single thread
   relay-options:
+    websocket-path: '/'
     greeting: 'GM'
     initial-query-limit: 100
     max-limit-per-filter: 1000
     max-filter-count: 21
+
+org.tbk.nostr.nip11:
+  enabled: true
+  path: ${org.tbk.nostr.relay.example.relay-options.websocket-path}
+  relay-info:
+    name: ${spring.application.name}
+    description: A spring boot nostr relay example application
+    supported-nips: [1, 9, 11, 40]
+    software: https://github.com/theborakompanioni/nostr-spring-boot-starter
+    version: nostr-spring-boot-starter-relay-example

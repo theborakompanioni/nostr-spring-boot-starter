@@ -1,1 +1,1 @@
-#### ${app.name} Banner
+#### ${spring.application.name} Banner

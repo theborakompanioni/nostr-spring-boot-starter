@@ -2,3 +2,14 @@ spring.application.name: 'tbk-nostr-relay-nip-test'
 
 logging.file.name: application-nip-test.log
 logging.level.org.tbk.nostr: INFO
+
+org.tbk.nostr.nip11:
+  enabled: true
+  path: ${org.tbk.nostr.relay.example.relay-options.websocket-path}
+  relay-info:
+    name: ${spring.application.name}
+    description: The Times 03/Jan/2009 Chancellor on brink of second bailout for banks
+    pubkey: '0000000000000000000000000000000000000000000000000000000000000001'
+    supported-nips: [1, 42, 21000000]
+    software: https://github.com/theborakompanioni/nostr-spring-boot-starter
+    version: 2.43.0
