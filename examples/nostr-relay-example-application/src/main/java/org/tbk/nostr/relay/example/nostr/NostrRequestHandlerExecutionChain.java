@@ -4,7 +4,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,15 +14,10 @@ import static java.util.Objects.requireNonNull;
  */
 public class NostrRequestHandlerExecutionChain {
 
-    private final List<NostrRequestHandlerInterceptor> interceptorList = new ArrayList<>();
+    private final List<NostrRequestHandlerInterceptor> interceptors;
 
-
-    public NostrRequestHandlerExecutionChain() {
-        this(Collections.emptyList());
-    }
-
-    public NostrRequestHandlerExecutionChain(List<NostrRequestHandlerInterceptor> interceptorList) {
-        this.interceptorList.addAll(requireNonNull(interceptorList));
+    public NostrRequestHandlerExecutionChain(List<NostrRequestHandlerInterceptor> interceptors) {
+        this.interceptors = Collections.unmodifiableList(requireNonNull(interceptors));
     }
 
     /**
@@ -34,7 +28,7 @@ public class NostrRequestHandlerExecutionChain {
      * that this interceptor has already dealt with the response itself.
      */
     boolean applyPreHandle(WebSocketSession session, Request request) throws Exception {
-        for (NostrRequestHandlerInterceptor interceptor : this.interceptorList) {
+        for (NostrRequestHandlerInterceptor interceptor : this.interceptors) {
             if (!interceptor.preHandle(session, request)) {
                 return false;
             }
@@ -59,8 +53,8 @@ public class NostrRequestHandlerExecutionChain {
      * Apply postHandle methods of registered interceptors.
      */
     void applyPostHandle(WebSocketSession session, Request request) throws Exception {
-        for (int i = this.interceptorList.size() - 1; i >= 0; i--) {
-            NostrRequestHandlerInterceptor interceptor = this.interceptorList.get(i);
+        for (int i = this.interceptors.size() - 1; i >= 0; i--) {
+            NostrRequestHandlerInterceptor interceptor = this.interceptors.get(i);
             interceptor.postHandle(session, request);
         }
     }
