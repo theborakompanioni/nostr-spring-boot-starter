@@ -1,16 +1,12 @@
 package org.tbk.nostr.proto.json;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.protobuf.ByteString;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 

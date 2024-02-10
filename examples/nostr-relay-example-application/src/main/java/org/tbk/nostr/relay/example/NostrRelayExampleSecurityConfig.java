@@ -24,7 +24,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
 class NostrRelayExampleSecurityConfig implements WebSecurityCustomizer {
-    
+
     @Override
     public void customize(WebSecurity web) {
         web.httpFirewall(new StrictHttpFirewall());

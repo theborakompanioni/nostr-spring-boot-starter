@@ -3,11 +3,11 @@ package org.tbk.nostr.relay.example.nostr;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.tbk.nostr.proto.*;
+import org.tbk.nostr.proto.NoticeResponse;
+import org.tbk.nostr.proto.Request;
+import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonReader;
 import org.tbk.nostr.proto.json.JsonWriter;
-
-import java.io.IOException;
 
 public abstract class AbstractNostrWebSocketHandler extends TextWebSocketHandler implements NostrWebSocketHandler {
     @Override

@@ -1,8 +1,9 @@
 package org.tbk.nostr.proto.json;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.tbk.nostr.base.Metadata;
-import org.tbk.nostr.proto.*;
+import org.tbk.nostr.proto.EventOrBuilder;
+import org.tbk.nostr.proto.Request;
+import org.tbk.nostr.proto.Response;
 
 public final class JsonWriter {
 

@@ -12,7 +12,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.List;
 
 public interface EventEntityService {
 

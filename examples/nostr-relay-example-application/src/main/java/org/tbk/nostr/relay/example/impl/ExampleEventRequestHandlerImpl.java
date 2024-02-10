@@ -2,7 +2,6 @@ package org.tbk.nostr.relay.example.impl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.web.socket.TextMessage;
