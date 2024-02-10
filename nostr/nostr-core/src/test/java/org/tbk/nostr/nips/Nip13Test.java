@@ -28,6 +28,19 @@ class Nip13Test {
     }
 
     @RepeatedTest(21)
+    void mineEvent0(RepetitionInfo info) {
+        int targetDifficulty = 0;
+
+        String content = "GM-%d-%d".formatted(targetDifficulty, info.getCurrentRepetition());
+        Event event = Nip13.mineEvent(Nip1.createTextNote(testPubkey, content), targetDifficulty).build();
+
+        assertThat(Nip13.calculateDifficulty(event), is(greaterThanOrEqualTo((long) targetDifficulty)));
+
+        TagValue nonceTag = MoreTags.filterTagsByName("nonce", event).getFirst();
+        assertThat("it took zero tries", nonceTag.getValues(0), is("0"));
+    }
+
+    @RepeatedTest(21)
     void mineEvent1(RepetitionInfo info) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         int targetDifficulty = 1;
@@ -41,7 +54,7 @@ class Nip13Test {
         assertThat(bitString, startsWith("0".repeat(targetDifficulty)));
 
         TagValue nonceTag = MoreTags.filterTagsByName("nonce", event).getFirst();
-        log.info("difficulty({}): Took {} and {} tries to find {}", targetDifficulty, stopwatch.stop(), nonceTag.getValues(0), bitString);
+        log.info("difficulty({}): Took {} and {} tries in the last epoch to find {}", targetDifficulty, stopwatch.stop(), nonceTag.getValues(0), bitString);
     }
 
     @RepeatedTest(21)
@@ -58,13 +71,13 @@ class Nip13Test {
         assertThat(bitString, startsWith("0".repeat(targetDifficulty)));
 
         TagValue nonceTag = MoreTags.filterTagsByName("nonce", event).getFirst();
-        log.info("difficulty({}): Took {} and {} tries to find {}", targetDifficulty, stopwatch.stop(), nonceTag.getValues(0), bitString);
+        log.info("difficulty({}): Took {} and {} tries in the last epoch to find {}", targetDifficulty, stopwatch.stop(), nonceTag.getValues(0), bitString);
     }
 
-    @RepeatedTest(15)
+    @RepeatedTest(16)
     void mineEventN(RepetitionInfo info) {
         Stopwatch stopwatch = Stopwatch.createStarted();
-        int targetDifficulty = info.getCurrentRepetition() + 1;
+        int targetDifficulty = info.getCurrentRepetition();
 
         String content = "GM-%d-%d".formatted(targetDifficulty, info.getCurrentRepetition());
         Event event = Nip13.mineEvent(Nip1.createTextNote(testPubkey, content), targetDifficulty).build();
@@ -75,6 +88,6 @@ class Nip13Test {
         assertThat(bitString, startsWith("0".repeat(targetDifficulty)));
 
         TagValue nonceTag = MoreTags.filterTagsByName("nonce", event).getFirst();
-        log.info("difficulty({}): Took {} and {} tries to find {}", targetDifficulty, stopwatch.stop(), nonceTag.getValues(0), bitString);
+        log.info("difficulty({}): Took {} and {} tries in the last epoch to find {}", targetDifficulty, stopwatch.stop(), nonceTag.getValues(0), bitString);
     }
 }

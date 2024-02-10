@@ -18,13 +18,20 @@ public final class Nip13 {
         throw new UnsupportedOperationException();
     }
 
+    public static long calculateDifficulty(EventOrBuilder event) {
+        return calculateDifficulty(MoreEvents.eventId(event));
+    }
+
+    public static long calculateDifficulty(byte[] bytes) {
+        return countLeadingZeroes(bytes);
+    }
+
     public static Event.Builder mineEvent(Event.Builder prototype, int targetDifficulty) {
         int prototypeTagCount = prototype.getTagsCount();
-        long i = 0;
+        long nonce = 0;
 
-        TagValue.Builder nonceBuilder = MoreTags.named("nonce", String.valueOf(i), String.valueOf(targetDifficulty)).toBuilder();
-        Event.Builder builder = Event.newBuilder(prototype.buildPartial())
-                .addTags(nonceBuilder);
+        TagValue.Builder nonceTagBuilder = MoreTags.named("nonce", Long.toString(nonce), Long.toString(targetDifficulty)).toBuilder();
+        Event.Builder builder = Event.newBuilder(prototype.buildPartial()).addTags(nonceTagBuilder);
 
         long currentEpoch = System.currentTimeMillis() / 1_000;
         long currentDifficulty = 0;
@@ -33,30 +40,23 @@ public final class Nip13 {
             if (runEpoch > currentEpoch) {
                 currentEpoch = runEpoch;
                 builder.setCreatedAt(Instant.now().toEpochMilli());
-                i = 0;
+                nonce = 0;
             }
 
-            nonceBuilder.setValues(0, String.valueOf(i));
-            builder.setTags(prototypeTagCount, nonceBuilder.build());
-            byte[] bytes = MoreEvents.eventId(builder);
+            // update "nonce" tag
+            builder.setTags(prototypeTagCount, nonceTagBuilder.setValues(0, Long.toString(nonce)));
 
-            currentDifficulty = calculateDifficulty(bytes);
-            i++;
+            currentDifficulty = countLeadingZeroes(MoreEvents.eventId(builder));
+            nonce++;
         }
 
         return MoreEvents.withEventId(builder);
     }
 
-    public static long calculateDifficulty(EventOrBuilder event) {
-        return calculateDifficulty(MoreEvents.eventId(event));
-    }
-
-    public static long calculateDifficulty(byte[] bytes) {
+    private static long countLeadingZeroes(byte[] bytes) {
         return IntStream.range(0, bytes.length)
                 .mapToObj(it -> toBitSet(bytes[it]))
-                .flatMap(bitSet -> IntStream.range(0, 8)
-                        .map(it -> 8 - it - 1)
-                        .mapToObj(bitSet::get))
+                .flatMap(bitSet -> IntStream.range(0, 8).mapToObj(it -> bitSet.get(7 - it)))
                 .takeWhile(it -> !it)
                 .count();
     }
