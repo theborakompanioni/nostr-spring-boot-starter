@@ -1,5 +1,6 @@
 package org.tbk.nostr.nips;
 
+import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.TagValue;
@@ -23,6 +24,10 @@ public final class Nip13 {
 
     public static long calculateDifficulty(EventOrBuilder event) {
         return calculateDifficulty(MoreEvents.eventId(event));
+    }
+
+    public static long calculateDifficulty(EventId eventId) {
+        return calculateDifficulty(eventId.toByteArray());
     }
 
     public static long calculateDifficulty(byte[] bytes) {
