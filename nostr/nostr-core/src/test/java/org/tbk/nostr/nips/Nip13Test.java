@@ -14,6 +14,7 @@ import org.tbk.nostr.proto.EventRequest;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.proto.json.JsonWriter;
+import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
 import java.time.Instant;
@@ -43,6 +44,7 @@ class Nip13Test {
         Event event = Nip13.mineEvent(Nip1.createTextNote(testPubkey, content), targetDifficulty).build();
 
         assertThat(Nip13.calculateDifficulty(event), is(greaterThanOrEqualTo((long) targetDifficulty)));
+        assertThat(Nip13.meetsTargetDifficulty(event, targetDifficulty), is(true));
         assertThat(event.getCreatedAt(), is(both(greaterThanOrEqualTo(Instant.now().minusSeconds(1).getEpochSecond()))
                 .and(lessThanOrEqualTo(Instant.now().plusSeconds(1).getEpochSecond()))));
 
@@ -60,6 +62,7 @@ class Nip13Test {
         Event event = Nip13.mineEvent(Nip1.createTextNote(testPubkey, content), targetDifficulty).build();
 
         assertThat(Nip13.calculateDifficulty(event), is(greaterThanOrEqualTo((long) targetDifficulty)));
+        assertThat(Nip13.meetsTargetDifficulty(event, targetDifficulty), is(true));
         assertThat(event.getCreatedAt(), is(both(greaterThanOrEqualTo(Instant.now().minusSeconds(1).getEpochSecond()))
                 .and(lessThanOrEqualTo(Instant.now().plusSeconds(1).getEpochSecond()))));
 
@@ -82,6 +85,7 @@ class Nip13Test {
         Event event = Nip13.mineEvent(Nip1.createTextNote(testPubkey, content), targetDifficulty).build();
 
         assertThat(Nip13.calculateDifficulty(event), is(greaterThanOrEqualTo((long) targetDifficulty)));
+        assertThat(Nip13.meetsTargetDifficulty(event, targetDifficulty), is(true));
         assertThat(event.getCreatedAt(), is(both(greaterThanOrEqualTo(Instant.now().minusSeconds(1).getEpochSecond()))
                 .and(lessThanOrEqualTo(Instant.now().plusSeconds(1).getEpochSecond()))));
 
@@ -104,6 +108,7 @@ class Nip13Test {
         Event event = Nip13.mineEvent(Nip1.createTextNote(testPubkey, content), targetDifficulty).build();
 
         assertThat(Nip13.calculateDifficulty(event), is(greaterThanOrEqualTo((long) targetDifficulty)));
+        assertThat(Nip13.meetsTargetDifficulty(event, targetDifficulty), is(true));
         assertThat(event.getCreatedAt(), is(both(greaterThanOrEqualTo(Instant.now().minusSeconds(1).getEpochSecond()))
                 .and(lessThanOrEqualTo(Instant.now().plusSeconds(1).getEpochSecond()))));
 
@@ -137,6 +142,7 @@ class Nip13Test {
         Event event = Nip13.mineEvent(Nip1.createTextNote(testPubkey, content), targetDifficulty).build();
 
         assertThat(Nip13.calculateDifficulty(event), is(greaterThanOrEqualTo((long) targetDifficulty)));
+        assertThat(Nip13.meetsTargetDifficulty(event, targetDifficulty), is(true));
         assertThat(event.getCreatedAt(), is(both(greaterThanOrEqualTo(Instant.now().minusSeconds(1).getEpochSecond()))
                 .and(lessThanOrEqualTo(Instant.now().plusSeconds(1).getEpochSecond()))));
 
@@ -152,6 +158,83 @@ class Nip13Test {
         log.info("{}", JsonWriter.toJson(Request.newBuilder()
                 .setEvent(EventRequest.newBuilder().setEvent(event).build())
                 .build()));
+    }
+
+    @RepeatedTest(3)
+    void itShouldMeetDifficultyTarget0(RepetitionInfo info) {
+        int targetDifficulty = 3 + info.getCurrentRepetition();
+
+        String content = "GM-%d-%d".formatted(targetDifficulty, info.getCurrentRepetition());
+        Event event = Nip13.mineEvent(Nip1.createTextNote(testPubkey, content), targetDifficulty).build();
+
+        assertThat(Nip13.meetsTargetDifficulty(event, targetDifficulty), is(true));
+    }
+
+    /**
+     * Special case - pass check, if all the nonce tags commit to the same target difficulty!
+     */
+    @Test
+    void itShouldMeetDifficultyTarget1() {
+        int targetDifficulty = 1;
+
+        String content = "GM-%d".formatted(targetDifficulty);
+        Event event = Nip13.mineEvent(Nip1.createTextNote(testPubkey, content)
+                        .addTags(Nip13.nonce(0, targetDifficulty))
+                        .addTags(Nip13.nonce(0, targetDifficulty))
+                        .addTags(Nip13.nonce(0, targetDifficulty))
+                        .addTags(Nip13.nonce(0, targetDifficulty)),
+                targetDifficulty).build();
+
+        assertThat(Nip13.meetsTargetDifficulty(event, targetDifficulty), is(true));
+    }
+
+    @Test
+    void itShouldNotMeetDifficultyTarget0() {
+        Event event = MoreEvents.withEventId(Nip1.createTextNote(testPubkey, "GM")).build();
+
+        assertThat(Nip13.meetsTargetDifficulty(event, 0), is(false));
+        assertThat(Nip13.meetsTargetDifficulty(event, 0, false), is(true));
+    }
+
+    @RepeatedTest(3)
+    void itShouldNotMeetDifficultyTarget1(RepetitionInfo info) {
+        int targetDifficulty = 3 + info.getCurrentRepetition();
+
+        String content = "GM-%d-%d".formatted(targetDifficulty, info.getCurrentRepetition());
+        Event event = MoreEvents.withEventId(Nip1.createTextNote(testPubkey, content)).build();
+
+        assertThat(Nip13.meetsTargetDifficulty(event, targetDifficulty), is(false));
+    }
+
+    @RepeatedTest(3)
+    void itShouldNotMeetDifficultyTarget2(RepetitionInfo info) {
+        int targetDifficulty = 3 + info.getCurrentRepetition();
+
+        String content = "GM-%d-%d".formatted(targetDifficulty, info.getCurrentRepetition());
+        Event eventWithWrongCommitment0 = MoreEvents.withEventId(Nip1.createTextNote(testPubkey, content))
+                .addTags(Nip13.nonce(0, targetDifficulty + 1))
+                .build();
+
+        assertThat(Nip13.meetsTargetDifficulty(eventWithWrongCommitment0, targetDifficulty), is(false));
+
+        Event eventWithWrongCommitment1 = MoreEvents.withEventId(Nip1.createTextNote(testPubkey, content))
+                .addTags(Nip13.nonce(0, targetDifficulty - 1))
+                .build();
+
+        assertThat(Nip13.meetsTargetDifficulty(eventWithWrongCommitment1, targetDifficulty), is(false));
+    }
+
+    @RepeatedTest(3)
+    void itShouldNotMeetDifficultyTarget3(RepetitionInfo info) {
+        int targetDifficulty = 3 + info.getCurrentRepetition();
+
+        String content = "GM-%d-%d".formatted(targetDifficulty, info.getCurrentRepetition());
+        Event eventWithMultipleCommitments = MoreEvents.withEventId(Nip1.createTextNote(testPubkey, content))
+                .addTags(Nip13.nonce(0, targetDifficulty + 1))
+                .addTags(Nip13.nonce(0, targetDifficulty))
+                .build();
+
+        assertThat(Nip13.meetsTargetDifficulty(eventWithMultipleCommitments, targetDifficulty), is(false));
     }
 
     @Test

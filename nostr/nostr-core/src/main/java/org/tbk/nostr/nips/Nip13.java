@@ -8,6 +8,7 @@ import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
 import java.util.BitSet;
+import java.util.List;
 import java.util.stream.IntStream;
 
 /**
@@ -32,6 +33,39 @@ public final class Nip13 {
 
     public static long calculateDifficulty(byte[] bytes) {
         return countLeadingZeroes(bytes);
+    }
+
+    public static boolean meetsTargetDifficulty(Event event, long targetDifficulty) {
+        return meetsTargetDifficulty(event, targetDifficulty, true);
+    }
+
+    public static boolean meetsTargetDifficulty(Event event, long targetDifficulty, boolean verifyCommitment) {
+        long difficulty = calculateDifficulty(event);
+
+        if (difficulty < targetDifficulty) {
+            return false;
+        }
+
+        if (verifyCommitment) {
+            List<TagValue> allNonceTags = MoreTags.filterTagsByName("nonce", event);
+            List<TagValue> matchingNonceTags = allNonceTags.stream()
+                    .filter(it -> it.getValuesCount() >= 2)
+                    .filter(it -> {
+                        try {
+                            long difficultyCommitment = Long.parseLong(it.getValues(1));
+                            return difficultyCommitment == targetDifficulty;
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    }).toList();
+            int matchingNonceTagsCount = matchingNonceTags.size();
+            if (matchingNonceTagsCount < 1 || matchingNonceTagsCount != allNonceTags.size()) {
+                // event has none or more than one "nonce" tag -> decline!
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static Event.Builder mineEvent(Event.Builder prototype, int targetDifficulty) {
