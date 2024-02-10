@@ -67,7 +67,7 @@ class Nip9EventEntityPostProcessor {
     }
 
     private void doOnDeletionEventCreated(EventEntity entity, Event event) {
-        List<TagValue> eTags = MoreTags.filterTagsByName("e", event);
+        List<TagValue> eTags = MoreTags.filterTagsByName(event, "e");
         // TODO: `a` tags ()
 
         Set<EventId> deletableEventIds = eTags.stream()

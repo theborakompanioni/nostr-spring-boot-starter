@@ -4,8 +4,10 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nips.Nip10;
+import org.tbk.nostr.nips.Nip13;
 import org.tbk.nostr.nips.Nip40;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.TagValue;
 
 import javax.annotation.Nullable;
@@ -20,9 +22,9 @@ public final class MoreTags {
         throw new UnsupportedOperationException();
     }
 
-    public static List<TagValue> filterTagsByName(String name, Event event) {
+    public static List<TagValue> filterTagsByName(EventOrBuilder event, String name) {
         return event.getTagsList().stream()
-                .filter(it -> name.equals(it.getName()))
+                .filter(it -> it.getName().equals(name))
                 .toList();
     }
 
@@ -110,6 +112,10 @@ public final class MoreTags {
 
     public static TagValue expiration(Instant instant) {
         return Nip40.expiration(instant);
+    }
+
+    public static TagValue nonce(String nonce, long targetDifficulty) {
+        return Nip13.nonce(nonce, targetDifficulty);
     }
 
     public static TagValue named(String name, String... values) {
