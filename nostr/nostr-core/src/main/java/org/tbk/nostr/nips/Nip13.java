@@ -15,12 +15,18 @@ import java.util.stream.IntStream;
  * See <a href="https://github.com/nostr-protocol/nips/blob/master/13.md">NIP-13</a>.
  */
 public final class Nip13 {
+    private static final String NONCE_TAG_NAME = "nonce";
+
     private Nip13() {
         throw new UnsupportedOperationException();
     }
 
     public static TagValue nonce(long nonce, long targetDifficulty) {
-        return MoreTags.named("nonce", Long.toString(nonce), Long.toString(targetDifficulty));
+        return nonce(Long.toString(nonce), targetDifficulty);
+    }
+
+    public static TagValue nonce(String nonce, long targetDifficulty) {
+        return MoreTags.named(NONCE_TAG_NAME, nonce == null ? "" : nonce, Long.toString(targetDifficulty));
     }
 
     public static long calculateDifficulty(EventOrBuilder event) {
@@ -35,11 +41,11 @@ public final class Nip13 {
         return countLeadingZeroes(bytes);
     }
 
-    public static boolean meetsTargetDifficulty(Event event, long targetDifficulty) {
+    public static boolean meetsTargetDifficulty(EventOrBuilder event, long targetDifficulty) {
         return meetsTargetDifficulty(event, targetDifficulty, true);
     }
 
-    public static boolean meetsTargetDifficulty(Event event, long targetDifficulty, boolean verifyCommitment) {
+    public static boolean meetsTargetDifficulty(EventOrBuilder event, long targetDifficulty, boolean verifyCommitment) {
         long difficulty = calculateDifficulty(event);
 
         if (difficulty < targetDifficulty) {
@@ -47,7 +53,7 @@ public final class Nip13 {
         }
 
         if (verifyCommitment) {
-            List<TagValue> allNonceTags = MoreTags.filterTagsByName("nonce", event);
+            List<TagValue> allNonceTags = MoreTags.filterTagsByName(event, NONCE_TAG_NAME);
             List<TagValue> matchingNonceTags = allNonceTags.stream()
                     .filter(it -> it.getValuesCount() >= 2)
                     .filter(it -> {
@@ -58,8 +64,8 @@ public final class Nip13 {
                             return false;
                         }
                     }).toList();
-            int matchingNonceTagsCount = matchingNonceTags.size();
-            if (matchingNonceTagsCount < 1 || matchingNonceTagsCount != allNonceTags.size()) {
+            
+            if (matchingNonceTags.isEmpty() || matchingNonceTags.size() != allNonceTags.size()) {
                 // event has none or more than one "nonce" tag -> decline!
                 return false;
             }
