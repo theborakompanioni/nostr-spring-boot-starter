@@ -5,10 +5,7 @@ import fr.acinq.bitcoin.DeterministicWallet;
 import fr.acinq.bitcoin.KeyPath;
 import fr.acinq.bitcoin.MnemonicCode;
 import fr.acinq.bitcoin.PrivateKey;
-import lombok.NonNull;
 import reactor.core.publisher.Flux;
-
-import java.util.HexFormat;
 
 import static fr.acinq.bitcoin.DeterministicWallet.hardened;
 

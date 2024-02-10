@@ -4,9 +4,6 @@ package org.tbk.nostr.base;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.security.SecureRandom;
-import java.util.stream.Collectors;
-
 import static java.util.Objects.requireNonNull;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

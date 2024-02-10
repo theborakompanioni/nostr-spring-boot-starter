@@ -3,15 +3,14 @@ package org.tbk.nostr.proto.json;
 import com.fasterxml.jackson.jr.ob.JSONComposer;
 import com.fasterxml.jackson.jr.ob.comp.ArrayComposer;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.HexFormat;
+import java.util.List;
+import java.util.Optional;
 
 import static org.tbk.nostr.proto.json.Json.json;
 import static org.tbk.nostr.proto.json.Json.jsonForSigning;

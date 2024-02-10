@@ -18,10 +18,10 @@ class RelayInfoDocumentTest {
         RelayInfoDocument sut = RelayInfoDocument.newBuilder().build();
 
         assertThat(JSON.std.anyFrom(sut.toJson()), is(JSON.std.anyFrom("""
-                    {
-                      "supported_nips": [ ]
-                    }
-                    """)));
+                {
+                  "supported_nips": [ ]
+                }
+                """)));
         assertThat(sut.toJson(), is(RelayInfoDocument.toJson(sut)));
     }
 
@@ -69,10 +69,10 @@ class RelayInfoDocumentTest {
 
         assertThat(RelayInfoDocument.fromJson("{}"), is(expected));
         assertThat(RelayInfoDocument.fromJson("""
-                    {
-                      "supported_nips": [ ]
-                    }
-                    """), is(expected));
+                {
+                  "supported_nips": [ ]
+                }
+                """), is(expected));
     }
 
     @Test

@@ -7,6 +7,7 @@ public final class EventEntityEvents {
 
     public record CreatedEvent(EventEntity.EventEntityId eventId) {
     }
+
     public record MarkDeletedEvent(EventEntity.EventEntityId eventId) {
     }
 }

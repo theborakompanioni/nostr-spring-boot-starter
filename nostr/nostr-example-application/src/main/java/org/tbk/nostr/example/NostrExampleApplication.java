@@ -12,10 +12,10 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.tbk.nostr.base.SubscriptionId;
-import org.tbk.nostr.util.MoreSubscriptionIds;
 import org.tbk.nostr.client.NostrClientService;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.ReqRequest;
+import org.tbk.nostr.util.MoreSubscriptionIds;
 
 import java.time.Duration;
 import java.time.Instant;
