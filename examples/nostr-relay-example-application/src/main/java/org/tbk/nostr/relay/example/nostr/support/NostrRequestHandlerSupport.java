@@ -1,9 +1,10 @@
-package org.tbk.nostr.relay.example.nostr;
+package org.tbk.nostr.relay.example.nostr.support;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.*;
+import org.tbk.nostr.relay.example.nostr.AbstractNostrWebSocketHandler;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 
 @RequiredArgsConstructor
