@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.support.validating;
+package org.tbk.nostr.relay.example.nostr.validating;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -10,7 +10,6 @@ import org.tbk.nostr.util.MorePublicKeys;
 
 import java.util.HexFormat;
 
-@Component
 public class DefaultEventValidator implements EventValidator {
     @Override
     public void validateEvent(Event event, Errors errors) {
