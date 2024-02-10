@@ -1,28 +1,28 @@
-package org.tbk.nostr.relay.example.nostr.support;
+package org.tbk.nostr.relay.example.nostr.interceptor;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.tbk.nostr.proto.ClosedResponse;
-import org.tbk.nostr.proto.Filter;
-import org.tbk.nostr.proto.ReqRequest;
-import org.tbk.nostr.proto.Response;
+import org.tbk.nostr.proto.*;
 import org.tbk.nostr.proto.json.JsonWriter;
-import org.tbk.nostr.relay.example.nostr.handler.ReqRequestHandler;
 
 @Slf4j
 @RequiredArgsConstructor
-public class MaxLimitPerFilterReqRequestHandlerDecorator implements ReqRequestHandler {
-
-    @NonNull
-    private final ReqRequestHandler delegate;
+public class MaxLimitPerFilterReqRequestHandlerInterceptor implements NostrRequestHandlerInterceptor {
 
     private final int maxLimitPerFilter;
 
     @Override
-    public void handleReqMessage(WebSocketSession session, ReqRequest req) throws Exception {
+    public boolean preHandle(WebSocketSession session, Request request) throws Exception {
+        if (request.getKindCase() == Request.KindCase.REQ) {
+            return handleReqMessage(session, request.getReq());
+        }
+
+        return true;
+    }
+
+    private boolean handleReqMessage(WebSocketSession session, ReqRequest req) throws Exception {
         for (Filter filter : req.getFiltersList()) {
             if (filter.getLimit() > maxLimitPerFilter) {
                 String message = "Maximum limit per filter in REQ message. Maximum is %d, got %d"
@@ -36,10 +36,10 @@ public class MaxLimitPerFilterReqRequestHandlerDecorator implements ReqRequestHa
                                 .setMessage("Error: %s".formatted(message))
                                 .build())
                         .build())));
-                return;
+                return false;
             }
         }
 
-        delegate.handleReqMessage(session, req);
+        return true;
     }
 }

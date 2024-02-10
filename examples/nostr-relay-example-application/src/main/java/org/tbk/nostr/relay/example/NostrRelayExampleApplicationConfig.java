@@ -11,14 +11,11 @@ import org.springframework.context.annotation.Configuration;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
-import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties.RelayOptionsProperties;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.relay.example.impl.*;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketHandler;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 import org.tbk.nostr.relay.example.nostr.support.DefaultUnknownRequestHandler;
-import org.tbk.nostr.relay.example.nostr.support.MaxFilterCountReqRequestHandlerDecorator;
-import org.tbk.nostr.relay.example.nostr.support.MaxLimitPerFilterReqRequestHandlerDecorator;
 
 @Slf4j
 @Configuration(proxyBeanMethods = false)
@@ -30,12 +27,7 @@ class NostrRelayExampleApplicationConfig {
     private final NostrRelayExampleApplicationProperties properties;
 
     @Bean
-    RelayOptionsProperties relayOptions() {
-        return properties.getRelayOptions();
-    }
-
-    @Bean
-    @ConditionalOnProperty("org.tbk.nostr.relay.example.identity.mnemonics")
+    @ConditionalOnProperty("org.tbk.nostr.example.relay.identity.mnemonics")
     Signer serverSigner() {
         return properties.getIdentity()
                 .map(NostrRelayExampleApplicationProperties.IdentityProperties::getSeed)
@@ -45,15 +37,8 @@ class NostrRelayExampleApplicationConfig {
     }
 
     @Bean
-    ReqRequestHandler exampleReqRequestHandler(EventEntityService eventEntityService,
-                                               RelayOptionsProperties relayOptions) {
-        return new MaxFilterCountReqRequestHandlerDecorator(
-                new MaxLimitPerFilterReqRequestHandlerDecorator(
-                        new ExampleReqRequestHandlerImpl(eventEntityService),
-                        relayOptions.getMaxLimitPerFilter()
-                ),
-                relayOptions.getMaxFilterCount()
-        );
+    ReqRequestHandler exampleReqRequestHandler(EventEntityService eventEntityService) {
+        return new ExampleReqRequestHandlerImpl(eventEntityService);
     }
 
     @Bean
@@ -78,14 +63,13 @@ class NostrRelayExampleApplicationConfig {
     }
 
     @Bean
-    NostrWebSocketHandler nostrRelayExampleWebSocketHandler(RelayOptionsProperties relayOptions,
-                                                            ReqRequestHandler reqRequestHandler,
+    NostrWebSocketHandler nostrRelayExampleWebSocketHandler(ReqRequestHandler reqRequestHandler,
                                                             EventRequestHandler eventRequestHandler,
                                                             CloseRequestHandler closeRequestHandler,
                                                             CountRequestHandler countRequestHandler,
                                                             UnknownRequestHandler unknownRequestHandler) {
         return new ExampleNostrWebSocketHandlerImpl(
-                relayOptions,
+                this.properties,
                 reqRequestHandler,
                 eventRequestHandler,
                 closeRequestHandler,

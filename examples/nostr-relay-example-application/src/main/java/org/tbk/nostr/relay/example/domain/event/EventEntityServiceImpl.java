@@ -16,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
-import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties.RelayOptionsProperties;
+import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties;
+import org.tbk.nostr.relay.example.nostr.NostrRelayProperties;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -43,10 +44,10 @@ public class EventEntityServiceImpl implements EventEntityService {
 
     private final PageRequest defaultPageRequest;
 
-    public EventEntityServiceImpl(EventEntities events, RelayOptionsProperties relayOptions) {
-        requireNonNull(relayOptions);
+    public EventEntityServiceImpl(EventEntities events, NostrRelayExampleApplicationProperties properties) {
+        requireNonNull(properties);
         this.events = requireNonNull(events);
-        this.defaultPageRequest = PageRequest.of(0, relayOptions.getInitialQueryLimit(), sortByCreatedAtDesc);
+        this.defaultPageRequest = PageRequest.of(0, properties.getInitialQueryLimit(), sortByCreatedAtDesc);
     }
 
     @Override

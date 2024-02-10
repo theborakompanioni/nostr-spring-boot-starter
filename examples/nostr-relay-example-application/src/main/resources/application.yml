@@ -32,18 +32,19 @@ spring.jpa.properties.hibernate.dialect: org.hibernate.community.dialect.SQLiteD
 spring.jpa.properties.hibernate.jdbc.time_zone: UTC
 spring.jpa.open-in-view: false
 
-org.tbk.nostr.relay.example:
+org.tbk.nostr.example.relay:
   identity:
     mnemonics: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
     passphrase: ''
   async-executor:
     max-pool-size: 1 # sqlite needs a single thread
-  relay-options:
-    websocket-path: '/'
-    greeting: 'GM'
-    initial-query-limit: 100
-    max-limit-per-filter: 1000
-    max-filter-count: 21
+  greeting: 'GM'
+  initial-query-limit: 100
+
+org.tbk.nostr.relay:
+  websocket-path: '/'
+  max-limit-per-filter: 1000
+  max-filter-count: 21
 
 org.tbk.nostr.nip11:
   enabled: true

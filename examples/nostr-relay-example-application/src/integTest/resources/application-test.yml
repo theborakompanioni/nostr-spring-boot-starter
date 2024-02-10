@@ -20,11 +20,13 @@ spring.docker.compose:
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
   skip.in-tests: false
 
-org.tbk.nostr.relay.example:
+org.tbk.nostr.example.relay:
   async-executor:
     max-pool-size: 10
-  relay-options:
-    greeting: null
-    initial-query-limit: 210
-    max-limit-per-filter: 2100
-    max-filter-count: 42
+  greeting: null
+  initial-query-limit: 210
+
+org.tbk.nostr.relay:
+  websocket-path: '/'
+  max-limit-per-filter: 2100
+  max-filter-count: 42
