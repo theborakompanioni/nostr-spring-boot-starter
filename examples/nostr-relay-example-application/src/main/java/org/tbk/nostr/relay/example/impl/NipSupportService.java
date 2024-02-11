@@ -1,7 +1,6 @@
 package org.tbk.nostr.relay.example.impl;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
-import org.jmolecules.ddd.annotation.Service;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.nips.Nip9;
@@ -19,7 +18,6 @@ import java.util.Collection;
 
 import static java.util.Objects.requireNonNull;
 
-@Service
 public class NipSupportService implements Nip9Support, Nip40Support {
 
     private final EventEntityService eventEntityService;

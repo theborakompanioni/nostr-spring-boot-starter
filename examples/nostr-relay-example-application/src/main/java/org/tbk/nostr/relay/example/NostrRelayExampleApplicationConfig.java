@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
@@ -34,6 +35,11 @@ class NostrRelayExampleApplicationConfig {
                 .map(MoreIdentities::fromSeed)
                 .map(SimpleSigner::fromPrivateKey)
                 .orElseThrow();
+    }
+
+    @Bean
+    NipSupportService nipSupportService(EventEntityService eventEntityService, ThreadPoolTaskExecutor asyncThreadPoolTaskExecutor) {
+        return new NipSupportService(eventEntityService, asyncThreadPoolTaskExecutor);
     }
 
     @Bean

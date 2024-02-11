@@ -29,9 +29,8 @@ import java.util.stream.Stream;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
-@Service
 @Transactional
-public class EventEntityServiceImpl implements EventEntityService {
+class EventEntityServiceImpl implements EventEntityService {
     private static final Sort sortByCreatedAtDesc = Sort.by(Sort.Direction.DESC, "createdAt");
 
     private static final Comparator<EventEntity> compareByCreatedAtDesc = Comparator.
