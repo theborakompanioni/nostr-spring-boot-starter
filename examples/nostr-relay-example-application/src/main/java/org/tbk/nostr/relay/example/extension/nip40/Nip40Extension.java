@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 class Nip40Extension {
 
     @Bean
-    Nip40RequestHandlerInterceptor nip40RequestHandlerInterceptor(Nip40Support nip40Support) {
-        return new Nip40RequestHandlerInterceptor(nip40Support);
+    Nip40RequestHandlerInterceptor nip40RequestHandlerInterceptor(Nip40Support support) {
+        return new Nip40RequestHandlerInterceptor(support);
     }
 }

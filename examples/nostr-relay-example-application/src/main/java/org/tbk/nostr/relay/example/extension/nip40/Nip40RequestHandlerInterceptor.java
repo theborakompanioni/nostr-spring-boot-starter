@@ -7,7 +7,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.nips.Nip40;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.EventRequest;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
 
@@ -16,7 +15,7 @@ import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerIntercep
 public class Nip40RequestHandlerInterceptor implements NostrRequestHandlerInterceptor {
 
     @NonNull
-    private final Nip40Support nip40Support;
+    private final Nip40Support support;
 
     @Override
     public void postHandle(WebSocketSession session, Request request) {
@@ -27,7 +26,7 @@ public class Nip40RequestHandlerInterceptor implements NostrRequestHandlerInterc
 
     private void handleEvent(Event event) {
         Nip40.getExpiration(event).ifPresent(expiresAt -> {
-            nip40Support.markExpiresAt(EventId.of(event.getId().toByteArray()), expiresAt);
+            support.markExpiresAt(EventId.of(event.getId().toByteArray()), expiresAt);
         });
-    }   
+    }
 }
