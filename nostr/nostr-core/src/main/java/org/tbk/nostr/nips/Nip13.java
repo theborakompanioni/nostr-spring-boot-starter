@@ -29,6 +29,10 @@ public final class Nip13 {
         return MoreTags.named(NONCE_TAG_NAME, nonce == null ? "" : nonce, Long.toString(targetDifficulty));
     }
 
+    public static long calculateDifficulty(Event event) {
+        return calculateDifficulty(event.getId().toByteArray());
+    }
+
     public static long calculateDifficulty(EventOrBuilder event) {
         return calculateDifficulty(MoreEvents.eventId(event));
     }
@@ -64,7 +68,7 @@ public final class Nip13 {
                             return false;
                         }
                     }).toList();
-            
+
             if (matchingNonceTags.isEmpty() || matchingNonceTags.size() != allNonceTags.size()) {
                 // event has none or more than one "nonce" tag -> decline!
                 return false;

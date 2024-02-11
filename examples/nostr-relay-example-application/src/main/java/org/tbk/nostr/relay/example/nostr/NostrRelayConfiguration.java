@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxFilterCountReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxLimitPerFilterReqRequestHandlerInterceptor;
@@ -39,6 +40,7 @@ class NostrRelayConfiguration {
     }
 
     @Bean
+    @Order(0)
     DefaultEventValidator defaultEventValidator() {
         return new DefaultEventValidator();
     }
