@@ -67,6 +67,10 @@ public final class MoreTags {
         return named("e", values);
     }
 
+    public static TagValue d(String... values) {
+        return named("d", values);
+    }
+
 
     public static TagValue p(XonlyPublicKey publicKey) {
         return named("p", publicKey.value.toHex());

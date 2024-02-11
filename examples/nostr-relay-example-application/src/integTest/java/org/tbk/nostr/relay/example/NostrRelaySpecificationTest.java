@@ -587,14 +587,9 @@ public class NostrRelaySpecificationTest {
     void itShouldFetchEventsSortedSuccessfully0WithSingleFilter() {
         Signer signer = SimpleSigner.random();
 
-        Instant now = Instant.now();
-
-        Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
-                .setCreatedAt(now.getEpochSecond()));
-        Event event1Newer = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
-                .setCreatedAt(event0.getCreatedAt() + 1));
-        Event event2Older = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
-                .setCreatedAt(event0.getCreatedAt() - 1));
+        Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM"));
+        Event event1Newer = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() + 1));
+        Event event2Older = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() - 1));
 
         List<Event> events = List.of(event0, event1Newer, event2Older);
         List<OkResponse> oks = nostrTemplate.send(events)
@@ -627,14 +622,9 @@ public class NostrRelaySpecificationTest {
     void itShouldFetchEventsSortedSuccessfully0WithMultiFilter() {
         Signer signer = SimpleSigner.random();
 
-        Instant now = Instant.now();
-
-        Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
-                .setCreatedAt(now.getEpochSecond()));
-        Event event1Newer = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
-                .setCreatedAt(event0.getCreatedAt() + 1));
-        Event event2Older = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
-                .setCreatedAt(event0.getCreatedAt() - 1));
+        Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM"));
+        Event event1Newer = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() + 1));
+        Event event2Older = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() - 1));
 
         List<Event> events = List.of(event0, event1Newer, event2Older);
         List<OkResponse> oks = nostrTemplate.send(events)
@@ -665,7 +655,7 @@ public class NostrRelaySpecificationTest {
         assertThat(fetchedEvents.get(2), is(event2Older));
     }
 
-    @Test
+    @RepeatedTest(5)
     void itShouldVerifyEphemeralEventBehaviour0() {
         Signer signer = SimpleSigner.random();
 
@@ -699,19 +689,8 @@ public class NostrRelaySpecificationTest {
                 .picture(URI.create("https://www.example.com/example.png"))
                 .build();
 
-        Metadata metadata1 = Metadata.newBuilder()
-                .name("name1")
-                .about("about1")
-                .picture(URI.create("https://www.example.com/example1.png"))
-                .build();
-
-        assertThat("sanity check", metadata1, not(is(metadata0)));
-
-
         Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata0);
-        Event event1Newer = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata1)
-                .setCreatedAt(event0.getCreatedAt() + 1)
-        );
+        Event event1Newer = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() + 1));
 
         assertThat("sanity check", event1Newer.getCreatedAt(), is(greaterThan(event0.getCreatedAt())));
 
@@ -733,7 +712,7 @@ public class NostrRelaySpecificationTest {
         List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
                         .setId(MoreSubscriptionIds.random().getId())
                         .addFilters(Filter.newBuilder()
-                                .addKinds(0)
+                                .addKinds(event0.getKind())
                                 .addAuthors(ByteString.copyFrom(signer.getPublicKey().value.toByteArray()))
                                 .build())
                         .build())
@@ -755,14 +734,9 @@ public class NostrRelaySpecificationTest {
                 .picture(URI.create("https://www.example.com/example.png"))
                 .build();
 
-
         Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata);
-        Event event1 = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata)
-                .setCreatedAt(event0.getCreatedAt() + 1)
-        );
-        Event event2 = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata)
-                .setCreatedAt(event0.getCreatedAt() - 1)
-        );
+        Event event1Newer = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() + 1));
+        Event event2Older = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() - 1));
 
         OkResponse ok0 = nostrTemplate.send(event0)
                 .blockOptional(Duration.ofSeconds(5))
@@ -770,13 +744,13 @@ public class NostrRelaySpecificationTest {
         assertThat(ok0.getMessage(), is(""));
         assertThat(ok0.getSuccess(), is(true));
 
-        OkResponse ok1 = nostrTemplate.send(event1)
+        OkResponse ok1 = nostrTemplate.send(event1Newer)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok1.getMessage(), is(""));
         assertThat(ok1.getSuccess(), is(true));
 
-        OkResponse ok2 = nostrTemplate.send(event2)
+        OkResponse ok2 = nostrTemplate.send(event2Older)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok2.getMessage(), is("Error: A newer version of this replaceable event already exists."));
@@ -794,7 +768,7 @@ public class NostrRelaySpecificationTest {
                 .orElseThrow();
 
         assertThat(fetchedEvents, hasSize(1));
-        assertThat(fetchedEvents.getFirst(), is(event1));
+        assertThat(fetchedEvents.getFirst(), is(event1Newer));
     }
 
     @RepeatedTest(5)
