@@ -26,7 +26,11 @@ public class Nip40RequestHandlerInterceptor implements NostrRequestHandlerInterc
 
     private void handleEvent(Event event) {
         Nip40.getExpiration(event).ifPresent(expiresAt -> {
-            support.markExpiresAt(EventId.of(event.getId().toByteArray()), expiresAt);
+            support.markExpiresAt(EventId.of(event.getId().toByteArray()), expiresAt).subscribe(unused -> {
+                log.debug("Successfully marked event {} as expired.", event.getId());
+            }, e -> {
+                log.warn("Error while marking event {} as expired: {}", event.getId(), e.getMessage());
+            });
         });
     }
 }

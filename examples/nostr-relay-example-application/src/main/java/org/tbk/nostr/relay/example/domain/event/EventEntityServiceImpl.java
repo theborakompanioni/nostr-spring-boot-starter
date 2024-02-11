@@ -17,13 +17,12 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,8 +54,8 @@ public class EventEntityServiceImpl implements EventEntityService {
     }
 
     @Override
-    public Mono<EventEntity> findById(EventEntity.EventEntityId eventId) {
-        return Mono.justOrEmpty(events.findById(eventId));
+    public Optional<EventEntity> findById(EventEntity.EventEntityId eventId) {
+        return events.findById(eventId);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class EventEntityServiceImpl implements EventEntityService {
     }
 
     @Override
-    public Flux<EventId> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author) {
+    public List<EventId> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author) {
         Specification<EventEntity> deletionSpecification = Specification.anyOf(deletableEventIds.stream()
                         .map(EventEntitySpecifications::hasId)
                         .collect(Collectors.toList()))
@@ -83,8 +82,9 @@ public class EventEntityServiceImpl implements EventEntityService {
         Instant now = Instant.now();
         List<EventEntity> deletabledEntities = events.saveAll(deletableEvents.stream().map(it -> it.markDeleted(now)).toList());
 
-        return Flux.fromIterable(deletabledEntities)
-                .map(it -> EventId.fromHex(it.getId().getId()));
+        return deletabledEntities.stream()
+                .map(it -> EventId.fromHex(it.getId().getId()))
+                .toList();
     }
 
     @Override
@@ -96,7 +96,7 @@ public class EventEntityServiceImpl implements EventEntityService {
     }
 
     @Override
-    public Flux<EventEntity> findAll(Collection<Filter> filters) {
+    public List<EventEntity> findAll(Collection<Filter> filters) {
         List<Filter> filterWithoutLimit = filters.stream()
                 .filter(it -> !it.hasField(Filter.getDescriptor().findFieldByNumber(Filter.LIMIT_FIELD_NUMBER)))
                 .toList();
@@ -140,9 +140,11 @@ public class EventEntityServiceImpl implements EventEntityService {
                 .reduce(Stream.empty(), Stream::concat);
 
         if (filterWithLimit.isEmpty()) {
-            return Flux.fromStream(stream);
+            return stream.toList();
         } else {
-            return Flux.fromStream(stream.distinct().sorted(compareByCreatedAtDesc));
+            return stream.distinct()
+                    .sorted(compareByCreatedAtDesc)
+                    .toList();
         }
     }
 

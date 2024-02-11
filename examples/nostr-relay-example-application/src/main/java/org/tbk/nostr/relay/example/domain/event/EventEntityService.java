@@ -7,29 +7,29 @@ import org.springframework.data.jpa.domain.Specification;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public interface EventEntityService {
 
     EventEntity createEvent(Event event);
 
-    default Mono<EventEntity> findById(EventId eventId) {
+    default Optional<EventEntity> findById(EventId eventId) {
         return findById(EventEntity.EventEntityId.of(eventId.toHex()));
     }
 
-    Mono<EventEntity> findById(EventEntity.EventEntityId eventId);
+    Optional<EventEntity> findById(EventEntity.EventEntityId eventId);
 
-    Flux<EventEntity> findAll(Collection<Filter> filters);
+    List<EventEntity> findAll(Collection<Filter> filters);
 
     Page<EventEntity> findAll(Specification<EventEntity> specs, Pageable page);
 
     boolean exists(Specification<EventEntity> specs);
 
-    Flux<EventId> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author);
+    List<EventId> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author);
 
     EventEntity markExpiresAt(EventId eventId, Instant expiresAt);
 }

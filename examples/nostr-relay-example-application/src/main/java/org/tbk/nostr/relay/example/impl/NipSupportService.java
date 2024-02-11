@@ -2,7 +2,6 @@ package org.tbk.nostr.relay.example.impl;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.jmolecules.ddd.annotation.Service;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.nips.Nip9;
@@ -32,20 +31,17 @@ public class NipSupportService implements Nip9Support, Nip40Support {
         this.asyncScheduler = Schedulers.fromExecutor(requireNonNull(asyncThreadPoolTaskExecutor));
     }
 
-    @Async
     @Override
-    public void markExpiresAt(EventId eventId, Instant expiresAt) {
-        eventEntityService.markExpiresAt(eventId, expiresAt);
+    public Mono<Void> markExpiresAt(EventId eventId, Instant expiresAt) {
+        return Mono.<Void>fromRunnable(() -> {
+            eventEntityService.markExpiresAt(eventId, expiresAt);
+        }).subscribeOn(asyncScheduler);
     }
 
     @Override
     public Mono<Void> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author) {
-        return Mono.<Void>fromCallable(() -> {
-            eventEntityService.markDeleted(deletableEventIds, author)
-                    .collectList()
-                    .blockOptional()
-                    .orElseThrow(() -> new IllegalStateException("Could not delete all events"));
-            return null;
+        return Mono.<Void>fromRunnable(() -> {
+            eventEntityService.markDeleted(deletableEventIds, author);
         }).subscribeOn(asyncScheduler);
     }
 
