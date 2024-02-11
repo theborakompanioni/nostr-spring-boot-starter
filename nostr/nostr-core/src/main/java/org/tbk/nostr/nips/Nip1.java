@@ -24,6 +24,10 @@ public final class Nip1 {
                (10_000 <= event.getKind() && event.getKind() < 20_000);
     }
 
+    public static boolean isEphemeralEvent(Event event) {
+        return (20_000 <= event.getKind() && event.getKind() < 30_000);
+    }
+
     public static Event.Builder createTextNote(XonlyPublicKey publicKey, String content) {
         return MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())

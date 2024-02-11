@@ -31,6 +31,7 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -664,6 +665,30 @@ public class NostrRelaySpecificationTest {
         assertThat(fetchedEvents.get(2), is(event2Older));
     }
 
+    @Test
+    void itShouldVerifyEphemeralEventBehaviour0() {
+        Signer signer = SimpleSigner.random();
+
+        Event ephemeralEvent0 = MoreEvents.finalize(signer, MoreEvents.withEventId(Event.newBuilder()
+                .setCreatedAt(Instant.now().getEpochSecond())
+                .setPubkey(ByteString.fromHex(signer.getPublicKey().value.toHex()))
+                .setKind(20_000)
+                .setContent("GM")));
+
+        OkResponse ok0 = nostrTemplate.send(ephemeralEvent0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok0.getEventId(), is(ephemeralEvent0.getId()));
+        assertThat(ok0.getSuccess(), is(true));
+        assertThat(ok0.getMessage(), is(""));
+
+        Optional<Event> fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(ephemeralEvent0.getId().toByteArray()))
+                .delaySubscription(Duration.ofSeconds(1))
+                .blockOptional(Duration.ofSeconds(5));
+        assertThat(fetchedEvent0.isPresent(), is(false));
+    }
+
     @RepeatedTest(5)
     void itShouldVerifyReplaceableEventBehaviour0() {
         Signer signer = SimpleSigner.random();
@@ -836,13 +861,13 @@ public class NostrRelaySpecificationTest {
         assertThat("sanity check", EventId.of(event0WithLowerId.getId().toByteArray()), is(lessThan(EventId.of(event1.getId().toByteArray()))));
 
         OkResponse ok0 = nostrTemplate.send(event0WithLowerId)
-                .blockOptional(Duration.ofSeconds(500000))
+                .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getMessage(), is(""));
         assertThat(ok0.getSuccess(), is(true));
 
         OkResponse ok2 = nostrTemplate.send(event1)
-                .blockOptional(Duration.ofSeconds(500000))
+                .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok2.getMessage(), is("Error: A version of this replaceable event with same timestamp and lower id already exists."));
         assertThat(ok2.getSuccess(), is(false));

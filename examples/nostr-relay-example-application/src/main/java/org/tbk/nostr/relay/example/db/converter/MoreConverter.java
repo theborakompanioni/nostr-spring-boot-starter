@@ -13,7 +13,7 @@ public final class MoreConverter {
     }
 
     @Converter
-    public static final class InstantConverter implements AttributeConverter<Instant, Long> {
+    public static final class InstantToMilliSecondsConverter implements AttributeConverter<Instant, Long> {
 
         @Override
         public Long convertToDatabaseColumn(Instant attribute) {
@@ -23,6 +23,20 @@ public final class MoreConverter {
         @Override
         public Instant convertToEntityAttribute(Long dbData) {
             return dbData == null ? null : Instant.ofEpochMilli(dbData);
+        }
+    }
+
+    @Converter
+    public static final class InstantToSecondsConverter implements AttributeConverter<Instant, Long> {
+
+        @Override
+        public Long convertToDatabaseColumn(Instant attribute) {
+            return attribute == null ? null : attribute.getEpochSecond();
+        }
+
+        @Override
+        public Instant convertToEntityAttribute(Long dbData) {
+            return dbData == null ? null : Instant.ofEpochSecond(dbData);
         }
     }
 }

@@ -33,7 +33,7 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
     private final int kind;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    @Convert(converter = MoreConverter.InstantConverter.class)
+    @Convert(converter = MoreConverter.InstantToSecondsConverter.class)
     private final Instant createdAt;
 
     @JoinColumn(name = "event_id", updatable = false)
@@ -48,15 +48,15 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
 
     @CreationTimestamp
     @Column(name = "first_seen_at")
-    @Convert(converter = MoreConverter.InstantConverter.class)
+    @Convert(converter = MoreConverter.InstantToMilliSecondsConverter.class)
     private Instant firstSeenAt;
 
     @Column(name = "deleted_at")
-    @Convert(converter = MoreConverter.InstantConverter.class)
+    @Convert(converter = MoreConverter.InstantToMilliSecondsConverter.class)
     private Instant deletedAt;
 
     @Column(name = "expires_at")
-    @Convert(converter = MoreConverter.InstantConverter.class)
+    @Convert(converter = MoreConverter.InstantToMilliSecondsConverter.class)
     private Instant expiresAt;
 
     /**

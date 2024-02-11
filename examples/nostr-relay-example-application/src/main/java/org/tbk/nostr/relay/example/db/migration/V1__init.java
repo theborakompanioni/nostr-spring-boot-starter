@@ -56,6 +56,10 @@ public class V1__init extends BaseJavaMigration {
                     """;
 
             String sql2 = """
+                    create index idx_event_pubkey_kind_created_at ON event (pubkey, kind, created_at)
+                    """;
+
+            String sql3 = """
                     create table if not exists event_tag (
                         event_id text NOT NULL,
                         position integer NOT NULL,
@@ -74,12 +78,12 @@ public class V1__init extends BaseJavaMigration {
                             Arrays.stream(abc.toLowerCase(Locale.US).split("")),
                             Arrays.stream(abc.toUpperCase(Locale.US).split(""))
                     ).map(it -> """
-                            CREATE INDEX idx_event_tag_%s_%s ON event_tag (name, value0) WHERE name = '%s';
+                            create index idx_event_tag_%s_%s ON event_tag (name, value0) WHERE name = '%s';
                             """.formatted(Character.isUpperCase(it.charAt(0)) ? "upper" : "lower", it, it))
                     .toList();
 
             return Stream.concat(
-                    Stream.of(sql1, sql2),
+                    Stream.of(sql1, sql2, sql3),
                     singleLetterTagsIndexSqlList.stream()
             ).toList();
         }
@@ -105,6 +109,10 @@ public class V1__init extends BaseJavaMigration {
                     """;
 
             String sql2 = """
+                    create index idx_event_pubkey_kind_created_at ON event(pubkey, kind, created_at)
+                    """;
+
+            String sql3 = """
                     create table if not exists event_tag (
                         event_id text NOT NULL,
                         position integer NOT NULL,
@@ -123,12 +131,12 @@ public class V1__init extends BaseJavaMigration {
                             Arrays.stream(abc.toLowerCase(Locale.US).split("")),
                             Arrays.stream(abc.toUpperCase(Locale.US).split(""))
                     ).map(it -> """
-                            CREATE INDEX idx_event_tag_%s_%s ON event_tag(name = '%s', value0);
+                            create index idx_event_tag_%s_%s ON event_tag(name = '%s', value0);
                             """.formatted(Character.isUpperCase(it.charAt(0)) ? "upper" : "lower", it, it))
                     .toList();
 
             return Stream.concat(
-                    Stream.of(sql1, sql2),
+                    Stream.of(sql1, sql2, sql3),
                     singleLetterTagsIndexSqlList.stream()
             ).toList();
         }

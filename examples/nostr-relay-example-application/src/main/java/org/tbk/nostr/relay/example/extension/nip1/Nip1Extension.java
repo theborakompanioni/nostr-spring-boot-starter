@@ -14,4 +14,9 @@ class Nip1Extension {
     ReplaceableEventRequestHandlerInterceptor replaceableEventRequestHandlerInterceptor(Nip1Support support) {
         return new ReplaceableEventRequestHandlerInterceptor(support);
     }
+
+    @Bean
+    EphemeralEventRequestHandlerInterceptor ephemeralEventRequestHandlerInterceptor(Nip1Support support) {
+        return new EphemeralEventRequestHandlerInterceptor(support);
+    }
 }
