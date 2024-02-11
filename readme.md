@@ -30,7 +30,12 @@ Planned:
 
 ### Test
 ```shell script
-./gradlew test integrationTest --rerun-tasks --no-parallel
+./gradlew test integrationTest --rerun-tasks
+```
+
+Run full test suite (including load tests):
+```shell script
+CI=true ./gradlew test integrationTest --rerun-tasks
 ```
 
 ## Contributing
