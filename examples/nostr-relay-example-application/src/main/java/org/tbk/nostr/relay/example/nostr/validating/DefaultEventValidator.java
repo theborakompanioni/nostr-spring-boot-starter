@@ -1,6 +1,5 @@
 package org.tbk.nostr.relay.example.nostr.validating;
 
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;

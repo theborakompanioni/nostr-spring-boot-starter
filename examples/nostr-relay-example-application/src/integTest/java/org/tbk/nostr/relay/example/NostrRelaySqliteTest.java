@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test", "sqlite-test"})
@@ -29,7 +30,7 @@ public class NostrRelaySqliteTest {
     @LocalServerPort
     private int serverPort;
 
-    @Autowired
+    @Autowired(required = false)
     private NostrRelayExampleApplicationProperties applicationProperties;
 
     private NostrTemplate nostrTemplate;
@@ -39,6 +40,11 @@ public class NostrRelaySqliteTest {
         if (this.nostrTemplate == null) {
             this.nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
         }
+    }
+
+    @Test
+    void contextLoads() {
+        assertThat(applicationProperties, is(notNullValue()));
     }
 
     @Test
