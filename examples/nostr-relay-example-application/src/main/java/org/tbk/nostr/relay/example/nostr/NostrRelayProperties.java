@@ -6,7 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

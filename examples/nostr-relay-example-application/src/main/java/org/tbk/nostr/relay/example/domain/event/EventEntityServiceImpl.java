@@ -17,7 +17,6 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties;
-import org.tbk.nostr.relay.example.nostr.NostrRelayProperties;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

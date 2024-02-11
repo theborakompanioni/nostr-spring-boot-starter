@@ -11,8 +11,6 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.handler.LoggingWebSocketHandlerDecorator;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
-import org.tbk.nostr.relay.example.nostr.NostrRelayProperties;
-import org.tbk.nostr.relay.example.nostr.NostrWebSocketHandlerDispatcher;
 
 @EnableWebSocket
 @ConditionalOnWebApplication
