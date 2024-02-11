@@ -32,6 +32,12 @@ public class NostrRelayProperties implements Validator {
     @Nullable
     private Integer maxFilterCount;
 
+    @Nullable
+    private Long createdAtLowerLimit;
+
+    @Nullable
+    private Long createdAtUpperLimit;
+
     public String getWebsocketPath() {
         return Optional.ofNullable(websocketPath)
                 .filter(it -> !it.isBlank())
@@ -62,6 +68,18 @@ public class NostrRelayProperties implements Validator {
         if (properties.getMaxFilterCount() <= 0) {
             String errorMessage = "'maxFilterCount' must be greater than zero";
             errors.rejectValue("maxFilterCount", "maxFilterCount.invalid", errorMessage);
+        }
+        if (properties.getCreatedAtLowerLimit() != null) {
+            if (properties.getCreatedAtLowerLimit() < 0) {
+                String errorMessage = "'createdAtLowerLimit' must be greater than or equal to zero";
+                errors.rejectValue("createdAtLowerLimit", "createdAtLowerLimit.invalid", errorMessage);
+            }
+        }
+        if (properties.getCreatedAtLowerLimit() != null && properties.getCreatedAtUpperLimit() != null) {
+            if (properties.getCreatedAtLowerLimit() > properties.getCreatedAtUpperLimit()) {
+                String errorMessage = "'createdAtLowerLimit' must be greater than or equal to 'createdAtLowerLimit'";
+                errors.rejectValue("createdAtUpperLimit", "createdAtUpperLimit.invalid", errorMessage);
+            }
         }
     }
 }

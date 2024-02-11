@@ -12,6 +12,7 @@ import org.tbk.nostr.relay.example.nostr.interceptor.MaxFilterCountReqRequestHan
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxLimitPerFilterReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.ValidatingEventRequestHandlerInterceptor;
+import org.tbk.nostr.relay.example.nostr.validating.CreatedAtLimitEventValidator;
 import org.tbk.nostr.relay.example.nostr.validating.DefaultEventValidator;
 import org.tbk.nostr.relay.example.nostr.validating.EventValidator;
 
@@ -43,6 +44,11 @@ class NostrRelayConfiguration {
     @Order(0)
     DefaultEventValidator defaultEventValidator() {
         return new DefaultEventValidator();
+    }
+
+    @Bean
+    CreatedAtLimitEventValidator createdAtLimitEventValidator() {
+        return new CreatedAtLimitEventValidator(relayProperties.getCreatedAtLowerLimit(), relayProperties.getCreatedAtUpperLimit());
     }
 
     @Bean

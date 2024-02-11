@@ -3,6 +3,7 @@ package org.tbk.nostr.relay.example;
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,6 +16,7 @@ import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.proto.ReqRequest;
+import org.tbk.nostr.relay.example.nostr.NostrRelayProperties;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
@@ -36,6 +38,9 @@ public class NostrRelaySpecificationTest {
     @LocalServerPort
     private int serverPort;
 
+    @Autowired(required = false)
+    private NostrRelayProperties relayProperties;
+
     private NostrTemplate nostrTemplate;
 
     @BeforeEach
@@ -43,6 +48,11 @@ public class NostrRelaySpecificationTest {
         if (this.nostrTemplate == null) {
             this.nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
         }
+    }
+
+    @Test
+    void contextLoads() {
+        assertThat(relayProperties, is(notNullValue()));
     }
 
     @Test
@@ -287,6 +297,48 @@ public class NostrRelaySpecificationTest {
             assertThat(ok.getSuccess(), is(false));
             assertThat(ok.getMessage(), is("Error: Invalid tag name."));
         }
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent7CreatedAtLessThanLowerLimit() {
+        assertThat("sanity check", relayProperties.getCreatedAtLowerLimit(), is(notNullValue()));
+
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
+                .setCreatedAt(1));
+
+        OkResponse ok0 = nostrTemplate.send(invalidEvent0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        String expectedMessage = "Error: 'created_at' timestamp %d is less than lower limit %d.".formatted(
+                invalidEvent0.getCreatedAt(),
+                relayProperties.getCreatedAtLowerLimit()
+        );
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is(expectedMessage));
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent8CreatedAtGreaterThanUpperLimit() {
+        assertThat("sanity check", relayProperties.getCreatedAtUpperLimit(), is(notNullValue()));
+
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1")
+                .setCreatedAt(Long.MAX_VALUE));
+
+        OkResponse ok0 = nostrTemplate.send(invalidEvent0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        String expectedMessage = "Error: 'created_at' timestamp %d is greater than upper limit %d.".formatted(
+                invalidEvent0.getCreatedAt(),
+                relayProperties.getCreatedAtUpperLimit()
+        );
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is(expectedMessage));
     }
 
     @Test
