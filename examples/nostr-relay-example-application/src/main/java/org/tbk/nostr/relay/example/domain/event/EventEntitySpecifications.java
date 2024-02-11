@@ -34,8 +34,16 @@ public final class EventEntitySpecifications {
         return hasId(EventId.of(eventId.toByteArray()));
     }
 
+    public static Specification<EventEntity> isCreatedBefore(Instant now) {
+        return (root, query, cb) -> cb.lessThan(root.get("createdAt"), now);
+    }
+
     public static Specification<EventEntity> isCreatedBeforeInclusive(Instant now) {
         return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("createdAt"), now);
+    }
+
+    public static Specification<EventEntity> isCreatedAfter(Instant now) {
+        return (root, query, cb) -> cb.greaterThan(root.get("createdAt"), now);
     }
 
     public static Specification<EventEntity> isCreatedAfterInclusive(Instant now) {

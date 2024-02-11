@@ -329,7 +329,8 @@ class NostrTemplateApplicationTest {
 
         Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata0);
         Event event1 = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata1)
-                // some relays reject events as duplicate if kind/created_at of same pubkey... so lame -_-
+                // some relays reject events as duplicate if kind/created_at of same pubkey...
+                // when in fact, it should replace it when it has a lower event id... so lame -_-
                 .setCreatedAt(event0.getCreatedAt() + 1)
         );
 

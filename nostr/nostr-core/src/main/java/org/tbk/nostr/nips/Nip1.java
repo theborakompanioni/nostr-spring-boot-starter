@@ -13,8 +13,15 @@ import java.time.Instant;
  * See <a href="https://github.com/nostr-protocol/nips/blob/master/01.md">NIP-1</a>.
  */
 public final class Nip1 {
+
     private Nip1() {
         throw new UnsupportedOperationException();
+    }
+
+    public static boolean isReplaceableEvent(Event event) {
+        return event.getKind() == 0 ||
+               event.getKind() == 3 ||
+               (10_000 <= event.getKind() && event.getKind() < 20_000);
     }
 
     public static Event.Builder createTextNote(XonlyPublicKey publicKey, String content) {

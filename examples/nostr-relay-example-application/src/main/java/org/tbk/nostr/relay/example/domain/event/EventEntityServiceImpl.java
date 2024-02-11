@@ -67,16 +67,13 @@ class EventEntityServiceImpl implements EventEntityService {
         return events.exists(specs);
     }
 
+
     @Override
-    public List<EventId> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author) {
-        Specification<EventEntity> deletionSpecification = Specification.anyOf(deletableEventIds.stream()
-                        .map(EventEntitySpecifications::hasId)
-                        .collect(Collectors.toList()))
+    public List<EventId> markDeleted(XonlyPublicKey author, Specification<EventEntity> specs) {
+        List<EventEntity> deletableEvents = events.findAll(specs
                 .and(EventEntitySpecifications.hasPubkey(author))
                 .and(Specification.not(EventEntitySpecifications.hasKind(5)))
-                .and(EventEntitySpecifications.isNotDeleted());
-
-        List<EventEntity> deletableEvents = events.findAll(deletionSpecification);
+                .and(EventEntitySpecifications.isNotDeleted()));
 
         Instant now = Instant.now();
         List<EventEntity> deletabledEntities = events.saveAll(deletableEvents.stream().map(it -> it.markDeleted(now)).toList());

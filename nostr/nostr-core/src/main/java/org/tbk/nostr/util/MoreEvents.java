@@ -5,6 +5,7 @@ import fr.acinq.bitcoin.ByteVector;
 import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
+import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nips.Nip1;
@@ -14,8 +15,7 @@ import org.tbk.nostr.proto.json.JsonWriter;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.HexFormat;
+import java.util.*;
 
 public final class MoreEvents {
 
@@ -76,5 +76,9 @@ public final class MoreEvents {
 
     public static Event createFinalizedMetadata(Signer signer, Metadata metadata) {
         return finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata));
+    }
+
+    public static Optional<EventId> findLowestEventId(Collection<EventId> eventIds) {
+        return eventIds.stream().min(Comparator.naturalOrder());
     }
 }

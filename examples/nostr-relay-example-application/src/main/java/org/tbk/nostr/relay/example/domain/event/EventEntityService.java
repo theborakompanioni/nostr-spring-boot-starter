@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public interface EventEntityService {
 
@@ -29,7 +30,17 @@ public interface EventEntityService {
 
     boolean exists(Specification<EventEntity> specs);
 
-    List<EventId> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author);
+    default List<EventId> markDeleted(XonlyPublicKey author, EventId deletableEventId) {
+        return markDeleted(author, List.of(deletableEventId));
+    }
+
+    default List<EventId> markDeleted(XonlyPublicKey author, Collection<EventId> deletableEventIds) {
+        return markDeleted(author, Specification.anyOf(deletableEventIds.stream()
+                .map(EventEntitySpecifications::hasId)
+                .collect(Collectors.toList())));
+    }
+
+    List<EventId> markDeleted(XonlyPublicKey author, Specification<EventEntity> specs);
 
     EventEntity markExpiresAt(EventId eventId, Instant expiresAt);
 }

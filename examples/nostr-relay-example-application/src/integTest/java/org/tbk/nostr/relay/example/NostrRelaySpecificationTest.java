@@ -2,16 +2,19 @@ package org.tbk.nostr.relay.example;
 
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
+import org.tbk.nostr.nips.Nip13;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.OkResponse;
@@ -24,6 +27,7 @@ import org.tbk.nostr.util.MoreKinds;
 import org.tbk.nostr.util.MoreSubscriptionIds;
 import org.tbk.nostr.util.MoreTags;
 
+import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -658,5 +662,203 @@ public class NostrRelaySpecificationTest {
         assertThat(fetchedEvents.get(0), is(event1Newer));
         assertThat(fetchedEvents.get(1), is(event0));
         assertThat(fetchedEvents.get(2), is(event2Older));
+    }
+
+    @RepeatedTest(5)
+    void itShouldVerifyReplaceableEventBehaviour0() {
+        Signer signer = SimpleSigner.random();
+
+        Metadata metadata0 = Metadata.newBuilder()
+                .name("name")
+                .about("about")
+                .picture(URI.create("https://www.example.com/example.png"))
+                .build();
+
+        Metadata metadata1 = Metadata.newBuilder()
+                .name("name1")
+                .about("about1")
+                .picture(URI.create("https://www.example.com/example1.png"))
+                .build();
+
+        assertThat("sanity check", metadata1, not(is(metadata0)));
+
+
+        Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata0);
+        Event event1Newer = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata1)
+                .setCreatedAt(event0.getCreatedAt() + 1)
+        );
+
+        assertThat("sanity check", event1Newer.getCreatedAt(), is(greaterThan(event0.getCreatedAt())));
+
+        List<Event> events = List.of(event0, event1Newer);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        // ok0 might contain an error flag - depending on which event arrives first! But ok1 MUST be successful.
+        OkResponse ok1 = oks.stream()
+                .filter(it -> event1Newer.getId().equals(it.getEventId()))
+                .findFirst().orElseThrow();
+        assertThat(ok1.getMessage(), is(""));
+        assertThat(ok1.getSuccess(), is(true));
+
+        assertThat(oks.stream().anyMatch(OkResponse::getSuccess), is(true));
+
+        List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addKinds(0)
+                                .addAuthors(ByteString.copyFrom(signer.getPublicKey().value.toByteArray()))
+                                .build())
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(event1Newer));
+    }
+
+    @RepeatedTest(5)
+    void itShouldVerifyReplaceableEventBehaviour1NewerEventsExist() {
+        Signer signer = SimpleSigner.random();
+
+        Metadata metadata = Metadata.newBuilder()
+                .name("name")
+                .about("about")
+                .picture(URI.create("https://www.example.com/example.png"))
+                .build();
+
+
+        Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata);
+        Event event1 = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata)
+                .setCreatedAt(event0.getCreatedAt() + 1)
+        );
+        Event event2 = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata)
+                .setCreatedAt(event0.getCreatedAt() - 1)
+        );
+
+        OkResponse ok0 = nostrTemplate.send(event0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok0.getMessage(), is(""));
+        assertThat(ok0.getSuccess(), is(true));
+
+        OkResponse ok1 = nostrTemplate.send(event1)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok1.getMessage(), is(""));
+        assertThat(ok1.getSuccess(), is(true));
+
+        OkResponse ok2 = nostrTemplate.send(event2)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok2.getMessage(), is("Error: A newer version of this replaceable event already exists."));
+        assertThat(ok2.getSuccess(), is(false));
+
+        List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addKinds(event0.getKind())
+                                .addAuthors(ByteString.copyFrom(signer.getPublicKey().value.toByteArray()))
+                                .build())
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(event1));
+    }
+
+    @RepeatedTest(5)
+    void itShouldVerifyReplaceableEventBehaviour2LowerIdWithSameCreatedAtTimestampCanBeInserted() {
+        Signer signer = SimpleSigner.random();
+
+        Metadata metadata = Metadata.newBuilder()
+                .name("name")
+                .about("about")
+                .picture(URI.create("https://www.example.com/example.png"))
+                .build();
+
+        Event event1WithLowerId = MoreEvents.finalize(signer, Nip13.mineEvent(Nip1.createMetadata(signer.getPublicKey(), metadata), 16));
+        Event event0 = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata)
+                .setCreatedAt(event1WithLowerId.getCreatedAt()));
+
+        assertThat("sanity check", event1WithLowerId.getCreatedAt(), is(event0.getCreatedAt()));
+        // this check might fail - unlikely, but can happen!
+        assertThat("sanity check", EventId.of(event1WithLowerId.getId().toByteArray()), is(lessThan(EventId.of(event0.getId().toByteArray()))));
+
+        OkResponse ok0 = nostrTemplate.send(event0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok0.getMessage(), is(""));
+        assertThat(ok0.getSuccess(), is(true));
+
+        OkResponse ok1 = nostrTemplate.send(event1WithLowerId)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok1.getMessage(), is(""));
+        assertThat(ok1.getSuccess(), is(true));
+
+        List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addKinds(event0.getKind())
+                                .addAuthors(ByteString.copyFrom(signer.getPublicKey().value.toByteArray()))
+                                .build())
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(event1WithLowerId));
+    }
+
+    @RepeatedTest(5)
+    void itShouldVerifyReplaceableEventBehaviour3GreaterIdWithSameCreatedAtTimestampCanNotBeInserted() {
+        Signer signer = SimpleSigner.random();
+
+        Metadata metadata = Metadata.newBuilder()
+                .name("name")
+                .about("about")
+                .picture(URI.create("https://www.example.com/example.png"))
+                .build();
+
+        Event event0WithLowerId = MoreEvents.finalize(signer, Nip13.mineEvent(Nip1.createMetadata(signer.getPublicKey(), metadata), 16));
+        Event event1 = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata)
+                .setCreatedAt(event0WithLowerId.getCreatedAt()));
+
+        assertThat("sanity check", event0WithLowerId.getCreatedAt(), is(event1.getCreatedAt()));
+        // this check might fail - unlikely, but can happen!
+        assertThat("sanity check", EventId.of(event0WithLowerId.getId().toByteArray()), is(lessThan(EventId.of(event1.getId().toByteArray()))));
+
+        OkResponse ok0 = nostrTemplate.send(event0WithLowerId)
+                .blockOptional(Duration.ofSeconds(500000))
+                .orElseThrow();
+        assertThat(ok0.getMessage(), is(""));
+        assertThat(ok0.getSuccess(), is(true));
+
+        OkResponse ok2 = nostrTemplate.send(event1)
+                .blockOptional(Duration.ofSeconds(500000))
+                .orElseThrow();
+        assertThat(ok2.getMessage(), is("Error: A version of this replaceable event with same timestamp and lower id already exists."));
+        assertThat(ok2.getSuccess(), is(false));
+
+        List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addKinds(event1.getKind())
+                                .addAuthors(ByteString.copyFrom(signer.getPublicKey().value.toByteArray()))
+                                .build())
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(event0WithLowerId));
     }
 }

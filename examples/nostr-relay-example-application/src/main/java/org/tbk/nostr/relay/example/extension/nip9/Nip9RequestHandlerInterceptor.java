@@ -35,13 +35,13 @@ public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterce
     private void handleEvent(Event event) {
         XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
         if (Nip9.isDeletionEvent(event)) {
-            doOnDeletionEventCreated(event, publicKey);
+            doOnDeletionEventCreated(publicKey, event);
         } else {
-            onNonDeletionEventCreated(event, publicKey);
+            onNonDeletionEventCreated(publicKey, event);
         }
     }
 
-    private void doOnDeletionEventCreated(Event event, XonlyPublicKey publicKey) {
+    private void doOnDeletionEventCreated(XonlyPublicKey publicKey, Event event) {
         List<TagValue> eTags = MoreTags.filterTagsByName(event, "e");
         // TODO: `a` tags ()
 
@@ -50,7 +50,7 @@ public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterce
                 .map(EventId::fromHex)
                 .collect(Collectors.toSet());
 
-        support.markDeleted(deletableEventIds, publicKey).subscribe(unused -> {
+        support.markDeleted(publicKey, deletableEventIds).subscribe(unused -> {
             log.debug("Marked events as deleted based on deletion event {}.", event.getId());
         }, e -> {
             log.warn("Error while marking events as deleted based on deletion event {}: {}", event.getId(), e.getMessage());
@@ -58,13 +58,13 @@ public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterce
     }
 
 
-    private void onNonDeletionEventCreated(Event event, XonlyPublicKey publicKey) {
-        support.hasDeletionEvent(event, publicKey)
+    private void onNonDeletionEventCreated(XonlyPublicKey publicKey, Event event) {
+        support.hasDeletionEvent(publicKey, event)
                 .filter(it -> it)
                 .doOnNext(it -> {
                     log.debug("Found existing deletion event for incoming event {}", event.getId());
                 })
-                .flatMap(it -> support.markDeleted(List.of(EventId.of(event.getId().toByteArray())), publicKey))
+                .flatMap(it -> support.markDeleted(publicKey, List.of(EventId.of(event.getId().toByteArray()))))
                 .subscribe(unused -> {
                     log.debug("Successfully marked event {} as deleted.", event.getId());
                 }, e -> {

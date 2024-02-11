@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public interface Nip9Support {
 
-    Mono<Void> markDeleted(Collection<EventId> deletableEventIds, XonlyPublicKey author);
+    Mono<Void> markDeleted(XonlyPublicKey author, Collection<EventId> deletableEventIds);
 
-    Mono<Boolean> hasDeletionEvent(Event event, XonlyPublicKey author);
+    Mono<Boolean> hasDeletionEvent(XonlyPublicKey author, Event event);
 }
