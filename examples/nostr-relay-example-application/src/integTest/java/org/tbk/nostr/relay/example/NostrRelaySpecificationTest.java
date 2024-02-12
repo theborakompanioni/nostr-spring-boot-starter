@@ -665,8 +665,8 @@ public class NostrRelaySpecificationTest {
         assertThat(ok0.getMessage(), is(""));
 
         Optional<Event> fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(ephemeralEvent0.getId().toByteArray()))
-                .delaySubscription(Duration.ofSeconds(1))
                 .blockOptional(Duration.ofSeconds(5));
+
         assertThat(fetchedEvent0.isPresent(), is(false));
     }
 

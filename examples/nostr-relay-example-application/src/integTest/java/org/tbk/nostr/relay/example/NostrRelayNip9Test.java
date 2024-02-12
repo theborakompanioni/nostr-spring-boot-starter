@@ -65,7 +65,6 @@ public class NostrRelayNip9Test {
         assertThat(ok1.getSuccess(), is(true));
 
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
-                .delaySubscription(Duration.ofSeconds(1))
                 .blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
     }
@@ -83,21 +82,24 @@ public class NostrRelayNip9Test {
 
         // publish the deletion event before the referenced event is published
         Event deletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEvent(signer.getPublicKey(), List.of(event0Id)));
+
         OkResponse ok1 = nostrTemplate.send(deletionEvent0)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
+
         assertThat(ok1.getEventId(), is(deletionEvent0.getId()));
         assertThat(ok1.getSuccess(), is(true));
 
         OkResponse ok0 = nostrTemplate.send(event0)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
+
         assertThat(ok0.getEventId(), is(event0.getId()));
         assertThat(ok0.getSuccess(), is(true));
 
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
-                .delaySubscription(Duration.ofSeconds(1))
                 .blockOptional(Duration.ofSeconds(5));
+
         assertThat(refetchedEvent0.isPresent(), is(false));
     }
 }
