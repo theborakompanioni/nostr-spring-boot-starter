@@ -2,6 +2,7 @@ package org.tbk.nostr.relay.example;
 
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +16,9 @@ import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.nips.Nip13;
-import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.Filter;
-import org.tbk.nostr.proto.OkResponse;
-import org.tbk.nostr.proto.ReqRequest;
+import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.example.nostr.NostrRelayProperties;
+import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
@@ -331,7 +330,7 @@ public class NostrRelaySpecificationTest {
 
         Signer signer = SimpleSigner.random();
 
-        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1")
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
                 .setCreatedAt(Long.MAX_VALUE));
 
         OkResponse ok0 = nostrTemplate.send(invalidEvent0)
@@ -899,7 +898,7 @@ public class NostrRelaySpecificationTest {
         Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "test"));
         Event event1Older = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() - 1));
         Event event2DifferentTag = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM",
-                        MoreTags.findByNameSingle(event0, "d")
+                        MoreTags.findByNameSingle(event0, Nip1Support.IndexedTagName.d.name())
                                 .map(it -> it.getValues(0))
                                 .orElseThrow()
                                 .repeat(2)
@@ -985,5 +984,67 @@ public class NostrRelaySpecificationTest {
 
         assertThat(fetchedEvents, hasSize(1));
         assertThat(fetchedEvents.getFirst(), is(event1Newer));
+    }
+
+    @Test
+    void itShouldVerifyParameterizedReplaceableEventBehaviour3MissingDTag() {
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "<will me removed>")
+                .clearTags());
+
+        OkResponse ok0 = nostrTemplate.send(invalidEvent0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok0.getMessage(), is("Error: Missing 'd' tag."));
+        assertThat(ok0.getSuccess(), is(false));
+    }
+
+    @Test
+    void itShouldVerifyParameterizedReplaceableEventBehaviour3MissingFirstValueOfDTag() {
+        Signer signer = SimpleSigner.random();
+
+        Event event0WithEmptyDTag = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", null));
+
+        OkResponse ok0 = nostrTemplate.send(event0WithEmptyDTag)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok0.getMessage(), is(""));
+        assertThat(ok0.getSuccess(), is(true));
+    }
+    @Test
+    @Disabled("NostrTemplate should have a method to send plain json")
+    void itShouldVerifyParameterizedReplaceableEventBehaviour4NullFirstValueOfDTag() {
+        Signer signer = SimpleSigner.random();
+
+        Event prototype = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "test"));
+        /*
+        // TODO: must serialize as json and send plain
+        OkResponse ok0 = nostrTemplate.send("TODO.. plain json here.. send a `d` tag like `["d", null, "value"]`")
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is("TODO.. what error message?"));
+         */
+    }
+
+    @Test
+    void itShouldVerifyParameterizedReplaceableEventBehaviour5MultipleDTags() {
+        Signer signer = SimpleSigner.random();
+
+        Event.Builder prototype = Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", null).clearTags();
+        Event event0WithEmptyDTag = MoreEvents.finalize(signer, prototype
+                .addTags(MoreTags.d("0"))
+                .addTags(MoreTags.d()));
+
+        OkResponse ok0 = nostrTemplate.send(event0WithEmptyDTag)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok0.getMessage(), is("Error: Multiple 'd' tags are not allowed."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 }

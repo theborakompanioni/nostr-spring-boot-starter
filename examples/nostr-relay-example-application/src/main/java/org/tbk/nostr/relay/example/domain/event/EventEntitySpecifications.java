@@ -10,6 +10,7 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -71,12 +72,16 @@ public final class EventEntitySpecifications {
         return (root, cq, cb) -> cb.isNotNull(root.get("deletedAt"));
     }
 
-    public static Specification<EventEntity> hasTagWithFirstValue(Nip1Support.IndexedTagName tagName, String eventId) {
+    public static Specification<EventEntity> hasTagWithoutValues(Nip1Support.IndexedTagName tagName) {
+        return hasTagWithFirstValue(tagName, null);
+    }
+
+    public static Specification<EventEntity> hasTagWithFirstValue(Nip1Support.IndexedTagName tagName, @Nullable String firstTagValue) {
         return (root, query, criteriaBuilder) -> {
             Join<TagEntity, EventEntity> eventTags = root.join("tags");
             return criteriaBuilder.and(
                     criteriaBuilder.equal(eventTags.get("name"), tagName.name()),
-                    criteriaBuilder.equal(eventTags.get("value0"), eventId)
+                    firstTagValue == null ? criteriaBuilder.isNull(eventTags.get("value0")) : criteriaBuilder.equal(eventTags.get("value0"), firstTagValue)
             );
         };
     }

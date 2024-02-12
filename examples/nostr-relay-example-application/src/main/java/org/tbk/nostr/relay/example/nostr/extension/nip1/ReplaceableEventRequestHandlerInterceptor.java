@@ -9,10 +9,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.nips.Nip1;
-import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.OkResponse;
-import org.tbk.nostr.proto.Request;
-import org.tbk.nostr.proto.Response;
+import org.tbk.nostr.proto.*;
 import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support.IndexedTagName;
 import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
@@ -76,11 +73,13 @@ public class ReplaceableEventRequestHandlerInterceptor implements NostrRequestHa
             return support.markDeletedBeforeCreatedAtInclusive(publicKey, event.getKind(), eventCreatedAt);
         } else if (Nip1.isParameterizedReplaceableEvent(event)) {
             IndexedTagName identifier = IndexedTagName.d;
-            String firstIdentifierValue = MoreTags.findByNameSingle(event, identifier.name())
-                    .map(it -> it.getValues(0))
+
+            TagValue identifierTag = MoreTags.findByNameSingle(event, identifier.name())
                     .orElseThrow(() -> new IllegalStateException("Error while replacing events: Missing or conflicting '%s' tag.".formatted(identifier.name())));
 
-            return support.markDeletedBeforeCreatedAtInclusiveWithTag(publicKey, event.getKind(), eventCreatedAt, IndexedTagName.d, firstIdentifierValue);
+            String firstIdentifierValueOrNull = identifierTag.getValuesCount() == 0 ? null : identifierTag.getValues(0);
+
+            return support.markDeletedBeforeCreatedAtInclusiveWithTag(publicKey, event.getKind(), eventCreatedAt, identifier, firstIdentifierValueOrNull);
         } else {
             throw new IllegalStateException("Only pass replaceable events to this function");
         }
@@ -95,12 +94,14 @@ public class ReplaceableEventRequestHandlerInterceptor implements NostrRequestHa
                     .orElseThrow(() -> new IllegalStateException("Error while replacing events: Fetch phase."));
         } else if (Nip1.isParameterizedReplaceableEvent(event)) {
             IndexedTagName identifier = IndexedTagName.d;
-            String firstIdentifierValue = MoreTags.findByNameSingle(event, identifier.name())
-                    .map(it -> it.getValues(0))
+
+            TagValue identifierTag = MoreTags.findByNameSingle(event, identifier.name())
                     .orElseThrow(() -> new IllegalStateException("Error while replacing events: Missing or conflicting '%s' tag.".formatted(identifier.name())));
 
+            String firstIdentifierValueOrNull = identifierTag.getValuesCount() == 0 ? null : identifierTag.getValues(0);
+
             return support
-                    .findAllAfterCreatedAtInclusiveWithTag(publicKey, event.getKind(), eventCreatedAt, identifier, firstIdentifierValue)
+                    .findAllAfterCreatedAtInclusiveWithTag(publicKey, event.getKind(), eventCreatedAt, identifier, firstIdentifierValueOrNull)
                     .collectList()
                     .blockOptional(Duration.ofSeconds(60))
                     .orElseThrow(() -> new IllegalStateException("Error while replacing events: Fetch phase."));

@@ -5,11 +5,11 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
-import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 
 /**
@@ -111,11 +111,11 @@ public final class Nip1 {
     }
 
 
-    public static Event.Builder createParameterizedReplaceableEvent(XonlyPublicKey publicKey, String content, String d) {
-        return createParameterizedReplaceableEvent(publicKey, content, PARAMETERIZED_REPLACEABLE_KIND_LOWER_BOUND_INCLUSIVE, d);
+    public static Event.Builder createParameterizedReplaceableEvent(XonlyPublicKey publicKey, String content, @Nullable String dTagValue) {
+        return createParameterizedReplaceableEvent(publicKey, content, PARAMETERIZED_REPLACEABLE_KIND_LOWER_BOUND_INCLUSIVE, dTagValue);
     }
 
-    public static Event.Builder createParameterizedReplaceableEvent(XonlyPublicKey publicKey, String content, int kind, String d) {
+    public static Event.Builder createParameterizedReplaceableEvent(XonlyPublicKey publicKey, String content, int kind, @Nullable String dTagValue) {
         if (!isParameterizedReplaceableEvent(kind)) {
             throw new IllegalArgumentException("Given kind is not parameterized replaceable. Must be %d <= n < %d, got: %d".formatted(
                     PARAMETERIZED_REPLACEABLE_KIND_LOWER_BOUND_INCLUSIVE,
@@ -128,7 +128,7 @@ public final class Nip1 {
                 .setCreatedAt(Instant.now().getEpochSecond())
                 .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
                 .setKind(kind)
-                .addTags(MoreTags.d(d))
+                .addTags(dTagValue == null ? MoreTags.d() : MoreTags.d(dTagValue))
                 .setContent(content));
     }
 }
