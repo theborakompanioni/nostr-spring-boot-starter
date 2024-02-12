@@ -48,7 +48,7 @@ class Nip13Test {
         assertThat(event.getCreatedAt(), is(both(greaterThanOrEqualTo(Instant.now().minusSeconds(1).getEpochSecond()))
                 .and(lessThanOrEqualTo(Instant.now().plusSeconds(1).getEpochSecond()))));
 
-        TagValue nonceTag = MoreTags.filterTagsByName(event, "nonce").getFirst();
+        TagValue nonceTag = MoreTags.findByName(event, "nonce").getFirst();
         assertThat("it took zero tries", nonceTag.getValues(0), is("0"));
         assertThat("it committed to target difficulty", nonceTag.getValues(1), is(Long.toString(targetDifficulty)));
     }
@@ -70,7 +70,7 @@ class Nip13Test {
         assertThat(bitString, hasLength(256));
         assertThat("it has enough zero bits", bitString, startsWith("0".repeat(targetDifficulty)));
 
-        TagValue nonceTag = MoreTags.filterTagsByName(event, "nonce").getFirst();
+        TagValue nonceTag = MoreTags.findByName(event, "nonce").getFirst();
         assertThat("it committed to target difficulty", nonceTag.getValues(1), is(Long.toString(targetDifficulty)));
 
         log.info("difficulty({}): Took {} and {} tries in the last epoch to find {}", targetDifficulty, stopwatch.stop(), nonceTag.getValues(0), bitString);
@@ -93,7 +93,7 @@ class Nip13Test {
         assertThat(bitString, hasLength(256));
         assertThat("it has enough zero bits", bitString, startsWith("0".repeat(targetDifficulty)));
 
-        TagValue nonceTag = MoreTags.filterTagsByName(event, "nonce").getFirst();
+        TagValue nonceTag = MoreTags.findByName(event, "nonce").getFirst();
         assertThat("it committed to target difficulty", nonceTag.getValues(1), is(Long.toString(targetDifficulty)));
 
         log.info("difficulty({}): Took {} and {} tries in the last epoch to find {}", targetDifficulty, stopwatch.stop(), nonceTag.getValues(0), bitString);
@@ -116,7 +116,7 @@ class Nip13Test {
         assertThat(bitString, hasLength(256));
         assertThat("it has enough zero bits", bitString, startsWith("0".repeat(targetDifficulty)));
 
-        TagValue nonceTag = MoreTags.filterTagsByName(event, "nonce").getFirst();
+        TagValue nonceTag = MoreTags.findByName(event, "nonce").getFirst();
         assertThat("it committed to target difficulty", nonceTag.getValues(1), is(Long.toString(targetDifficulty)));
 
         log.info("difficulty({}): Took {} and {} tries in the last epoch to find {}", targetDifficulty, stopwatch.stop(), nonceTag.getValues(0), bitString);
@@ -150,7 +150,7 @@ class Nip13Test {
         assertThat(bitString, hasLength(256));
         assertThat("it has enough zero bits", bitString, startsWith("0".repeat(targetDifficulty)));
 
-        TagValue nonceTag = MoreTags.filterTagsByName(event, "nonce").getFirst();
+        TagValue nonceTag = MoreTags.findByName(event, "nonce").getFirst();
         assertThat("it committed to target difficulty", nonceTag.getValues(1), is(Long.toString(targetDifficulty)));
 
         log.info("difficulty({}): Took {} and {} tries in the last epoch to find {}", targetDifficulty, stopwatch.stop(), nonceTag.getValues(0), bitString);

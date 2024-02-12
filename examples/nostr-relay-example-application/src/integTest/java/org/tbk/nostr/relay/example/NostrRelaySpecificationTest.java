@@ -130,7 +130,7 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(oks.size(), is(events.size()));
+        assertThat(oks, hasSize(events.size()));
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
@@ -152,7 +152,7 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(oks.size(), is(events.size()));
+        assertThat(oks, hasSize(events.size()));
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
@@ -208,7 +208,7 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(oks.size(), is(events.size()));
+        assertThat(oks, hasSize(events.size()));
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
@@ -238,7 +238,7 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(oks.size(), is(events.size()));
+        assertThat(oks, hasSize(events.size()));
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
@@ -271,7 +271,7 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(oks.size(), is(events.size()));
+        assertThat(oks, hasSize(events.size()));
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
@@ -296,7 +296,7 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(oks.size(), is(events.size()));
+        assertThat(oks, hasSize(events.size()));
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
@@ -416,10 +416,8 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(fetchedEvents.size(), is(1));
-
-        Event fetchedEventSinceNow0 = fetchedEvents.getFirst();
-        assertThat(fetchedEventSinceNow0, is(eventMatching));
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(eventMatching));
     }
 
     @Test
@@ -457,10 +455,8 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(fetchedEvents.size(), is(1));
-
-        Event fetchedEvent0 = fetchedEvents.getFirst();
-        assertThat(fetchedEvent0, is(eventMatching));
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(eventMatching));
     }
 
     @Test
@@ -495,10 +491,8 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(fetchedEvents.size(), is(1));
-
-        Event fetchedEvent0 = fetchedEvents.getFirst();
-        assertThat(fetchedEvent0, is(eventMatching));
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(eventMatching));
     }
 
     @Test
@@ -533,10 +527,8 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(fetchedEvents.size(), is(1));
-
-        Event fetchedEvent0 = fetchedEvents.getFirst();
-        assertThat(fetchedEvent0, is(eventMatching));
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(eventMatching));
     }
 
     @Test
@@ -567,7 +559,7 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(fetchedEventsAll.size(), is(events.size()));
+        assertThat(fetchedEventsAll, hasSize(events.size()));
 
         int limit = events.size() - 1;
         List<Event> fetchedEventsLimited = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
@@ -580,7 +572,7 @@ public class NostrRelaySpecificationTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(fetchedEventsLimited.size(), is(limit));
+        assertThat(fetchedEventsLimited, hasSize(limit));
     }
 
     @Test
@@ -859,5 +851,139 @@ public class NostrRelaySpecificationTest {
 
         assertThat(fetchedEvents, hasSize(1));
         assertThat(fetchedEvents.getFirst(), is(event0WithLowerId));
+    }
+
+    @RepeatedTest(5)
+    void itShouldVerifyParameterizedReplaceableEventBehaviour0() {
+        Signer signer = SimpleSigner.random();
+
+        Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "d"));
+        Event event1Newer = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() + 1));
+
+        assertThat("sanity check", event1Newer.getCreatedAt(), is(greaterThan(event0.getCreatedAt())));
+
+        List<Event> events = List.of(event0, event1Newer);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        // ok0 might contain an error flag - depending on which event arrives first! But ok1 MUST be successful.
+        OkResponse ok1 = oks.stream()
+                .filter(it -> event1Newer.getId().equals(it.getEventId()))
+                .findFirst().orElseThrow();
+        assertThat(ok1.getMessage(), is(""));
+        assertThat(ok1.getSuccess(), is(true));
+
+        assertThat(oks.stream().anyMatch(OkResponse::getSuccess), is(true));
+
+        List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addKinds(event0.getKind())
+                                .addAuthors(ByteString.copyFrom(signer.getPublicKey().value.toByteArray()))
+                                .build())
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(event1Newer));
+    }
+
+    @RepeatedTest(5)
+    void itShouldVerifyParameterizedReplaceableEventBehaviour1NewerEventsDoNotExist() {
+        Signer signer = SimpleSigner.random();
+
+        Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "test"));
+        Event event1Older = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() - 1));
+        Event event2DifferentTag = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM",
+                        MoreTags.findByNameSingle(event0, "d")
+                                .map(it -> it.getValues(0))
+                                .orElseThrow()
+                                .repeat(2)
+                )
+                .setCreatedAt(event0.getCreatedAt()));
+
+        assertThat("sanity check", event1Older.getTagsList(), is(event0.getTagsList()));
+        assertThat("sanity check", event1Older.getCreatedAt(), is(lessThan(event0.getCreatedAt())));
+        assertThat("sanity check", event2DifferentTag.getTagsList(), is(not(event0.getTagsList())));
+        assertThat("sanity check", event2DifferentTag.getCreatedAt(), is(event0.getCreatedAt()));
+
+        OkResponse ok0 = nostrTemplate.send(event0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok0.getMessage(), is(""));
+        assertThat(ok0.getSuccess(), is(true));
+
+        OkResponse ok2 = nostrTemplate.send(event1Older)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok2.getMessage(), is("Error: A newer version of this replaceable event already exists."));
+        assertThat(ok2.getSuccess(), is(false));
+
+        OkResponse ok3 = nostrTemplate.send(event2DifferentTag)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok3.getMessage(), is(""));
+        assertThat(ok3.getSuccess(), is(true));
+
+        List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addKinds(event0.getKind())
+                                .addAuthors(ByteString.copyFrom(signer.getPublicKey().value.toByteArray()))
+                                .build())
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEvents, hasSize(2));
+        assertThat(fetchedEvents, hasItem(event0));
+        assertThat(fetchedEvents, hasItem(event2DifferentTag));
+        assertThat(fetchedEvents, not(hasItem(event1Older)));
+    }
+
+    @RepeatedTest(5)
+    void itShouldVerifyParameterizedReplaceableEventBehaviour2NewerEventsExist() {
+        Signer signer = SimpleSigner.random();
+
+        Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "d"));
+        Event event1Newer = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() + 1));
+        Event event2Older = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() - 1));
+
+        OkResponse ok0 = nostrTemplate.send(event0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok0.getMessage(), is(""));
+        assertThat(ok0.getSuccess(), is(true));
+
+        OkResponse ok1 = nostrTemplate.send(event1Newer)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok1.getMessage(), is(""));
+        assertThat(ok1.getSuccess(), is(true));
+
+        OkResponse ok2 = nostrTemplate.send(event2Older)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok2.getMessage(), is("Error: A newer version of this replaceable event already exists."));
+        assertThat(ok2.getSuccess(), is(false));
+
+        List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addKinds(event0.getKind())
+                                .addAuthors(ByteString.copyFrom(signer.getPublicKey().value.toByteArray()))
+                                .build())
+                        .build())
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(event1Newer));
     }
 }

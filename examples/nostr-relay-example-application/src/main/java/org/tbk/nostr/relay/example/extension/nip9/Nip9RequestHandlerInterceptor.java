@@ -42,7 +42,7 @@ public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterce
     }
 
     private void doOnDeletionEventCreated(XonlyPublicKey publicKey, Event event) {
-        List<TagValue> eTags = MoreTags.filterTagsByName(event, "e");
+        List<TagValue> eTags = MoreTags.findByName(event, "e");
         // TODO: `a` tags ()
 
         Set<EventId> deletableEventIds = eTags.stream()

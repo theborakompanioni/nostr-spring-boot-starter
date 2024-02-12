@@ -57,7 +57,7 @@ public final class Nip13 {
         }
 
         if (verifyCommitment) {
-            List<TagValue> allNonceTags = MoreTags.filterTagsByName(event, NONCE_TAG_NAME);
+            List<TagValue> allNonceTags = MoreTags.findByName(event, NONCE_TAG_NAME);
             List<TagValue> matchingNonceTags = allNonceTags.stream()
                     .filter(it -> it.getValuesCount() >= 2)
                     .filter(it -> {

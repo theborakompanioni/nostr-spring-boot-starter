@@ -1,6 +1,7 @@
 package org.tbk.nostr.relay.example.impl;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
+import lombok.NonNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -35,30 +36,58 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
     }
 
     @Override
-    public Flux<Event> findAllAfterCreatedAt(XonlyPublicKey author, int kind, Instant createdAt) {
+    public Flux<Event> findAllAfterCreatedAtInclusive(XonlyPublicKey author, int kind, Instant createdAt) {
         return Flux.defer(() -> {
             PageRequest pageRequest = PageRequest.of(0, Integer.MAX_VALUE);
 
-            Specification<EventEntity> specs = EventEntitySpecifications.hasPubkey(author)
-                    .and(EventEntitySpecifications.hasKind(kind))
-                    .and(EventEntitySpecifications.isCreatedAfterInclusive(createdAt))
-                    .and(EventEntitySpecifications.isNotDeleted())
-                    .and(EventEntitySpecifications.isNotExpired());
+            Specification<EventEntity> specs = allAfterCreatedAtInclusiveSpec(author, kind, createdAt);
 
             return Flux.fromIterable(eventEntityService.findAll(specs, pageRequest).toList());
         }).map(EventEntity::toNostrEvent);
     }
 
     @Override
+    public Flux<Event> findAllAfterCreatedAtInclusiveWithTag(XonlyPublicKey author, int kind, Instant createdAt, IndexedTagName tagName, String firstTagValue) {
+        return Flux.defer(() -> {
+            PageRequest pageRequest = PageRequest.of(0, Integer.MAX_VALUE);
+
+            Specification<EventEntity> specs = allAfterCreatedAtInclusiveSpec(author, kind, createdAt)
+                    .and(EventEntitySpecifications.hasTagWithFirstValue(tagName, firstTagValue));
+
+            return Flux.fromIterable(eventEntityService.findAll(specs, pageRequest).toList());
+        }).map(EventEntity::toNostrEvent);
+    }
+
+    @NonNull
+    private static Specification<EventEntity> allAfterCreatedAtInclusiveSpec(XonlyPublicKey author, int kind, Instant createdAt) {
+        return EventEntitySpecifications.hasPubkey(author)
+                .and(EventEntitySpecifications.hasKind(kind))
+                .and(EventEntitySpecifications.isCreatedAfterInclusive(createdAt))
+                .and(EventEntitySpecifications.isNotDeleted())
+                .and(EventEntitySpecifications.isNotExpired());
+    }
+
+    @Override
     public Mono<Void> markDeletedBeforeCreatedAtInclusive(XonlyPublicKey publicKey, int kind, Instant createdAt) {
         return Mono.<Void>fromRunnable(() -> {
-            eventEntityService.markDeleted(publicKey,
-                    EventEntitySpecifications.hasPubkey(publicKey)
-                            .and(EventEntitySpecifications.hasKind(kind))
-                            .and(EventEntitySpecifications.isCreatedBeforeInclusive(createdAt))
-                            .and(EventEntitySpecifications.isNotDeleted())
-            );
+            eventEntityService.markDeleted(publicKey, allBeforeCreatedAtInclusive(publicKey, kind, createdAt));
         }).subscribeOn(asyncScheduler);
+    }
+
+    @Override
+    public Mono<Void> markDeletedBeforeCreatedAtInclusiveWithTag(XonlyPublicKey publicKey, int kind, Instant createdAt, IndexedTagName tagName, String firstTagValue) {
+        return Mono.<Void>fromRunnable(() -> {
+            eventEntityService.markDeleted(publicKey, allBeforeCreatedAtInclusive(publicKey, kind, createdAt)
+                    .and(EventEntitySpecifications.hasTagWithFirstValue(tagName, firstTagValue)));
+        }).subscribeOn(asyncScheduler);
+    }
+
+    @NonNull
+    private static Specification<EventEntity> allBeforeCreatedAtInclusive(XonlyPublicKey publicKey, int kind, Instant createdAt) {
+        return EventEntitySpecifications.hasPubkey(publicKey)
+                .and(EventEntitySpecifications.hasKind(kind))
+                .and(EventEntitySpecifications.isCreatedBeforeInclusive(createdAt))
+                .and(EventEntitySpecifications.isNotDeleted());
     }
 
     @Override
@@ -79,9 +108,9 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
     public Mono<Boolean> hasDeletionEvent(XonlyPublicKey author, Event event) {
         return Mono.fromCallable(() -> {
             EventId eventId = EventId.of(event.getId().toByteArray());
-            return eventEntityService.exists(EventEntitySpecifications.hasTagWithFirstValue('e', eventId.toHex())
-                    .and(EventEntitySpecifications.hasPubkey(author))
-                    .and(EventEntitySpecifications.hasKind(Nip9.kind())));
+            return eventEntityService.exists(EventEntitySpecifications.hasPubkey(author)
+                    .and(EventEntitySpecifications.hasKind(Nip9.kind()))
+                    .and(EventEntitySpecifications.hasTagWithFirstValue(IndexedTagName.e, eventId.toHex())));
         }).subscribeOn(asyncScheduler);
     }
 }

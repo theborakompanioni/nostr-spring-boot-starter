@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public final class MoreTags {
 
@@ -22,10 +23,23 @@ public final class MoreTags {
         throw new UnsupportedOperationException();
     }
 
-    public static List<TagValue> filterTagsByName(EventOrBuilder event, String name) {
+    public static List<TagValue> findByName(EventOrBuilder event, String name) {
         return event.getTagsList().stream()
                 .filter(it -> it.getName().equals(name))
                 .toList();
+    }
+
+    public static Optional<TagValue> findByNameSingle(EventOrBuilder event, String name) {
+        TagValue found = null;
+        for (TagValue tag : event.getTagsList()) {
+            if (tag.getName().equals(name)) {
+                if (found != null) {
+                    return Optional.empty();
+                }
+                found = tag;
+            }
+        }
+        return Optional.ofNullable(found);
     }
 
     public static TagValue e(Event event) {

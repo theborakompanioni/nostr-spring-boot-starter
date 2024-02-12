@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Filter;
+import org.tbk.nostr.relay.example.extension.nip1.Nip1Support;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -70,11 +71,11 @@ public final class EventEntitySpecifications {
         return (root, cq, cb) -> cb.isNotNull(root.get("deletedAt"));
     }
 
-    public static Specification<EventEntity> hasTagWithFirstValue(char tagName, String eventId) {
+    public static Specification<EventEntity> hasTagWithFirstValue(Nip1Support.IndexedTagName tagName, String eventId) {
         return (root, query, criteriaBuilder) -> {
             Join<TagEntity, EventEntity> eventTags = root.join("tags");
             return criteriaBuilder.and(
-                    criteriaBuilder.equal(eventTags.get("name"), String.valueOf(tagName)),
+                    criteriaBuilder.equal(eventTags.get("name"), tagName.name()),
                     criteriaBuilder.equal(eventTags.get("value0"), eventId)
             );
         };

@@ -1,6 +1,7 @@
 package org.tbk.nostr.relay.example.extension.nip1;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +14,12 @@ import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonWriter;
+import org.tbk.nostr.relay.example.extension.nip1.Nip1Support.IndexedTagName;
 import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MorePublicKeys;
+import org.tbk.nostr.util.MoreTags;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -40,71 +44,110 @@ public class ReplaceableEventRequestHandlerInterceptor implements NostrRequestHa
     }
 
     private boolean handleEvent(WebSocketSession session, Event event) throws IOException {
-        if (Nip1.isReplaceableEvent(event)) {
-            return doOnReplaceableEvent(session, event);
-        }
-        return true;
-    }
+        if (Nip1.isReplaceableEvent(event) || Nip1.isParameterizedReplaceableEvent(event)) {
+            XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
 
-    private boolean doOnReplaceableEvent(WebSocketSession session, Event event) throws IOException {
-        XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
+            Instant eventCreatedAt = Instant.ofEpochSecond(event.getCreatedAt());
 
-        // should only be at most "one" event, so we can fetch it instead of using "exists" directly
-        Instant eventCreatedAt = Instant.ofEpochSecond(event.getCreatedAt());
-        List<Event> existingReplaceableEventsWithCreatedAfterOrEqual = support
-                .findAllAfterCreatedAt(publicKey, event.getKind(), eventCreatedAt)
-                .collectList()
-                .blockOptional(Duration.ofSeconds(60))
-                .orElseThrow(() -> new IllegalStateException("Error while replacing events: Fetch phase."));
+            List<Event> newerExistingEvents = findExistingReplaceableEventsWithCreatedAfterOrEqual(event, publicKey, eventCreatedAt);
 
-        if (!existingReplaceableEventsWithCreatedAfterOrEqual.isEmpty()) {
-            if (existingReplaceableEventsWithCreatedAfterOrEqual.size() > 1) {
-                log.warn("Found {} replaceable events, when there should only be at most one such event: {}",
-                        existingReplaceableEventsWithCreatedAfterOrEqual.size(),
-                        event);
-            }
+            Optional<ReplaceableError> replaceableErrorOrEmpty = checkReplaceableEventRules(event, newerExistingEvents);
 
-            List<Event> existingReplaceableEventsWithSameCreatedAt = existingReplaceableEventsWithCreatedAfterOrEqual.stream()
-                    .filter(it -> it.getCreatedAt() == event.getCreatedAt())
-                    .toList();
-
-            if (existingReplaceableEventsWithCreatedAfterOrEqual.size() != existingReplaceableEventsWithSameCreatedAt.size()) {
+            if (replaceableErrorOrEmpty.isPresent()) {
                 session.sendMessage(new TextMessage(JsonWriter.toJson(Response.newBuilder()
                         .setOk(OkResponse.newBuilder()
                                 .setEventId(event.getId())
                                 .setSuccess(false)
-                                .setMessage("Error: A newer version of this replaceable event already exists.")
+                                .setMessage(replaceableErrorOrEmpty.get().getMessage())
                                 .build())
                         .build())));
-
                 return false;
+            }
+
+            deleteEventsBefore(event, publicKey, eventCreatedAt)
+                    .block(Duration.ofSeconds(60));
+        }
+
+        return true;
+    }
+
+    private Mono<Void> deleteEventsBefore(Event event, XonlyPublicKey publicKey, Instant eventCreatedAt) {
+        if (Nip1.isReplaceableEvent(event)) {
+            return support.markDeletedBeforeCreatedAtInclusive(publicKey, event.getKind(), eventCreatedAt);
+        } else if (Nip1.isParameterizedReplaceableEvent(event)) {
+            IndexedTagName identifier = IndexedTagName.d;
+            String firstIdentifierValue = MoreTags.findByNameSingle(event, identifier.name())
+                    .map(it -> it.getValues(0))
+                    .orElseThrow(() -> new IllegalStateException("Error while replacing events: Missing or conflicting '%s' tag.".formatted(identifier.name())));
+
+            return support.markDeletedBeforeCreatedAtInclusiveWithTag(publicKey, event.getKind(), eventCreatedAt, IndexedTagName.d, firstIdentifierValue);
+        } else {
+            throw new IllegalStateException("Only pass replaceable events to this function");
+        }
+    }
+
+    private List<Event> findExistingReplaceableEventsWithCreatedAfterOrEqual(Event event, XonlyPublicKey publicKey, Instant eventCreatedAt) {
+        if (Nip1.isReplaceableEvent(event)) {
+            return support
+                    .findAllAfterCreatedAtInclusive(publicKey, event.getKind(), eventCreatedAt)
+                    .collectList()
+                    .blockOptional(Duration.ofSeconds(60))
+                    .orElseThrow(() -> new IllegalStateException("Error while replacing events: Fetch phase."));
+        } else if (Nip1.isParameterizedReplaceableEvent(event)) {
+            IndexedTagName identifier = IndexedTagName.d;
+            String firstIdentifierValue = MoreTags.findByNameSingle(event, identifier.name())
+                    .map(it -> it.getValues(0))
+                    .orElseThrow(() -> new IllegalStateException("Error while replacing events: Missing or conflicting '%s' tag.".formatted(identifier.name())));
+
+            return support
+                    .findAllAfterCreatedAtInclusiveWithTag(publicKey, event.getKind(), eventCreatedAt, identifier, firstIdentifierValue)
+                    .collectList()
+                    .blockOptional(Duration.ofSeconds(60))
+                    .orElseThrow(() -> new IllegalStateException("Error while replacing events: Fetch phase."));
+        } else {
+            throw new IllegalStateException("Only pass replaceable events to this function");
+        }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    enum ReplaceableError {
+        NEWER_VERSION("Error: A newer version of this replaceable event already exists."),
+        LOWER_ID("Error: A version of this replaceable event with same timestamp and lower id already exists.");
+
+        @NonNull
+        private final String message;
+    }
+
+    private Optional<ReplaceableError> checkReplaceableEventRules(Event event, List<Event> existingEvents) {
+        if (!existingEvents.isEmpty()) {
+            if (existingEvents.size() > 1) {
+                log.warn("Found {} replaceable events, when there should only be at most one such event: {}",
+                        existingEvents.size(),
+                        event);
+            }
+
+            List<Event> existingEventsWithSameCreatedAt = existingEvents.stream()
+                    .filter(it -> it.getCreatedAt() == event.getCreatedAt())
+                    .toList();
+
+            if (existingEvents.size() != existingEventsWithSameCreatedAt.size()) {
+                return Optional.of(ReplaceableError.NEWER_VERSION);
             }
 
             // From NIP-01:
             // "In case of replaceable events with the same timestamp, the event with the lowest id
             // (first in lexical order) should be retained, and the other discarded."
-            List<EventId> eventIds = existingReplaceableEventsWithSameCreatedAt.stream()
+            List<EventId> eventIds = existingEventsWithSameCreatedAt.stream()
                     .map(it -> EventId.of(it.getId().toByteArray()))
                     .toList();
 
             EventId incomingEventId = EventId.of(event.getId().toByteArray());
             Optional<EventId> lowestEventId = MoreEvents.findLowestEventId(Stream.concat(eventIds.stream(), Stream.of(incomingEventId)).toList());
             if (lowestEventId.isPresent() && !lowestEventId.get().equals(incomingEventId)) {
-                session.sendMessage(new TextMessage(JsonWriter.toJson(Response.newBuilder()
-                        .setOk(OkResponse.newBuilder()
-                                .setEventId(event.getId())
-                                .setSuccess(false)
-                                .setMessage("Error: A version of this replaceable event with same timestamp and lower id already exists.")
-                                .build())
-                        .build())));
-
-                return false;
+                return Optional.of(ReplaceableError.LOWER_ID);
             }
         }
-
-        support.markDeletedBeforeCreatedAtInclusive(publicKey, event.getKind(), eventCreatedAt)
-                .block(Duration.ofSeconds(60));
-
-        return true;
+        return Optional.empty();
     }
 }
