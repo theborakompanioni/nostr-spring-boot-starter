@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.extension.nip11;
+package org.tbk.nostr.relay.example.nostr.extension.nip11;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

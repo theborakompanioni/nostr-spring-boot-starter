@@ -8,7 +8,7 @@ import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Filter;
-import org.tbk.nostr.relay.example.extension.nip1.Nip1Support;
+import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
 
 import java.time.Instant;
 import java.util.Optional;

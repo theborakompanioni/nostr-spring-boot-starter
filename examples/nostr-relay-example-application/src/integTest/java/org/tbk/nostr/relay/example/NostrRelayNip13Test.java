@@ -13,7 +13,7 @@ import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.nips.Nip13;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.OkResponse;
-import org.tbk.nostr.relay.example.extension.nip13.Nip13ExtensionProperties;
+import org.tbk.nostr.relay.example.nostr.extension.nip13.Nip13ExtensionProperties;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;

@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.extension.nip9;
+package org.tbk.nostr.relay.example.nostr.extension.nip9;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;

@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.extension.nip1;
+package org.tbk.nostr.relay.example.nostr.extension.nip1;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonWriter;
-import org.tbk.nostr.relay.example.extension.nip1.Nip1Support.IndexedTagName;
+import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support.IndexedTagName;
 import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MorePublicKeys;

@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.extension.nip40;
+package org.tbk.nostr.relay.example.nostr.extension.nip40;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
