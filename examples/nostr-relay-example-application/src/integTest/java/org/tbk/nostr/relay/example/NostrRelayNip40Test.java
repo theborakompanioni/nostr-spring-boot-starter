@@ -83,7 +83,6 @@ public class NostrRelayNip40Test {
         assertThat(ok0.getEventId(), is(event0.getId()));
         assertThat(ok0.getSuccess(), is(true));
 
-
         EventId event0Id = EventId.of(event0.getId().toByteArray());
         Event fetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
                 .blockOptional(Duration.ofSeconds(5))
@@ -91,6 +90,7 @@ public class NostrRelayNip40Test {
         assertThat("event is still present", fetchedEvent0, is(event0));
 
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
+                .delaySubscription(expiresIn)
                 .blockOptional(expiresIn.plus(Duration.ofSeconds(5)));
 
         assertThat("event expired", refetchedEvent0.isPresent(), is(false));

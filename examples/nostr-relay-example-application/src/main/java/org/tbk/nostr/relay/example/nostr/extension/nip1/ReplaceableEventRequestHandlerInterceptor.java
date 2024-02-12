@@ -5,12 +5,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.*;
-import org.tbk.nostr.proto.json.JsonWriter;
+import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support.IndexedTagName;
 import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
 import org.tbk.nostr.util.MoreEvents;
@@ -33,14 +31,14 @@ public class ReplaceableEventRequestHandlerInterceptor implements NostrRequestHa
     private final Nip1Support support;
 
     @Override
-    public boolean preHandle(WebSocketSession session, Request request) throws IOException {
+    public boolean preHandle(NostrWebSocketSession session, Request request) throws IOException {
         if (request.getKindCase() == Request.KindCase.EVENT) {
             return handleEvent(session, request.getEvent().getEvent());
         }
         return true;
     }
 
-    private boolean handleEvent(WebSocketSession session, Event event) throws IOException {
+    private boolean handleEvent(NostrWebSocketSession session, Event event) throws IOException {
         if (Nip1.isReplaceableEvent(event) || Nip1.isParameterizedReplaceableEvent(event)) {
             XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
 
@@ -51,13 +49,13 @@ public class ReplaceableEventRequestHandlerInterceptor implements NostrRequestHa
             Optional<ReplaceableError> replaceableErrorOrEmpty = checkReplaceableEventRules(event, newerExistingEvents);
 
             if (replaceableErrorOrEmpty.isPresent()) {
-                session.sendMessage(new TextMessage(JsonWriter.toJson(Response.newBuilder()
+                session.sendResponseImmediately(Response.newBuilder()
                         .setOk(OkResponse.newBuilder()
                                 .setEventId(event.getId())
                                 .setSuccess(false)
                                 .setMessage(replaceableErrorOrEmpty.get().getMessage())
                                 .build())
-                        .build())));
+                        .build());
                 return false;
             }
 

@@ -1,6 +1,5 @@
 package org.tbk.nostr.relay.example.nostr;
 
-import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
 
@@ -27,7 +26,7 @@ public class NostrRequestHandlerExecutionChain {
      * next interceptor or the handler itself. Else, it is assumed
      * that this interceptor has already dealt with the response itself.
      */
-    boolean applyPreHandle(WebSocketSession session, Request request) throws Exception {
+    boolean applyPreHandle(NostrWebSocketSession session, Request request) throws Exception {
         for (NostrRequestHandlerInterceptor interceptor : this.interceptors) {
             if (!interceptor.preHandle(session, request)) {
                 return false;
@@ -39,7 +38,7 @@ public class NostrRequestHandlerExecutionChain {
     /**
      * Apply postHandle methods of registered interceptors.
      */
-    void applyHandle(WebSocketSession session, Request request, NostrWebSocketHandler handler) throws Exception {
+    void applyHandle(NostrWebSocketSession session, Request request, NostrWebSocketHandler handler) throws Exception {
         switch (request.getKindCase()) {
             case EVENT -> handler.handleEventMessage(session, request.getEvent());
             case REQ -> handler.handleReqMessage(session, request.getReq());
@@ -52,7 +51,7 @@ public class NostrRequestHandlerExecutionChain {
     /**
      * Apply postHandle methods of registered interceptors.
      */
-    void applyPostHandle(WebSocketSession session, Request request) throws Exception {
+    void applyPostHandle(NostrWebSocketSession session, Request request) throws Exception {
         for (int i = this.interceptors.size() - 1; i >= 0; i--) {
             NostrRequestHandlerInterceptor interceptor = this.interceptors.get(i);
             interceptor.postHandle(session, request);

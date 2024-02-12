@@ -6,11 +6,6 @@ import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.relay.example.nostr.validating.EventValidator;
-import org.tbk.nostr.util.MoreTags;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Optional;
 
 @AllArgsConstructor
 public class ReplaceableEventValidator implements EventValidator {

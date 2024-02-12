@@ -1,9 +1,9 @@
 package org.tbk.nostr.relay.example.nostr.handler;
 
-import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.CountRequest;
+import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 
 public interface CountRequestHandler {
 
-    void handleCountMessage(WebSocketSession session, CountRequest count) throws Exception;
+    void handleCountMessage(NostrWebSocketSession session, CountRequest count) throws Exception;
 }

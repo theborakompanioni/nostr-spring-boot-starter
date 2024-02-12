@@ -2,10 +2,8 @@ package org.tbk.nostr.relay.example.nostr.interceptor;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.*;
-import org.tbk.nostr.proto.json.JsonWriter;
+import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -14,7 +12,7 @@ public class MaxLimitPerFilterReqRequestHandlerInterceptor implements NostrReque
     private final int maxLimitPerFilter;
 
     @Override
-    public boolean preHandle(WebSocketSession session, Request request) throws Exception {
+    public boolean preHandle(NostrWebSocketSession session, Request request) throws Exception {
         if (request.getKindCase() == Request.KindCase.REQ) {
             return handleReqMessage(session, request.getReq());
         }
@@ -22,7 +20,7 @@ public class MaxLimitPerFilterReqRequestHandlerInterceptor implements NostrReque
         return true;
     }
 
-    private boolean handleReqMessage(WebSocketSession session, ReqRequest req) throws Exception {
+    private boolean handleReqMessage(NostrWebSocketSession session, ReqRequest req) throws Exception {
         for (Filter filter : req.getFiltersList()) {
             if (filter.getLimit() > maxLimitPerFilter) {
                 String message = "Maximum limit per filter in REQ message. Maximum is %d, got %d"
@@ -30,12 +28,12 @@ public class MaxLimitPerFilterReqRequestHandlerInterceptor implements NostrReque
 
                 log.debug("Validation failed for REQ request: {}", message);
 
-                session.sendMessage(new TextMessage(JsonWriter.toJson(Response.newBuilder()
+                session.sendResponseImmediately(Response.newBuilder()
                         .setClosed(ClosedResponse.newBuilder()
                                 .setSubscriptionId(req.getId())
                                 .setMessage("Error: %s".formatted(message))
                                 .build())
-                        .build())));
+                        .build());
                 return false;
             }
         }

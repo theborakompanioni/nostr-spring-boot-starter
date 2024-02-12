@@ -2,6 +2,7 @@ package org.tbk.nostr.relay.example.nostr;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -9,10 +10,15 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.socket.handler.WebSocketSessionDecorator;
 import org.tbk.nostr.proto.Request;
+import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonReader;
+import org.tbk.nostr.proto.json.JsonWriter;
 
 import java.io.IOException;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
+@Slf4j
 @RequiredArgsConstructor
 public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
 
@@ -39,13 +45,10 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
         }
 
         if (request != null) {
-            if (!executionChain.applyPreHandle(sessionWrapper, request)) {
-                return;
+            if (executionChain.applyPreHandle(sessionWrapper, request)) {
+                executionChain.applyHandle(sessionWrapper, request, handler);
+                executionChain.applyPostHandle(sessionWrapper, request);
             }
-
-            executionChain.applyHandle(sessionWrapper, request, handler);
-
-            executionChain.applyPostHandle(sessionWrapper, request);
         }
 
         sessionWrapper.tryFlushMessageBuffer();
@@ -56,43 +59,61 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
         handler.afterConnectionClosed(session, status);
     }
 
-    private static class WebSocketSessionWrapper extends WebSocketSessionDecorator {
+    private static class WebSocketSessionWrapper extends WebSocketSessionDecorator implements NostrWebSocketSession {
+
+        private final Queue<WebSocketMessage<?>> messageQueue;
 
         public WebSocketSessionWrapper(WebSocketSession session) {
             super(session);
+            this.messageQueue = new LinkedBlockingQueue<>();
         }
 
         @Override
-        public void setTextMessageSizeLimit(int messageSizeLimit) {
-            throw new UnsupportedOperationException("'setTextMessageSizeLimit' has been disabled on purpose. Do it in method 'afterConnectionEstablished'.");
+        public void sendMessage(WebSocketMessage<?> message) {
+            queueMessage(message);
+        }
+
+
+        @Override
+        public boolean queueResponse(Response response) {
+            return queueMessage(new TextMessage(JsonWriter.toJson(response)));
         }
 
         @Override
-        public void setBinaryMessageSizeLimit(int messageSizeLimit) {
-            throw new UnsupportedOperationException("'setBinaryMessageSizeLimit' has been disabled on purpose. Do it in method 'afterConnectionEstablished'.");
+        public void sendResponseImmediately(Response response) throws IOException {
+            this.getDelegate().sendMessage(new TextMessage(JsonWriter.toJson(response)));
         }
 
-        @Override
-        public void sendMessage(WebSocketMessage<?> message) throws IOException {
-            // TODO: delay sending message
-            // e.g. take a look at ConcurrentWebSocketSessionDecorator
-            this.getDelegate().sendMessage(message);
+        private boolean queueMessage(WebSocketMessage<?> message) {
+            return this.messageQueue.offer(message);
         }
 
-        public void tryFlushMessageBuffer() {
-            // TODO: try flushing all messages in the buffer here
-            // e.g. take a look at ConcurrentWebSocketSessionDecorator
+        private void tryFlushMessageBuffer() throws IOException {
+            while (!this.messageQueue.isEmpty()) {
+                WebSocketMessage<?> message = this.messageQueue.poll();
+                this.getDelegate().sendMessage(message);
+            }
         }
 
         @Override
         public void close() throws IOException {
-            tryFlushMessageBuffer();
-            this.getDelegate().close();
+            this.close(CloseStatus.NORMAL);
         }
 
         @Override
         public void close(CloseStatus status) throws IOException {
-            tryFlushMessageBuffer();
+            try {
+                tryFlushMessageBuffer();
+            } catch (IOException e) {
+                try {
+                    this.getDelegate().close(status);
+                } catch (IOException e2) {
+                    log.warn("Swallowed error while closing connection {}: {}", this.getId(), e2.getMessage());
+                    // empty on purpose
+                }
+                throw e;
+            }
+
             this.getDelegate().close(status);
         }
     }

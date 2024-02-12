@@ -1,31 +1,18 @@
 package org.tbk.nostr.relay.example.impl;
 
-import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.UncategorizedDataAccessException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 import org.sqlite.SQLiteException;
-import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.EventRequest;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.proto.Response;
-import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.relay.example.domain.event.EventEntity;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
-import org.tbk.nostr.relay.example.domain.event.EventEntitySpecifications;
+import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 import org.tbk.nostr.relay.example.nostr.handler.EventRequestHandler;
-import org.tbk.nostr.util.MoreEvents;
-import org.tbk.nostr.util.MorePublicKeys;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +22,7 @@ public class ExampleEventRequestHandlerImpl implements EventRequestHandler {
     private final EventEntityService eventEntityService;
 
     @Override
-    public void handleEventMessage(WebSocketSession session, EventRequest event) throws Exception {
+    public void handleEventMessage(NostrWebSocketSession session, EventRequest event) throws Exception {
         OkResponse.Builder okBuilder = OkResponse.newBuilder()
                 .setEventId(event.getEvent().getId())
                 .setSuccess(false);
@@ -47,9 +34,9 @@ public class ExampleEventRequestHandlerImpl implements EventRequestHandler {
             okBuilder.mergeFrom(handleEventMessageException(e, okBuilder).buildPartial());
         }
 
-        session.sendMessage(new TextMessage(JsonWriter.toJson(Response.newBuilder()
+        session.queueResponse(Response.newBuilder()
                 .setOk(okBuilder.build())
-                .build())));
+                .build());
     }
 
     private static OkResponse.Builder handleEventMessageException(Exception e, OkResponse.Builder okBuilder) {

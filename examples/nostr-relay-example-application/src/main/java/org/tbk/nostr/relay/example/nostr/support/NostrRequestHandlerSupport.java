@@ -2,9 +2,9 @@ package org.tbk.nostr.relay.example.nostr.support;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.example.nostr.AbstractNostrWebSocketHandler;
+import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 
 @RequiredArgsConstructor
@@ -26,27 +26,27 @@ public abstract class NostrRequestHandlerSupport extends AbstractNostrWebSocketH
     private final UnknownRequestHandler unknownRequestHandler;
 
     @Override
-    public final void handleReqMessage(WebSocketSession session, ReqRequest req) throws Exception {
+    public final void handleReqMessage(NostrWebSocketSession session, ReqRequest req) throws Exception {
         reqRequestHandler.handleReqMessage(session, req);
     }
 
     @Override
-    public final void handleEventMessage(WebSocketSession session, EventRequest event) throws Exception {
+    public final void handleEventMessage(NostrWebSocketSession session, EventRequest event) throws Exception {
         eventRequestHandler.handleEventMessage(session, event);
     }
 
     @Override
-    public final void handleCloseMessage(WebSocketSession session, CloseRequest close) throws Exception {
+    public final void handleCloseMessage(NostrWebSocketSession session, CloseRequest close) throws Exception {
         closeRequestHandler.handleCloseMessage(session, close);
     }
 
     @Override
-    public final void handleCountMessage(WebSocketSession session, CountRequest count) throws Exception {
+    public final void handleCountMessage(NostrWebSocketSession session, CountRequest count) throws Exception {
         countRequestHandler.handleCountMessage(session, count);
     }
 
     @Override
-    public final void handleUnknownMessage(WebSocketSession session, Request request) throws Exception {
+    public final void handleUnknownMessage(NostrWebSocketSession session, Request request) throws Exception {
         unknownRequestHandler.handleUnknownMessage(session, request);
     }
 }

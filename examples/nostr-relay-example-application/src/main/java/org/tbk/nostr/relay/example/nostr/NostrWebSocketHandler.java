@@ -7,7 +7,7 @@ import org.tbk.nostr.relay.example.nostr.handler.*;
 
 public interface NostrWebSocketHandler extends CloseRequestHandler, CountRequestHandler, EventRequestHandler, ReqRequestHandler, UnknownRequestHandler {
 
-    void handleJsonParseException(WebSocketSession session, TextMessage message, Exception e) throws Exception;
+    void handleJsonParseException(NostrWebSocketSession session, TextMessage message, Exception e) throws Exception;
 
     /**
      * Invoked after WebSocket negotiation has succeeded and the WebSocket connection is

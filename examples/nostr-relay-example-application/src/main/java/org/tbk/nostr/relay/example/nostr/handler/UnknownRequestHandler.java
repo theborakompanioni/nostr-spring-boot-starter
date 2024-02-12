@@ -1,9 +1,9 @@
 package org.tbk.nostr.relay.example.nostr.handler;
 
-import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.Request;
+import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 
 public interface UnknownRequestHandler {
 
-    void handleUnknownMessage(WebSocketSession session, Request request) throws Exception;
+    void handleUnknownMessage(NostrWebSocketSession session, Request request) throws Exception;
 }

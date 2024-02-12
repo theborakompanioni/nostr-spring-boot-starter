@@ -1,9 +1,9 @@
 package org.tbk.nostr.relay.example.nostr.handler;
 
-import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.ReqRequest;
+import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 
 public interface ReqRequestHandler {
 
-    void handleReqMessage(WebSocketSession session, ReqRequest req) throws Exception;
+    void handleReqMessage(NostrWebSocketSession session, ReqRequest req) throws Exception;
 }

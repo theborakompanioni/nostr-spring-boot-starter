@@ -58,20 +58,11 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
         }).map(EventEntity::toNostrEvent);
     }
 
-    @NonNull
-    private static Specification<EventEntity> allAfterCreatedAtInclusiveSpec(XonlyPublicKey author, int kind, Instant createdAt) {
-        return EventEntitySpecifications.hasPubkey(author)
-                .and(EventEntitySpecifications.hasKind(kind))
-                .and(EventEntitySpecifications.isCreatedAfterInclusive(createdAt))
-                .and(EventEntitySpecifications.isNotDeleted())
-                .and(EventEntitySpecifications.isNotExpired());
-    }
-
     @Override
     public Mono<Void> markDeletedBeforeCreatedAtInclusive(XonlyPublicKey publicKey, int kind, Instant createdAt) {
         return Mono.<Void>fromRunnable(() -> {
             eventEntityService.markDeleted(publicKey, allBeforeCreatedAtInclusive(publicKey, kind, createdAt));
-        }).subscribeOn(asyncScheduler);
+        });
     }
 
     @Override
@@ -79,29 +70,21 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
         return Mono.<Void>fromRunnable(() -> {
             eventEntityService.markDeleted(publicKey, allBeforeCreatedAtInclusive(publicKey, kind, createdAt)
                     .and(EventEntitySpecifications.hasTagWithFirstValue(tagName, firstTagValue)));
-        }).subscribeOn(asyncScheduler);
-    }
-
-    @NonNull
-    private static Specification<EventEntity> allBeforeCreatedAtInclusive(XonlyPublicKey publicKey, int kind, Instant createdAt) {
-        return EventEntitySpecifications.hasPubkey(publicKey)
-                .and(EventEntitySpecifications.hasKind(kind))
-                .and(EventEntitySpecifications.isCreatedBeforeInclusive(createdAt))
-                .and(EventEntitySpecifications.isNotDeleted());
+        });
     }
 
     @Override
     public Mono<Void> markExpiresAt(EventId eventId, Instant expiresAt) {
         return Mono.<Void>fromRunnable(() -> {
             eventEntityService.markExpiresAt(eventId, expiresAt);
-        }).subscribeOn(asyncScheduler);
+        });
     }
 
     @Override
     public Mono<Void> markDeleted(XonlyPublicKey author, Collection<EventId> deletableEventIds) {
         return Mono.<Void>fromRunnable(() -> {
             eventEntityService.markDeleted(author, deletableEventIds);
-        }).subscribeOn(asyncScheduler);
+        });
     }
 
     @Override
@@ -111,6 +94,23 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
             return eventEntityService.exists(EventEntitySpecifications.hasPubkey(author)
                     .and(EventEntitySpecifications.hasKind(Nip9.kind()))
                     .and(EventEntitySpecifications.hasTagWithFirstValue(IndexedTagName.e, eventId.toHex())));
-        }).subscribeOn(asyncScheduler);
+        });
+    }
+
+    @NonNull
+    private static Specification<EventEntity> allAfterCreatedAtInclusiveSpec(XonlyPublicKey author, int kind, Instant createdAt) {
+        return EventEntitySpecifications.hasPubkey(author)
+                .and(EventEntitySpecifications.hasKind(kind))
+                .and(EventEntitySpecifications.isCreatedAfterInclusive(createdAt))
+                .and(EventEntitySpecifications.isNotDeleted())
+                .and(EventEntitySpecifications.isNotExpired());
+    }
+
+    @NonNull
+    private static Specification<EventEntity> allBeforeCreatedAtInclusive(XonlyPublicKey publicKey, int kind, Instant createdAt) {
+        return EventEntitySpecifications.hasPubkey(publicKey)
+                .and(EventEntitySpecifications.hasKind(kind))
+                .and(EventEntitySpecifications.isCreatedBeforeInclusive(createdAt))
+                .and(EventEntitySpecifications.isNotDeleted());
     }
 }

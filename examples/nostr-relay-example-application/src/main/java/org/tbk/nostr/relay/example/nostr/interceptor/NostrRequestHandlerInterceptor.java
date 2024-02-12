@@ -16,8 +16,8 @@
 
 package org.tbk.nostr.relay.example.nostr.interceptor;
 
-import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.Request;
+import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 
 /**
  * Workflow interface that allows for customized handler execution chains.
@@ -38,7 +38,7 @@ public interface NostrRequestHandlerInterceptor {
      * that this interceptor has already dealt with the response itself.
      * @throws Exception in case of errors
      */
-    default boolean preHandle(WebSocketSession session, Request request) throws Exception {
+    default boolean preHandle(NostrWebSocketSession session, Request request) throws Exception {
         return true;
     }
 
@@ -51,7 +51,7 @@ public interface NostrRequestHandlerInterceptor {
      * @param request current request
      * @throws Exception in case of errors
      */
-    default void postHandle(WebSocketSession session, Request request) throws Exception {
+    default void postHandle(NostrWebSocketSession session, Request request) throws Exception {
     }
 
 }

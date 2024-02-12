@@ -9,10 +9,13 @@ import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 import org.tbk.nostr.relay.example.nostr.support.NostrRequestHandlerSupport;
 
+import javax.annotation.Nullable;
+
 import static java.util.Objects.requireNonNull;
 
 public class ExampleNostrWebSocketHandlerImpl extends NostrRequestHandlerSupport {
-    private final NostrRelayExampleApplicationProperties properties;
+    @Nullable
+    private final String greeting;
 
     public ExampleNostrWebSocketHandlerImpl(NostrRelayExampleApplicationProperties properties,
                                             ReqRequestHandler reqRequestHandler,
@@ -21,15 +24,15 @@ public class ExampleNostrWebSocketHandlerImpl extends NostrRequestHandlerSupport
                                             CountRequestHandler countRequestHandler,
                                             UnknownRequestHandler unknownRequestHandler) {
         super(reqRequestHandler, eventRequestHandler, closeRequestHandler, countRequestHandler, unknownRequestHandler);
-        this.properties = requireNonNull(properties);
+        this.greeting = requireNonNull(properties).getGreeting().orElse(null);
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        if (properties.getGreeting().isPresent()) {
+        if (greeting != null) {
             session.sendMessage(new TextMessage(JsonWriter.toJson(Response.newBuilder()
                     .setNotice(NoticeResponse.newBuilder()
-                            .setMessage(properties.getGreeting().get())
+                            .setMessage(greeting)
                             .build())
                     .build())));
         }
