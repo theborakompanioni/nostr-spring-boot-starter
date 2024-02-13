@@ -96,7 +96,7 @@ public class NostrRelayNip9Test {
         EventId deletionEvent0Id = EventId.of(deletionEvent0.getId().toByteArray());
         Event refetchedDeletionEvent0 = nostrTemplate.fetchEventById(deletionEvent0Id)
                 .blockOptional(Duration.ofSeconds(5))
-                        .orElseThrow();
+                .orElseThrow();
         assertThat(refetchedDeletionEvent0, is(deletionEvent0));
     }
 

@@ -6,12 +6,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.EventUri;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.relay.example.domain.event.EventEntity;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.relay.example.domain.event.EventEntitySpecifications;
-import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
 import org.tbk.nostr.relay.example.nostr.extension.nip40.Nip40Support;
 import org.tbk.nostr.relay.example.nostr.extension.nip9.Nip9Support;
@@ -82,9 +83,16 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
     }
 
     @Override
-    public Mono<Void> markDeleted(XonlyPublicKey author, Collection<EventId> deletableEventIds) {
+    public Mono<Void> markDeletedByEventIds(XonlyPublicKey author, Collection<EventId> deletableEventIds) {
         return Mono.<Void>fromRunnable(() -> {
-            eventEntityService.markDeleted(author, deletableEventIds);
+            eventEntityService.markDeletedByEventIds(author, deletableEventIds);
+        });
+    }
+
+    @Override
+    public Mono<Void> markDeletedByEventUris(XonlyPublicKey author, Collection<EventUri> deletableEventUris) {
+        return Mono.<Void>fromRunnable(() -> {
+            eventEntityService.markDeletedByEventUris(author, deletableEventUris);
         });
     }
 

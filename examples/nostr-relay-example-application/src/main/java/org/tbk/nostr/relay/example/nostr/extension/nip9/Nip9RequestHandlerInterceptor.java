@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
@@ -43,23 +44,47 @@ public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterce
     }
 
     private void doOnDeletionEventCreated(XonlyPublicKey publicKey, Event event) {
-        // TODO: `a` tags ()
         List<TagValue> eTags = MoreTags.findByName(event, IndexedTag.e);
+        List<TagValue> aTags = MoreTags.findByName(event, IndexedTag.a);
 
-        Set<EventId> deletableEventIds = eTags.stream()
-                .map(it -> it.getValues(0))
-                .map(EventId::fromHex)
-                .collect(Collectors.toSet());
-
-        if (deletableEventIds.isEmpty()) {
+        if (eTags.isEmpty() && aTags.isEmpty()) {
             log.warn("Invalid state - missing `e` or `a` tag of deletion event: Did the validator not run?");
         } else {
-            support.markDeleted(publicKey, deletableEventIds).subscribe(unused -> {
-                log.debug("Marked events as deleted based on deletion event {}.", event.getId());
-            }, e -> {
-                log.warn("Error while marking events as deleted based on deletion event {}: {}", event.getId(), e.getMessage());
-            });
+            if (!eTags.isEmpty()) {
+                Set<EventId> deletableEventIds = eTags.stream()
+                        .map(it -> it.getValues(0))
+                        .map(EventId::fromHex)
+                        .collect(Collectors.toSet());
+
+                if (deletableEventIds.isEmpty()) {
+                    log.warn("Invalid state - invalid `e` tag of deletion event: Did the validator not run?");
+                } else {
+                    support.markDeletedByEventIds(publicKey, deletableEventIds).subscribe(unused -> {
+                        log.debug("Marked events as deleted based on deletion event {}.", event.getId());
+                    }, e -> {
+                        log.warn("Error while marking events as deleted based on deletion event {}: {}", event.getId(), e.getMessage());
+                    });
+                }
+            }
+
+            if (!aTags.isEmpty()) {
+                Set<EventUri> deletableEventIds = aTags.stream()
+                        .map(it -> it.getValues(0))
+                        .map(EventUri::fromString)
+                        .collect(Collectors.toSet());
+
+                if (deletableEventIds.isEmpty()) {
+                    log.warn("Invalid state - invalid `a` tag of deletion event: Did the validator not run?");
+                } else {
+                    support.markDeletedByEventUris(publicKey, deletableEventIds).subscribe(unused -> {
+                        log.debug("Marked events as deleted based on deletion event {}.", event.getId());
+                    }, e -> {
+                        log.warn("Error while marking events as deleted based on deletion event {}: {}", event.getId(), e.getMessage());
+                    });
+                }
+            }
         }
+
     }
 
     private void onNonDeletionEventCreated(XonlyPublicKey publicKey, Event event) {
@@ -68,7 +93,7 @@ public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterce
                 .doOnNext(it -> {
                     log.debug("Found existing deletion event for incoming event {}", event.getId());
                 })
-                .flatMap(it -> support.markDeleted(publicKey, List.of(EventId.of(event.getId().toByteArray()))))
+                .flatMap(it -> support.markDeletedByEventIds(publicKey, List.of(EventId.of(event.getId().toByteArray()))))
                 .subscribe(unused -> {
                     log.debug("Successfully marked event {} as deleted.", event.getId());
                 }, e -> {

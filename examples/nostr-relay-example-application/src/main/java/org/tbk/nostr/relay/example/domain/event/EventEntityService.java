@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 
@@ -31,12 +32,22 @@ public interface EventEntityService {
     boolean exists(Specification<EventEntity> specs);
 
     default List<EventId> markDeleted(XonlyPublicKey author, EventId deletableEventId) {
-        return markDeleted(author, List.of(deletableEventId));
+        return markDeletedByEventIds(author, List.of(deletableEventId));
     }
 
-    default List<EventId> markDeleted(XonlyPublicKey author, Collection<EventId> deletableEventIds) {
+    default List<EventId> markDeleted(XonlyPublicKey author, EventUri deletableEventUri) {
+        return markDeletedByEventUris(author, List.of(deletableEventUri));
+    }
+
+    default List<EventId> markDeletedByEventIds(XonlyPublicKey author, Collection<EventId> deletableEventIds) {
         return markDeleted(author, Specification.anyOf(deletableEventIds.stream()
                 .map(EventEntitySpecifications::hasId)
+                .collect(Collectors.toList())));
+    }
+
+    default List<EventId> markDeletedByEventUris(XonlyPublicKey author, Collection<EventUri> deletableEventUris) {
+        return markDeleted(author, Specification.anyOf(deletableEventUris.stream()
+                .map(EventEntitySpecifications::matches)
                 .collect(Collectors.toList())));
     }
 

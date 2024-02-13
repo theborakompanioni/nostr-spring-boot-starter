@@ -7,8 +7,10 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.proto.Filter;
+import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.IndexedTag;
+import org.tbk.nostr.base.Kind;
+import org.tbk.nostr.proto.Filter;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
@@ -22,6 +24,19 @@ public final class EventEntitySpecifications {
 
     public static Specification<EventEntity> hasPubkey(ByteString pubkey) {
         return hasPubkey(new XonlyPublicKey(new ByteVector32(pubkey.toByteArray())));
+    }
+
+    public static Specification<EventEntity> hasKind(Kind kind) {
+        return hasKind(kind.getValue());
+    }
+
+    public static Specification<EventEntity> matches(EventUri eventUri) {
+        Specification<EventEntity> spec = hasPubkey(ByteString.fromHex(eventUri.getPublicKeyHex()))
+                .and(hasKind(eventUri.getKind()));
+
+        return eventUri.getIdentifier()
+                .map(id -> spec.and(hasTagWithFirstValue(IndexedTag.d, id)))
+                .orElse(spec);
     }
 
     public static Specification<EventEntity> hasKind(int kind) {
