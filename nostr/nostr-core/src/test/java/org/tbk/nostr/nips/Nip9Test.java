@@ -1,6 +1,7 @@
 package org.tbk.nostr.nips;
 
 import org.junit.jupiter.api.Test;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;
@@ -21,9 +22,9 @@ class Nip9Test {
 
         Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM");
 
-        Event deletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEventForEvent(signer.getPublicKey(), event0));
+        Event deletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEventForEvent(event0));
 
-        TagValue eTag = MoreTags.findByNameSingle(deletionEvent0, "e")
+        TagValue eTag = MoreTags.findByNameSingle(deletionEvent0, IndexedTag.e)
                 .orElseThrow(() -> new IllegalStateException("Expected an `e` tag"));
 
         assertThat(eTag.getValues(0), is(HexFormat.of().formatHex(event0.getId().toByteArray())));
@@ -36,9 +37,9 @@ class Nip9Test {
         Event event0 = MoreEvents.finalize(signer, Nip1.createReplaceableEvent(signer.getPublicKey(), "GM"));
         assertThat("sanity check", Nip1.isReplaceableEvent(event0));
 
-        Event deletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEventForEvent(signer.getPublicKey(), event0));
+        Event deletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEventForEvent(event0));
 
-        TagValue aTag = MoreTags.findByNameSingle(deletionEvent0, "a")
+        TagValue aTag = MoreTags.findByNameSingle(deletionEvent0, IndexedTag.a)
                 .orElseThrow(() -> new IllegalStateException("Expected an `a` tag"));
 
         String expectedTagValue = "%d:%s".formatted(event0.getKind(), HexFormat.of().formatHex(event0.getPubkey().toByteArray()));
@@ -52,12 +53,12 @@ class Nip9Test {
         Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "test"));
         assertThat("sanity check", Nip1.isParameterizedReplaceableEvent(event0));
 
-        TagValue dTag = MoreTags.findByNameSingle(event0, "d")
+        TagValue dTag = MoreTags.findByNameSingle(event0, IndexedTag.d)
                 .orElseThrow(() -> new IllegalStateException("Expected an `d` tag"));
 
-        Event deletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEventForEvent(signer.getPublicKey(), event0));
+        Event deletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEventForEvent(event0));
 
-        TagValue aTag = MoreTags.findByNameSingle(deletionEvent0, "a")
+        TagValue aTag = MoreTags.findByNameSingle(deletionEvent0, IndexedTag.a)
                 .orElseThrow(() -> new IllegalStateException("Expected an `a` tag"));
 
         String expectedTagValue = "%d:%s:%s".formatted(event0.getKind(), signer.getPublicKey().value.toHex(), dTag.getValues(0));

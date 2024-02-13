@@ -68,15 +68,15 @@ public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterce
             }
 
             if (!aTags.isEmpty()) {
-                Set<EventUri> deletableEventIds = aTags.stream()
+                Set<EventUri> deletableEventUris = aTags.stream()
                         .map(it -> it.getValues(0))
                         .map(EventUri::fromString)
                         .collect(Collectors.toSet());
 
-                if (deletableEventIds.isEmpty()) {
+                if (deletableEventUris.isEmpty()) {
                     log.warn("Invalid state - invalid `a` tag of deletion event: Did the validator not run?");
                 } else {
-                    support.markDeletedByEventUris(publicKey, deletableEventIds).subscribe(unused -> {
+                    support.markDeletedByEventUris(publicKey, deletableEventUris).subscribe(unused -> {
                         log.debug("Marked events as deleted based on deletion event {}.", event.getId());
                     }, e -> {
                         log.warn("Error while marking events as deleted based on deletion event {}: {}", event.getId(), e.getMessage());
