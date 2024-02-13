@@ -11,6 +11,7 @@ import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.relay.example.domain.event.EventEntity;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.relay.example.domain.event.EventEntitySpecifications;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
 import org.tbk.nostr.relay.example.nostr.extension.nip40.Nip40Support;
 import org.tbk.nostr.relay.example.nostr.extension.nip9.Nip9Support;
@@ -47,7 +48,7 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
     }
 
     @Override
-    public Flux<Event> findAllAfterCreatedAtInclusiveWithTag(XonlyPublicKey author, int kind, Instant createdAt, IndexedTagName tagName, String firstTagValue) {
+    public Flux<Event> findAllAfterCreatedAtInclusiveWithTag(XonlyPublicKey author, int kind, Instant createdAt, IndexedTag tagName, String firstTagValue) {
         return Flux.defer(() -> {
             PageRequest pageRequest = PageRequest.of(0, Integer.MAX_VALUE);
 
@@ -66,7 +67,7 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
     }
 
     @Override
-    public Mono<Void> markDeletedBeforeCreatedAtInclusiveWithTag(XonlyPublicKey publicKey, int kind, Instant createdAt, IndexedTagName tagName, String firstTagValue) {
+    public Mono<Void> markDeletedBeforeCreatedAtInclusiveWithTag(XonlyPublicKey publicKey, int kind, Instant createdAt, IndexedTag tagName, String firstTagValue) {
         return Mono.<Void>fromRunnable(() -> {
             eventEntityService.markDeleted(publicKey, allBeforeCreatedAtInclusive(publicKey, kind, createdAt)
                     .and(EventEntitySpecifications.hasTagWithFirstValue(tagName, firstTagValue)));
@@ -93,7 +94,7 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
             EventId eventId = EventId.of(event.getId().toByteArray());
             return eventEntityService.exists(EventEntitySpecifications.hasPubkey(author)
                     .and(EventEntitySpecifications.hasKind(Nip9.kind()))
-                    .and(EventEntitySpecifications.hasTagWithFirstValue(IndexedTagName.e, eventId.toHex())));
+                    .and(EventEntitySpecifications.hasTagWithFirstValue(IndexedTag.e, eventId.toHex())));
         });
     }
 

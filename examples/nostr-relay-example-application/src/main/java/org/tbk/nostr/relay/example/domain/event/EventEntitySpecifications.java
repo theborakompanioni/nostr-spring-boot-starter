@@ -8,7 +8,7 @@ import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.proto.Filter;
-import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
+import org.tbk.nostr.base.IndexedTag;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
@@ -72,11 +72,11 @@ public final class EventEntitySpecifications {
         return (root, cq, cb) -> cb.isNotNull(root.get("deletedAt"));
     }
 
-    public static Specification<EventEntity> hasTagWithoutValues(Nip1Support.IndexedTagName tagName) {
+    public static Specification<EventEntity> hasTagWithoutValues(IndexedTag tagName) {
         return hasTagWithFirstValue(tagName, null);
     }
 
-    public static Specification<EventEntity> hasTagWithFirstValue(Nip1Support.IndexedTagName tagName, @Nullable String firstTagValue) {
+    public static Specification<EventEntity> hasTagWithFirstValue(IndexedTag tagName, @Nullable String firstTagValue) {
         return (root, query, criteriaBuilder) -> {
             Join<TagEntity, EventEntity> eventTags = root.join("tags");
             return criteriaBuilder.and(

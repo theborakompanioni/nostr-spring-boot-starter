@@ -2,6 +2,7 @@ package org.tbk.nostr.relay.example.nostr.extension.nip1;
 
 import lombok.AllArgsConstructor;
 import org.springframework.validation.Errors;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
@@ -13,7 +14,7 @@ public class ReplaceableEventValidator implements EventValidator {
     @Override
     public void validateEvent(Event event, Errors errors) {
         if (Nip1.isParameterizedReplaceableEvent(event)) {
-            Nip1Support.IndexedTagName identifier = Nip1Support.IndexedTagName.d;
+            IndexedTag identifier = IndexedTag.d;
 
             TagValue found = null;
             for (int i = 0; i < event.getTagsCount(); i++) {

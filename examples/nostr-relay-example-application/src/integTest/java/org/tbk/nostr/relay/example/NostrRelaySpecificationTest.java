@@ -21,7 +21,7 @@ import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.proto.ReqRequest;
 import org.tbk.nostr.relay.example.nostr.NostrRelayProperties;
-import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
@@ -901,7 +901,7 @@ public class NostrRelaySpecificationTest {
         Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "test"));
         Event event1Older = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() - 1));
         Event event2DifferentTag = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM",
-                        MoreTags.findByNameSingle(event0, Nip1Support.IndexedTagName.d.name())
+                        MoreTags.findByNameSingle(event0, IndexedTag.d.name())
                                 .map(it -> it.getValues(0))
                                 .orElseThrow()
                                 .repeat(2)

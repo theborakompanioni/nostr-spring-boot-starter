@@ -6,10 +6,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
-import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support.IndexedTagName;
 import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MorePublicKeys;
@@ -70,7 +70,7 @@ public class ReplaceableEventRequestHandlerInterceptor implements NostrRequestHa
         if (Nip1.isReplaceableEvent(event)) {
             return support.markDeletedBeforeCreatedAtInclusive(publicKey, event.getKind(), eventCreatedAt);
         } else if (Nip1.isParameterizedReplaceableEvent(event)) {
-            IndexedTagName identifier = IndexedTagName.d;
+            IndexedTag identifier = IndexedTag.d;
 
             TagValue identifierTag = MoreTags.findByNameSingle(event, identifier.name())
                     .orElseThrow(() -> new IllegalStateException("Error while replacing events: Missing or conflicting '%s' tag.".formatted(identifier.name())));
@@ -91,7 +91,7 @@ public class ReplaceableEventRequestHandlerInterceptor implements NostrRequestHa
                     .blockOptional(Duration.ofSeconds(60))
                     .orElseThrow(() -> new IllegalStateException("Error while replacing events: Fetch phase."));
         } else if (Nip1.isParameterizedReplaceableEvent(event)) {
-            IndexedTagName identifier = IndexedTagName.d;
+            IndexedTag identifier = IndexedTag.d;
 
             TagValue identifierTag = MoreTags.findByNameSingle(event, identifier.name())
                     .orElseThrow(() -> new IllegalStateException("Error while replacing events: Missing or conflicting '%s' tag.".formatted(identifier.name())));
