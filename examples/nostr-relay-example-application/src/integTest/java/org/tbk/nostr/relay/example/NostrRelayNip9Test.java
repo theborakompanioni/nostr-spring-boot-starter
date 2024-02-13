@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
@@ -18,12 +19,12 @@ import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 
 import java.time.Duration;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test", "nip-test"})
@@ -42,7 +43,7 @@ public class NostrRelayNip9Test {
     }
 
     @Test
-    void itShouldValidateExistingEventSuccessfully0() {
+    void itShouldValidateEventSuccessfully0() {
         Signer signer = SimpleSigner.random();
 
         Event invalidDeletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEvent(signer.getPublicKey(), List.of()));
@@ -51,6 +52,29 @@ public class NostrRelayNip9Test {
                 .orElseThrow();
         assertThat(ok1.getEventId(), is(invalidDeletionEvent0.getId()));
         assertThat(ok1.getMessage(), is("Error: Missing 'e' or 'a' tag."));
+        assertThat(ok1.getSuccess(), is(false));
+
+        EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0.getId().toByteArray());
+        Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(invalidDeletionEvent0Id).blockOptional(Duration.ofSeconds(5));
+        assertThat(refetchedEvent0.isPresent(), is(false));
+    }
+
+    @Test
+    void itShouldValidateEventSuccessfully1() {
+        Signer signer = SimpleSigner.random();
+        Signer otherSigner = SimpleSigner.random();
+        assertThat("sanity check", signer.getPublicKey(), is(not(otherSigner.getPublicKey())));
+
+        Event event0ByOtherAuthor = MoreEvents.createFinalizedTextNote(otherSigner, "GM");
+
+        Event invalidDeletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEventForEvent(
+                EventUri.of(event0ByOtherAuthor.getKind(), HexFormat.of().formatHex(event0ByOtherAuthor.getPubkey().toByteArray()))
+        ));
+        OkResponse ok1 = nostrTemplate.send(invalidDeletionEvent0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok1.getEventId(), is(invalidDeletionEvent0.getId()));
+        assertThat(ok1.getMessage(), is("Error: Referencing events not signed by author is not permitted."));
         assertThat(ok1.getSuccess(), is(false));
 
         EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0.getId().toByteArray());

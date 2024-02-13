@@ -20,6 +20,18 @@ public final class EventUri {
         return new EventUri(uri);
     }
 
+    public static EventUri of(int kind, String publicKeyHex) {
+        return of(Kind.of(kind), publicKeyHex);
+    }
+
+    public static EventUri of(Kind kind, @NonNull String publicKeyHex) {
+        return new EventUri("%d:%s".formatted(kind.getValue(), publicKeyHex));
+    }
+
+    public static EventUri of(Kind kind, @NonNull String publicKeyHex, @NonNull String identifier) {
+        return new EventUri("%d:%s:%s".formatted(kind.getValue(), publicKeyHex, identifier));
+    }
+
     public static boolean isValidEventUriString(String value) {
         String[] split = value.split(":", 3);
         if (split.length < 2) {

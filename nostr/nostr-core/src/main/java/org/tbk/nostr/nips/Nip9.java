@@ -50,6 +50,14 @@ public final class Nip9 {
         return createDeletionEvent(publicKey, null, Collections.singletonList(EventId.of(event.getId().toByteArray())));
     }
 
+    public static Event.Builder createDeletionEventForEvent(EventUri eventUri) {
+        return createDeletionEventForEvent(eventUri, null);
+    }
+
+    public static Event.Builder createDeletionEventForEvent(EventUri eventUri, @Nullable String reason) {
+        return createDeletionEventForParameterizedReplaceableEvent(MorePublicKeys.fromHex(eventUri.getPublicKeyHex()), reason, eventUri.getKind().getValue(), eventUri.getIdentifier().orElse(null));
+    }
+
     public static Event.Builder createDeletionEvent(XonlyPublicKey publicKey, Collection<EventId> eventId) {
         return createDeletionEvent(publicKey, null, eventId);
     }
@@ -67,14 +75,6 @@ public final class Nip9 {
 
     public static Event.Builder createDeletionEventForReplaceableEvent(XonlyPublicKey publicKey, @Nullable String reason, int kind) {
         return createDeletionEventInternal(publicKey, reason, Collections.singletonList(MoreTags.a(kind, publicKey)));
-    }
-
-    public static Event.Builder createDeletionEventForParameterizedReplaceableEvent(EventUri dTagValue) {
-        return createDeletionEventForParameterizedReplaceableEvent(dTagValue, null);
-    }
-
-    public static Event.Builder createDeletionEventForParameterizedReplaceableEvent(EventUri dTagValue, @Nullable String reason) {
-        return createDeletionEventForParameterizedReplaceableEvent(MorePublicKeys.fromHex(dTagValue.getPublicKeyHex()), reason, dTagValue.getKind().getValue(), dTagValue.getIdentifier().orElse(null));
     }
 
     public static Event.Builder createDeletionEventForParameterizedReplaceableEvent(XonlyPublicKey publicKey, int kind, @Nullable String dTagValue) {
