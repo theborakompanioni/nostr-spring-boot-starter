@@ -47,7 +47,7 @@ public class ReplaceableEventValidator implements EventValidator {
             //  After all, missing a "d" tag is also identifiable.
             if (found == null) {
                 String errorMessage =  "Missing '%s' tag.".formatted(identifier.name());
-                errors.rejectValue("createdAt", "createdAt.invalid", errorMessage);
+                errors.rejectValue("kind", "kind.invalid", errorMessage);
             }
         }
     }

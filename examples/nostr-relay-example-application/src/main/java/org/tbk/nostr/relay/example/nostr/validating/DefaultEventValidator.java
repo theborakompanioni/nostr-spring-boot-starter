@@ -1,6 +1,7 @@
 package org.tbk.nostr.relay.example.nostr.validating;
 
 import org.springframework.validation.Errors;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
@@ -93,7 +94,7 @@ public class DefaultEventValidator implements EventValidator {
     // - "<kind integer>:<32-bytes lowercase hex of a pubkey>:<d tag value>" for parameterized replaceable events
     private boolean isValidEventUri(String value) {
         String[] split = value.split(":");
-        if (split.length != 2 && split.length != 3) {
+        if (split.length < 2) {
             return false;
         }
         if (!isValidKindString(split[0])) {

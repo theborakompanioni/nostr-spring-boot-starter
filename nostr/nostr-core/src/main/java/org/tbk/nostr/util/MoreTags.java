@@ -2,6 +2,7 @@ package org.tbk.nostr.util;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nips.Nip10;
 import org.tbk.nostr.nips.Nip13;
@@ -23,10 +24,18 @@ public final class MoreTags {
         throw new UnsupportedOperationException();
     }
 
+    public static List<TagValue> findByName(EventOrBuilder event, IndexedTag tag) {
+        return findByName(event, tag.name());
+    }
+
     public static List<TagValue> findByName(EventOrBuilder event, String name) {
         return event.getTagsList().stream()
                 .filter(it -> it.getName().equals(name))
                 .toList();
+    }
+
+    public static Optional<TagValue> findByNameSingle(EventOrBuilder event, IndexedTag tag) {
+        return findByNameSingle(event, tag.name());
     }
 
     public static Optional<TagValue> findByNameSingle(EventOrBuilder event, String name) {
@@ -40,6 +49,16 @@ public final class MoreTags {
             }
         }
         return Optional.ofNullable(found);
+    }
+
+    public static Optional<TagValue> findByNameFirst(EventOrBuilder event, IndexedTag tag) {
+        return findByNameFirst(event, tag.name());
+    }
+
+    public static Optional<TagValue> findByNameFirst(EventOrBuilder event, String name) {
+        return event.getTagsList().stream()
+                .filter(it -> it.getName().equals(name))
+                .findFirst();
     }
 
     public static TagValue e(Event event) {
@@ -59,7 +78,7 @@ public final class MoreTags {
     }
 
     public static TagValue e(EventId eventId) {
-        return named("e", eventId.toHex());
+        return named(IndexedTag.e.name(), eventId.toHex());
     }
 
     public static TagValue e(EventId eventId, Nip10.Marker marker) {
@@ -67,7 +86,7 @@ public final class MoreTags {
     }
 
     public static TagValue e(EventId eventId, RelayUri recommendedRelay) {
-        return named("e", eventId.toHex(), recommendedRelay.getUri().toString());
+        return named(IndexedTag.e.name(), eventId.toHex(), recommendedRelay.getUri().toString());
     }
 
     public static TagValue e(EventId eventId, @Nullable RelayUri recommendedRelay, Nip10.Marker marker) {
@@ -78,27 +97,27 @@ public final class MoreTags {
      * Prefer typed versions, e.g. {@link #e(EventId)}, {@link #e(EventId, RelayUri)},
      */
     public static TagValue e(String... values) {
-        return named("e", values);
+        return named(IndexedTag.e.name(), values);
     }
 
     public static TagValue d(String... values) {
-        return named("d", values);
+        return named(IndexedTag.d.name(), values);
     }
 
 
     public static TagValue p(XonlyPublicKey publicKey) {
-        return named("p", publicKey.value.toHex());
+        return named(IndexedTag.p.name(), publicKey.value.toHex());
     }
 
     public static TagValue p(XonlyPublicKey publicKey, RelayUri recommendedRelay) {
-        return named("p", publicKey.value.toHex(), recommendedRelay.getUri().toString());
+        return named(IndexedTag.p.name(), publicKey.value.toHex(), recommendedRelay.getUri().toString());
     }
 
     /**
      * Prefer typed versions, e.g. {@link #p(XonlyPublicKey)} , {@link #p(XonlyPublicKey, RelayUri)},
      */
     public static TagValue p(String... values) {
-        return named("p", values);
+        return named(IndexedTag.p.name(), values);
     }
 
     public static TagValue a(int kind, XonlyPublicKey publicKey) {
@@ -121,7 +140,7 @@ public final class MoreTags {
      * Prefer typed versions, e.g. {@link #a(int, XonlyPublicKey)}, {@link #a(int, XonlyPublicKey, RelayUri)},
      */
     public static TagValue a(String... values) {
-        return named("a", values);
+        return named(IndexedTag.a.name(), values);
     }
 
     public static TagValue expiration(Duration duration) {
