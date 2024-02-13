@@ -3,7 +3,11 @@
 nostr-spring-boot-starter
 ===
 
-Work in progress.
+Spring boot starter projects for building [Nostr](https://github.com/nostr-protocol/nostr) applications.
+Whether you're building your own client or custom relay software, this framework provides most of what you
+need to write scalable and efficient solutions effortlessly.
+
+**Note**: Most code is still experimental - **this is work in progress**.
 
 - [x] [NIP-1](https://github.com/nostr-protocol/nips/blob/master/01.md)
 - [x] [NIP-6](https://github.com/nostr-protocol/nips/blob/master/06.md)
@@ -30,12 +34,12 @@ Planned:
 
 ### Test
 ```shell script
-./gradlew test integrationTest --rerun-tasks
+./gradlew test integrationTest --rerun-tasks --no-parallel
 ```
 
 Run full test suite (including load tests):
 ```shell script
-CI=true ./gradlew test integrationTest --rerun-tasks
+CI=true ./gradlew test integrationTest --rerun-tasks --no-parallel
 ```
 
 ## Contributing
