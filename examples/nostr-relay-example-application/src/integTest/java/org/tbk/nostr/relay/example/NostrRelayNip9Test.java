@@ -9,6 +9,7 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.OkResponse;
@@ -132,5 +133,43 @@ public class NostrRelayNip9Test {
                 .blockOptional(Duration.ofSeconds(5));
 
         assertThat(refetchedEvent0.isPresent(), is(false));
+    }
+
+    @Test
+    void itShouldDeleteExistingEventSuccessfully2ReplaceableEvent() {
+        Signer signer = SimpleSigner.random();
+
+        Event event0 = MoreEvents.finalize(signer, Nip1.createReplaceableEvent(signer.getPublicKey(), "GM"));
+        Event event1 = MoreEvents.createFinalizedTextNote(signer, "GM1");
+
+        List<Event> events = List.of(event0, event1);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks, hasSize(events.size()));
+        assertThat("events are ok", oks.stream().allMatch(OkResponse::getSuccess));
+
+        EventId event0Id = EventId.of(event0.getId().toByteArray());
+        Event fetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(fetchedEvent0, is(event0));
+
+        Event deletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEventForEvent(signer.getPublicKey(), event0));
+
+        OkResponse ok1 = nostrTemplate.send(deletionEvent0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok1.getEventId(), is(deletionEvent0.getId()));
+        assertThat(ok1.getSuccess(), is(true));
+
+        Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(event0Id).blockOptional(Duration.ofSeconds(5));
+        assertThat(refetchedEvent0.isPresent(), is(false));
+
+        EventId event1Id = EventId.of(event1.getId().toByteArray());
+        Optional<Event> refetchedEvent1 = nostrTemplate.fetchEventById(event1Id).blockOptional(Duration.ofSeconds(5));
+        assertThat(refetchedEvent1.isPresent(), is(true));
     }
 }
