@@ -102,11 +102,11 @@ public final class MoreTags {
     }
 
     public static TagValue a(int kind, XonlyPublicKey publicKey) {
-        return a("%d:%s".formatted(kind, publicKey));
+        return a("%d:%s".formatted(kind, publicKey.value.toHex()));
     }
 
     public static TagValue a(int kind, XonlyPublicKey publicKey, String dTagValue) {
-        return a("%d:%s:%s".formatted(kind, publicKey, dTagValue));
+        return a("%d:%s:%s".formatted(kind, publicKey.value.toHex(), dTagValue));
     }
 
     public static TagValue a(int kind, XonlyPublicKey publicKey, RelayUri recommendedRelay) {
