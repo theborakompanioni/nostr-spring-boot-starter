@@ -68,14 +68,14 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
     }
 
     @Override
-    public Mono<Void> markDeletedBeforeCreatedAtInclusive(XonlyPublicKey publicKey, int kind, Instant createdAt) {
+    public Mono<Void> deleteAllBeforeCreatedAtInclusive(XonlyPublicKey publicKey, int kind, Instant createdAt) {
         return Mono.<Void>fromRunnable(() -> {
             eventEntityService.markDeleted(publicKey, allBeforeCreatedAtInclusive(publicKey, kind, createdAt));
         });
     }
 
     @Override
-    public Mono<Void> markDeletedBeforeCreatedAtInclusiveWithTag(XonlyPublicKey publicKey, int kind, Instant createdAt, IndexedTag tagName, String firstTagValue) {
+    public Mono<Void> deleteAllBeforeCreatedAtInclusiveWithTag(XonlyPublicKey publicKey, int kind, Instant createdAt, IndexedTag tagName, String firstTagValue) {
         return Mono.<Void>fromRunnable(() -> {
             eventEntityService.markDeleted(publicKey, allBeforeCreatedAtInclusive(publicKey, kind, createdAt)
                     .and(EventEntitySpecifications.hasTagWithFirstValue(tagName, firstTagValue)));
@@ -90,14 +90,14 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
     }
 
     @Override
-    public Mono<Void> markDeletedByEventIds(XonlyPublicKey author, Collection<EventId> deletableEventIds) {
+    public Mono<Void> deleteAllByEventIds(XonlyPublicKey author, Collection<EventId> deletableEventIds) {
         return Mono.<Void>fromRunnable(() -> {
             eventEntityService.markDeletedByEventIds(author, deletableEventIds);
         });
     }
 
     @Override
-    public Mono<Void> markDeletedByEventUris(XonlyPublicKey author, Collection<EventUri> deletableEventUris) {
+    public Mono<Void> deleteAllByEventUris(XonlyPublicKey author, Collection<EventUri> deletableEventUris) {
         return Mono.<Void>fromRunnable(() -> {
             eventEntityService.markDeletedByEventUris(author, deletableEventUris);
         });

@@ -11,9 +11,9 @@ import java.util.Collection;
 
 public interface Nip9Support {
 
-    Mono<Void> markDeletedByEventIds(XonlyPublicKey author, Collection<EventId> deletableEventIds);
+    Mono<Void> deleteAllByEventIds(XonlyPublicKey author, Collection<EventId> deletableEventIds);
 
-    Mono<Void> markDeletedByEventUris(XonlyPublicKey author, Collection<EventUri> deletableEventUris);
+    Mono<Void> deleteAllByEventUris(XonlyPublicKey author, Collection<EventUri> deletableEventUris);
 
     Mono<Boolean> hasDeletionEvent(XonlyPublicKey author, Event event);
 }

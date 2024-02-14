@@ -18,8 +18,12 @@ public interface Nip1Support {
 
     Flux<Event> findAllAfterCreatedAtInclusiveWithTag(XonlyPublicKey author, int kind, Instant createdAt, IndexedTag tagName, @Nullable String firstTagValue);
 
-    Mono<Void> markDeletedBeforeCreatedAtInclusive(XonlyPublicKey author, int kind, Instant createdAt);
+    default Mono<Void> deleteAll(XonlyPublicKey author, int kind) {
+        return deleteAllBeforeCreatedAtInclusive(author, kind, Instant.MAX);
+    }
 
-    Mono<Void> markDeletedBeforeCreatedAtInclusiveWithTag(XonlyPublicKey author, int kind, Instant createdAt, IndexedTag tagName, @Nullable String firstTagValue);
+    Mono<Void> deleteAllBeforeCreatedAtInclusive(XonlyPublicKey author, int kind, Instant createdAt);
+
+    Mono<Void> deleteAllBeforeCreatedAtInclusiveWithTag(XonlyPublicKey author, int kind, Instant createdAt, IndexedTag tagName, @Nullable String firstTagValue);
 
 }

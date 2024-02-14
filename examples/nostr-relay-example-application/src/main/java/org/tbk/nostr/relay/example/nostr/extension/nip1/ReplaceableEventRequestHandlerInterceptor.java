@@ -68,7 +68,7 @@ public class ReplaceableEventRequestHandlerInterceptor implements NostrRequestHa
 
     private Mono<Void> deleteEventsBefore(Event event, XonlyPublicKey publicKey, Instant eventCreatedAt) {
         if (Nip1.isReplaceableEvent(event)) {
-            return support.markDeletedBeforeCreatedAtInclusive(publicKey, event.getKind(), eventCreatedAt);
+            return support.deleteAllBeforeCreatedAtInclusive(publicKey, event.getKind(), eventCreatedAt);
         } else if (Nip1.isParameterizedReplaceableEvent(event)) {
             IndexedTag identifier = IndexedTag.d;
 
@@ -77,7 +77,7 @@ public class ReplaceableEventRequestHandlerInterceptor implements NostrRequestHa
 
             String firstIdentifierValueOrNull = identifierTag.getValuesCount() == 0 ? null : identifierTag.getValues(0);
 
-            return support.markDeletedBeforeCreatedAtInclusiveWithTag(publicKey, event.getKind(), eventCreatedAt, identifier, firstIdentifierValueOrNull);
+            return support.deleteAllBeforeCreatedAtInclusiveWithTag(publicKey, event.getKind(), eventCreatedAt, identifier, firstIdentifierValueOrNull);
         } else {
             throw new IllegalStateException("Only pass replaceable events to this function");
         }

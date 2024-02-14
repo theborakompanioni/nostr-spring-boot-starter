@@ -59,7 +59,7 @@ public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterce
                 if (deletableEventIds.isEmpty()) {
                     log.warn("Invalid state - invalid `e` tag of deletion event: Did the validator not run?");
                 } else {
-                    support.markDeletedByEventIds(publicKey, deletableEventIds).subscribe(unused -> {
+                    support.deleteAllByEventIds(publicKey, deletableEventIds).subscribe(unused -> {
                         log.debug("Marked events as deleted based on deletion event {}.", event.getId());
                     }, e -> {
                         log.warn("Error while marking events as deleted based on deletion event {}: {}", event.getId(), e.getMessage());
@@ -76,7 +76,7 @@ public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterce
                 if (deletableEventUris.isEmpty()) {
                     log.warn("Invalid state - invalid `a` tag of deletion event: Did the validator not run?");
                 } else {
-                    support.markDeletedByEventUris(publicKey, deletableEventUris).subscribe(unused -> {
+                    support.deleteAllByEventUris(publicKey, deletableEventUris).subscribe(unused -> {
                         log.debug("Marked events as deleted based on deletion event {}.", event.getId());
                     }, e -> {
                         log.warn("Error while marking events as deleted based on deletion event {}: {}", event.getId(), e.getMessage());
@@ -93,7 +93,7 @@ public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterce
                 .doOnNext(it -> {
                     log.debug("Found existing deletion event for incoming event {}", event.getId());
                 })
-                .flatMap(it -> support.markDeletedByEventIds(publicKey, List.of(EventId.of(event.getId().toByteArray()))))
+                .flatMap(it -> support.deleteAllByEventIds(publicKey, List.of(EventId.of(event.getId().toByteArray()))))
                 .subscribe(unused -> {
                     log.debug("Successfully marked event {} as deleted.", event.getId());
                 }, e -> {

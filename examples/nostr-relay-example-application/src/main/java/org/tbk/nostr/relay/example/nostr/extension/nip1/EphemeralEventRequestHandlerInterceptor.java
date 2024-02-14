@@ -12,7 +12,6 @@ import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerIntercep
 import org.tbk.nostr.util.MorePublicKeys;
 
 import java.time.Duration;
-import java.time.Instant;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,7 +36,7 @@ public class EphemeralEventRequestHandlerInterceptor implements NostrRequestHand
     private void doOnEphemeralEvent(Event event) {
         XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
 
-        support.markDeletedBeforeCreatedAtInclusive(publicKey, event.getKind(), Instant.MAX)
+        support.deleteAll(publicKey, event.getKind())
                 .block(Duration.ofSeconds(60));
     }
 }
