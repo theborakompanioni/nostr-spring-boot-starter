@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr relay starter package'
+
+dependencies {
+    api project(':examples:nostr-relay-core')
+
+    api project(':examples:nostr-relay-autoconfigure')
+
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter'
+}

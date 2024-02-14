@@ -1,6 +1,5 @@
 package org.tbk.nostr.relay.example.nostr.extension.nip1;
 
-import lombok.AllArgsConstructor;
 import org.springframework.validation.Errors;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip1;
@@ -8,7 +7,6 @@ import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.relay.example.nostr.validating.EventValidator;
 
-@AllArgsConstructor
 public class ReplaceableEventValidator implements EventValidator {
 
     @Override
@@ -22,7 +20,7 @@ public class ReplaceableEventValidator implements EventValidator {
                 if (identifier.name().equals(tag.getName())) {
                     if (found != null) {
                         errors.pushNestedPath("tagsList[%d]".formatted(i));
-                        String errorMessage =  "Multiple '%s' tags are not allowed.".formatted(identifier.name());
+                        String errorMessage = "Multiple '%s' tags are not allowed.".formatted(identifier.name());
                         errors.rejectValue("valuesList", "valuesList.invalid", errorMessage);
                         errors.popNestedPath();
                         break;
@@ -46,7 +44,7 @@ public class ReplaceableEventValidator implements EventValidator {
             // TODO: Current implementation CAN NOT handle missing the "d" tag-> should it?
             //  After all, missing a "d" tag is also identifiable.
             if (found == null) {
-                String errorMessage =  "Missing '%s' tag.".formatted(identifier.name());
+                String errorMessage = "Missing '%s' tag.".formatted(identifier.name());
                 errors.rejectValue("kind", "kind.invalid", errorMessage);
             }
         }

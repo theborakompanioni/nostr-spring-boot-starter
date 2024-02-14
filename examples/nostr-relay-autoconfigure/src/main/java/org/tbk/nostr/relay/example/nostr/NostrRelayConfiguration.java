@@ -2,6 +2,7 @@ package org.tbk.nostr.relay.example.nostr;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.tbk.nostr.relay.example.nostr.handler.UnknownRequestHandler;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxFilterCountReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxLimitPerFilterReqRequestHandlerInterceptor;
@@ -23,10 +25,12 @@ import java.util.List;
 
 @EnableWebSocket
 @ConditionalOnWebApplication
+@ConditionalOnClass(WebSocketConfigurer.class)
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(NostrRelayProperties.class)
 @RequiredArgsConstructor
 class NostrRelayConfiguration {
+
     @NonNull
     private final NostrRelayProperties relayProperties;
 
