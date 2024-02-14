@@ -263,21 +263,35 @@ public class NostrRelaySpecificationTest {
         Event invalidEvent4 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM4")
                 .addTags(MoreTags.a("NaN", signer.getPublicKey().value.toHex())));
         Event invalidEvent5 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM5")
-                .addTags(MoreTags.a("%d:%s".formatted(1, "00".repeat(32)))));
-        Event invalidEvent6 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM6")
                 .addTags(MoreTags.a(":")));
 
-        List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2, invalidEvent3, invalidEvent4, invalidEvent5, invalidEvent6);
-        List<OkResponse> oks = nostrTemplate.send(events)
+        List<Event> events0 = List.of(invalidEvent0, invalidEvent1, invalidEvent2, invalidEvent3, invalidEvent4, invalidEvent5);
+        List<OkResponse> oks0 = nostrTemplate.send(events0)
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(oks, hasSize(events.size()));
+        assertThat(oks0, hasSize(events0.size()));
 
-        for (OkResponse ok : oks) {
+        for (OkResponse ok : oks0) {
             assertThat(ok.getSuccess(), is(false));
             assertThat(ok.getMessage(), is("Error: Invalid tag 'a'."));
+        }
+
+    Event invalidEvent6 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM6")
+            .addTags(MoreTags.a("%d:%s".formatted(1, "00".repeat(32)))));
+
+        List<Event> events1 = List.of(invalidEvent6);
+        List<OkResponse> oks1 = nostrTemplate.send(events1)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks1, hasSize(events1.size()));
+
+        for (OkResponse ok : oks1) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("Error: Invalid pubkey in tag 'a'."));
         }
     }
 

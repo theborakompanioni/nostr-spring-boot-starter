@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import javax.annotation.Nullable;
-import java.net.URI;
+import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.Optional;
 
@@ -16,8 +16,14 @@ import static java.util.Objects.requireNonNull;
 // - "<kind integer>:<32-bytes lowercase hex of a pubkey>:<d tag value>" for parameterized replaceable events
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class EventUri {
-    public static EventUri fromString(String uri) {
-        return new EventUri(uri);
+
+    public static boolean isValidEventUriString(String value) {
+        try {
+            fromString(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public static EventUri of(int kind, String publicKeyHex) {
@@ -25,25 +31,35 @@ public final class EventUri {
     }
 
     public static EventUri of(Kind kind, @NonNull String publicKeyHex) {
-        return new EventUri("%d:%s".formatted(kind.getValue(), publicKeyHex));
+        return fromString("%d:%s".formatted(kind.getValue(), publicKeyHex));
+    }
+
+    public static EventUri of(int kind, @NonNull String publicKeyHex, @NonNull String identifier) {
+        return of(Kind.of(kind), publicKeyHex, identifier);
     }
 
     public static EventUri of(Kind kind, @NonNull String publicKeyHex, @NonNull String identifier) {
-        return new EventUri("%d:%s:%s".formatted(kind.getValue(), publicKeyHex, identifier));
+        return fromString("%d:%s:%s".formatted(kind.getValue(), publicKeyHex, identifier));
     }
 
-    public static boolean isValidEventUriString(String value) {
-        String[] split = value.split(":", 3);
-        if (split.length < 2) {
-            return false;
+    public static EventUri fromString(String value) {
+        try {
+            String[] split = value.split(":", 3);
+            if (split.length < 2) {
+                throw new IllegalArgumentException("Invalid string.");
+            }
+            String kindString = split[0];
+            String supposedPublicKey = split[1];
+
+            if (supposedPublicKey.length() != 64) {
+                throw new IllegalArgumentException("Invalid pubkey string.");
+            }
+
+            String identifier = split.length != 3 ? null : split[2];
+            return new EventUri(Kind.fromString(kindString), supposedPublicKey, identifier);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error while parsing event uri: " + e.getMessage());
         }
-        if (!Kind.isValidKindString(split[0])) {
-            return false;
-        }
-        if (!looksLikePublicKey(split[1])) {
-            return false;
-        }
-        return true;
     }
 
     @EqualsAndHashCode.Include
@@ -53,45 +69,46 @@ public final class EventUri {
 
     @EqualsAndHashCode.Include
     @Getter
-    @NonNull
-    private final String publicKeyHex;
+    private final byte[] publicKey;
 
     @EqualsAndHashCode.Include
     @Nullable
     private final String identifier;
 
-    private EventUri(String value) {
-        requireNonNull(value);
-        if (!isValidEventUriString(value)) {
-            throw new IllegalArgumentException("Invalid argument given, expected valid event uri, got: %s".formatted(value));
+    private EventUri(Kind kind, String publicKeyHex, @Nullable String identifier) {
+        byte[] publicKey = parsePublicKey(publicKeyHex);
+        if (!looksLikePublicKey(publicKey)) {
+            throw new IllegalArgumentException("Invalid pubkey.");
         }
-        String[] split = value.split(":", 3);
-        this.kind = Kind.fromString(split[0]);
-        this.publicKeyHex = split[1];
-
-        this.identifier = split.length != 3 ? null : split[2];
+        this.kind = requireNonNull(kind);
+        this.publicKey = publicKey;
+        this.identifier = identifier;
     }
 
     public Optional<String> getIdentifier() {
         return Optional.ofNullable(identifier);
     }
 
+    public String getPublicKeyHex() {
+        return HexFormat.of().formatHex(this.publicKey);
+    }
+
     @Override
     public String toString() {
         return identifier == null ?
-                "%d:%s".formatted(kind.getValue(), publicKeyHex) :
-                "%d:%s:%s".formatted(kind.getValue(), publicKeyHex, identifier);
+                "%d:%s".formatted(kind.getValue(), getPublicKeyHex()) :
+                "%d:%s:%s".formatted(kind.getValue(), getPublicKeyHex(), identifier);
     }
 
-    private static boolean looksLikePublicKey(String value) {
-        if (value.length() != 64) {
-            return false;
-        } else {
-            try {
-                return HexFormat.of().parseHex(value).length == 32;
-            } catch (Exception e) {
-                return false;
-            }
+    private static boolean looksLikePublicKey(byte[] raw) {
+        return raw.length == 32;
+    }
+
+    private static byte[] parsePublicKey(String publicKeyHex) {
+        try {
+            return HexFormat.of().parseHex(publicKeyHex);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid pubkey.");
         }
     }
 }

@@ -2,8 +2,6 @@ package org.tbk.nostr.base;
 
 import org.junit.jupiter.api.Test;
 
-import java.net.URI;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -11,11 +9,26 @@ import static org.hamcrest.Matchers.notNullValue;
 class EventUriTest {
 
     @Test
+    void testEquals0() {
+        assertThat(EventUri.fromString("1:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2"),
+                is(EventUri.of(1, "82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2")));
+
+        assertThat(EventUri.fromString("2:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2:"),
+                is(EventUri.of(2, "82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2", "")));
+
+        assertThat(EventUri.fromString("3:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2:test"),
+                is(EventUri.of(3, "82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2", "test")));
+
+        assertThat(EventUri.fromString("4:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2: : test :"),
+                is(EventUri.of(4, "82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2", " : test :")));
+    }
+
+    @Test
     void createFromString0() {
         assertThat(EventUri.fromString("1:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2"), is(notNullValue()));
-        assertThat(EventUri.fromString("1:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2:"), is(notNullValue()));
-        assertThat(EventUri.fromString("1:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2:test"), is(notNullValue()));
-        assertThat(EventUri.fromString("1:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2: : test :"), is(notNullValue()));
+        assertThat(EventUri.fromString("2:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2:"), is(notNullValue()));
+        assertThat(EventUri.fromString("3:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2:test"), is(notNullValue()));
+        assertThat(EventUri.fromString("4:82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2: : test :"), is(notNullValue()));
     }
 
     @Test

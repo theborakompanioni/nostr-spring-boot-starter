@@ -2,7 +2,7 @@ package org.tbk.nostr.relay.example.nostr.validating;
 
 import org.springframework.validation.Errors;
 import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.base.Kind;
+import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
@@ -84,50 +84,36 @@ public class DefaultEventValidator implements EventValidator {
             errors.rejectValue("valuesList", "valuesList.invalid", "Invalid tag 'a'.");
         } else {
             String supposedEventUri = tag.getValues(0);
-            if (!isValidEventUri(supposedEventUri)) {
+            try {
+                EventUri eventUri = EventUri.fromString(supposedEventUri);
+                if (!isValidPublicKey(eventUri.getPublicKey())) {
+                    errors.rejectValue("valuesList", "valuesList.invalid", "Invalid pubkey in tag 'a'.");
+                }
+            } catch (Exception e) {
                 errors.rejectValue("valuesList", "valuesList.invalid", "Invalid tag 'a'.");
             }
         }
     }
 
-    // "coordinates to an event" in the form of:
-    // - "<kind integer>:<32-bytes lowercase hex of a pubkey>" for non-parameterized replaceable events
-    // - "<kind integer>:<32-bytes lowercase hex of a pubkey>:<d tag value>" for parameterized replaceable events
-    private boolean isValidEventUri(String value) {
-        String[] split = value.split(":", 3);
-        if (split.length < 2) {
-            return false;
-        }
-        if (!Kind.isValidKindString(split[0])) {
-            return false;
-        }
-        if (!isValidPublicKey(split[1])) {
-            return false;
-        }
-        return true;
-    }
-
     private boolean isValidPublicKey(String value) {
         if (value.length() != 64) {
             return false;
-        } else {
-            try {
-                return isValidPublicKey(HexFormat.of().parseHex(value));
-            } catch (Exception e) {
-                return false;
-            }
+        }
+        try {
+            return isValidPublicKey(HexFormat.of().parseHex(value));
+        } catch (Exception e) {
+            return false;
         }
     }
 
     private boolean isValidPublicKey(byte[] raw) {
         if (raw.length != 32) {
             return false;
-        } else {
-            try {
-                return MorePublicKeys.isValidPublicKey(raw);
-            } catch (Exception e) {
-                return false;
-            }
+        }
+        try {
+            return MorePublicKeys.isValidPublicKey(raw);
+        } catch (Exception e) {
+            return false;
         }
     }
 }
