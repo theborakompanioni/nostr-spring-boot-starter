@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
-class Nip40Extension {
+class Nip40ExtensionConfiguration {
 
     @Bean
     Nip40RequestHandlerInterceptor nip40RequestHandlerInterceptor(Nip40Support support) {

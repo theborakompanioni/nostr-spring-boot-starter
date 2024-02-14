@@ -15,6 +15,8 @@ import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.relay.example.impl.*;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketHandler;
+import org.tbk.nostr.relay.example.nostr.extension.nip1.DefaultReqRequestHandler;
+import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 import org.tbk.nostr.relay.example.nostr.support.DefaultUnknownRequestHandler;
 
@@ -42,9 +44,11 @@ class NostrRelayExampleApplicationConfig {
         return new NipSupportService(eventEntityService, asyncThreadPoolTaskExecutor);
     }
 
+    // TODO: move to own autoconfigure module
     @Bean
-    ReqRequestHandler exampleReqRequestHandler(EventEntityService eventEntityService) {
-        return new ExampleReqRequestHandlerImpl(eventEntityService);
+    @ConditionalOnMissingBean(ReqRequestHandler.class)
+    DefaultReqRequestHandler defaultReqRequestHandler(Nip1Support support) {
+        return new DefaultReqRequestHandler(support);
     }
 
     @Bean

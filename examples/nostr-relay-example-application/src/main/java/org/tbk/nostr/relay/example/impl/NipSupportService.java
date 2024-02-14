@@ -10,6 +10,7 @@ import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.relay.example.domain.event.EventEntity;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.relay.example.domain.event.EventEntitySpecifications;
@@ -35,6 +36,12 @@ public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support
     public NipSupportService(EventEntityService eventEntityService, ThreadPoolTaskExecutor asyncThreadPoolTaskExecutor) {
         this.eventEntityService = requireNonNull(eventEntityService);
         this.asyncScheduler = Schedulers.fromExecutor(requireNonNull(asyncThreadPoolTaskExecutor));
+    }
+
+    @Override
+    public Flux<Event> findAll(Collection<Filter> filters) {
+        return Flux.defer(() -> Flux.fromIterable(eventEntityService.findAll(filters)))
+                .map(EventEntity::toNostrEvent);
     }
 
     @Override

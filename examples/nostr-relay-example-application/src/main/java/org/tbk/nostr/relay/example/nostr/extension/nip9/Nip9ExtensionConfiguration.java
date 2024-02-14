@@ -9,7 +9,7 @@ import org.springframework.core.annotation.Order;
 @Slf4j
 @Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
-class Nip9Extension {
+class Nip9ExtensionConfiguration {
 
     @Bean
     Nip9RequestHandlerInterceptor nip9RequestHandlerInterceptor(Nip9Support support) {

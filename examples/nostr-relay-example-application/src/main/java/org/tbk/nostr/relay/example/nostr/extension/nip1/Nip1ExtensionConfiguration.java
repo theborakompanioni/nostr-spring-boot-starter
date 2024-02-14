@@ -9,7 +9,7 @@ import org.springframework.core.annotation.Order;
 @Slf4j
 @Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
-class Nip1Extension {
+class Nip1ExtensionConfiguration {
 
     @Bean
     ReplaceableEventRequestHandlerInterceptor replaceableEventRequestHandlerInterceptor(Nip1Support support) {
@@ -26,4 +26,5 @@ class Nip1Extension {
     ReplaceableEventValidator replaceableEventValidator() {
         return new ReplaceableEventValidator();
     }
+
 }

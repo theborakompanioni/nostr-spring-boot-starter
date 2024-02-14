@@ -24,7 +24,7 @@ import java.util.TimeZone;
 import java.util.function.Supplier;
 
 @Slf4j
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class NostrRelayExampleApplication {
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

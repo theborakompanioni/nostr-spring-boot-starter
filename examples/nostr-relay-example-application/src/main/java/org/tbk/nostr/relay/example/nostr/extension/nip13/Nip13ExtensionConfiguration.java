@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(Nip13ExtensionProperties.class)
 @ConditionalOnProperty(value = "org.tbk.nostr.nip13.enabled")
 @RequiredArgsConstructor
-class Nip13Extension {
+class Nip13ExtensionConfiguration {
 
     @NonNull
     private final Nip13ExtensionProperties properties;
