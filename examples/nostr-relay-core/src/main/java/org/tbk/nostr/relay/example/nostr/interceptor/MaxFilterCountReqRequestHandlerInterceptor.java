@@ -8,7 +8,7 @@ import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 
 @RequiredArgsConstructor
-public class MaxFilterCountReqRequestHandlerInterceptor implements NostrRequestHandlerInterceptor {
+public class MaxFilterCountReqRequestHandlerInterceptor implements RequestHandlerInterceptor {
 
     private final int maxFilterCount;
 

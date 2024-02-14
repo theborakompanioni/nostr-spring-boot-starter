@@ -10,7 +10,7 @@ import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
-import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
+import org.tbk.nostr.relay.example.nostr.interceptor.RequestHandlerInterceptor;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MorePublicKeys;
 import org.tbk.nostr.util.MoreTags;
@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ReplaceableEventRequestHandlerInterceptor implements NostrRequestHandlerInterceptor {
+public class ReplaceableEventRequestHandlerInterceptor implements RequestHandlerInterceptor {
 
     @NonNull
     private final Nip1Support support;

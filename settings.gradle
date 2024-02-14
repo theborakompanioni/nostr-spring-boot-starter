@@ -11,6 +11,7 @@ include 'nostr:nostr-proto-json'
 include 'nostr:nostr-template'
 include 'nostr:nostr-example-application'
 
+include 'examples:nostr-relay-base'
 include 'examples:nostr-relay-core'
 include 'examples:nostr-relay-autoconfigure'
 include 'examples:nostr-relay-starter'

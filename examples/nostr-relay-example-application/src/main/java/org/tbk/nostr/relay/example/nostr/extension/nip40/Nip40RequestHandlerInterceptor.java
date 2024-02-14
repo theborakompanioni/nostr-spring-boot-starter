@@ -8,11 +8,11 @@ import org.tbk.nostr.nips.Nip40;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
-import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
+import org.tbk.nostr.relay.example.nostr.interceptor.RequestHandlerInterceptor;
 
 @Slf4j
 @RequiredArgsConstructor
-public class Nip40RequestHandlerInterceptor implements NostrRequestHandlerInterceptor {
+public class Nip40RequestHandlerInterceptor implements RequestHandlerInterceptor {
 
     @NonNull
     private final Nip40Support support;

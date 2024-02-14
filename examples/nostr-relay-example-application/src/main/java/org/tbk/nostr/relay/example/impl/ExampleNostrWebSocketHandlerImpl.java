@@ -7,7 +7,7 @@ import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties;
 import org.tbk.nostr.relay.example.nostr.handler.*;
-import org.tbk.nostr.relay.example.nostr.support.NostrRequestHandlerSupport;
+import org.tbk.nostr.relay.example.nostr.NostrRequestHandlerSupport;
 
 import javax.annotation.Nullable;
 

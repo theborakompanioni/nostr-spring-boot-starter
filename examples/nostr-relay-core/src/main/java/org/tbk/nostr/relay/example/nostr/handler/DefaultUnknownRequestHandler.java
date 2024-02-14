@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.support;
+package org.tbk.nostr.relay.example.nostr.handler;
 
 import org.tbk.nostr.proto.NoticeResponse;
 import org.tbk.nostr.proto.Request;

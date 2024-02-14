@@ -7,7 +7,7 @@ import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 
 @Slf4j
 @RequiredArgsConstructor
-public class MaxLimitPerFilterReqRequestHandlerInterceptor implements NostrRequestHandlerInterceptor {
+public class MaxLimitPerFilterReqRequestHandlerInterceptor implements RequestHandlerInterceptor {
 
     private final int maxLimitPerFilter;
 

@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.support;
+package org.tbk.nostr.relay.example.nostr;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

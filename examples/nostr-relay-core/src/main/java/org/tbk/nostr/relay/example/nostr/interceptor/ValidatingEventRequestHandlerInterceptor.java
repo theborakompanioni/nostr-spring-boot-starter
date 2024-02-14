@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ValidatingEventRequestHandlerInterceptor implements NostrRequestHandlerInterceptor {
+public class ValidatingEventRequestHandlerInterceptor implements RequestHandlerInterceptor {
 
     @NonNull
     private final List<EventValidator> validators;

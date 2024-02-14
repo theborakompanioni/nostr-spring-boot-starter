@@ -12,7 +12,7 @@ import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
-import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
+import org.tbk.nostr.relay.example.nostr.interceptor.RequestHandlerInterceptor;
 import org.tbk.nostr.util.MorePublicKeys;
 import org.tbk.nostr.util.MoreTags;
 
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
-public class Nip9RequestHandlerInterceptor implements NostrRequestHandlerInterceptor {
+public class Nip9RequestHandlerInterceptor implements RequestHandlerInterceptor {
 
     @NonNull
     private final Nip9Support support;

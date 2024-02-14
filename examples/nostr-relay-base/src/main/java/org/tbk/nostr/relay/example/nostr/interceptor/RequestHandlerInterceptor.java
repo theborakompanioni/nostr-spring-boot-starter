@@ -25,7 +25,7 @@ import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
  * for certain groups of handlers, to add common preprocessing behavior
  * without needing to modify each handler implementation.
  */
-public interface NostrRequestHandlerInterceptor {
+public interface RequestHandlerInterceptor {
 
     /**
      * Interception point before the execution of a handler.

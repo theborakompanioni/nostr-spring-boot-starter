@@ -8,14 +8,14 @@ import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
-import org.tbk.nostr.relay.example.nostr.interceptor.NostrRequestHandlerInterceptor;
+import org.tbk.nostr.relay.example.nostr.interceptor.RequestHandlerInterceptor;
 import org.tbk.nostr.util.MorePublicKeys;
 
 import java.time.Duration;
 
 @Slf4j
 @RequiredArgsConstructor
-public class EphemeralEventRequestHandlerInterceptor implements NostrRequestHandlerInterceptor {
+public class EphemeralEventRequestHandlerInterceptor implements RequestHandlerInterceptor {
 
     @NonNull
     private final Nip1Support support;

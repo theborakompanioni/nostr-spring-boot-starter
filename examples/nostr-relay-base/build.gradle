@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr relay base package'
+
+
+dependencies {
+    api project(':nostr:nostr-core')
+
+    api 'io.projectreactor:reactor-core'
+
+    api 'org.springframework:spring-websocket'
+}

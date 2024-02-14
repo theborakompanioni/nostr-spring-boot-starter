@@ -18,7 +18,7 @@ import org.tbk.nostr.relay.example.nostr.NostrWebSocketHandler;
 import org.tbk.nostr.relay.example.nostr.extension.nip1.DefaultReqRequestHandler;
 import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
 import org.tbk.nostr.relay.example.nostr.handler.*;
-import org.tbk.nostr.relay.example.nostr.support.DefaultUnknownRequestHandler;
+import org.tbk.nostr.relay.example.nostr.handler.DefaultUnknownRequestHandler;
 
 @Slf4j
 @Configuration(proxyBeanMethods = false)
