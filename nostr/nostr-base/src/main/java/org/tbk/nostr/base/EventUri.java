@@ -51,7 +51,6 @@ public final class EventUri {
     @NonNull
     private final Kind kind;
 
-
     @EqualsAndHashCode.Include
     @Getter
     @NonNull
@@ -75,10 +74,6 @@ public final class EventUri {
 
     public Optional<String> getIdentifier() {
         return Optional.ofNullable(identifier);
-    }
-
-    public URI toUri() {
-        return URI.create(this.toString());
     }
 
     @Override

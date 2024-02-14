@@ -11,6 +11,18 @@ import java.util.stream.IntStream;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class EventId implements Comparable<EventId> {
 
+    public static boolean isValidEventIdString(String value) {
+        if (value.length() != 64) {
+            return false;
+        } else {
+            try {
+                return HexFormat.of().parseHex(value).length == 32;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
+
     public static EventId fromHex(String id) {
         return of(HexFormat.of().parseHex(id));
     }
