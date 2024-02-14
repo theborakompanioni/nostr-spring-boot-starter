@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr relay autoconfigure package'
+
+dependencies {
+    compileOnly project(':examples:nostr-relay-core')
+
+    implementation 'org.springframework:spring-websocket'
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+
+    annotationProcessor 'org.springframework.boot:spring-boot-autoconfigure-processor'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+}

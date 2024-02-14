@@ -66,11 +66,13 @@ class NostrRelayExampleApplicationConfig {
         return new ExampleCountRequestHandlerImpl();
     }
 
+    // request handler
     @Bean
     @ConditionalOnMissingBean(UnknownRequestHandler.class)
     UnknownRequestHandler defaultUnknownRequestHandler() {
         return new DefaultUnknownRequestHandler();
     }
+    // request handler - end
 
     @Bean
     NostrWebSocketHandler nostrRelayExampleWebSocketHandler(ReqRequestHandler reqRequestHandler,
