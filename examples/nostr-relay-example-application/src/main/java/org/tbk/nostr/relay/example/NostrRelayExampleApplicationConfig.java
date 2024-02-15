@@ -60,14 +60,16 @@ class NostrRelayExampleApplicationConfig {
                                                             EventRequestHandler eventRequestHandler,
                                                             CloseRequestHandler closeRequestHandler,
                                                             CountRequestHandler countRequestHandler,
-                                                            UnknownRequestHandler unknownRequestHandler) {
+                                                            UnknownRequestHandler unknownRequestHandler,
+                                                            ParseErrorHandler parseErrorHandler) {
         return new ExampleNostrWebSocketHandlerImpl(
                 this.properties,
                 reqRequestHandler,
                 eventRequestHandler,
                 closeRequestHandler,
                 countRequestHandler,
-                unknownRequestHandler
+                unknownRequestHandler,
+                parseErrorHandler
         );
     }
 }

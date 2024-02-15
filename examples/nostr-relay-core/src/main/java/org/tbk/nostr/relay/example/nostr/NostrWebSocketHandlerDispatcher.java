@@ -41,7 +41,7 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
         try {
             request = JsonReader.fromJson(message.getPayload(), Request.newBuilder());
         } catch (Exception e) {
-            handler.handleJsonParseException(sessionWrapper, message, e);
+            handler.handleParseError(sessionWrapper, message, e);
         }
 
         if (request != null) {

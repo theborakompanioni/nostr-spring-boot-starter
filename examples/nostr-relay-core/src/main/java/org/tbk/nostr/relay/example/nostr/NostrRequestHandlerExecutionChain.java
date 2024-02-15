@@ -57,5 +57,4 @@ public class NostrRequestHandlerExecutionChain {
             interceptor.postHandle(session, request);
         }
     }
-
 }

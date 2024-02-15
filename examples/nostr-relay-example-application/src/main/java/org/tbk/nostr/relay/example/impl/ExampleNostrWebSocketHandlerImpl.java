@@ -22,8 +22,9 @@ public class ExampleNostrWebSocketHandlerImpl extends NostrRequestHandlerSupport
                                             EventRequestHandler eventRequestHandler,
                                             CloseRequestHandler closeRequestHandler,
                                             CountRequestHandler countRequestHandler,
-                                            UnknownRequestHandler unknownRequestHandler) {
-        super(reqRequestHandler, eventRequestHandler, closeRequestHandler, countRequestHandler, unknownRequestHandler);
+                                            UnknownRequestHandler unknownRequestHandler,
+                                            ParseErrorHandler parseErrorHandler) {
+        super(reqRequestHandler, eventRequestHandler, closeRequestHandler, countRequestHandler, unknownRequestHandler, parseErrorHandler);
         this.greeting = requireNonNull(properties).getGreeting().orElse(null);
     }
 

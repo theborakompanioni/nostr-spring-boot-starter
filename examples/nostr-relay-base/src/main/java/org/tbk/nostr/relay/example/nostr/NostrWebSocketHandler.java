@@ -1,7 +1,6 @@
 package org.tbk.nostr.relay.example.nostr;
 
 import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 
@@ -10,10 +9,8 @@ public interface NostrWebSocketHandler extends
         EventRequestHandler,
         CloseRequestHandler,
         CountRequestHandler,
-        UnknownRequestHandler {
-
-    void handleJsonParseException(NostrWebSocketSession session, TextMessage message, Exception e) throws Exception;
-
+        UnknownRequestHandler,
+        ParseErrorHandler {
     /**
      * Invoked after WebSocket negotiation has succeeded and the WebSocket connection is
      * opened and ready for use.

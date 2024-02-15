@@ -2,9 +2,8 @@ package org.tbk.nostr.relay.example.nostr;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.socket.TextMessage;
 import org.tbk.nostr.proto.*;
-import org.tbk.nostr.relay.example.nostr.AbstractNostrWebSocketHandler;
-import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 
 @RequiredArgsConstructor
@@ -24,6 +23,15 @@ public abstract class NostrRequestHandlerSupport extends AbstractNostrWebSocketH
 
     @NonNull
     private final UnknownRequestHandler unknownRequestHandler;
+
+    @NonNull
+    private final ParseErrorHandler parseErrorHandler;
+
+
+    @Override
+    public final void handleParseError(NostrWebSocketSession session, TextMessage message, Exception e) throws Exception {
+        parseErrorHandler.handleParseError(session, message, e);
+    }
 
     @Override
     public final void handleReqMessage(NostrWebSocketSession session, ReqRequest req) throws Exception {

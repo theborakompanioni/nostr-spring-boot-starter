@@ -10,10 +10,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.tbk.nostr.relay.example.nostr.extension.nip1.ReplaceableEventValidator;
-import org.tbk.nostr.relay.example.nostr.handler.DefaultReqRequestHandler;
-import org.tbk.nostr.relay.example.nostr.handler.DefaultUnknownRequestHandler;
-import org.tbk.nostr.relay.example.nostr.handler.ReqRequestHandler;
-import org.tbk.nostr.relay.example.nostr.handler.UnknownRequestHandler;
+import org.tbk.nostr.relay.example.nostr.handler.*;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxFilterCountReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxLimitPerFilterReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.RequestHandlerInterceptor;
@@ -82,9 +79,15 @@ class NostrRelayAutoConfiguration {
     }
 
     @Bean
-        //@ConditionalOnMissingBean(UnknownRequestHandler.class)
+    //@ConditionalOnMissingBean(UnknownRequestHandler.class)
     UnknownRequestHandler defaultUnknownRequestHandler() {
         return new DefaultUnknownRequestHandler();
+    }
+
+    @Bean
+    //@ConditionalOnMissingBean(ParseErrorHandler.class)
+    ParseErrorHandler defaultParseErrorHandler() {
+        return new DefaultParseErrorHandler();
     }
     // request handler - end
 
