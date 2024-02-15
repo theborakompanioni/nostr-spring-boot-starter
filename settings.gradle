@@ -14,6 +14,7 @@ include 'nostr:nostr-example-application'
 include 'examples:nostr-relay-base'
 include 'examples:nostr-relay-core'
 include 'examples:nostr-relay-nip1'
+include 'examples:nostr-relay-nip9'
 include 'examples:nostr-relay-autoconfigure'
 include 'examples:nostr-relay-starter'
 

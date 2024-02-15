@@ -20,7 +20,7 @@ import org.tbk.nostr.relay.example.domain.event.EventEntity;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.relay.example.domain.event.EventEntitySpecifications;
 import org.tbk.nostr.relay.example.nostr.extension.nip40.Nip40Support;
-import org.tbk.nostr.relay.example.nostr.extension.nip9.Nip9Support;
+import org.tbk.nostr.relay.nip9.Nip9Support;
 import org.tbk.nostr.relay.nip1.Nip1Support;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

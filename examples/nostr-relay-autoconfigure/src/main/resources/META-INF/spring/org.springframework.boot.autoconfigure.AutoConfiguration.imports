@@ -1,4 +1,5 @@
 org.tbk.nostr.relay.config.NostrRelayAutoConfiguration
 org.tbk.nostr.relay.config.NostrRelayWebSocketAutoConfiguration
 org.tbk.nostr.relay.config.nip1.Nip1AutoConfiguration
+org.tbk.nostr.relay.config.nip9.Nip9AutoConfiguration
 

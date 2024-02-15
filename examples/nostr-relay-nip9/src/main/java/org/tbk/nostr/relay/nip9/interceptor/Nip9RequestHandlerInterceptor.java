@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.extension.nip9;
+package org.tbk.nostr.relay.nip9.interceptor;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.NonNull;
@@ -13,6 +13,7 @@ import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.relay.NostrWebSocketSession;
 import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
+import org.tbk.nostr.relay.nip9.Nip9Support;
 import org.tbk.nostr.util.MorePublicKeys;
 import org.tbk.nostr.util.MoreTags;
 

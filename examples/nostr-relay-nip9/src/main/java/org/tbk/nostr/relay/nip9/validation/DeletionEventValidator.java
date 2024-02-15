@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.extension.nip9;
+package org.tbk.nostr.relay.nip9.validation;
 
 import lombok.AllArgsConstructor;
 import org.springframework.validation.Errors;
