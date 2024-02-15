@@ -2,14 +2,13 @@ package org.tbk.nostr.relay.example.nostr;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.tbk.nostr.relay.example.nostr.handler.DefaultUnknownRequestHandler;
+import org.tbk.nostr.relay.example.nostr.handler.UnknownRequestHandler;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxFilterCountReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxLimitPerFilterReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.RequestHandlerInterceptor;
@@ -20,29 +19,14 @@ import org.tbk.nostr.relay.example.nostr.validating.EventValidator;
 
 import java.util.List;
 
-@EnableWebSocket
 @ConditionalOnWebApplication
-@ConditionalOnClass(WebSocketConfigurer.class)
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(NostrRelayProperties.class)
 @RequiredArgsConstructor
-class NostrRelayConfiguration {
+class NostrRelayAutoConfiguration {
 
     @NonNull
     private final NostrRelayProperties relayProperties;
-
-    @NonNull
-    private final NostrWebSocketHandler nostrWebSocketHandler;
-
-    @Bean
-    NostrRequestHandlerExecutionChain nostrRequestHandlerExecutionChain(List<RequestHandlerInterceptor> interceptors) {
-        return new NostrRequestHandlerExecutionChain(interceptors);
-    }
-
-    @Bean
-    NostrWebSocketHandlerDispatcher nostrWebSocketHandlerDispatcher(NostrRequestHandlerExecutionChain executionChain) {
-        return new NostrWebSocketHandlerDispatcher(executionChain, nostrWebSocketHandler);
-    }
 
     // validators
     @Bean
@@ -77,4 +61,24 @@ class NostrRelayConfiguration {
         return new MaxFilterCountReqRequestHandlerInterceptor(relayProperties.getMaxFilterCount());
     }
     // interceptors - end
+
+    // request handler
+    @Bean
+    //@ConditionalOnMissingBean(UnknownRequestHandler.class)
+    UnknownRequestHandler defaultUnknownRequestHandler() {
+        return new DefaultUnknownRequestHandler();
+    }
+    // request handler - end
+
+
+    @Bean
+    NostrRequestHandlerExecutionChain nostrRequestHandlerExecutionChain(List<RequestHandlerInterceptor> interceptors) {
+        return new NostrRequestHandlerExecutionChain(interceptors);
+    }
+
+    @Bean
+    NostrWebSocketHandlerDispatcher nostrWebSocketHandlerDispatcher(NostrRequestHandlerExecutionChain executionChain,
+                                                                    NostrWebSocketHandler nostrWebSocketHandler) {
+        return new NostrWebSocketHandlerDispatcher(executionChain, nostrWebSocketHandler);
+    }
 }

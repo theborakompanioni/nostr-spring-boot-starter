@@ -44,13 +44,6 @@ class NostrRelayExampleApplicationConfig {
         return new NipSupportService(eventEntityService, asyncThreadPoolTaskExecutor);
     }
 
-    // TODO: move to own autoconfigure module
-    @Bean
-    @ConditionalOnMissingBean(ReqRequestHandler.class)
-    DefaultReqRequestHandler defaultReqRequestHandler(Nip1Support support) {
-        return new DefaultReqRequestHandler(support);
-    }
-
     @Bean
     EventRequestHandler exampleEventRequestHandler(EventEntityService eventEntityService) {
         return new ExampleEventRequestHandlerImpl(eventEntityService);
@@ -65,14 +58,6 @@ class NostrRelayExampleApplicationConfig {
     CountRequestHandler exampleCountRequestHandler() {
         return new ExampleCountRequestHandlerImpl();
     }
-
-    // request handler
-    @Bean
-    @ConditionalOnMissingBean(UnknownRequestHandler.class)
-    UnknownRequestHandler defaultUnknownRequestHandler() {
-        return new DefaultUnknownRequestHandler();
-    }
-    // request handler - end
 
     @Bean
     NostrWebSocketHandler nostrRelayExampleWebSocketHandler(ReqRequestHandler reqRequestHandler,

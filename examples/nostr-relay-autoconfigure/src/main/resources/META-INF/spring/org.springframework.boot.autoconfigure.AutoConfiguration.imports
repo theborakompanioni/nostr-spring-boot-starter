@@ -1,1 +1,3 @@
-org.tbk.nostr.relay.example.nostr.NostrRelayConfiguration
+org.tbk.nostr.relay.example.nostr.NostrRelayAutoConfiguration
+org.tbk.nostr.relay.example.nostr.NostrRelayWebSocketAutoConfiguration
+
