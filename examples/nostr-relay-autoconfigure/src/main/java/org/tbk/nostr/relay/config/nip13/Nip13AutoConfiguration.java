@@ -9,12 +9,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.tbk.nostr.relay.config.NostrRelayAutoConfiguration;
-import org.tbk.nostr.relay.nip13.validation.PowEventValidator;
+import org.tbk.nostr.relay.nip13.validation.ProofOfWorkEventValidator;
 
 @AutoConfiguration
 @AutoConfigureBefore(NostrRelayAutoConfiguration.class)
 @EnableConfigurationProperties(Nip13Properties.class)
-@ConditionalOnClass(PowEventValidator.class)
+@ConditionalOnClass(ProofOfWorkEventValidator.class)
 @ConditionalOnProperty(value = "org.tbk.nostr.nip13.enabled")
 @RequiredArgsConstructor
 class Nip13AutoConfiguration {
@@ -23,7 +23,7 @@ class Nip13AutoConfiguration {
     private final Nip13Properties properties;
 
     @Bean
-    PowEventValidator powEventValidator() {
-        return new PowEventValidator(this.properties.getMinPowDifficulty(), this.properties.getRequireCommitment());
+    ProofOfWorkEventValidator proofOfWorkEventValidator() {
+        return new ProofOfWorkEventValidator(this.properties.getMinPowDifficulty(), this.properties.getRequireCommitment());
     }
 }

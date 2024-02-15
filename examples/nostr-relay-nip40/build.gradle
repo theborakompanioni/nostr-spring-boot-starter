@@ -1,0 +1,11 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr relay nip40 package'
+
+dependencies {
+    api project(':examples:nostr-relay-base')
+
+    api 'io.projectreactor:reactor-core'
+}

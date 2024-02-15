@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.extension.nip40;
+package org.tbk.nostr.relay.nip40.interceptor;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +9,11 @@ import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.relay.NostrWebSocketSession;
 import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
+import org.tbk.nostr.relay.nip40.Nip40Support;
 
 @Slf4j
 @RequiredArgsConstructor
-public class Nip40RequestHandlerInterceptor implements RequestHandlerInterceptor {
+public class ExpiringEventHandlerInterceptor implements RequestHandlerInterceptor {
 
     @NonNull
     private final Nip40Support support;

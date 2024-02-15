@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
-public class Nip9RequestHandlerInterceptor implements RequestHandlerInterceptor {
+public class DeletionEventHandlerInterceptor implements RequestHandlerInterceptor {
 
     @NonNull
     private final Nip9Support support;

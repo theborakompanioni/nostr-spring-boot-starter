@@ -5,13 +5,13 @@ import org.tbk.nostr.nips.Nip13;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.relay.validation.EventValidator;
 
-public class PowEventValidator implements EventValidator {
+public class ProofOfWorkEventValidator implements EventValidator {
 
     private final int minPowDifficulty;
 
     private final boolean requireCommitment;
 
-    public PowEventValidator(int minPowDifficulty, boolean requireCommitment) {
+    public ProofOfWorkEventValidator(int minPowDifficulty, boolean requireCommitment) {
         if (minPowDifficulty < 0 || minPowDifficulty > 256) {
             throw new IllegalArgumentException("'minPowDifficulty' must be between 0 and 256.");
         }

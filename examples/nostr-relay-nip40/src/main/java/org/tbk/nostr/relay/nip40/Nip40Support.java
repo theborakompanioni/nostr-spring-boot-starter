@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.extension.nip40;
+package org.tbk.nostr.relay.nip40;
 
 import org.tbk.nostr.base.EventId;
 import reactor.core.publisher.Mono;
