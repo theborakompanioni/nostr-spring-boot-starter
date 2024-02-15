@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.validating;
+package org.tbk.nostr.relay.example.nostr.validation;
 
 import org.springframework.util.Assert;
 import org.springframework.validation.Errors;

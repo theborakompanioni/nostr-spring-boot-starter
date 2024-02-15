@@ -5,7 +5,7 @@ import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
-import org.tbk.nostr.relay.example.nostr.validating.EventValidator;
+import org.tbk.nostr.relay.example.nostr.validation.EventValidator;
 
 public class ReplaceableEventValidator implements EventValidator {
 

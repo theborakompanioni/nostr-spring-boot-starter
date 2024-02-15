@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.validating;
+package org.tbk.nostr.relay.example.nostr.validation;
 
 import lombok.AllArgsConstructor;
 import org.springframework.validation.Errors;

@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -11,14 +12,15 @@ import org.springframework.core.annotation.Order;
 import org.tbk.nostr.relay.example.nostr.extension.nip1.ReplaceableEventValidator;
 import org.tbk.nostr.relay.example.nostr.handler.DefaultReqRequestHandler;
 import org.tbk.nostr.relay.example.nostr.handler.DefaultUnknownRequestHandler;
+import org.tbk.nostr.relay.example.nostr.handler.ReqRequestHandler;
 import org.tbk.nostr.relay.example.nostr.handler.UnknownRequestHandler;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxFilterCountReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxLimitPerFilterReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.RequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.ValidatingEventRequestHandlerInterceptor;
-import org.tbk.nostr.relay.example.nostr.validating.CreatedAtLimitEventValidator;
-import org.tbk.nostr.relay.example.nostr.validating.DefaultEventValidator;
-import org.tbk.nostr.relay.example.nostr.validating.EventValidator;
+import org.tbk.nostr.relay.example.nostr.validation.CreatedAtLimitEventValidator;
+import org.tbk.nostr.relay.example.nostr.validation.DefaultEventValidator;
+import org.tbk.nostr.relay.example.nostr.validation.EventValidator;
 
 import java.util.List;
 

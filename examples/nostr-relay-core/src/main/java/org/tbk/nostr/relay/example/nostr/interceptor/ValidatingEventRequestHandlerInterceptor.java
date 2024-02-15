@@ -8,7 +8,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.ValidationUtils;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
-import org.tbk.nostr.relay.example.nostr.validating.EventValidator;
+import org.tbk.nostr.relay.example.nostr.validation.EventValidator;
 
 import java.util.List;
 
