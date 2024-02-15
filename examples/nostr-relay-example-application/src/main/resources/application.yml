@@ -48,7 +48,6 @@ org.tbk.nostr.relay:
 
 org.tbk.nostr.nip11:
   enabled: true
-  path: ${org.tbk.nostr.relay.example.relay-options.websocket-path}
   relay-info:
     name: ${spring.application.name}
     description: A spring boot nostr relay example application

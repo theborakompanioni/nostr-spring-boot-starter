@@ -1,6 +1,5 @@
 package org.tbk.nostr.relay.config.nip9;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -16,8 +15,7 @@ import org.tbk.nostr.relay.nip9.validation.DeletionEventValidator;
 @ConditionalOnClass(Nip9Support.class)
 @AutoConfiguration
 @AutoConfigureBefore(NostrRelayAutoConfiguration.class)
-@RequiredArgsConstructor
-class Nip9AutoConfiguration {
+public class Nip9AutoConfiguration {
 
     @Bean
     Nip9RequestHandlerInterceptor nip9RequestHandlerInterceptor(Nip9Support support) {

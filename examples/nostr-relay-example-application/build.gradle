@@ -10,7 +10,6 @@ byteBuddy {
 }
 
 dependencies {
-    implementation project(':nostr:nostr-nip11')
     implementation project(':examples:nostr-relay-starter')
 
     implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
@@ -24,12 +23,12 @@ dependencies {
     implementation "org.xerial:sqlite-jdbc:${sqliteVersion}"
     implementation "org.hibernate.orm:hibernate-community-dialects:${hibernateCommunityDialectsVersion}"
 
-    implementation "org.jmolecules:jmolecules-ddd"
-    implementation "org.jmolecules:jmolecules-events"
-    implementation "org.jmolecules.integrations:jmolecules-jpa"
-    implementation "org.jmolecules.integrations:jmolecules-ddd-integration"
-    implementation "org.jmolecules.integrations:jmolecules-spring"
-    implementation "org.jmolecules.integrations:jmolecules-jackson"
+    implementation 'org.jmolecules:jmolecules-ddd'
+    implementation 'org.jmolecules:jmolecules-events'
+    implementation 'org.jmolecules.integrations:jmolecules-jpa'
+    implementation 'org.jmolecules.integrations:jmolecules-ddd-integration'
+    implementation 'org.jmolecules.integrations:jmolecules-spring'
+    implementation 'org.jmolecules.integrations:jmolecules-jackson'
 
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

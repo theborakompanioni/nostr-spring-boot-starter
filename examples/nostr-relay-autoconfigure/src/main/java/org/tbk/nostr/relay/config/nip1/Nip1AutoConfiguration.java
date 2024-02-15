@@ -1,6 +1,5 @@
 package org.tbk.nostr.relay.config.nip1;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -18,7 +17,6 @@ import org.tbk.nostr.relay.nip1.validation.ReplaceableEventValidator;
 @ConditionalOnClass(Nip1Support.class)
 @AutoConfiguration
 @AutoConfigureBefore(NostrRelayAutoConfiguration.class)
-@RequiredArgsConstructor
 public class Nip1AutoConfiguration {
 
     // validators

@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.extension.nip11;
+package org.tbk.nostr.relay.nip11;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +15,7 @@ import java.util.Enumeration;
 import static java.util.Objects.requireNonNull;
 
 
-class RelayInfoWriterFilter implements Filter {
+public class RelayInfoWriterFilter implements Filter {
     private static final String APPLICATION_JSON_NOSTR_VALUE = new MediaType("application", "nostr+json").toString();
 
     private final String path;

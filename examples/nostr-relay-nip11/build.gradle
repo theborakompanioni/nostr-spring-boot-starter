@@ -1,0 +1,12 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr relay nip11 package'
+
+dependencies {
+    api project(':nostr:nostr-nip11')
+
+    compileOnly 'jakarta.servlet:jakarta.servlet-api'
+    api 'org.springframework:spring-web'
+}

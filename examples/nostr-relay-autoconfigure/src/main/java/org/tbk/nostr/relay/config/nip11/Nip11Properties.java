@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.extension.nip11;
+package org.tbk.nostr.relay.config.nip11;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.AllArgsConstructor;
@@ -23,28 +23,21 @@ import java.util.List;
 )
 @Getter
 @AllArgsConstructor(onConstructor = @__(@ConstructorBinding))
-public class Nip11ExtensionProperties implements Validator {
+public class Nip11Properties implements Validator {
 
     private boolean enabled;
-
-    private String path;
 
     private RelayInfoProperties relayInfo;
 
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz == Nip11ExtensionProperties.class;
+        return clazz == Nip11Properties.class;
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        Nip11ExtensionProperties properties = (Nip11ExtensionProperties) target;
-
-        if (properties.path == null || properties.path.isBlank()) {
-            String errorMessage = "'path' must not be empty and should represent a URL path";
-            errors.rejectValue("path", "path.invalid", errorMessage);
-        }
+        Nip11Properties properties = (Nip11Properties) target;
 
         errors.pushNestedPath("relayInfo");
         ValidationUtils.invokeValidator(properties.relayInfo, properties.relayInfo, errors);
