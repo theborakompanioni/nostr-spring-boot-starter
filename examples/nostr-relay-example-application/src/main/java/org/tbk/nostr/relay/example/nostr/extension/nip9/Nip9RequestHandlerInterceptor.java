@@ -11,8 +11,8 @@ import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.TagValue;
-import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
-import org.tbk.nostr.relay.example.nostr.interceptor.RequestHandlerInterceptor;
+import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
 import org.tbk.nostr.util.MorePublicKeys;
 import org.tbk.nostr.util.MoreTags;
 

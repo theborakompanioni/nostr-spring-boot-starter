@@ -6,7 +6,7 @@ import org.tbk.nostr.proto.NoticeResponse;
 import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties;
-import org.tbk.nostr.relay.example.nostr.handler.DefaultConnectionEstablishedHandler;
+import org.tbk.nostr.relay.handler.DefaultConnectionEstablishedHandler;
 
 import javax.annotation.Nullable;
 

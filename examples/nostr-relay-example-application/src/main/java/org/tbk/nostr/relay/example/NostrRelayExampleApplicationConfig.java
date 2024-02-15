@@ -12,8 +12,13 @@ import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
-import org.tbk.nostr.relay.example.impl.*;
-import org.tbk.nostr.relay.example.nostr.handler.*;
+import org.tbk.nostr.relay.example.impl.ExampleCloseRequestHandlerImpl;
+import org.tbk.nostr.relay.example.impl.ExampleConnectionEstablishedHandler;
+import org.tbk.nostr.relay.example.impl.ExampleCountRequestHandlerImpl;
+import org.tbk.nostr.relay.example.impl.NostrSupportService;
+import org.tbk.nostr.relay.handler.CloseRequestHandler;
+import org.tbk.nostr.relay.handler.ConnectionEstablishedHandler;
+import org.tbk.nostr.relay.handler.CountRequestHandler;
 
 @Slf4j
 @Configuration(proxyBeanMethods = false)
@@ -35,8 +40,8 @@ class NostrRelayExampleApplicationConfig {
     }
 
     @Bean
-    NipSupportService nipSupportService(EventEntityService eventEntityService, ThreadPoolTaskExecutor asyncThreadPoolTaskExecutor) {
-        return new NipSupportService(eventEntityService, asyncThreadPoolTaskExecutor);
+    NostrSupportService nipSupportService(EventEntityService eventEntityService, ThreadPoolTaskExecutor asyncThreadPoolTaskExecutor) {
+        return new NostrSupportService(eventEntityService, asyncThreadPoolTaskExecutor);
     }
 
     @Bean

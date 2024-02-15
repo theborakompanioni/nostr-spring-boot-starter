@@ -2,8 +2,8 @@ package org.tbk.nostr.relay.example.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.tbk.nostr.proto.CountRequest;
-import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
-import org.tbk.nostr.relay.example.nostr.handler.CountRequestHandler;
+import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.handler.CountRequestHandler;
 
 @RequiredArgsConstructor
 public class ExampleCountRequestHandlerImpl implements CountRequestHandler {

@@ -7,8 +7,8 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.nips.Nip40;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
-import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
-import org.tbk.nostr.relay.example.nostr.interceptor.RequestHandlerInterceptor;
+import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.Errors;
 import org.tbk.nostr.nips.Nip13;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.relay.example.nostr.validation.EventValidator;
+import org.tbk.nostr.relay.validation.EventValidator;
 
 @RequiredArgsConstructor
 class PowEventValidator implements EventValidator {

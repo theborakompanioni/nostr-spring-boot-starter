@@ -11,7 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.relay.example.nostr.NostrRelayProperties;
+import org.tbk.nostr.relay.config.NostrRelayProperties;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.template.SimpleNostrTemplate;
 

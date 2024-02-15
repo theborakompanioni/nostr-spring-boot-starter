@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.Optional;
 

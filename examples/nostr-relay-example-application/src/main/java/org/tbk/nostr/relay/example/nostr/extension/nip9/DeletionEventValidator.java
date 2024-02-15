@@ -7,7 +7,7 @@ import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
-import org.tbk.nostr.relay.example.nostr.validation.EventValidator;
+import org.tbk.nostr.relay.validation.EventValidator;
 import org.tbk.nostr.util.MoreTags;
 
 import java.util.HexFormat;
