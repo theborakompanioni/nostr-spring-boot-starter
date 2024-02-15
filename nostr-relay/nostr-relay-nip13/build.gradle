@@ -5,5 +5,5 @@ plugins {
 description = 'nostr relay nip13 package'
 
 dependencies {
-    api project(':examples:nostr-relay-base')
+    api project(':nostr-relay:nostr-relay-base')
 }

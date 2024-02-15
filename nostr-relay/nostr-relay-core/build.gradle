@@ -6,7 +6,7 @@ description = 'nostr relay core package'
 
 
 dependencies {
-    api project(':examples:nostr-relay-base')
+    api project(':nostr-relay:nostr-relay-base')
 
     api 'io.projectreactor:reactor-core'
 }
