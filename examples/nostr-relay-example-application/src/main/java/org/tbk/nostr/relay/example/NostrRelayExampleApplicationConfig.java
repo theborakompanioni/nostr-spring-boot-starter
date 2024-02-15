@@ -13,7 +13,6 @@ import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.relay.example.impl.*;
-import org.tbk.nostr.relay.example.nostr.NostrWebSocketHandler;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 
 @Slf4j
@@ -38,11 +37,6 @@ class NostrRelayExampleApplicationConfig {
     @Bean
     NipSupportService nipSupportService(EventEntityService eventEntityService, ThreadPoolTaskExecutor asyncThreadPoolTaskExecutor) {
         return new NipSupportService(eventEntityService, asyncThreadPoolTaskExecutor);
-    }
-
-    @Bean
-    EventRequestHandler exampleEventRequestHandler(EventEntityService eventEntityService) {
-        return new ExampleEventRequestHandlerImpl(eventEntityService);
     }
 
     @Bean

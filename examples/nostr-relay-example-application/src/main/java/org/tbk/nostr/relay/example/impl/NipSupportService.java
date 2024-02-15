@@ -2,15 +2,19 @@ package org.tbk.nostr.relay.example.impl;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.NonNull;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.UncategorizedDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.sqlite.SQLiteException;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
+import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.relay.example.domain.event.EventEntity;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.relay.example.domain.event.EventEntitySpecifications;
@@ -38,6 +42,47 @@ public class NipSupportService implements NostrSupport, Nip1Support, Nip9Support
         this.eventEntityService = requireNonNull(eventEntityService);
         this.asyncScheduler = Schedulers.fromExecutor(requireNonNull(asyncThreadPoolTaskExecutor));
     }
+
+    @Override
+    public Mono<OkResponse> createEvent(Event event) {
+        return Mono.fromCallable(() -> {
+            OkResponse.Builder okBuilder = OkResponse.newBuilder()
+                    .setEventId(event.getId())
+                    .setSuccess(false);
+
+            try {
+                EventEntity eventEntity = eventEntityService.createEvent(event);
+                okBuilder.setSuccess(eventEntity != null);
+            } catch (Exception e) {
+                okBuilder.mergeFrom(handleEventMessageException(e, okBuilder).buildPartial());
+            }
+
+            return okBuilder.build();
+        });
+    }
+
+    private static OkResponse.Builder handleEventMessageException(Exception e, OkResponse.Builder okBuilder) {
+        if (e instanceof UncategorizedDataAccessException udae) {
+            okBuilder.setMessage("Error: %s".formatted("Undefined storage error."));
+
+            Throwable mostSpecificCause = udae.getMostSpecificCause();
+            if (mostSpecificCause instanceof SQLiteException sqliteException) {
+                okBuilder.setMessage("Error: %s".formatted("Storage error (%d).".formatted(sqliteException.getResultCode().code)));
+                switch (sqliteException.getResultCode()) {
+                    case SQLITE_CONSTRAINT_UNIQUE, SQLITE_CONSTRAINT_PRIMARYKEY ->
+                            okBuilder.setMessage("Error: %s".formatted("Duplicate event."));
+                    case SQLITE_CONSTRAINT_CHECK -> okBuilder.setMessage("Error: %s".formatted("Check failed."));
+                }
+            }
+        } else if (e instanceof DataIntegrityViolationException) {
+            okBuilder.setMessage("Error: %s".formatted("Duplicate event."));
+        } else {
+            okBuilder.setMessage("Error: %s".formatted("Unknown reason."));
+        }
+
+        return okBuilder;
+    }
+
 
     @Override
     public Flux<Event> findAll(Collection<Filter> filters) {

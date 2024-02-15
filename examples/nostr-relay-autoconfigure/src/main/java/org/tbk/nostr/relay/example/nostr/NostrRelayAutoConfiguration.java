@@ -24,7 +24,7 @@ import java.util.List;
 @AutoConfiguration
 @EnableConfigurationProperties(NostrRelayProperties.class)
 @RequiredArgsConstructor
-class NostrRelayAutoConfiguration {
+public class NostrRelayAutoConfiguration {
 
     @NonNull
     private final NostrRelayProperties relayProperties;
@@ -67,8 +67,15 @@ class NostrRelayAutoConfiguration {
     @Bean
     @ConditionalOnBean(NostrSupport.class)
     @ConditionalOnMissingBean(ReqRequestHandler.class)
-    DefaultReqRequestHandler defaultReqRequestHandler(NostrSupport support) {
+    ReqRequestHandler defaultReqRequestHandler(NostrSupport support) {
         return new DefaultReqRequestHandler(support);
+    }
+
+    @Bean
+    @ConditionalOnBean(NostrSupport.class)
+    @ConditionalOnMissingBean(EventRequestHandler.class)
+    EventRequestHandler defaultEventRequestHandler(NostrSupport support) {
+        return new DefaultEventRequestHandler(support);
     }
 
     @Bean

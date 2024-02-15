@@ -6,7 +6,7 @@
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples/nostr-relay-example-application" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.tbk.nostr.relay.example.impl.*" />
+        <option name="PATTERN" value="org.tbk.nostr.relay.example.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

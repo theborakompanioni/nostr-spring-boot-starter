@@ -8,7 +8,7 @@ import org.springframework.web.socket.WebSocketSession;
 public class DefaultConnectionClosedHandler implements ConnectionClosedHandler {
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("WebSocket connection closed ({}): {}", closeStatus.getCode(), session.getId());
         }

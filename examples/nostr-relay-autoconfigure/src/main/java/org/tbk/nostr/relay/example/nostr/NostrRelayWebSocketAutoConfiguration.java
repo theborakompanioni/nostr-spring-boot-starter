@@ -18,7 +18,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 @ConditionalOnClass(WebSocketConfigurer.class)
 @AutoConfiguration
 @RequiredArgsConstructor
-class NostrRelayWebSocketAutoConfiguration implements WebSocketConfigurer {
+public class NostrRelayWebSocketAutoConfiguration implements WebSocketConfigurer {
 
     @NonNull
     private final NostrRelayProperties relayProperties;
