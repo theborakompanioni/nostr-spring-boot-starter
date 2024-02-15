@@ -3,10 +3,13 @@ package org.tbk.nostr.relay.example.nostr;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
+import org.tbk.nostr.relay.example.nostr.extension.nip1.ReplaceableEventValidator;
+import org.tbk.nostr.relay.example.nostr.handler.DefaultReqRequestHandler;
 import org.tbk.nostr.relay.example.nostr.handler.DefaultUnknownRequestHandler;
 import org.tbk.nostr.relay.example.nostr.handler.UnknownRequestHandler;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxFilterCountReqRequestHandlerInterceptor;
@@ -40,6 +43,12 @@ class NostrRelayAutoConfiguration {
     CreatedAtLimitEventValidator createdAtLimitEventValidator() {
         return new CreatedAtLimitEventValidator(relayProperties.getCreatedAtLowerLimit(), relayProperties.getCreatedAtUpperLimit());
     }
+
+    @Bean
+    @Order(20)
+    ReplaceableEventValidator replaceableEventValidator() {
+        return new ReplaceableEventValidator();
+    }
     // validators - end
 
     // interceptors
@@ -51,25 +60,31 @@ class NostrRelayAutoConfiguration {
 
     @Bean
     @Order(10)
-    MaxLimitPerFilterReqRequestHandlerInterceptor maxLimitPerFilterReqRequestHandlerInterceptor() {
-        return new MaxLimitPerFilterReqRequestHandlerInterceptor(relayProperties.getMaxLimitPerFilter());
+    MaxFilterCountReqRequestHandlerInterceptor maxFilterCountReqRequestHandlerInterceptor() {
+        return new MaxFilterCountReqRequestHandlerInterceptor(relayProperties.getMaxFilterCount());
     }
 
     @Bean
-    @Order(10)
-    MaxFilterCountReqRequestHandlerInterceptor maxFilterCountReqRequestHandlerInterceptor() {
-        return new MaxFilterCountReqRequestHandlerInterceptor(relayProperties.getMaxFilterCount());
+    @Order(20)
+    MaxLimitPerFilterReqRequestHandlerInterceptor maxLimitPerFilterReqRequestHandlerInterceptor() {
+        return new MaxLimitPerFilterReqRequestHandlerInterceptor(relayProperties.getMaxLimitPerFilter());
     }
     // interceptors - end
 
     // request handler
     @Bean
-    //@ConditionalOnMissingBean(UnknownRequestHandler.class)
+    @ConditionalOnBean(NostrSupport.class)
+    //@ConditionalOnMissingBean(ReqRequestHandler.class)
+    DefaultReqRequestHandler defaultReqRequestHandler(NostrSupport support) {
+        return new DefaultReqRequestHandler(support);
+    }
+
+    @Bean
+        //@ConditionalOnMissingBean(UnknownRequestHandler.class)
     UnknownRequestHandler defaultUnknownRequestHandler() {
         return new DefaultUnknownRequestHandler();
     }
     // request handler - end
-
 
     @Bean
     NostrRequestHandlerExecutionChain nostrRequestHandlerExecutionChain(List<RequestHandlerInterceptor> interceptors) {

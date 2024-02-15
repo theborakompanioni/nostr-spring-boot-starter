@@ -3,7 +3,6 @@ package org.tbk.nostr.relay.example;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,10 +14,7 @@ import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.relay.example.impl.*;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketHandler;
-import org.tbk.nostr.relay.example.nostr.extension.nip1.DefaultReqRequestHandler;
-import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
 import org.tbk.nostr.relay.example.nostr.handler.*;
-import org.tbk.nostr.relay.example.nostr.handler.DefaultUnknownRequestHandler;
 
 @Slf4j
 @Configuration(proxyBeanMethods = false)

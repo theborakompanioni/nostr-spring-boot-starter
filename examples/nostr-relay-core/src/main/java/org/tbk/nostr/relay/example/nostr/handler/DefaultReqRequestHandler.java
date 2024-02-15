@@ -1,11 +1,11 @@
-package org.tbk.nostr.relay.example.nostr.extension.nip1;
+package org.tbk.nostr.relay.example.nostr.handler;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tbk.nostr.proto.*;
+import org.tbk.nostr.relay.example.nostr.NostrSupport;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
-import org.tbk.nostr.relay.example.nostr.handler.ReqRequestHandler;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
 public class DefaultReqRequestHandler implements ReqRequestHandler {
 
     @NonNull
-    private final Nip1Support support;
+    private final NostrSupport support;
 
     @Override
     public void handleReqMessage(NostrWebSocketSession session, ReqRequest req) {
@@ -22,7 +22,7 @@ public class DefaultReqRequestHandler implements ReqRequestHandler {
             handleInternal(session, req);
         } catch (Exception e) {
             log.debug("Error while handling REQ message: {}", e.getMessage());
-            
+
             session.queueResponse(Response.newBuilder()
                     .setNotice(NoticeResponse.newBuilder()
                             .setMessage("Error: %s".formatted("Internal error."))

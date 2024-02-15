@@ -12,7 +12,6 @@ import java.time.Instant;
 import java.util.Collection;
 
 public interface Nip1Support {
-    Flux<Event> findAll(Collection<Filter> filters);
 
     Flux<Event> findAllAfterCreatedAtInclusive(XonlyPublicKey author, int kind, Instant createdAt);
 

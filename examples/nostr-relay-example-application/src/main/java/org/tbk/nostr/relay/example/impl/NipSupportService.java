@@ -14,6 +14,7 @@ import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.relay.example.domain.event.EventEntity;
 import org.tbk.nostr.relay.example.domain.event.EventEntityService;
 import org.tbk.nostr.relay.example.domain.event.EventEntitySpecifications;
+import org.tbk.nostr.relay.example.nostr.NostrSupport;
 import org.tbk.nostr.relay.example.nostr.extension.nip1.Nip1Support;
 import org.tbk.nostr.relay.example.nostr.extension.nip40.Nip40Support;
 import org.tbk.nostr.relay.example.nostr.extension.nip9.Nip9Support;
@@ -27,7 +28,7 @@ import java.util.Collection;
 
 import static java.util.Objects.requireNonNull;
 
-public class NipSupportService implements Nip1Support, Nip9Support, Nip40Support {
+public class NipSupportService implements NostrSupport, Nip1Support, Nip9Support, Nip40Support {
 
     private final EventEntityService eventEntityService;
 
