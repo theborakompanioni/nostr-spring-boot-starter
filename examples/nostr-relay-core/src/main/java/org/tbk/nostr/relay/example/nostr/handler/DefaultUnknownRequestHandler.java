@@ -8,7 +8,7 @@ import org.tbk.nostr.relay.example.nostr.handler.UnknownRequestHandler;
 
 import java.io.IOException;
 
-public final class DefaultUnknownRequestHandler implements UnknownRequestHandler {
+public class DefaultUnknownRequestHandler implements UnknownRequestHandler {
 
     @Override
     public void handleUnknownMessage(NostrWebSocketSession session, Request request) throws IOException {

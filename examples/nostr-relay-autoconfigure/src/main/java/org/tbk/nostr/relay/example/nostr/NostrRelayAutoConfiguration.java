@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
-import org.tbk.nostr.relay.example.nostr.extension.nip1.ReplaceableEventValidator;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxFilterCountReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.example.nostr.interceptor.MaxLimitPerFilterReqRequestHandlerInterceptor;
@@ -42,12 +41,6 @@ class NostrRelayAutoConfiguration {
     CreatedAtLimitEventValidator createdAtLimitEventValidator() {
         return new CreatedAtLimitEventValidator(relayProperties.getCreatedAtLowerLimit(), relayProperties.getCreatedAtUpperLimit());
     }
-
-    @Bean
-    @Order(20)
-    ReplaceableEventValidator replaceableEventValidator() {
-        return new ReplaceableEventValidator();
-    }
     // validators - end
 
     // interceptors
@@ -73,23 +66,57 @@ class NostrRelayAutoConfiguration {
     // request handler
     @Bean
     @ConditionalOnBean(NostrSupport.class)
-    //@ConditionalOnMissingBean(ReqRequestHandler.class)
+    @ConditionalOnMissingBean(ReqRequestHandler.class)
     DefaultReqRequestHandler defaultReqRequestHandler(NostrSupport support) {
         return new DefaultReqRequestHandler(support);
     }
 
     @Bean
-    //@ConditionalOnMissingBean(UnknownRequestHandler.class)
+    @ConditionalOnMissingBean(UnknownRequestHandler.class)
     UnknownRequestHandler defaultUnknownRequestHandler() {
         return new DefaultUnknownRequestHandler();
     }
 
     @Bean
-    //@ConditionalOnMissingBean(ParseErrorHandler.class)
+    @ConditionalOnMissingBean(ParseErrorHandler.class)
     ParseErrorHandler defaultParseErrorHandler() {
         return new DefaultParseErrorHandler();
     }
+
+    @Bean
+    @ConditionalOnMissingBean(ConnectionEstablishedHandler.class)
+    ConnectionEstablishedHandler defaultConnectionEstablishedHandler() {
+        return new DefaultConnectionEstablishedHandler();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ConnectionClosedHandler.class)
+    ConnectionClosedHandler defaultConnectionClosedHandler() {
+        return new DefaultConnectionClosedHandler();
+    }
     // request handler - end
+
+    @Bean
+    @ConditionalOnMissingBean(NostrWebSocketHandler.class)
+    NostrWebSocketHandler nostrWebSocketHandler(ConnectionEstablishedHandler connectionEstablishedHandler,
+                                                ConnectionClosedHandler connectionClosedHandler,
+                                                ReqRequestHandler reqRequestHandler,
+                                                EventRequestHandler eventRequestHandler,
+                                                CloseRequestHandler closeRequestHandler,
+                                                CountRequestHandler countRequestHandler,
+                                                UnknownRequestHandler unknownRequestHandler,
+                                                ParseErrorHandler parseErrorHandler) {
+        return new NostrRequestHandlerSupport(
+                connectionEstablishedHandler,
+                connectionClosedHandler,
+                reqRequestHandler,
+                eventRequestHandler,
+                closeRequestHandler,
+                countRequestHandler,
+                unknownRequestHandler,
+                parseErrorHandler
+        );
+    }
 
     @Bean
     NostrRequestHandlerExecutionChain nostrRequestHandlerExecutionChain(List<RequestHandlerInterceptor> interceptors) {

@@ -2,12 +2,20 @@ package org.tbk.nostr.relay.example.nostr;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.example.nostr.handler.*;
 
 @RequiredArgsConstructor
-public abstract class NostrRequestHandlerSupport extends AbstractNostrWebSocketHandler {
+public class NostrRequestHandlerSupport implements NostrWebSocketHandler {
+
+    @NonNull
+    private final ConnectionEstablishedHandler connectionEstablishedHandler;
+
+    @NonNull
+    private final ConnectionClosedHandler connectionClosedHandler;
 
     @NonNull
     private final ReqRequestHandler reqRequestHandler;
@@ -27,6 +35,15 @@ public abstract class NostrRequestHandlerSupport extends AbstractNostrWebSocketH
     @NonNull
     private final ParseErrorHandler parseErrorHandler;
 
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        connectionEstablishedHandler.afterConnectionEstablished(session);
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+        connectionClosedHandler.afterConnectionClosed(session, closeStatus);
+    }
 
     @Override
     public final void handleParseError(NostrWebSocketSession session, TextMessage message, Exception e) throws Exception {

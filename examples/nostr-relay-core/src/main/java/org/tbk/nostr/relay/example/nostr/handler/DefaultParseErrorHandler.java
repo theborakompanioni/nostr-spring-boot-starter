@@ -5,7 +5,7 @@ import org.tbk.nostr.proto.NoticeResponse;
 import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.relay.example.nostr.NostrWebSocketSession;
 
-public final class DefaultParseErrorHandler implements ParseErrorHandler {
+public class DefaultParseErrorHandler implements ParseErrorHandler {
 
     @Override
     public void handleParseError(NostrWebSocketSession session, TextMessage message, Exception e) throws Exception {

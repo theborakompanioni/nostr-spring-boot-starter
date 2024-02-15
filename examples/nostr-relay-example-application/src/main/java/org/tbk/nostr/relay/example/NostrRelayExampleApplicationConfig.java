@@ -56,20 +56,7 @@ class NostrRelayExampleApplicationConfig {
     }
 
     @Bean
-    NostrWebSocketHandler nostrRelayExampleWebSocketHandler(ReqRequestHandler reqRequestHandler,
-                                                            EventRequestHandler eventRequestHandler,
-                                                            CloseRequestHandler closeRequestHandler,
-                                                            CountRequestHandler countRequestHandler,
-                                                            UnknownRequestHandler unknownRequestHandler,
-                                                            ParseErrorHandler parseErrorHandler) {
-        return new ExampleNostrWebSocketHandlerImpl(
-                this.properties,
-                reqRequestHandler,
-                eventRequestHandler,
-                closeRequestHandler,
-                countRequestHandler,
-                unknownRequestHandler,
-                parseErrorHandler
-        );
+    ConnectionEstablishedHandler exampleConnectionEstablishedHandler() {
+        return new ExampleConnectionEstablishedHandler(this.properties);
     }
 }
