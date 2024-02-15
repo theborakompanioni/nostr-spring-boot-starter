@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.example.nostr.extension.nip13;
+package org.tbk.nostr.relay.config.nip13;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import org.springframework.validation.Validator;
 )
 @Getter
 @AllArgsConstructor(onConstructor = @__(@ConstructorBinding))
-public class Nip13ExtensionProperties implements Validator {
+public class Nip13Properties implements Validator {
     private static final boolean REQUIRE_COMMITMENT_DEFAULT = true;
 
     private boolean enabled;
@@ -28,12 +28,12 @@ public class Nip13ExtensionProperties implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz == Nip13ExtensionProperties.class;
+        return clazz == Nip13Properties.class;
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        Nip13ExtensionProperties properties = (Nip13ExtensionProperties) target;
+        Nip13Properties properties = (Nip13Properties) target;
 
         if (properties.minPowDifficulty < 0) {
             String errorMessage = "'minPowDifficulty' must not be negative";

@@ -1,0 +1,9 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr relay nip13 package'
+
+dependencies {
+    api project(':examples:nostr-relay-base')
+}
