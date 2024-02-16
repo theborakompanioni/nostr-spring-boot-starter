@@ -1,7 +1,5 @@
 package org.tbk.nostr.relay;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -13,24 +11,51 @@ import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonReader;
 import org.tbk.nostr.proto.json.JsonWriter;
+import org.tbk.nostr.relay.handler.ConnectionClosedHandler;
+import org.tbk.nostr.relay.handler.ConnectionEstablishedHandler;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static java.util.Objects.requireNonNull;
+
 @Slf4j
-@RequiredArgsConstructor
 public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
 
-    @NonNull
     private final NostrRequestHandlerExecutionChain executionChain;
 
-    @NonNull
     private final NostrWebSocketHandler handler;
+
+    private final List<ConnectionEstablishedHandler> connectionEstablishedHandler;
+
+    private final List<ConnectionClosedHandler> connectionClosedHandler;
+
+    public NostrWebSocketHandlerDispatcher(NostrRequestHandlerExecutionChain executionChain,
+                                           NostrWebSocketHandler handler,
+                                           List<ConnectionEstablishedHandler> connectionEstablishedHandler,
+                                           List<ConnectionClosedHandler> connectionClosedHandler) {
+        this.executionChain = requireNonNull(executionChain);
+        this.handler = requireNonNull(handler);
+        this.connectionEstablishedHandler = Collections.unmodifiableList(requireNonNull(connectionEstablishedHandler));
+        this.connectionClosedHandler = Collections.unmodifiableList(requireNonNull(connectionClosedHandler));
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        handler.afterConnectionEstablished(session);
+        if (log.isTraceEnabled()) {
+            log.trace("WebSocket connection established: {}", session.getId());
+        }
+
+        WebSocketSessionWrapper sessionWrapper = new WebSocketSessionWrapper(session);
+
+        for (ConnectionEstablishedHandler ceh : this.connectionEstablishedHandler) {
+            ceh.afterConnectionEstablished(sessionWrapper);
+        }
+
+        sessionWrapper.tryFlushMessageBuffer();
     }
 
     @Override
@@ -56,7 +81,14 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        handler.afterConnectionClosed(session, status);
+        if (log.isTraceEnabled()) {
+            log.trace("WebSocket connection closed ({}): {}", status.getCode(), session.getId());
+        }
+
+        WebSocketSessionWrapper sessionWrapper = new WebSocketSessionWrapper(session);
+        for (ConnectionClosedHandler cch : this.connectionClosedHandler) {
+            cch.afterConnectionClosed(sessionWrapper, status);
+        }
     }
 
     private static class WebSocketSessionWrapper extends WebSocketSessionDecorator implements NostrWebSocketSession {
@@ -72,7 +104,6 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
         public void sendMessage(WebSocketMessage<?> message) {
             queueMessage(message);
         }
-
 
         @Override
         public boolean queueResponse(Response response) {

@@ -1,5 +1,6 @@
 package org.tbk.nostr.relay.handler;
-import org.springframework.web.socket.WebSocketSession;
+
+import org.tbk.nostr.relay.NostrWebSocketSession;
 
 public interface ConnectionEstablishedHandler {
     /**
@@ -8,5 +9,5 @@ public interface ConnectionEstablishedHandler {
      *
      * @throws Exception this method can handle or propagate exceptions
      */
-    void afterConnectionEstablished(WebSocketSession session) throws Exception;
+    void afterConnectionEstablished(NostrWebSocketSession session) throws Exception;
 }

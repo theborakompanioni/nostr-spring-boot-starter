@@ -96,33 +96,17 @@ public class NostrRelayAutoConfiguration {
     ParseErrorHandler defaultParseErrorHandler() {
         return new DefaultParseErrorHandler();
     }
-
-    @Bean
-    @ConditionalOnMissingBean(ConnectionEstablishedHandler.class)
-    ConnectionEstablishedHandler defaultConnectionEstablishedHandler() {
-        return new DefaultConnectionEstablishedHandler();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(ConnectionClosedHandler.class)
-    ConnectionClosedHandler defaultConnectionClosedHandler() {
-        return new DefaultConnectionClosedHandler();
-    }
     // request handler - end
 
     @Bean
     @ConditionalOnMissingBean(NostrWebSocketHandler.class)
-    NostrWebSocketHandler nostrWebSocketHandler(ConnectionEstablishedHandler connectionEstablishedHandler,
-                                                ConnectionClosedHandler connectionClosedHandler,
-                                                ReqRequestHandler reqRequestHandler,
+    NostrWebSocketHandler nostrWebSocketHandler(ReqRequestHandler reqRequestHandler,
                                                 EventRequestHandler eventRequestHandler,
                                                 CloseRequestHandler closeRequestHandler,
                                                 CountRequestHandler countRequestHandler,
                                                 UnknownRequestHandler unknownRequestHandler,
                                                 ParseErrorHandler parseErrorHandler) {
         return new NostrRequestHandlerSupport(
-                connectionEstablishedHandler,
-                connectionClosedHandler,
                 reqRequestHandler,
                 eventRequestHandler,
                 closeRequestHandler,
@@ -139,7 +123,14 @@ public class NostrRelayAutoConfiguration {
 
     @Bean
     NostrWebSocketHandlerDispatcher nostrWebSocketHandlerDispatcher(NostrRequestHandlerExecutionChain executionChain,
-                                                                    NostrWebSocketHandler nostrWebSocketHandler) {
-        return new NostrWebSocketHandlerDispatcher(executionChain, nostrWebSocketHandler);
+                                                                    NostrWebSocketHandler nostrWebSocketHandler,
+                                                                    List<ConnectionEstablishedHandler> connectionEstablishedHandler,
+                                                                    List<ConnectionClosedHandler> connectionClosedHandler) {
+        return new NostrWebSocketHandlerDispatcher(
+                executionChain,
+                nostrWebSocketHandler,
+                connectionEstablishedHandler,
+                connectionClosedHandler
+        );
     }
 }

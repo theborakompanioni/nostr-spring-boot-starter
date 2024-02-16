@@ -1,18 +1,16 @@
 package org.tbk.nostr.relay.example.impl;
 
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.NoticeResponse;
 import org.tbk.nostr.proto.Response;
-import org.tbk.nostr.proto.json.JsonWriter;
+import org.tbk.nostr.relay.NostrWebSocketSession;
 import org.tbk.nostr.relay.example.NostrRelayExampleApplicationProperties;
-import org.tbk.nostr.relay.handler.DefaultConnectionEstablishedHandler;
+import org.tbk.nostr.relay.handler.ConnectionEstablishedHandler;
 
 import javax.annotation.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
-public class ExampleConnectionEstablishedHandler extends DefaultConnectionEstablishedHandler {
+public class ExampleConnectionEstablishedHandler implements ConnectionEstablishedHandler {
     @Nullable
     private final String greeting;
 
@@ -21,15 +19,13 @@ public class ExampleConnectionEstablishedHandler extends DefaultConnectionEstabl
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        super.afterConnectionEstablished(session);
-
+    public void afterConnectionEstablished(NostrWebSocketSession session) throws Exception {
         if (greeting != null) {
-            session.sendMessage(new TextMessage(JsonWriter.toJson(Response.newBuilder()
+            session.sendResponseImmediately(Response.newBuilder()
                     .setNotice(NoticeResponse.newBuilder()
                             .setMessage(greeting)
                             .build())
-                    .build())));
+                    .build());
         }
     }
 }
