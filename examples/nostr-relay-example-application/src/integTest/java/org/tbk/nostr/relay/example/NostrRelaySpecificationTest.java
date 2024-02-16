@@ -17,10 +17,7 @@ import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.nips.Nip13;
-import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.Filter;
-import org.tbk.nostr.proto.OkResponse;
-import org.tbk.nostr.proto.ReqRequest;
+import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.config.NostrRelayProperties;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.template.SimpleNostrTemplate;
@@ -278,8 +275,8 @@ public class NostrRelaySpecificationTest {
             assertThat(ok.getMessage(), is("Error: Invalid tag 'a'."));
         }
 
-    Event invalidEvent6 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM6")
-            .addTags(MoreTags.a("%d:%s".formatted(1, "00".repeat(32)))));
+        Event invalidEvent6 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM6")
+                .addTags(MoreTags.a("%d:%s".formatted(1, "00".repeat(32)))));
 
         List<Event> events1 = List.of(invalidEvent6);
         List<OkResponse> oks1 = nostrTemplate.send(events1)
@@ -1031,6 +1028,7 @@ public class NostrRelaySpecificationTest {
         assertThat(ok0.getMessage(), is(""));
         assertThat(ok0.getSuccess(), is(true));
     }
+
     @Test
     @Disabled("NostrTemplate should have a method to send plain json")
     void itShouldVerifyParameterizedReplaceableEventBehaviour4NullFirstValueOfDTag() {
@@ -1063,5 +1061,23 @@ public class NostrRelaySpecificationTest {
 
         assertThat(ok0.getMessage(), is("Error: Multiple 'd' tags are not allowed."));
         assertThat(ok0.getSuccess(), is(false));
+    }
+
+    @Test
+    void itShouldVerifyCountIsNotSupportedByDefault() {
+        Signer signer0 = SimpleSigner.random();
+        Signer signer1 = SimpleSigner.random();
+
+        Optional<CountResult> countBefore = nostrTemplate.countEvents(CountRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addAuthors(ByteString.fromHex(signer0.getPublicKey().value.toHex()))
+                                .addAuthors(ByteString.fromHex(signer1.getPublicKey().value.toHex()))
+                                .build())
+                        .build())
+                .next()
+                .blockOptional(Duration.ofSeconds(5));
+
+        assertThat("COUNT is not supported", countBefore.isEmpty());
     }
 }

@@ -80,6 +80,12 @@ public class NostrRelayAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(CountRequestHandler.class)
+    CountRequestHandler defaultCountRequestHandler() {
+        return new DefaultCountRequestHandler();
+    }
+
+    @Bean
     @ConditionalOnMissingBean(UnknownRequestHandler.class)
     UnknownRequestHandler defaultUnknownRequestHandler() {
         return new DefaultUnknownRequestHandler();
