@@ -15,6 +15,7 @@ import org.tbk.nostr.relay.interceptor.MaxFilterCountReqRequestHandlerIntercepto
 import org.tbk.nostr.relay.interceptor.MaxLimitPerFilterReqRequestHandlerInterceptor;
 import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
 import org.tbk.nostr.relay.interceptor.ValidatingEventRequestHandlerInterceptor;
+import org.tbk.nostr.relay.support.InMemorySessionSubscriptionSupport;
 import org.tbk.nostr.relay.validation.CreatedAtLimitEventValidator;
 import org.tbk.nostr.relay.validation.DefaultEventValidator;
 import org.tbk.nostr.relay.validation.EventValidator;
@@ -29,6 +30,12 @@ public class NostrRelayAutoConfiguration {
 
     @NonNull
     private final NostrRelayProperties relayProperties;
+
+    @Bean
+    @ConditionalOnMissingBean(SessionSubscriptionSupport.class)
+    SessionSubscriptionSupport inMemorySubscriptionHandler() {
+        return new InMemorySessionSubscriptionSupport();
+    }
 
     // validators
     @Bean
@@ -68,26 +75,32 @@ public class NostrRelayAutoConfiguration {
     @Bean
     @ConditionalOnBean(NostrSupport.class)
     @ConditionalOnMissingBean(ReqRequestHandler.class)
-    ReqRequestHandler defaultReqRequestHandler(NostrSupport support) {
+    DefaultReqRequestHandler defaultReqRequestHandler(NostrSupport support) {
         return new DefaultReqRequestHandler(support);
     }
 
     @Bean
     @ConditionalOnBean(NostrSupport.class)
     @ConditionalOnMissingBean(EventRequestHandler.class)
-    EventRequestHandler defaultEventRequestHandler(NostrSupport support) {
+    DefaultEventRequestHandler defaultEventRequestHandler(NostrSupport support) {
         return new DefaultEventRequestHandler(support);
     }
 
     @Bean
+    @ConditionalOnMissingBean(CloseRequestHandler.class)
+    DefaultCloseRequestHandler defaultCloseRequestHandler(SessionSubscriptionSupport support) {
+        return new DefaultCloseRequestHandler(support);
+    }
+
+    @Bean
     @ConditionalOnMissingBean(CountRequestHandler.class)
-    CountRequestHandler defaultCountRequestHandler() {
+    DefaultCountRequestHandler defaultCountRequestHandler() {
         return new DefaultCountRequestHandler();
     }
 
     @Bean
     @ConditionalOnMissingBean(UnknownRequestHandler.class)
-    UnknownRequestHandler defaultUnknownRequestHandler() {
+    DefaultUnknownRequestHandler defaultUnknownRequestHandler() {
         return new DefaultUnknownRequestHandler();
     }
 

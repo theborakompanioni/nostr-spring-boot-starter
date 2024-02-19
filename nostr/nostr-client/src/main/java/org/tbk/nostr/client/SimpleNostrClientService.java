@@ -14,6 +14,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.base.SubscriptionId;
@@ -216,7 +217,9 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         log.info("Trying to connect to relay {}", relayUri);
 
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
-        this.session = client.execute(textWebSocketHandler, headers, relayUri.getUri()).get();
+        this.session = client.execute(textWebSocketHandler, headers, relayUri.getUri())
+                .thenApply(it -> new ConcurrentWebSocketSessionDecorator(it, (int) Duration.ofSeconds(60).toMillis(), 512 * 1024))
+                .get();
 
         log.info("Successfully connected to relay {}", relayUri);
     }

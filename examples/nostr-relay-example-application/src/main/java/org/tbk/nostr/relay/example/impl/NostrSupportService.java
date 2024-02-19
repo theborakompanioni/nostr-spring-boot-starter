@@ -115,14 +115,14 @@ public class NostrSupportService implements NostrSupport, Nip1Support, Nip9Suppo
 
     @Override
     public Mono<Void> deleteAllBeforeCreatedAtInclusive(XonlyPublicKey publicKey, int kind, Instant createdAt) {
-        return Mono.<Void>fromRunnable(() -> {
+        return Mono.fromRunnable(() -> {
             eventEntityService.markDeleted(publicKey, allBeforeCreatedAtInclusive(publicKey, kind, createdAt));
         });
     }
 
     @Override
     public Mono<Void> deleteAllBeforeCreatedAtInclusiveWithTag(XonlyPublicKey publicKey, int kind, Instant createdAt, IndexedTag tagName, String firstTagValue) {
-        return Mono.<Void>fromRunnable(() -> {
+        return Mono.fromRunnable(() -> {
             eventEntityService.markDeleted(publicKey, allBeforeCreatedAtInclusive(publicKey, kind, createdAt)
                     .and(EventEntitySpecifications.hasTagWithFirstValue(tagName, firstTagValue)));
         });
@@ -130,21 +130,21 @@ public class NostrSupportService implements NostrSupport, Nip1Support, Nip9Suppo
 
     @Override
     public Mono<Void> markExpiresAt(EventId eventId, Instant expiresAt) {
-        return Mono.<Void>fromRunnable(() -> {
+        return Mono.fromRunnable(() -> {
             eventEntityService.markExpiresAt(eventId, expiresAt);
         });
     }
 
     @Override
     public Mono<Void> deleteAllByEventIds(XonlyPublicKey author, Collection<EventId> deletableEventIds) {
-        return Mono.<Void>fromRunnable(() -> {
+        return Mono.fromRunnable(() -> {
             eventEntityService.markDeletedByEventIds(author, deletableEventIds);
         });
     }
 
     @Override
     public Mono<Void> deleteAllByEventUris(XonlyPublicKey author, Collection<EventUri> deletableEventUris) {
-        return Mono.<Void>fromRunnable(() -> {
+        return Mono.fromRunnable(() -> {
             eventEntityService.markDeletedByEventUris(author, deletableEventUris);
         });
     }

@@ -1,14 +1,17 @@
 package org.tbk.nostr.relay.example;
 
 import com.google.protobuf.ByteString;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Metadata;
@@ -36,28 +39,36 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = {NostrRelaySpecTest.NostrRelaySpecTestConfig.class})
 @ActiveProfiles({"test", "spec-test"})
-public class NostrRelaySpecificationTest {
+public class NostrRelaySpecTest {
 
-    @LocalServerPort
-    private int serverPort;
+    @Lazy // needed for @LocalServerPort to be populated
+    @TestConfiguration
+    static class NostrRelaySpecTestConfig {
 
-    @Autowired(required = false)
-    private NostrRelayProperties relayProperties;
+        private final int serverPort;
 
-    private NostrTemplate nostrTemplate;
+        NostrRelaySpecTestConfig(@LocalServerPort int serverPort) {
+            this.serverPort = serverPort;
+        }
 
-    @BeforeEach
-    void beforeEach() {
-        if (this.nostrTemplate == null) {
-            this.nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
+        @Bean
+        RelayUri relayUri() {
+            return RelayUri.of("ws://localhost:%d".formatted(serverPort));
+        }
+
+        @Bean
+        NostrTemplate nostrTemplate(RelayUri relayUri) {
+            return new SimpleNostrTemplate(relayUri);
         }
     }
 
-    @Test
-    void contextLoads() {
-        assertThat(relayProperties, is(notNullValue()));
-    }
+    @Autowired
+    private NostrRelayProperties relayProperties;
+
+    @Autowired
+    private NostrTemplate nostrTemplate;
 
     @Test
     void itShouldPublishSimpleEventSuccessfully0() {
