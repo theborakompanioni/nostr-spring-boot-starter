@@ -23,7 +23,6 @@ public final class MoreEvents {
         throw new UnsupportedOperationException();
     }
 
-
     public static Event.Builder withEventId(Event.Builder event) {
         return event.setId(ByteString.copyFrom(eventId(event)));
     }
