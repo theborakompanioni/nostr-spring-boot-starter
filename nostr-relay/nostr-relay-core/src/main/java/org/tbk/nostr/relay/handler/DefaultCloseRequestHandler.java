@@ -12,8 +12,6 @@ import org.tbk.nostr.relay.SessionSubscriptionSupport.SessionSubscription;
 import org.tbk.nostr.relay.SessionSubscriptionSupport.SubscriptionKey;
 import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
 
-import java.io.IOException;
-
 @Slf4j
 @RequiredArgsConstructor
 public class DefaultCloseRequestHandler implements CloseRequestHandler,
@@ -29,7 +27,9 @@ public class DefaultCloseRequestHandler implements CloseRequestHandler,
 
     @Override
     public void handleCloseMessage(NostrWebSocketSession session, CloseRequest close) {
-        log.debug("Closing active subscription '{}' on CLOSE command: {}", close.getId(), session.getId());
+        if (log.isDebugEnabled()) {
+            log.debug("Closing subscription '{}' on CLOSE command for session '{}'", close.getId(), session.getId());
+        }
 
         SessionId sessionId = new SessionId(session.getId());
         SubscriptionId subscriptionId = SubscriptionId.of(close.getId());
@@ -54,7 +54,9 @@ public class DefaultCloseRequestHandler implements CloseRequestHandler,
     }
 
     private void handleReqMessage(NostrWebSocketSession session, ReqRequest req) {
-        log.debug("Creating active subscription '{}' on REQ command: {}", req.getId(), session.getId());
+        if (log.isDebugEnabled()) {
+            log.debug("Creating subscription '{}' on REQ command for session '{}'", req.getId(), session.getId());
+        }
 
         SessionId sessionId = new SessionId(session.getId());
         SubscriptionId subscriptionId = SubscriptionId.of(req.getId());
@@ -66,16 +68,19 @@ public class DefaultCloseRequestHandler implements CloseRequestHandler,
     }
 
     private void handleEventMessage(EventRequest event) {
-        support.findMatching(event.getEvent()).subscribe(entry -> {
-            try {
-                entry.session().sendResponseImmediately(Response.newBuilder()
-                        .setEvent(EventResponse.newBuilder()
-                                .setSubscriptionId(entry.request().getId())
-                                .setEvent(event.getEvent())
-                                .build()).build());
-            } catch (IOException e) {
-                log.warn("Could not send event to client matching subscription: {}", e.getMessage());
-            }
-        });
+        support.findMatching(event.getEvent())
+                .filter(it -> it.session().isOpen())
+                .subscribe(entry -> {
+                    try {
+                        entry.session().sendResponseImmediately(Response.newBuilder()
+                                .setEvent(EventResponse.newBuilder()
+                                        .setSubscriptionId(entry.request().getId())
+                                        .setEvent(event.getEvent())
+                                        .build())
+                                .build());
+                    } catch (Exception e) {
+                        log.warn("Error while sending event to session '{}': {}", entry.session().getId(), e.getMessage());
+                    }
+                });
     }
 }
