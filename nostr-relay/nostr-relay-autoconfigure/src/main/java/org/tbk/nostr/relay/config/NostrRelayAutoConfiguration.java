@@ -12,6 +12,7 @@ import org.springframework.core.annotation.Order;
 import org.tbk.nostr.relay.*;
 import org.tbk.nostr.relay.handler.*;
 import org.tbk.nostr.relay.interceptor.*;
+import org.tbk.nostr.relay.support.EventToSubscribers;
 import org.tbk.nostr.relay.support.SimpleEventStreamSupport;
 import org.tbk.nostr.relay.support.SimpleSubscriptionSupport;
 import org.tbk.nostr.relay.validation.CreatedAtLimitEventValidator;
@@ -29,6 +30,7 @@ public class NostrRelayAutoConfiguration {
     @NonNull
     private final NostrRelayProperties relayProperties;
 
+
     @Bean
     @ConditionalOnMissingBean(SubscriptionSupport.class)
     SimpleSubscriptionSupport simpleSubscriptionSupport() {
@@ -36,10 +38,16 @@ public class NostrRelayAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(SubscriptionSupport.class)
     @ConditionalOnMissingBean(EventStreamSupport.class)
-    SimpleEventStreamSupport simpleEventStreamSupport(SubscriptionSupport support) {
-        return new SimpleEventStreamSupport(support);
+    SimpleEventStreamSupport simpleEventStreamSupport() {
+        return new SimpleEventStreamSupport();
+    }
+
+    @Bean
+    @ConditionalOnBean({SubscriptionSupport.class, EventStreamSupport.class})
+    EventToSubscribers eventToSubscribers(SubscriptionSupport subscriptionSupport,
+                                          EventStreamSupport eventStreamSupport) {
+        return new EventToSubscribers(subscriptionSupport, eventStreamSupport);
     }
 
     // validators
