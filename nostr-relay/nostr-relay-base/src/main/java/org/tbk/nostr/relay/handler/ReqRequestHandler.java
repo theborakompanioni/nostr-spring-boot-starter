@@ -1,9 +1,9 @@
 package org.tbk.nostr.relay.handler;
 
 import org.tbk.nostr.proto.ReqRequest;
-import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.NostrRequestContext;
 
 public interface ReqRequestHandler {
 
-    void handleReqMessage(NostrWebSocketSession session, ReqRequest req) throws Exception;
+    void handleReqMessage(NostrRequestContext context, ReqRequest req) throws Exception;
 }

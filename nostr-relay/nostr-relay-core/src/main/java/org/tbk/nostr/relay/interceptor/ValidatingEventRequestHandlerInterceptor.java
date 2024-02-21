@@ -7,7 +7,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ValidationUtils;
 import org.tbk.nostr.proto.*;
-import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.validation.EventValidator;
 
 import java.util.List;
@@ -20,15 +20,15 @@ public class ValidatingEventRequestHandlerInterceptor implements RequestHandlerI
     private final List<EventValidator> validators;
 
     @Override
-    public boolean preHandle(NostrWebSocketSession session, Request request) throws Exception {
+    public boolean preHandle(NostrRequestContext context, Request request) throws Exception {
         if (request.getKindCase() == Request.KindCase.EVENT) {
-            return handleEventMessage(session, request.getEvent());
+            return handleEventMessage(context, request.getEvent());
         }
 
         return true;
     }
 
-    private boolean handleEventMessage(NostrWebSocketSession session, EventRequest request) throws Exception {
+    private boolean handleEventMessage(NostrRequestContext context, EventRequest request) throws Exception {
         Event event = request.getEvent();
         BindException errors = new BindException(event, "event");
 
@@ -50,7 +50,7 @@ public class ValidatingEventRequestHandlerInterceptor implements RequestHandlerI
 
         log.debug("Validation of event {} failed: {}", event.getId(), message);
 
-        session.sendResponseImmediately(Response.newBuilder()
+        context.add(Response.newBuilder()
                 .setOk(OkResponse.newBuilder()
                         .setEventId(event.getId())
                         .setSuccess(false)

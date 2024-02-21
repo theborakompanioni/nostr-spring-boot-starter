@@ -1,5 +1,6 @@
 package org.tbk.nostr.relay;
 
+import lombok.NonNull;
 import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.Response;
 
@@ -17,7 +18,12 @@ public interface NostrWebSocketSession extends WebSocketSession {
         throw new UnsupportedOperationException("'setBinaryMessageSizeLimit' has been disabled on purpose. Do it in method 'afterConnectionEstablished'.");
     }
 
+    SessionId getSessionId();
+
     boolean queueResponse(Response message);
 
     void sendResponseImmediately(Response message) throws IOException;
+
+    record SessionId(@NonNull String id) {
+    }
 }

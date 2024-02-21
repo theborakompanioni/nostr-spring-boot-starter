@@ -11,7 +11,7 @@ import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.TagValue;
-import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
 import org.tbk.nostr.relay.nip9.Nip9Support;
 import org.tbk.nostr.util.MorePublicKeys;
@@ -29,7 +29,7 @@ public class DeletionEventHandlerInterceptor implements RequestHandlerIntercepto
     private final Nip9Support support;
 
     @Override
-    public void postHandle(NostrWebSocketSession session, Request request) {
+    public void postHandle(NostrRequestContext context, Request request) {
         if (request.getKindCase() == Request.KindCase.EVENT) {
             handleEvent(request.getEvent().getEvent());
         }

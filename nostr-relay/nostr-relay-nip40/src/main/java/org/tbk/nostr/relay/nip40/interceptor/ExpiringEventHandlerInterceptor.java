@@ -7,7 +7,7 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.nips.Nip40;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
-import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
 import org.tbk.nostr.relay.nip40.Nip40Support;
 
@@ -19,7 +19,7 @@ public class ExpiringEventHandlerInterceptor implements RequestHandlerIntercepto
     private final Nip40Support support;
 
     @Override
-    public void postHandle(NostrWebSocketSession session, Request request) {
+    public void postHandle(NostrRequestContext context, Request request) {
         if (request.getKindCase() == Request.KindCase.EVENT) {
             handleEvent(request.getEvent().getEvent());
         }

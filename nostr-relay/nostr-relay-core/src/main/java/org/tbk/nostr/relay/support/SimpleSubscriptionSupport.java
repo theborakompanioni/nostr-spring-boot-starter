@@ -2,6 +2,7 @@ package org.tbk.nostr.relay.support;
 
 import lombok.extern.slf4j.Slf4j;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.relay.NostrWebSocketSession;
 import org.tbk.nostr.relay.SubscriptionSupport;
 import org.tbk.nostr.util.MoreFilters;
 import reactor.core.publisher.Flux;
@@ -15,10 +16,10 @@ import java.util.stream.Stream;
 public class SimpleSubscriptionSupport implements SubscriptionSupport {
 
     private final Map<SubscriptionKey, SessionSubscription> subscriptions = new ConcurrentHashMap<>();
-    private final Map<SessionId, List<SubscriptionKey>> sessionIdToSubscriptionKeys = new ConcurrentHashMap<>();
+    private final Map<NostrWebSocketSession.SessionId, List<SubscriptionKey>> sessionIdToSubscriptionKeys = new ConcurrentHashMap<>();
 
     @Override
-    public void removeAll(SessionId sessionId) {
+    public void removeAll(NostrWebSocketSession.SessionId sessionId) {
         List<SubscriptionKey> removed = sessionIdToSubscriptionKeys.remove(sessionId);
         if (removed != null) {
             log.debug("Removing {} active subscriptions after websocket closed: {}", removed.size(), sessionId);

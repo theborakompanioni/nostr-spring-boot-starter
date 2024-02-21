@@ -4,8 +4,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tbk.nostr.proto.*;
+import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.NostrSupport;
-import org.tbk.nostr.relay.NostrWebSocketSession;
 
 import java.util.List;
 
@@ -17,13 +17,13 @@ public class DefaultReqRequestHandler implements ReqRequestHandler {
     private final NostrSupport support;
 
     @Override
-    public void handleReqMessage(NostrWebSocketSession session, ReqRequest req) {
+    public void handleReqMessage(NostrRequestContext context, ReqRequest req) {
         try {
-            handleInternal(session, req);
+            handleInternal(context, req);
         } catch (Exception e) {
             log.debug("Error while handling REQ message: {}", e.getMessage());
 
-            session.queueResponse(Response.newBuilder()
+            context.add(Response.newBuilder()
                     .setNotice(NoticeResponse.newBuilder()
                             .setMessage("Error: %s".formatted("Internal error."))
                             .build())
@@ -31,7 +31,7 @@ public class DefaultReqRequestHandler implements ReqRequestHandler {
         }
     }
 
-    private void handleInternal(NostrWebSocketSession session, ReqRequest req) {
+    private void handleInternal(NostrRequestContext context, ReqRequest req) {
         List<Event> events = support.findAll(req.getFiltersList()).toStream().toList();
 
         events.stream()
@@ -40,9 +40,9 @@ public class DefaultReqRequestHandler implements ReqRequestHandler {
                                 .setEvent(it)
                                 .build())
                         .build())
-                .forEach(session::queueResponse);
+                .forEach(context::add);
 
-        session.queueResponse(Response.newBuilder()
+        context.add(Response.newBuilder()
                 .setEose(EoseResponse.newBuilder()
                         .setSubscriptionId(req.getId())
                         .build())

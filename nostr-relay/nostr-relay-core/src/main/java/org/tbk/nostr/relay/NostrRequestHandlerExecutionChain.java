@@ -26,9 +26,9 @@ public class NostrRequestHandlerExecutionChain {
      * next interceptor or the handler itself. Else, it is assumed
      * that this interceptor has already dealt with the response itself.
      */
-    boolean applyPreHandle(NostrWebSocketSession session, Request request) throws Exception {
+    boolean applyPreHandle(NostrRequestContext context, Request request) throws Exception {
         for (RequestHandlerInterceptor interceptor : this.interceptors) {
-            if (!interceptor.preHandle(session, request)) {
+            if (!interceptor.preHandle(context, request)) {
                 return false;
             }
         }
@@ -38,23 +38,23 @@ public class NostrRequestHandlerExecutionChain {
     /**
      * Apply postHandle methods of registered interceptors.
      */
-    void applyHandle(NostrWebSocketSession session, Request request, NostrWebSocketHandler handler) throws Exception {
+    void applyHandle(NostrRequestContext context, Request request, NostrWebSocketHandler handler) throws Exception {
         switch (request.getKindCase()) {
-            case EVENT -> handler.handleEventMessage(session, request.getEvent());
-            case REQ -> handler.handleReqMessage(session, request.getReq());
-            case CLOSE -> handler.handleCloseMessage(session, request.getClose());
-            case COUNT -> handler.handleCountMessage(session, request.getCount());
-            case KIND_NOT_SET -> handler.handleUnknownMessage(session, request);
+            case EVENT -> handler.handleEventMessage(context, request.getEvent());
+            case REQ -> handler.handleReqMessage(context, request.getReq());
+            case CLOSE -> handler.handleCloseMessage(context, request.getClose());
+            case COUNT -> handler.handleCountMessage(context, request.getCount());
+            case KIND_NOT_SET -> handler.handleUnknownMessage(context, request);
         }
     }
 
     /**
      * Apply postHandle methods of registered interceptors.
      */
-    void applyPostHandle(NostrWebSocketSession session, Request request) throws Exception {
+    void applyPostHandle(NostrRequestContext context, Request request) throws Exception {
         for (int i = this.interceptors.size() - 1; i >= 0; i--) {
             RequestHandlerInterceptor interceptor = this.interceptors.get(i);
-            interceptor.postHandle(session, request);
+            interceptor.postHandle(context, request);
         }
     }
 }

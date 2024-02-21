@@ -1,9 +1,9 @@
 package org.tbk.nostr.relay.handler;
 
 import org.tbk.nostr.proto.Request;
-import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.NostrRequestContext;
 
 public interface UnknownRequestHandler {
 
-    void handleUnknownMessage(NostrWebSocketSession session, Request request) throws Exception;
+    void handleUnknownMessage(NostrRequestContext context, Request request) throws Exception;
 }

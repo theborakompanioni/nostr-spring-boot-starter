@@ -1,5 +1,6 @@
 package org.tbk.nostr.relay.example;
 
+import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -100,5 +101,53 @@ public class NostrRelaySpecEventStreamTest {
         assertThat(receivedEvents, hasItem(event1));
         assertThat(receivedEvents, hasItem(event2));
         assertThat(receivedEvents, not(hasItem(event0)));
+    }
+
+    @Test
+    void itShouldVerifyDuplicateEventsWontGetEmittedToSubscribers() throws InterruptedException {
+        Signer signer = SimpleSigner.random();
+
+        Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM0");
+        Event event1 = MoreEvents.createFinalizedTextNote(signer, "GM1");
+        Event event2 = MoreEvents.createFinalizedTextNote(signer, "GM2");
+
+        CountDownLatch latch = new CountDownLatch(3);
+
+        List<Event> receivedEvents = new ArrayList<>();
+        nostrClient.subscribe(ReqRequest.newBuilder()
+                        .setId(MoreSubscriptionIds.random().getId())
+                        .addFilters(Filter.newBuilder()
+                                .addAuthors(ByteString.copyFrom(signer.getPublicKey().value.toByteArray()))
+                                .build())
+                        .build(), NostrClientService.SubscribeOptions.defaultOptions().toBuilder()
+                        .closeOnEndOfStream(false)
+                        .build())
+                .subscribe(it -> {
+                    receivedEvents.add(it);
+                    latch.countDown();
+                });
+
+        nostrClient.send(event0).block(Duration.ofSeconds(5));
+        nostrClient.send(event0).block(Duration.ofSeconds(5));
+
+        nostrClient.send(event1).block(Duration.ofSeconds(5));
+
+        nostrClient.send(event0).block(Duration.ofSeconds(5));
+        nostrClient.send(event0).block(Duration.ofSeconds(5));
+
+        nostrClient.send(event2).block(Duration.ofSeconds(5));
+
+        nostrClient.send(event0).block(Duration.ofSeconds(5));
+        nostrClient.send(event0).block(Duration.ofSeconds(5));
+
+        boolean awaited = latch.await(30, TimeUnit.SECONDS);
+        if (!awaited) {
+            throw new IllegalStateException("Could not await latch");
+        }
+
+        assertThat(receivedEvents, hasSize(3));
+        assertThat(receivedEvents, hasItem(event0));
+        assertThat(receivedEvents, hasItem(event1));
+        assertThat(receivedEvents, hasItem(event2));
     }
 }

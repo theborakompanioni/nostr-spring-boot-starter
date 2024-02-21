@@ -9,7 +9,7 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.*;
-import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
 import org.tbk.nostr.relay.nip1.Nip1Support;
 import org.tbk.nostr.util.MoreEvents;
@@ -32,14 +32,14 @@ public class ReplaceableEventRequestHandlerInterceptor implements RequestHandler
     private final Nip1Support support;
 
     @Override
-    public boolean preHandle(NostrWebSocketSession session, Request request) throws IOException {
+    public boolean preHandle(NostrRequestContext context, Request request) throws IOException {
         if (request.getKindCase() == Request.KindCase.EVENT) {
-            return handleEvent(session, request.getEvent().getEvent());
+            return handleEvent(context, request.getEvent().getEvent());
         }
         return true;
     }
 
-    private boolean handleEvent(NostrWebSocketSession session, Event event) throws IOException {
+    private boolean handleEvent(NostrRequestContext context, Event event) throws IOException {
         if (Nip1.isReplaceableEvent(event) || Nip1.isParameterizedReplaceableEvent(event)) {
             XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
 
@@ -50,7 +50,7 @@ public class ReplaceableEventRequestHandlerInterceptor implements RequestHandler
             Optional<ReplaceableError> replaceableErrorOrEmpty = checkReplaceableEventRules(event, newerExistingEvents);
 
             if (replaceableErrorOrEmpty.isPresent()) {
-                session.sendResponseImmediately(Response.newBuilder()
+                context.add(Response.newBuilder()
                         .setOk(OkResponse.newBuilder()
                                 .setEventId(event.getId())
                                 .setSuccess(false)

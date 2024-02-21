@@ -5,7 +5,7 @@ import org.tbk.nostr.proto.ClosedResponse;
 import org.tbk.nostr.proto.ReqRequest;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.Response;
-import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.NostrRequestContext;
 
 @RequiredArgsConstructor
 public class MaxFilterCountReqRequestHandlerInterceptor implements RequestHandlerInterceptor {
@@ -13,20 +13,20 @@ public class MaxFilterCountReqRequestHandlerInterceptor implements RequestHandle
     private final int maxFilterCount;
 
     @Override
-    public boolean preHandle(NostrWebSocketSession session, Request request) {
+    public boolean preHandle(NostrRequestContext context, Request request) {
         if (request.getKindCase() == Request.KindCase.REQ) {
-            return handleReqMessage(session, request.getReq());
+            return handleReqMessage(context, request.getReq());
         }
 
         return true;
     }
 
-    private boolean handleReqMessage(NostrWebSocketSession session, ReqRequest req) {
+    private boolean handleReqMessage(NostrRequestContext context, ReqRequest req) {
         if (req.getFiltersCount() <= maxFilterCount) {
             return true;
         }
 
-        session.queueResponse(Response.newBuilder()
+        context.add(Response.newBuilder()
                 .setClosed(ClosedResponse.newBuilder()
                         .setSubscriptionId(req.getId())
                         .setMessage("Error: %s".formatted(

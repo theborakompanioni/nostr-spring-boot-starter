@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
-import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
 import org.tbk.nostr.relay.nip1.Nip1Support;
 import org.tbk.nostr.util.MorePublicKeys;
@@ -22,7 +22,7 @@ public class EphemeralEventRequestHandlerInterceptor implements RequestHandlerIn
     private final Nip1Support support;
 
     @Override
-    public void postHandle(NostrWebSocketSession session, Request request) {
+    public void postHandle(NostrRequestContext context, Request request) {
         if (request.getKindCase() == Request.KindCase.EVENT) {
             handleEvent(request.getEvent().getEvent());
         }

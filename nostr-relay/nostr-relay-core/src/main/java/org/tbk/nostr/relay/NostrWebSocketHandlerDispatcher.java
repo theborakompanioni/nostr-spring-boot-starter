@@ -7,6 +7,7 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.socket.handler.WebSocketSessionDecorator;
+import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.proto.json.JsonReader;
@@ -17,6 +18,7 @@ import org.tbk.nostr.relay.handler.ConnectionEstablishedHandler;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -62,17 +64,19 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
     protected final void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         WebSocketSessionWrapper sessionWrapper = new WebSocketSessionWrapper(session);
 
+        NostrRequestContextImpl context = new NostrRequestContextImpl(sessionWrapper);
+
         Request request = null;
         try {
             request = JsonReader.fromJson(message.getPayload(), Request.newBuilder());
         } catch (Exception e) {
-            handler.handleParseError(sessionWrapper, message, e);
+            handler.handleParseError(context, message, e);
         }
 
         if (request != null) {
-            if (executionChain.applyPreHandle(sessionWrapper, request)) {
-                executionChain.applyHandle(sessionWrapper, request, handler);
-                executionChain.applyPostHandle(sessionWrapper, request);
+            if (executionChain.applyPreHandle(context, request)) {
+                executionChain.applyHandle(context, request, handler);
+                executionChain.applyPostHandle(context, request);
             }
         }
 
@@ -91,13 +95,52 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
         }
     }
 
+    private static class NostrRequestContextImpl implements NostrRequestContext {
+
+        private final NostrWebSocketSession session;
+
+        private Event event;
+
+        NostrRequestContextImpl(NostrWebSocketSession session) {
+            this.session = requireNonNull(session);
+        }
+
+        @Override
+        public NostrWebSocketSession getSession() {
+            return this.session;
+        }
+
+        @Override
+        public boolean add(Response response) {
+            return this.session.queueResponse(response);
+        }
+
+        @Override
+        public void setHandledEvent(Event event) {
+            this.event = event;
+        }
+
+        @Override
+        public Optional<Event> getHandledEvent() {
+            return Optional.ofNullable(event);
+        }
+    }
+
     private static class WebSocketSessionWrapper extends WebSocketSessionDecorator implements NostrWebSocketSession {
+
+        private final SessionId sessionId;
 
         private final Queue<WebSocketMessage<?>> messageQueue;
 
         public WebSocketSessionWrapper(WebSocketSession session) {
             super(session);
+            this.sessionId = new SessionId(session.getId());
             this.messageQueue = new LinkedBlockingQueue<>();
+        }
+
+        @Override
+        public SessionId getSessionId() {
+            return this.sessionId;
         }
 
         @Override
@@ -140,7 +183,6 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
                     this.getDelegate().close(status);
                 } catch (IOException e2) {
                     log.warn("Swallowed error while closing connection {}: {}", this.getId(), e2.getMessage());
-                    // empty on purpose
                 }
                 throw e;
             }

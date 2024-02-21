@@ -1,9 +1,9 @@
 package org.tbk.nostr.relay.handler;
 
 import org.tbk.nostr.proto.CloseRequest;
-import org.tbk.nostr.relay.NostrWebSocketSession;
+import org.tbk.nostr.relay.NostrRequestContext;
 
 public interface CloseRequestHandler {
 
-    void handleCloseMessage(NostrWebSocketSession session, CloseRequest close) throws Exception;
+    void handleCloseMessage(NostrRequestContext context, CloseRequest close) throws Exception;
 }

@@ -7,7 +7,7 @@ import org.tbk.nostr.proto.ReqRequest;
 import reactor.core.publisher.Flux;
 
 public interface SubscriptionSupport {
-    void removeAll(SessionId sessionId);
+    void removeAll(NostrWebSocketSession.SessionId sessionId);
 
     void remove(SubscriptionKey key);
 
@@ -15,10 +15,7 @@ public interface SubscriptionSupport {
 
     Flux<SessionSubscription> findMatching(Event event);
 
-    record SessionId(@NonNull String id) {
-    }
-
-    record SubscriptionKey(@NonNull SessionId sessionId,
+    record SubscriptionKey(@NonNull NostrWebSocketSession.SessionId sessionId,
                            @NonNull SubscriptionId subscriptionId) {
     }
 
