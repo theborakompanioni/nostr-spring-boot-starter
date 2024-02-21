@@ -11,11 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.tbk.nostr.relay.*;
 import org.tbk.nostr.relay.handler.*;
-import org.tbk.nostr.relay.interceptor.MaxFilterCountReqRequestHandlerInterceptor;
-import org.tbk.nostr.relay.interceptor.MaxLimitPerFilterReqRequestHandlerInterceptor;
-import org.tbk.nostr.relay.interceptor.RequestHandlerInterceptor;
-import org.tbk.nostr.relay.interceptor.ValidatingEventRequestHandlerInterceptor;
-import org.tbk.nostr.relay.support.InMemorySessionSubscriptionSupport;
+import org.tbk.nostr.relay.interceptor.*;
+import org.tbk.nostr.relay.support.SimpleEventStreamSupport;
+import org.tbk.nostr.relay.support.SimpleSubscriptionSupport;
 import org.tbk.nostr.relay.validation.CreatedAtLimitEventValidator;
 import org.tbk.nostr.relay.validation.DefaultEventValidator;
 import org.tbk.nostr.relay.validation.EventValidator;
@@ -32,9 +30,16 @@ public class NostrRelayAutoConfiguration {
     private final NostrRelayProperties relayProperties;
 
     @Bean
-    @ConditionalOnMissingBean(SessionSubscriptionSupport.class)
-    SessionSubscriptionSupport inMemorySubscriptionHandler() {
-        return new InMemorySessionSubscriptionSupport();
+    @ConditionalOnMissingBean(SubscriptionSupport.class)
+    SimpleSubscriptionSupport simpleSubscriptionSupport() {
+        return new SimpleSubscriptionSupport();
+    }
+
+    @Bean
+    @ConditionalOnBean(SubscriptionSupport.class)
+    @ConditionalOnMissingBean(EventStreamSupport.class)
+    SimpleEventStreamSupport simpleEventStreamSupport(SubscriptionSupport support) {
+        return new SimpleEventStreamSupport(support);
     }
 
     // validators
@@ -69,6 +74,12 @@ public class NostrRelayAutoConfiguration {
     MaxLimitPerFilterReqRequestHandlerInterceptor maxLimitPerFilterReqRequestHandlerInterceptor() {
         return new MaxLimitPerFilterReqRequestHandlerInterceptor(relayProperties.getMaxLimitPerFilter());
     }
+
+    @Bean
+    @ConditionalOnBean(SubscriptionSupport.class)
+    SubscriptionHandlerInterceptor subscriptionHandlerInterceptor(SubscriptionSupport support) {
+        return new SubscriptionHandlerInterceptor(support);
+    }
     // interceptors - end
 
     // request handler
@@ -88,8 +99,8 @@ public class NostrRelayAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(CloseRequestHandler.class)
-    DefaultCloseRequestHandler defaultCloseRequestHandler(SessionSubscriptionSupport support) {
-        return new DefaultCloseRequestHandler(support);
+    DefaultCloseRequestHandler defaultCloseRequestHandler() {
+        return new DefaultCloseRequestHandler();
     }
 
     @Bean
@@ -106,19 +117,19 @@ public class NostrRelayAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(ParseErrorHandler.class)
-    ParseErrorHandler defaultParseErrorHandler() {
+    DefaultParseErrorHandler defaultParseErrorHandler() {
         return new DefaultParseErrorHandler();
     }
     // request handler - end
 
     @Bean
     @ConditionalOnMissingBean(NostrWebSocketHandler.class)
-    NostrWebSocketHandler nostrWebSocketHandler(ReqRequestHandler reqRequestHandler,
-                                                EventRequestHandler eventRequestHandler,
-                                                CloseRequestHandler closeRequestHandler,
-                                                CountRequestHandler countRequestHandler,
-                                                UnknownRequestHandler unknownRequestHandler,
-                                                ParseErrorHandler parseErrorHandler) {
+    NostrRequestHandlerSupport nostrWebSocketHandler(ReqRequestHandler reqRequestHandler,
+                                                     EventRequestHandler eventRequestHandler,
+                                                     CloseRequestHandler closeRequestHandler,
+                                                     CountRequestHandler countRequestHandler,
+                                                     UnknownRequestHandler unknownRequestHandler,
+                                                     ParseErrorHandler parseErrorHandler) {
         return new NostrRequestHandlerSupport(
                 reqRequestHandler,
                 eventRequestHandler,

@@ -6,7 +6,7 @@ import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.ReqRequest;
 import reactor.core.publisher.Flux;
 
-public interface SessionSubscriptionSupport {
+public interface SubscriptionSupport {
     void removeAll(SessionId sessionId);
 
     void remove(SubscriptionKey key);

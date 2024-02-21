@@ -17,9 +17,6 @@ import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.ReqRequest;
-import org.tbk.nostr.relay.config.NostrRelayProperties;
-import org.tbk.nostr.template.NostrTemplate;
-import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreSubscriptionIds;
 
@@ -34,17 +31,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = {NostrRelaySpecStreamTest.NostrRelaySpecStreamTestConfig.class})
+@ContextConfiguration(classes = {NostrRelaySpecEventStreamTest.NostrRelaySpecEventStreamTestConfig.class})
 @ActiveProfiles({"test", "spec-test"})
-public class NostrRelaySpecStreamTest {
+public class NostrRelaySpecEventStreamTest {
 
     @Lazy // needed for @LocalServerPort to be populated
-    @TestConfiguration
-    static class NostrRelaySpecStreamTestConfig {
+    @TestConfiguration(proxyBeanMethods = false)
+    static class NostrRelaySpecEventStreamTestConfig {
 
         private final int serverPort;
 
-        NostrRelaySpecStreamTestConfig(@LocalServerPort int serverPort) {
+        NostrRelaySpecEventStreamTestConfig(@LocalServerPort int serverPort) {
             this.serverPort = serverPort;
         }
 

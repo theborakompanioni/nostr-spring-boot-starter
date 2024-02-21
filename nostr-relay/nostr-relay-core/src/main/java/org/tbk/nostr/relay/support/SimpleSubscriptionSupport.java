@@ -2,7 +2,7 @@ package org.tbk.nostr.relay.support;
 
 import lombok.extern.slf4j.Slf4j;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.relay.SessionSubscriptionSupport;
+import org.tbk.nostr.relay.SubscriptionSupport;
 import org.tbk.nostr.util.MoreFilters;
 import reactor.core.publisher.Flux;
 
@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 @Slf4j
-public class InMemorySessionSubscriptionSupport implements SessionSubscriptionSupport {
+public class SimpleSubscriptionSupport implements SubscriptionSupport {
 
     private final Map<SubscriptionKey, SessionSubscription> subscriptions = new ConcurrentHashMap<>();
     private final Map<SessionId, List<SubscriptionKey>> sessionIdToSubscriptionKeys = new ConcurrentHashMap<>();

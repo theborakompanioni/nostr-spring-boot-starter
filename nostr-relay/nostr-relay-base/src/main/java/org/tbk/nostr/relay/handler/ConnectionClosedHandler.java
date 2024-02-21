@@ -1,7 +1,6 @@
 package org.tbk.nostr.relay.handler;
 
 import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.relay.NostrWebSocketSession;
 
 public interface ConnectionClosedHandler {

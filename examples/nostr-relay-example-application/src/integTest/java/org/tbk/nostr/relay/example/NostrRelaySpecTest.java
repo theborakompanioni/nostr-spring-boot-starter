@@ -44,7 +44,7 @@ import static org.hamcrest.Matchers.*;
 public class NostrRelaySpecTest {
 
     @Lazy // needed for @LocalServerPort to be populated
-    @TestConfiguration
+    @TestConfiguration(proxyBeanMethods = false)
     static class NostrRelaySpecTestConfig {
 
         private final int serverPort;
