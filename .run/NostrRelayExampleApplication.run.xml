@@ -1,12 +1,12 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="NostrRelayExampleApplication" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="org.tbk.nostr.relay.example.NostrRelayExampleApplication" />
+    <option name="MAIN_CLASS_NAME" value="org.tbk.nostr.example.relay.NostrRelayExampleApplication" />
     <module name="nostr-spring-boot-starter.examples.nostr-relay-example-application.main" />
     <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=development" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples/nostr-relay-example-application" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.tbk.nostr.relay.example.*" />
+        <option name="PATTERN" value="org.tbk.nostr.example.relay.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
