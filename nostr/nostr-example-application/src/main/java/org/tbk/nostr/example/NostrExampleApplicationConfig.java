@@ -10,7 +10,6 @@ import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.client.NostrClientService;
 import org.tbk.nostr.client.SimpleNostrClientService;
 
-import java.net.URI;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
@@ -25,7 +24,7 @@ class NostrExampleApplicationConfig {
 
     @Bean
     RelayUri relayUri() {
-        return RelayUri.of(URI.create(properties.getRelayUri()));
+        return RelayUri.of(properties.getRelayUri());
     }
 
     @Bean(destroyMethod = "shutDown")

@@ -20,6 +20,10 @@ public class NostrExampleApplicationProperties implements Validator {
 
     private String relayUri;
 
+    public URI getRelayUri() {
+        return URI.create(relayUri);
+    }
+
     @Override
     public boolean supports(Class<?> clazz) {
         return clazz == NostrExampleApplicationProperties.class;
@@ -29,7 +33,7 @@ public class NostrExampleApplicationProperties implements Validator {
     public void validate(Object target, Errors errors) {
         NostrExampleApplicationProperties properties = (NostrExampleApplicationProperties) target;
 
-        String relayUri = properties.getRelayUri();
+        String relayUri = properties.relayUri;
         if (Strings.isNullOrEmpty(relayUri)) {
             String errorMessage = "'relayUri' entry must not be empty";
             errors.rejectValue("relayUri", "relayUri.invalid", errorMessage);

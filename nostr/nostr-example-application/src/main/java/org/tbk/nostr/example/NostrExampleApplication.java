@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 @Slf4j
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class NostrExampleApplication {
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
