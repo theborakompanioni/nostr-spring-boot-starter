@@ -9,7 +9,6 @@ include 'nostr:nostr-nip11'
 include 'nostr:nostr-proto'
 include 'nostr:nostr-proto-json'
 include 'nostr:nostr-template'
-include 'nostr:nostr-example-application'
 
 include 'nostr-relay:nostr-relay-base'
 include 'nostr-relay:nostr-relay-core'
@@ -21,4 +20,5 @@ include 'nostr-relay:nostr-relay-nip40'
 include 'nostr-relay:nostr-relay-autoconfigure'
 include 'nostr-relay:nostr-relay-starter'
 
+include 'examples:nostr-client-example-application'
 include 'examples:nostr-relay-example-application'

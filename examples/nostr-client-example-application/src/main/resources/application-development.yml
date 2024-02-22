@@ -1,7 +1,4 @@
-app.name: tbk-nostr-spring-boot-starter-demo (dev)
-app.description: A spring boot nostr demo application
-
-spring.application.name: 'tbk-nostr-spring-boot-starter-demo-dev'
+spring.application.name: 'tbk-nostr-client-dev'
 
 # LOGGING
 logging.file.path: ./var/log

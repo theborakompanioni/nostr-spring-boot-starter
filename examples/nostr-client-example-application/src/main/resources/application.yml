@@ -1,7 +1,4 @@
-app.name: tbk-nostr-spring-boot-starter-demo
-app.description: A spring boot nostr demo application
-
-spring.application.name: 'tbk-nostr-spring-boot-starter-demo'
+spring.application.name: 'tbk-nostr-client'
 spring.http.log-request-details: false
 
 spring.lifecycle.timeout-per-shutdown-phase: 30s
@@ -12,8 +9,7 @@ logging.file.path: ./var/log
 logging.file.name: application.log
 logging.config: classpath:logback.xml
 logging.level.org.springframework: INFO
-#logging.level.web: DEBUG
 
-org.tbk.nostr.example:
+org.tbk.nostr.example.client:
   #relay-uri: wss://nostr-pub.wellorder.net
   relay-uri: wss://relay.damus.io

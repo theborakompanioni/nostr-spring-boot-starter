@@ -1,4 +1,4 @@
-package org.tbk.nostr.example;
+package org.tbk.nostr.example.client;
 
 import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
@@ -11,12 +11,12 @@ import org.springframework.validation.Validator;
 import java.net.URI;
 
 @ConfigurationProperties(
-        prefix = "org.tbk.nostr.example",
+        prefix = "org.tbk.nostr.example.client",
         ignoreUnknownFields = false
 )
 @Getter
 @AllArgsConstructor(onConstructor = @__(@ConstructorBinding))
-public class NostrExampleApplicationProperties implements Validator {
+public class NostrClientExampleApplicationProperties implements Validator {
 
     private String relayUri;
 
@@ -26,12 +26,12 @@ public class NostrExampleApplicationProperties implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz == NostrExampleApplicationProperties.class;
+        return clazz == NostrClientExampleApplicationProperties.class;
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        NostrExampleApplicationProperties properties = (NostrExampleApplicationProperties) target;
+        NostrClientExampleApplicationProperties properties = (NostrClientExampleApplicationProperties) target;
 
         String relayUri = properties.relayUri;
         if (Strings.isNullOrEmpty(relayUri)) {

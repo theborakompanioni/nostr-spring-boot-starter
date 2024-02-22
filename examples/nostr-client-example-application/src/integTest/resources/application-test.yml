@@ -12,5 +12,5 @@ spring.docker.compose:
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
   skip.in-tests: false
 
-org.tbk.nostr.example:
+org.tbk.nostr.example.client:
   relay-uri: 'ws://localhost:7000'

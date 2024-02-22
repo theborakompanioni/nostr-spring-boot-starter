@@ -1,4 +1,4 @@
-package org.tbk.nostr.example;
+package org.tbk.nostr.example.client;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

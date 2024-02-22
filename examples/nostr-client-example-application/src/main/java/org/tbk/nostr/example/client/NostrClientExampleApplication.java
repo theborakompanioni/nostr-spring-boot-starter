@@ -1,4 +1,4 @@
-package org.tbk.nostr.example;
+package org.tbk.nostr.example.client;
 
 import com.google.protobuf.ByteString;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.util.TimeZone;
 
 @Slf4j
 @SpringBootApplication(proxyBeanMethods = false)
-public class NostrExampleApplication {
+public class NostrClientExampleApplication {
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         Locale.setDefault(Locale.ENGLISH);
@@ -35,7 +35,7 @@ public class NostrExampleApplication {
 
     public static void main(String[] args) {
         new SpringApplicationBuilder()
-                .sources(NostrExampleApplication.class)
+                .sources(NostrClientExampleApplication.class)
                 .listeners(applicationPidFileWriter(), webServerPortFileWriter())
                 .web(WebApplicationType.NONE)
                 .run(args);

@@ -1,4 +1,4 @@
-package org.tbk.nostr.example;
+package org.tbk.nostr.example.client;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +15,12 @@ import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(NostrExampleApplicationProperties.class)
+@EnableConfigurationProperties(NostrClientExampleApplicationProperties.class)
 @RequiredArgsConstructor
-class NostrExampleApplicationConfig {
+class NostrClientExampleApplicationConfig {
 
     @NonNull
-    private final NostrExampleApplicationProperties properties;
+    private final NostrClientExampleApplicationProperties properties;
 
     @Bean
     RelayUri relayUri() {
