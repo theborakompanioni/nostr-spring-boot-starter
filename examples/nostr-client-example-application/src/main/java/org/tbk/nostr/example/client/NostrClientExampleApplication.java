@@ -1,6 +1,5 @@
 package org.tbk.nostr.example.client;
 
-import com.google.protobuf.ByteString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.WebApplicationType;
@@ -10,9 +9,9 @@ import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.boot.web.context.WebServerPortFileWriter;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
 import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.client.NostrClientService;
+import org.tbk.nostr.client.NostrClientService.SubscribeOptions;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.ReqRequest;
 import org.tbk.nostr.util.MoreSubscriptionIds;
@@ -30,9 +29,6 @@ public class NostrClientExampleApplication {
         Locale.setDefault(Locale.ENGLISH);
     }
 
-    // npub1qny3tkh0acurzla8x3zy4nhrjz5zd8l9sy9jys09umwng00manysew95gx
-    private static final String ODELL_PUBKEY = "04c915daefee38317fa734444acee390a8269fe5810b2241e5e6dd343dfbecc9";
-
     public static void main(String[] args) {
         new SpringApplicationBuilder()
                 .sources(NostrClientExampleApplication.class)
@@ -41,43 +37,16 @@ public class NostrClientExampleApplication {
                 .run(args);
     }
 
-    public static ApplicationListener<?> applicationPidFileWriter() {
+    private static ApplicationListener<?> applicationPidFileWriter() {
         return new ApplicationPidFileWriter("application.pid");
     }
 
-    public static ApplicationListener<?> webServerPortFileWriter() {
+    private static ApplicationListener<?> webServerPortFileWriter() {
         return new WebServerPortFileWriter("application.port");
     }
 
     @Bean
-    @Profile("!test")
-    ApplicationRunner odellEvents(NostrClientService reactiveNostrRelayClient) {
-        return args -> {
-            SubscriptionId subscriptionId = MoreSubscriptionIds.random();
-
-            ReqRequest reqRequest = ReqRequest.newBuilder()
-                    .setId(subscriptionId.getId())
-                    .addFilters(Filter.newBuilder()
-                            .addKinds(1)
-                            .addAuthors(ByteString.fromHex(ODELL_PUBKEY))
-                            .build())
-                    .build();
-
-            log.info("[ODELL] WILL SUBSCRIBE (subscription_id = {})...", subscriptionId);
-
-            reactiveNostrRelayClient.subscribe(reqRequest)
-                    .doOnSubscribe(foo -> {
-                        log.info("[ODELL] SUBSCRIBED");
-                    })
-                    .subscribe(it -> {
-                        log.info("[ODELL] NEW EVENT: {}", it.getContent());
-                    });
-        };
-    }
-
-    @Bean
-    @Profile("!test")
-    ApplicationRunner allTextNotesSinceNow(NostrClientService reactiveNostrRelayClient) {
+    ApplicationRunner allTextNotesSinceNow(NostrClientService nostrClientService) {
         return args -> {
             SubscriptionId subscriptionId = MoreSubscriptionIds.random();
 
@@ -89,16 +58,20 @@ public class NostrClientExampleApplication {
                             .build())
                     .build();
 
-            log.info("[ALL] Will subscribe (subscription_id = {})...", subscriptionId);
-            reactiveNostrRelayClient.subscribe(reqRequest, NostrClientService.SubscribeOptions.defaultOptions().toBuilder()
+            log.info("[ALL] Will subscribe (subscription_id = '{}')…", subscriptionId.getId());
+            nostrClientService.subscribe(reqRequest, SubscribeOptions.defaultOptions().toBuilder()
                             .closeOnEndOfStream(false)
                             .build())
-                    .delaySubscription(Duration.ofSeconds(5))
                     .doOnSubscribe(foo -> {
-                        log.info("[ALL] Subscribed");
+                        log.info("[ALL] Subscribed.");
                     })
+                    .delaySubscription(Duration.ofSeconds(5))
                     .subscribe(it -> {
-                        log.info("[ALL] New event: {}", it.getContent());
+                        log.info("[ALL] New event: '{}'", it.getContent());
+                    }, e -> {
+                        log.error("[ALL] Error during event stream: {}", e.getMessage());
+                    }, () -> {
+                        log.info("[ALL] Completed.");
                     });
         };
     }
