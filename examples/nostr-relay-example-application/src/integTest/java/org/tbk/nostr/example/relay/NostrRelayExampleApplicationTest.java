@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.proto.Event;
@@ -23,11 +24,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = NostrRelayTestConfig.class)
 @ActiveProfiles("test")
-public class NostrRelayExampleApplicationTest {
-
-    @LocalServerPort
-    private int serverPort;
+class NostrRelayExampleApplicationTest {
 
     @Autowired(required = false)
     private ApplicationContext applicationContext;
@@ -38,11 +37,15 @@ public class NostrRelayExampleApplicationTest {
     @Autowired(required = false)
     private NostrRelayProperties relayProperties;
 
+    @Autowired(required = false)
+    private NostrTemplate nostrTemplate;
+
     @Test
     void contextLoads() {
         assertThat(applicationContext, is(notNullValue()));
         assertThat(applicationProperties, is(notNullValue()));
         assertThat(relayProperties, is(notNullValue()));
+        assertThat(nostrTemplate, is(notNullValue()));
     }
 
     @Test
@@ -59,8 +62,6 @@ public class NostrRelayExampleApplicationTest {
 
     @Test
     void itShouldReceiveStartupEvents() {
-        NostrTemplate nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
-
         XonlyPublicKey applicationPubkey = applicationProperties.getIdentity()
                 .map(NostrRelayExampleApplicationProperties.IdentityProperties::getSeed)
                 .map(MoreIdentities::fromSeed)

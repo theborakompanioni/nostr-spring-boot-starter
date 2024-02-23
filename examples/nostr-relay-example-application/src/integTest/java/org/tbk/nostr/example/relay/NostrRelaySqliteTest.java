@@ -1,19 +1,16 @@
 package org.tbk.nostr.example.relay;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.template.NostrTemplate;
-import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 
 import java.time.Duration;
@@ -21,31 +18,17 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = NostrRelayTestConfig.class)
 @ActiveProfiles({"test", "sqlite-test"})
-public class NostrRelaySqliteTest {
+class NostrRelaySqliteTest {
 
-    @LocalServerPort
-    private int serverPort;
-
-    @Autowired(required = false)
+    @Autowired
     private NostrRelayExampleApplicationProperties applicationProperties;
 
+    @Autowired
     private NostrTemplate nostrTemplate;
-
-    @BeforeEach
-    void beforeEach() {
-        if (this.nostrTemplate == null) {
-            this.nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
-        }
-    }
-
-    @Test
-    void contextLoads() {
-        assertThat(applicationProperties, is(notNullValue()));
-    }
 
     @Test
     void itShouldLoadProperties() {

@@ -25,10 +25,15 @@ public class DefaultEventRequestHandler implements EventRequestHandler {
                 .setSuccess(false);
 
         try {
-            OkResponse ok = support.createEvent(event.getEvent()).block(Duration.ofSeconds(60));
+            OkResponse ok = support.createEvent(event.getEvent())
+                    .blockOptional(Duration.ofSeconds(60))
+                    .orElseThrow(() -> new IllegalStateException("Timeout during invocation of 'createEvent'."));
+            
             okBuilder.mergeFrom(ok);
 
-            context.setHandledEvent(event.getEvent());
+            if (ok.getSuccess()) {
+                context.setHandledEvent(event.getEvent());
+            }
         } catch (Exception e) {
             if (log.isWarnEnabled()) {
                 log.warn("Unhandled error while creating event: {}", e.getMessage());

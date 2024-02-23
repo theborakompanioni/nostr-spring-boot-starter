@@ -1,13 +1,12 @@
 package org.tbk.nostr.example.relay;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.EventUri;
-import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
@@ -15,7 +14,6 @@ import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.template.NostrTemplate;
-import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 
 import java.time.Duration;
@@ -27,20 +25,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = NostrRelayTestConfig.class)
 @ActiveProfiles({"test", "nip-test"})
-public class NostrRelayNip9Test {
+class NostrRelayNip9Test {
 
-    @LocalServerPort
-    private int serverPort;
-
+    @Autowired
     private NostrTemplate nostrTemplate;
-
-    @BeforeEach
-    void beforeEach() {
-        if (this.nostrTemplate == null) {
-            this.nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
-        }
-    }
 
     @Test
     void itShouldValidateEventSuccessfully0() {

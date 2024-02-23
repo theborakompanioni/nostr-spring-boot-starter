@@ -1,14 +1,12 @@
 package org.tbk.nostr.example.relay;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-import org.tbk.nostr.base.RelayUri;
+import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.nip11.RelayInfoDocument;
 import org.tbk.nostr.template.NostrTemplate;
-import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MorePublicKeys;
 
 import java.net.URI;
@@ -18,20 +16,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = NostrRelayTestConfig.class)
 @ActiveProfiles({"test", "nip-test"})
-public class NostrRelayNip11Test {
+class NostrRelayNip11Test {
 
-    @LocalServerPort
-    private int serverPort;
-
+    @Autowired
     private NostrTemplate nostrTemplate;
-
-    @BeforeEach
-    void beforeEach() {
-        if (this.nostrTemplate == null) {
-            this.nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
-        }
-    }
 
     @Test
     void itShouldFetchRelayInfoSuccessfully0() {

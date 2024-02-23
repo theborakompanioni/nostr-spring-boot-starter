@@ -2,21 +2,19 @@ package org.tbk.nostr.example.relay;
 
 import com.google.common.base.Stopwatch;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-import org.tbk.nostr.base.RelayUri;
+import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.template.NostrTemplate;
-import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 import reactor.core.publisher.Flux;
@@ -32,22 +30,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 @Slf4j
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"test", "load-test"})
 @EnabledIfEnvironmentVariable(named = "CI", matches = "true")
-public class NostrRelayLoadTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = NostrRelayTestConfig.class)
+@ActiveProfiles({"test", "load-test"})
+class NostrRelayLoadTest {
 
-    @LocalServerPort
-    private int serverPort;
-
+    @Autowired
     private NostrTemplate nostrTemplate;
-
-    @BeforeEach
-    void beforeEach() {
-        if (this.nostrTemplate == null) {
-            this.nostrTemplate = new SimpleNostrTemplate(RelayUri.of("ws://localhost:%d".formatted(serverPort)));
-        }
-    }
 
     @Test
     void itShouldSendEventLoadTestSingleEvent() {

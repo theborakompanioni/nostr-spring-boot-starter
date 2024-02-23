@@ -6,16 +6,11 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Metadata;
-import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
@@ -23,7 +18,6 @@ import org.tbk.nostr.nips.Nip13;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.config.NostrRelayProperties;
 import org.tbk.nostr.template.NostrTemplate;
-import org.tbk.nostr.template.SimpleNostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreKinds;
 import org.tbk.nostr.util.MoreSubscriptionIds;
@@ -39,30 +33,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = {NostrRelaySpecTest.NostrRelaySpecTestConfig.class})
+@ContextConfiguration(classes = NostrRelayTestConfig.class)
 @ActiveProfiles({"test", "spec-test"})
-public class NostrRelaySpecTest {
-
-    @Lazy // needed for @LocalServerPort to be populated
-    @TestConfiguration(proxyBeanMethods = false)
-    static class NostrRelaySpecTestConfig {
-
-        private final int serverPort;
-
-        NostrRelaySpecTestConfig(@LocalServerPort int serverPort) {
-            this.serverPort = serverPort;
-        }
-
-        @Bean
-        RelayUri relayUri() {
-            return RelayUri.of("ws://localhost:%d".formatted(serverPort));
-        }
-
-        @Bean
-        NostrTemplate nostrTemplate(RelayUri relayUri) {
-            return new SimpleNostrTemplate(relayUri);
-        }
-    }
+class NostrRelaySpecTest {
 
     @Autowired
     private NostrRelayProperties relayProperties;
