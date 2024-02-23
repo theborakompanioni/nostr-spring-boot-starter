@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class NostrExampleApplicationTest {
+class NostrClientExampleApplicationTest {
 
     @Autowired(required = false)
     private ApplicationContext applicationContext;

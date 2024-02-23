@@ -1,5 +1,4 @@
 spring.application.name: 'tbk-nostr-client'
-spring.http.log-request-details: false
 
 spring.lifecycle.timeout-per-shutdown-phase: 30s
 spring.threads.virtual.enabled: true
