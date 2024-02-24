@@ -25,11 +25,9 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
 
@@ -55,6 +53,8 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
     private final Map<SubscriptionId, SubscribeContext> subscriptions;
 
+    private final Scheduler heartbeatScheduler;
+
     private volatile WebSocketSession session;
 
     @Builder
@@ -67,13 +67,20 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
     }
 
     public SimpleNostrClientService(RelayUri relay, WebSocketClient webSocketClient) {
+        this(relay, webSocketClient, Duration.ofSeconds(30));
+    }
+
+    public SimpleNostrClientService(RelayUri relay, WebSocketClient webSocketClient, Duration heartbeatInterval) {
         this.relayUri = requireNonNull(relay);
         this.client = requireNonNull(webSocketClient);
 
         this.publisher = new SubmissionPublisher<>(publisherExecutor, Flow.defaultBufferSize());
         this.textWebSocketHandler = new SubmissionPublisherTextWebSocketHandler(this.publisher);
         this.subscriptions = new ConcurrentHashMap<>();
+
+        this.heartbeatScheduler = Scheduler.newFixedDelaySchedule(heartbeatInterval, heartbeatInterval);
     }
+
 
     @Override
     public Flux<Event> subscribe(ReqRequest req, SubscribeOptions options) {
@@ -207,14 +214,15 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
     @Override
     protected Scheduler scheduler() {
-        return Scheduler.newFixedDelaySchedule(Duration.ofSeconds(30), Duration.ofSeconds(30));
+        return this.heartbeatScheduler;
     }
 
     @Override
     protected void runOneIteration() throws Exception {
         if (session != null && session.isOpen()) {
-            log.trace("Sending ping to {}", relayUri);
-            this.session.sendMessage(new PingMessage());
+            ByteBuffer payload = ByteBuffer.allocate(Long.BYTES).putLong(0, System.currentTimeMillis() / 1_000L);
+            log.trace("Sending ping to {}: {}", session.getRemoteAddress(), HexFormat.of().formatHex(payload.array()));
+            this.session.sendMessage(new PingMessage(payload));
         }
     }
 
@@ -234,14 +242,21 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
     protected void shutDown() {
         log.info("Closing {} subscriptions on relay {}", this.subscriptions.size(), this.relayUri.getUri());
 
-        Set<SubscriptionId> subscriptionIds = Set.copyOf(subscriptions.keySet());
-        for (SubscriptionId id : subscriptionIds) {
-            this.sendClose(id);
-            subscriptions.remove(id);
-        }
-
         if (this.session != null) {
             log.info("Shutting down connection to relay {}", this.relayUri.getUri());
+
+            if (this.session.isOpen()) {
+                Set<SubscriptionId> subscriptionIds = Set.copyOf(subscriptions.keySet());
+                for (SubscriptionId id : subscriptionIds) {
+                    try {
+                        this.sendClose(id);
+                        subscriptions.remove(id);
+                    } catch (Exception e) {
+                        log.warn("Error while closing subscription {}: {}", id.getId(), e.getMessage());
+                    }
+                }
+            }
+
             try {
                 this.session.close();
             } catch (Exception e) {
@@ -288,8 +303,18 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         }
 
         @Override
+        protected void handlePongMessage(WebSocketSession session, PongMessage message) {
+            log.trace("handlePongMessage: {}", HexFormat.of().formatHex(message.getPayload().array()));
+        }
+
+        @Override
+        public void handleTransportError(WebSocketSession session, Throwable t) {
+            log.error("handleTransportError", t);
+        }
+
+        @Override
         public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-            log.debug("Connection closed: {}", status);
+            log.debug("Connection closed to {}: {}", session.getRemoteAddress(), status);
         }
     }
 }
