@@ -9,10 +9,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.FlowAdapters;
-import org.springframework.web.socket.PingMessage;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketHttpHeaders;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.*;
+import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -49,15 +47,15 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
     private final RelayUri relayUri;
 
-    private final StandardWebSocketClient client;
+    private final WebSocketClient client;
+
+    private final SubmissionPublisher<TextMessage> publisher;
+
+    private final TextWebSocketHandler textWebSocketHandler;
+
+    private final Map<SubscriptionId, SubscribeContext> subscriptions;
 
     private volatile WebSocketSession session;
-
-    private final SubmissionPublisher<TextMessage> publisher = new SubmissionPublisher<>(publisherExecutor, Flow.defaultBufferSize());
-
-    private final TextWebSocketHandler textWebSocketHandler = new SubmissionPublisherTextWebSocketHandler(this.publisher);
-
-    private final Map<SubscriptionId, SubscribeContext> subscriptions = new ConcurrentHashMap<>();
 
     @Builder
     private record SubscribeContext(@NonNull ReqRequest reqRequest,
@@ -65,8 +63,16 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
     }
 
     public SimpleNostrClientService(RelayUri relay) {
+        this(relay, new StandardWebSocketClient());
+    }
+
+    public SimpleNostrClientService(RelayUri relay, WebSocketClient webSocketClient) {
         this.relayUri = requireNonNull(relay);
-        this.client = new StandardWebSocketClient();
+        this.client = requireNonNull(webSocketClient);
+
+        this.publisher = new SubmissionPublisher<>(publisherExecutor, Flow.defaultBufferSize());
+        this.textWebSocketHandler = new SubmissionPublisherTextWebSocketHandler(this.publisher);
+        this.subscriptions = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -214,14 +220,14 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
     @Override
     protected void startUp() throws ExecutionException, InterruptedException {
-        log.info("Trying to connect to relay {}", relayUri);
+        log.info("Trying to connect to relay {}", relayUri.getUri());
 
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
         this.session = client.execute(textWebSocketHandler, headers, relayUri.getUri())
                 .thenApply(it -> new ConcurrentWebSocketSessionDecorator(it, (int) Duration.ofSeconds(60).toMillis(), 512 * 1024))
                 .get();
 
-        log.info("Successfully connected to relay {}", relayUri);
+        log.info("Successfully connected to relay {}", relayUri.getUri());
     }
 
     @Override
@@ -268,17 +274,22 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
         @Override
         public void afterConnectionEstablished(WebSocketSession session) {
-            log.trace("Successfully connected! Headers: {}", session.getHandshakeHeaders());
+            log.debug("Connection established to {}: {}", session.getRemoteAddress(), session.getId());
         }
 
         @Override
         protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-            log.trace("handleTextMessage: {}", message.getPayload());
+            log.trace("handleTextMessage: message with {} bytes", message.getPayloadLength());
             if (publisher.isClosed()) {
                 log.warn("Will not submit incoming websocket message: Publisher is already closed.");
             } else {
                 publisher.submit(message);
             }
+        }
+
+        @Override
+        public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+            log.debug("Connection closed: {}", status);
         }
     }
 }

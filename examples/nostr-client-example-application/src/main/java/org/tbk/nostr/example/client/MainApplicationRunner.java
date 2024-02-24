@@ -15,6 +15,7 @@ import reactor.core.Disposable;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HexFormat;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,7 +47,16 @@ class MainApplicationRunner implements ApplicationRunner, DisposableBean {
                 })
                 .delaySubscription(Duration.ofSeconds(5))
                 .subscribe(it -> {
-                    log.info("[ALL] New event: '{}'", it.getContent());
+                    String id = HexFormat.of().formatHex(it.getId().toByteArray());
+                    String pubkey = HexFormat.of().formatHex(it.getPubkey().toByteArray());
+                    log.info("""
+                        [ALL] New event:
+                        id: {}
+                        pubkey: {}
+                        content: \"\"\"
+                        {}
+                        \"\"\"
+                        """, id, pubkey, it.getContent());
                 }, e -> {
                     log.error("[ALL] Error during event stream: {}", e.getMessage());
                 }, () -> {
