@@ -23,6 +23,7 @@ import org.tbk.nostr.util.MoreEvents;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -30,15 +31,19 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
 public class SimpleNostrClientService extends AbstractScheduledService implements NostrClientService {
+    private final static OnCloseHandler defaultOnCloseHandler = new ReconnectOnClose();
+    private final static Duration defaultHeartbeatInterval = Duration.ofSeconds(30);
+
     private final String serviceId = Integer.toHexString(System.identityHashCode(this));
 
-    private final ExecutorService publisherExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
+    private final ScheduledExecutorService publisherExecutor = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
             .setNameFormat("nostr-msg-pub-" + serviceId + "-%d")
             .setDaemon(false)
             .build());
@@ -47,40 +52,52 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
     private final WebSocketClient client;
 
+    private final OnCloseHandler onCloseHandler;
+
     private final SubmissionPublisher<TextMessage> publisher;
 
     private final TextWebSocketHandler textWebSocketHandler;
 
-    private final Map<SubscriptionId, SubscribeContext> subscriptions;
+    private final Map<SubscriptionId, SubscriptionContext> subscriptions;
 
     private final Scheduler heartbeatScheduler;
 
     private volatile WebSocketSession session;
 
     @Builder
-    private record SubscribeContext(@NonNull ReqRequest reqRequest,
-                                    @NonNull NostrClientService.SubscribeOptions options) {
+    private record SubscriptionContext(@NonNull ReqRequest reqRequest,
+                                       @NonNull NostrClientService.SubscribeOptions options) {
     }
 
     public SimpleNostrClientService(RelayUri relay) {
         this(relay, new StandardWebSocketClient());
     }
 
-    public SimpleNostrClientService(RelayUri relay, WebSocketClient webSocketClient) {
-        this(relay, webSocketClient, Duration.ofSeconds(30));
+    public SimpleNostrClientService(RelayUri relay,
+                                    WebSocketClient webSocketClient) {
+        this(relay, webSocketClient, defaultHeartbeatInterval);
     }
 
-    public SimpleNostrClientService(RelayUri relay, WebSocketClient webSocketClient, Duration heartbeatInterval) {
+    public SimpleNostrClientService(RelayUri relay,
+                                    WebSocketClient webSocketClient,
+                                    Duration heartbeatInterval) {
+        this(relay, webSocketClient, heartbeatInterval, defaultOnCloseHandler);
+    }
+
+    public SimpleNostrClientService(RelayUri relay,
+                                    WebSocketClient webSocketClient,
+                                    Duration heartbeatInterval,
+                                    OnCloseHandler onCloseHandler) {
         this.relayUri = requireNonNull(relay);
         this.client = requireNonNull(webSocketClient);
+        this.onCloseHandler = requireNonNull(onCloseHandler);
+
+        this.heartbeatScheduler = Scheduler.newFixedDelaySchedule(requireNonNull(heartbeatInterval), heartbeatInterval);
 
         this.publisher = new SubmissionPublisher<>(publisherExecutor, Flow.defaultBufferSize());
-        this.textWebSocketHandler = new SubmissionPublisherTextWebSocketHandler(this.publisher);
+        this.textWebSocketHandler = new SubmissionPublisherTextWebSocketHandler(this.publisher, this::onConnectionClosed);
         this.subscriptions = new ConcurrentHashMap<>();
-
-        this.heartbeatScheduler = Scheduler.newFixedDelaySchedule(heartbeatInterval, heartbeatInterval);
     }
-
 
     @Override
     public Flux<Event> subscribe(ReqRequest req, SubscribeOptions options) {
@@ -89,7 +106,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         SubscriptionId subscriptionId = SubscriptionId.of(req.getId());
 
         return this.connect(subscriptionId).doOnSubscribe(s -> {
-            this.subscriptions.put(subscriptionId, SubscribeContext.builder()
+            this.subscriptions.put(subscriptionId, SubscriptionContext.builder()
                     .reqRequest(req)
                     .options(options)
                     .build());
@@ -117,7 +134,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
                             Optional.ofNullable(subscriptions.get(id))
                                     .filter(ctx -> ctx.options.isCloseOnEndOfStream())
                                     .ifPresent(ctx -> {
-                                        SubscribeContext removed = subscriptions.remove(id);
+                                        SubscriptionContext removed = subscriptions.remove(id);
                                         if (removed != null) {
                                             sendClose(id);
                                         }
@@ -218,17 +235,77 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
     }
 
     @Override
-    protected void runOneIteration() throws Exception {
+    protected void runOneIteration() {
         if (session != null && session.isOpen()) {
-            ByteBuffer payload = ByteBuffer.allocate(Long.BYTES).putLong(0, System.currentTimeMillis() / 1_000L);
-            log.trace("Sending ping to {}: {}", session.getRemoteAddress(), HexFormat.of().formatHex(payload.array()));
-            this.session.sendMessage(new PingMessage(payload));
+            log.trace("Sending ping to {}", session.getRemoteAddress());
+            try {
+                this.session.sendMessage(new PingMessage());
+            } catch (IOException e) {
+                log.warn("Error while sending ping message: {}", e.getMessage());
+            }
         }
     }
 
     @Override
     protected void startUp() throws ExecutionException, InterruptedException {
+        openSession();
+    }
+
+    @Override
+    protected void shutDown() {
+        log.info("Closing {} subscriptions on relay {}", this.subscriptions.size(), this.relayUri.getUri());
+
+        closeSubscriptions();
+        closeSession();
+
+        publisher.close();
+
+        boolean success = MoreExecutors.shutdownAndAwaitTermination(this.publisherExecutor, Duration.ofSeconds(60));
+        if (!success) {
+            log.warn("Could not cleanly shutdown publisher executor");
+        }
+    }
+
+    private void onConnectionClosed(CloseStatus closeStatus) {
+        State serviceState = this.state();
+        if (serviceState != State.RUNNING) {
+            log.trace("Not calling OnCloseHandler as service is in state {}", serviceState);
+            return;
+        }
+
+        this.onCloseHandler.doOnClose(this, closeStatus);
+    }
+
+    public Mono<Boolean> reconnect(Duration delay) {
+        return Mono.fromCallable(() -> {
+            State serviceState = this.state();
+            if (serviceState != State.RUNNING) {
+                log.warn("Not reconnecting as service is in state {}", serviceState);
+                return false;
+            }
+
+            closeSession();
+            openSession();
+            resubscribe();
+
+            return true;
+        }).delaySubscription(delay, Schedulers.fromExecutor(publisherExecutor));
+    }
+
+    private void resubscribe() {
+        for (SubscriptionContext ctx : this.subscriptions.values()) {
+            this.send(Request.newBuilder()
+                    .setReq(ctx.reqRequest())
+                    .build());
+        }
+    }
+
+    private void openSession() throws InterruptedException, ExecutionException {
         log.info("Trying to connect to relay {}", relayUri.getUri());
+
+        if (this.session != null && this.session.isOpen()) {
+            throw new IllegalStateException("Session is already present");
+        }
 
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
         this.session = client.execute(textWebSocketHandler, headers, relayUri.getUri())
@@ -238,13 +315,20 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         log.info("Successfully connected to relay {}", relayUri.getUri());
     }
 
-    @Override
-    protected void shutDown() {
-        log.info("Closing {} subscriptions on relay {}", this.subscriptions.size(), this.relayUri.getUri());
+    private void closeSession() {
+        if (this.session != null && this.session.isOpen()) {
+            log.info("Closing session to relay {}", this.relayUri.getUri());
 
+            try {
+                this.session.close();
+            } catch (Exception e) {
+                log.warn("Error while closing session: {}", e.getMessage());
+            }
+        }
+    }
+
+    private void closeSubscriptions() {
         if (this.session != null) {
-            log.info("Shutting down connection to relay {}", this.relayUri.getUri());
-
             if (this.session.isOpen()) {
                 Set<SubscriptionId> subscriptionIds = Set.copyOf(subscriptions.keySet());
                 for (SubscriptionId id : subscriptionIds) {
@@ -256,19 +340,6 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
                     }
                 }
             }
-
-            try {
-                this.session.close();
-            } catch (Exception e) {
-                log.warn("Error while closing session: {}", e.getMessage());
-            }
-        }
-
-        publisher.close();
-
-        boolean success = MoreExecutors.shutdownAndAwaitTermination(this.publisherExecutor, Duration.ofSeconds(60));
-        if (!success) {
-            log.warn("Could not cleanly shutdown publisher executor");
         }
     }
 
@@ -278,7 +349,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
     }
 
     @VisibleForTesting
-    Map<SubscriptionId, SubscribeContext> getSubscriptions() {
+    Map<SubscriptionId, SubscriptionContext> getSubscriptions() {
         return Collections.unmodifiableMap(this.subscriptions);
     }
 
@@ -287,6 +358,9 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         @NonNull
         private final SubmissionPublisher<TextMessage> publisher;
 
+        @NonNull
+        private final Consumer<CloseStatus> onConnectionClosed;
+
         @Override
         public void afterConnectionEstablished(WebSocketSession session) {
             log.debug("Connection established to {}: {}", session.getRemoteAddress(), session.getId());
@@ -294,7 +368,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
         @Override
         protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-            log.trace("handleTextMessage: message with {} bytes", message.getPayloadLength());
+            log.trace("handleTextMessage with {} bytes: '{}'", message.getPayloadLength(), message.getPayload());
             if (publisher.isClosed()) {
                 log.warn("Will not submit incoming websocket message: Publisher is already closed.");
             } else {
@@ -304,7 +378,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
         @Override
         protected void handlePongMessage(WebSocketSession session, PongMessage message) {
-            log.trace("handlePongMessage: {}", HexFormat.of().formatHex(message.getPayload().array()));
+            log.trace("handlePongMessage: {} bytes", message.getPayloadLength());
         }
 
         @Override
@@ -315,6 +389,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         @Override
         public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
             log.debug("Connection closed to {}: {}", session.getRemoteAddress(), status);
+            onConnectionClosed.accept(status);
         }
     }
 }

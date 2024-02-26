@@ -8,6 +8,8 @@ import org.tbk.nostr.proto.ReqRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 public interface NostrClientService {
     default Flux<Event> subscribe(ReqRequest req) {
         return this.subscribe(req, SubscribeOptions.defaultOptions());
@@ -20,6 +22,8 @@ public interface NostrClientService {
     Mono<Void> close(SubscriptionId id);
 
     Mono<Void> send(Event event);
+
+    Mono<Boolean> reconnect(Duration delay);
 
     @Value
     @Builder(toBuilder = true)
