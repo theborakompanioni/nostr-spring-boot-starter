@@ -14,6 +14,9 @@ import org.tbk.nostr.util.MorePublicKeys;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * See <a href="https://github.com/nostr-protocol/nips/blob/master/19.md">NIP-19</a>.
+ */
 public final class Nip19 {
 
     public static XonlyPublicKey fromNpub(String bech32) {
@@ -97,7 +100,17 @@ public final class Nip19 {
         T decode(String hrp, byte[] data);
     }
 
-    private static final List<Transformer<?>> transformers = List.of(new Transformer<XonlyPublicKey>() {
+    private static final List<Transformer<?>> transformers = List.of(new Transformer<EventId>() {
+        @Override
+        public boolean supports(String hrp, Class<?> clazz) {
+            return EntityType.NOTE.getHrp().equals(hrp) && clazz.isAssignableFrom(EventId.class);
+        }
+
+        @Override
+        public EventId decode(String hrp, byte[] data) {
+            return EventId.of(data);
+        }
+    }, new Transformer<XonlyPublicKey>() {
         @Override
         public boolean supports(String hrp, Class<?> clazz) {
             return EntityType.NPUB.getHrp().equals(hrp) && clazz.isAssignableFrom(XonlyPublicKey.class);
@@ -105,10 +118,11 @@ public final class Nip19 {
 
         @Override
         public XonlyPublicKey decode(String hrp, byte[] data) {
-            if (!MorePublicKeys.isValidPublicKey(data)) {
+            XonlyPublicKey publicKey = MorePublicKeys.fromBytes(data);
+            if (!publicKey.getPublicKey().isValid()) {
                 throw new IllegalArgumentException("Invalid public key value");
             }
-            return MorePublicKeys.fromBytes(data);
+            return publicKey;
         }
     }, new Transformer<PrivateKey>() {
         @Override
@@ -123,16 +137,6 @@ public final class Nip19 {
                 throw new IllegalArgumentException("Invalid private key value");
             }
             return privateKey;
-        }
-    }, new Transformer<EventId>() {
-        @Override
-        public boolean supports(String hrp, Class<?> clazz) {
-            return EntityType.NOTE.getHrp().equals(hrp) && clazz.isAssignableFrom(EventId.class);
-        }
-
-        @Override
-        public EventId decode(String hrp, byte[] data) {
-            return EventId.of(data);
         }
     });
 }
