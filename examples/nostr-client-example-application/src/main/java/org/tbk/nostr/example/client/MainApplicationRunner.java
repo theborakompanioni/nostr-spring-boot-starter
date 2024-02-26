@@ -6,10 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.client.NostrClientService;
+import org.tbk.nostr.nips.Nip19;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.ReqRequest;
+import org.tbk.nostr.util.MorePublicKeys;
 import org.tbk.nostr.util.MoreSubscriptionIds;
 import reactor.core.Disposable;
 
@@ -47,16 +50,21 @@ class MainApplicationRunner implements ApplicationRunner, DisposableBean {
                 })
                 .delaySubscription(Duration.ofSeconds(5))
                 .subscribe(it -> {
-                    String id = HexFormat.of().formatHex(it.getId().toByteArray());
-                    String pubkey = HexFormat.of().formatHex(it.getPubkey().toByteArray());
+                    String idHex = HexFormat.of().formatHex(it.getId().toByteArray());
+                    String noteId = Nip19.toNote(EventId.fromHex(idHex));
+                    String displayId = "%s (%s)".formatted(noteId, idHex);
+
+                    String pubkeyHex = HexFormat.of().formatHex(it.getPubkey().toByteArray());
+                    String npub = Nip19.toNpub(MorePublicKeys.fromHex(pubkeyHex));
+                    String displayPubkey = "%s (%s)".formatted(npub, pubkeyHex);
                     log.info("""
-                        [ALL] New event:
-                        id: {}
-                        pubkey: {}
-                        content: \"\"\"
-                        {}
-                        \"\"\"
-                        """, id, pubkey, it.getContent());
+                            [ALL] New event:
+                            id: {}
+                            pubkey: {}
+                            content: \"\"\"
+                            {}
+                            \"\"\"
+                            """, displayId, displayPubkey, it.getContent());
                 }, e -> {
                     log.error("[ALL] Error during event stream: {}", e.getMessage());
                 }, () -> {

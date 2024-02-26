@@ -12,4 +12,5 @@ logging.level.org.tbk.nostr: INFO
 
 org.tbk.nostr.example.client:
   #relay-uri: wss://nostr-pub.wellorder.net
-  relay-uri: wss://relay.damus.io
+  #relay-uri: wss://relay.damus.io
+  relay-uri: wss://relay.primal.net
