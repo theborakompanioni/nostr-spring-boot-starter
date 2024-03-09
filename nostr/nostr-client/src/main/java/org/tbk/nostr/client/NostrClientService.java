@@ -17,11 +17,13 @@ public interface NostrClientService {
 
     Flux<Event> subscribe(ReqRequest req, SubscribeOptions options);
 
-    Flux<Event> connect(SubscriptionId id);
+    Flux<Event> attachTo(SubscriptionId id);
 
     Mono<Void> close(SubscriptionId id);
 
     Mono<Void> send(Event event);
+
+    boolean isConnected();
 
     Mono<Boolean> reconnect(Duration delay);
 

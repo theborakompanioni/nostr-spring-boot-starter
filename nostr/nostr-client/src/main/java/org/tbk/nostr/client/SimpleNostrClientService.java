@@ -26,9 +26,11 @@ import reactor.core.publisher.SynchronousSink;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -101,11 +103,11 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
     @Override
     public Flux<Event> subscribe(ReqRequest req, SubscribeOptions options) {
-        verifySession();
+        checkOpenSession();
 
         SubscriptionId subscriptionId = SubscriptionId.of(req.getId());
 
-        return this.connect(subscriptionId).doOnSubscribe(s -> {
+        return this.attachTo(subscriptionId).doOnSubscribe(s -> {
             this.subscriptions.put(subscriptionId, SubscriptionContext.builder()
                     .reqRequest(req)
                     .options(options)
@@ -118,8 +120,8 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
     }
 
     @Override
-    public Flux<Event> connect(SubscriptionId id) {
-        verifySession();
+    public Flux<Event> attachTo(SubscriptionId id) {
+        checkOpenSession();
 
         return Flux.<TextMessage>from(s -> publisher.subscribe(FlowAdapters.toFlowSubscriber(s)))
                 .map(it -> JsonReader.fromJson(it.getPayload(), Response.newBuilder()))
@@ -205,28 +207,26 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         });
     }
 
-    private void sendClose(SubscriptionId id) {
-        this.send(Request.newBuilder()
-                .setClose(CloseRequest.newBuilder()
-                        .setId(id.getId())
-                        .build())
-                .build());
+    @Override
+    public boolean isConnected() {
+        return this.session != null && this.session.isOpen();
     }
 
-    private void send(Request request) {
-        verifySession();
+    @Override
+    public Mono<Boolean> reconnect(Duration delay) {
+        return Mono.fromCallable(() -> {
+            State serviceState = this.state();
+            if (serviceState != State.RUNNING) {
+                log.warn("Not reconnecting as service is in state {}", serviceState);
+                return false;
+            }
 
-        try {
-            TextMessage message = new TextMessage(JsonWriter.toJson(request));
-            log.debug("Sending {}", message.getPayload());
-            this.session.sendMessage(message);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+            closeSession();
+            openSession();
+            resubscribe();
 
-    private void verifySession() {
-        checkState(this.session.isOpen(), "Session must be open");
+            return true;
+        }).delaySubscription(delay, Schedulers.fromExecutor(publisherExecutor));
     }
 
     @Override
@@ -266,6 +266,10 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         }
     }
 
+    private void checkOpenSession() {
+        checkState(this.session.isOpen(), "Session must be open");
+    }
+
     private void onConnectionClosed(CloseStatus closeStatus) {
         State serviceState = this.state();
         if (serviceState != State.RUNNING) {
@@ -276,20 +280,24 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         this.onCloseHandler.doOnClose(this, closeStatus);
     }
 
-    public Mono<Boolean> reconnect(Duration delay) {
-        return Mono.fromCallable(() -> {
-            State serviceState = this.state();
-            if (serviceState != State.RUNNING) {
-                log.warn("Not reconnecting as service is in state {}", serviceState);
-                return false;
-            }
+    private void sendClose(SubscriptionId id) {
+        this.send(Request.newBuilder()
+                .setClose(CloseRequest.newBuilder()
+                        .setId(id.getId())
+                        .build())
+                .build());
+    }
 
-            closeSession();
-            openSession();
-            resubscribe();
+    private void send(Request request) {
+        checkOpenSession();
 
-            return true;
-        }).delaySubscription(delay, Schedulers.fromExecutor(publisherExecutor));
+        try {
+            TextMessage message = new TextMessage(JsonWriter.toJson(request));
+            log.debug("Sending {}", message.getPayload());
+            this.session.sendMessage(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void resubscribe() {

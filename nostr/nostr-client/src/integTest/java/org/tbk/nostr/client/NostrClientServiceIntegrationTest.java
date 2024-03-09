@@ -94,7 +94,7 @@ class NostrClientServiceIntegrationTest {
         String subscriptionId = "test";
 
         CountDownLatch latch = new CountDownLatch(1);
-        Disposable subscriptionDisposable = sut.connect(SubscriptionId.of(subscriptionId))
+        Disposable subscriptionDisposable = sut.attachTo(SubscriptionId.of(subscriptionId))
                 .doOnSubscribe(it -> latch.countDown())
                 .subscribe();
 
