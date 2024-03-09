@@ -1,7 +1,9 @@
 package org.tbk.nostr.base;
 
+import com.google.common.annotations.VisibleForTesting;
 import lombok.EqualsAndHashCode;
 
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HexFormat;
@@ -10,6 +12,7 @@ import java.util.stream.IntStream;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class EventId implements Comparable<EventId> {
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     public static boolean isValidEventIdString(String value) {
         if (value.length() != 64) {
@@ -29,6 +32,13 @@ public final class EventId implements Comparable<EventId> {
 
     public static EventId of(byte[] id) {
         return new EventId(id);
+    }
+
+    @VisibleForTesting
+    public static EventId random() {
+        byte[] bytes = new byte[32];
+        RANDOM.nextBytes(bytes);
+        return of(bytes);
     }
 
     @EqualsAndHashCode.Include

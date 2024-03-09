@@ -85,7 +85,6 @@ public class DeletionEventHandlerInterceptor implements RequestHandlerIntercepto
                 }
             }
         }
-
     }
 
     private void onNonDeletionEventCreated(XonlyPublicKey publicKey, Event event) {

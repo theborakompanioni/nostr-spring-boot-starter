@@ -50,7 +50,7 @@ class NostrRelayNip9Test {
     }
 
     @Test
-    void itShouldValidateEventSuccessfully1() {
+    void itShouldValidateEventSuccessfully1OnlyAuthorCanDeleteOwnEvents() {
         Signer signer = SimpleSigner.random();
         Signer otherSigner = SimpleSigner.random();
         assertThat("sanity check", signer.getPublicKey(), is(not(otherSigner.getPublicKey())));
@@ -68,8 +68,53 @@ class NostrRelayNip9Test {
         assertThat(ok1.getSuccess(), is(false));
 
         EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0.getId().toByteArray());
-        Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(invalidDeletionEvent0Id).blockOptional(Duration.ofSeconds(5));
+        Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(invalidDeletionEvent0Id)
+                .blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
+    }
+
+    // Publishing a deletion event against a deletion has no effect.
+    @Test
+    void itShouldValidateEventSuccessfully2DeletingADeletionEventHasNoEffect() {
+        Signer signer = SimpleSigner.random();
+
+        Event deletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEvent(signer.getPublicKey(), List.of(EventId.random())));
+
+        OkResponse ok0 = nostrTemplate.send(deletionEvent0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok0.getEventId(), is(deletionEvent0.getId()));
+        assertThat(ok0.getSuccess(), is(true));
+
+        EventId deletionEventId0 = EventId.of(deletionEvent0.getId().toByteArray());
+        Event deletionEvent1 = MoreEvents.finalize(signer, Nip9.createDeletionEvent(signer.getPublicKey(), List.of(deletionEventId0)));
+
+        OkResponse ok1 = nostrTemplate.send(deletionEvent1)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok1.getEventId(), is(deletionEvent1.getId()));
+        assertThat(ok1.getSuccess(), is(true));
+
+        // former deletion event is still present: Trying to delete it has no effect.
+        Optional<Event> refetchedDeletionEvent0 = nostrTemplate.fetchEventById(deletionEventId0)
+                .blockOptional(Duration.ofSeconds(5));
+        assertThat(refetchedDeletionEvent0.isPresent(), is(true));
+    }
+
+    @Test
+    void itShouldAcceptDeletionEventForMissingEvent0() {
+        Signer signer = SimpleSigner.random();
+
+        Event deletionEvent0 = MoreEvents.finalize(signer, Nip9.createDeletionEvent(signer.getPublicKey(), List.of(EventId.random())));
+
+        OkResponse ok0 = nostrTemplate.send(deletionEvent0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok0.getEventId(), is(deletionEvent0.getId()));
+        assertThat(ok0.getSuccess(), is(true));
     }
 
     @Test
@@ -150,7 +195,42 @@ class NostrRelayNip9Test {
     }
 
     @Test
-    void itShouldDeleteExistingEventSuccessfully2ReplaceableEvent() {
+    void itShouldDeleteExistingEventSuccessfully2VerifyThatLaterEventsFromDifferentAuthorsAreStillPresent() {
+        Signer signer0 = SimpleSigner.random();
+        Signer signer1 = SimpleSigner.random();
+
+        Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
+
+        EventId event0Id = EventId.of(event0.getId().toByteArray());
+        Optional<Event> fetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
+                .blockOptional(Duration.ofSeconds(5));
+        assertThat(fetchedEvent0.isPresent(), is(false));
+
+        // publish the deletion event before the referenced event is published
+        Event deletionEvent0 = MoreEvents.finalize(signer1, Nip9.createDeletionEvent(signer1.getPublicKey(), List.of(event0Id)));
+
+        OkResponse ok1 = nostrTemplate.send(deletionEvent0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok1.getEventId(), is(deletionEvent0.getId()));
+        assertThat(ok1.getSuccess(), is(true));
+
+        OkResponse ok0 = nostrTemplate.send(event0)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok0.getEventId(), is(event0.getId()));
+        assertThat(ok0.getSuccess(), is(true));
+
+        Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
+                .blockOptional(Duration.ofSeconds(5));
+
+        assertThat(refetchedEvent0.isPresent(), is(true));
+    }
+
+    @Test
+    void itShouldDeleteExistingEventSuccessfully3ReplaceableEvent() {
         Signer signer = SimpleSigner.random();
 
         Event event0 = MoreEvents.finalize(signer, Nip1.createReplaceableEvent(signer.getPublicKey(), "GM"));
@@ -188,7 +268,7 @@ class NostrRelayNip9Test {
     }
 
     @Test
-    void itShouldDeleteExistingEventSuccessfully2ParameterizedReplaceableEvent() {
+    void itShouldDeleteExistingEventSuccessfully4ParameterizedReplaceableEvent() {
         Signer signer = SimpleSigner.random();
 
         Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "test"));

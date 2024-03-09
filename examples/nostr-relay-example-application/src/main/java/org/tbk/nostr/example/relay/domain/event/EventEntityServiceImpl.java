@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.example.relay.NostrRelayExampleApplicationProperties;
+import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 
@@ -70,7 +71,7 @@ class EventEntityServiceImpl implements EventEntityService {
     public List<EventId> markDeleted(XonlyPublicKey author, Specification<EventEntity> specs) {
         List<EventEntity> deletableEvents = events.findAll(specs
                 .and(EventEntitySpecifications.hasPubkey(author))
-                .and(Specification.not(EventEntitySpecifications.hasKind(5)))
+                .and(Specification.not(EventEntitySpecifications.hasKind(Nip9.kind())))
                 .and(EventEntitySpecifications.isNotDeleted()));
 
         Instant now = Instant.now();
