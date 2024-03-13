@@ -1,9 +1,14 @@
 package org.tbk.nostr.proto.json;
 
 import org.tbk.nostr.base.Metadata;
+import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.Response;
+
+import java.io.IOException;
+
+import static org.tbk.nostr.proto.json.Json.json;
 
 public final class JsonWriter {
 
@@ -27,4 +32,14 @@ public final class JsonWriter {
         return JsonRequestWriter.toJsonForSigning(event);
     }
 
+    public static String toJson(Event val) {
+        try {
+            return json
+                    .composeString()
+                    .addObject(Json.asMap(val))
+                    .finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

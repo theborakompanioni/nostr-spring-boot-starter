@@ -126,15 +126,6 @@ final class JsonResponseReader {
         }
     }
 
-    @VisibleForTesting
-    static Event fromJson(String val, Event.Builder event) {
-        try {
-            return Json.fromMap(json.mapFrom(val), event);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static CountResult countFromMap(Map<String, Object> map, CountResult.Builder count) {
         return count
                 .setCount(Long.parseLong(String.valueOf(map.get("count"))))

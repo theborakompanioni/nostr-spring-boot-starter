@@ -22,3 +22,4 @@ include 'nostr-relay:nostr-relay-starter'
 
 include 'examples:nostr-client-example-application'
 include 'examples:nostr-relay-example-application'
+include 'examples:nostr-shell-example-application'

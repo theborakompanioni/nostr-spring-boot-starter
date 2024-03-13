@@ -59,6 +59,46 @@ final class Json {
                 .build();
     }
 
+    static Event.Builder fromMapPartial(Map<String, Object> map, Event.Builder event) {
+        List<Descriptors.FieldDescriptor> fields = Event.getDescriptor().getFields();
+        for (Descriptors.FieldDescriptor field : fields) {
+            Object value = map.get(field.getJsonName());
+            if (value != null) {
+                switch (field.getJsonName()) {
+                    case "id":
+                        event.setId(ByteString.fromHex(String.valueOf(value)));
+                        break;
+                    case "pubkey":
+                        event.setPubkey(ByteString.fromHex(String.valueOf(value)));
+                        break;
+                    case "kind":
+                        event.setKind(Integer.parseInt(String.valueOf(value)));
+                        break;
+                    case "created_at":
+                        event.setCreatedAt(Long.parseLong(String.valueOf(value)));
+                        break;
+                    case "content":
+                        event.setContent(String.valueOf(value));
+                        break;
+                    case "sig":
+                        event.setSig(ByteString.fromHex(String.valueOf(value)));
+                        break;
+                }
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        List<List<String>> tags = Optional.ofNullable((List<Object>) map.get("tags"))
+                .orElseGet(Collections::emptyList).stream()
+                .map(it -> (List<String>) it)
+                .toList();
+        List<TagValue> tagsFromProto = List.copyOf(event.getTagsList());
+
+        return event
+                .clearTags()
+                .addAllTags(!tags.isEmpty() ? tagsFromList(tags) : tagsFromProto);
+    }
+
     private static List<TagValue> tagsFromList(List<List<String>> tags) {
         return ImmutableList.<TagValue>builder()
                 .addAll(tags.stream().filter(it -> !it.isEmpty())

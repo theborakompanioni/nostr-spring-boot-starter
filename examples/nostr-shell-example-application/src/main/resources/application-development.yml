@@ -1,0 +1,8 @@
+spring.application.name: 'tbk-nostr-pow-shell'
+
+# LOGGING
+logging.file.path: ./var/log
+logging.file.name: application-dev.log
+logging.config: classpath:logback-development.xml
+logging.level.org.springframework: INFO
+logging.level.org.tbk.nostr: DEBUG

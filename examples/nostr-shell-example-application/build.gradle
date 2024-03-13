@@ -1,0 +1,30 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+apply plugin: 'org.springframework.boot'
+
+description = 'nostr pow example application package'
+
+
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.shell:spring-shell-dependencies:${springBootVersion}"
+    }
+}
+
+
+bootRun {
+    args = [] // overwrite from global gradle build
+}
+
+dependencies {
+    implementation project(':nostr:nostr-core')
+
+    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
+    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
+
+    implementation 'io.projectreactor:reactor-core'
+
+    implementation "org.springframework.shell:spring-shell-starter"
+    testImplementation "org.springframework.shell:spring-shell-starter-test"
+}

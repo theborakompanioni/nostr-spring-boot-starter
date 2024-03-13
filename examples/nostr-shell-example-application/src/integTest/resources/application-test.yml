@@ -1,0 +1,4 @@
+spring.application.name: 'tbk-nostr-shell-test'
+
+logging.file.name: application-test.log
+logging.level.org.tbk.nostr: TRACE

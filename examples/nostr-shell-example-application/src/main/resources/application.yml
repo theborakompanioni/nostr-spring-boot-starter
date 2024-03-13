@@ -1,0 +1,11 @@
+spring.application.name: 'tbk-nostr-shell'
+
+spring.lifecycle.timeout-per-shutdown-phase: 30s
+spring.threads.virtual.enabled: true
+
+# LOGGING
+logging.file.path: ./var/log
+logging.file.name: application.log
+logging.config: classpath:logback.xml
+logging.level.org.springframework: WARN
+logging.level.org.tbk.nostr: WARN
