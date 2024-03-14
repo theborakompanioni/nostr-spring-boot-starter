@@ -14,6 +14,9 @@ A simple Nostr shell example application, e.g. to "mine" notes (NIP-13).
 ```
 
 ## Example
+
+### Interactive
+
 ```shell
 ./examples/nostr-shell-example-application/build/libs/nostr-shell-example-application-0.1.0-dev-boot.jar 
 nostr:>help
@@ -39,4 +42,10 @@ nostr:>pow --target 24 --json "{ \"kind\": 1, \"content\":\"GM!\" }"
 {"id":"0000003ab4d37414fd72a009505ef11f98c1ce9c3af6a918235041f3530250ce","pubkey":"","created_at":1710363805,"kind":1,"tags":[["nonce","651487","24"]],"content":"GM!","sig":""}
 nostr:>pow --target 25 --json "{ \"kind\": 1, \"content\":\"GM!\", \"tags\": [[ \"expiration\", \"1710378232\" ]] }"
 {"id":"00000009af73d28a49db7f6047229cca1da09a46180b46129f2ca5a0a1f43a07","pubkey":"","created_at":1710368995,"kind":1,"tags":[["expiration","1710378232"],["nonce","189309","25"]],"content":"GM!","sig":""}
+```
+
+### Non-interactive
+```shell
+./examples/nostr-shell-example-application/build/libs/nostr-shell-example-application-0.1.0-dev-boot.jar pow --target 25 --parallelism 8 --json '{ \"kind\": 1, \"content\":\"GM!\", \"tags\": [[ \"expiration\", \"1710378232\" ]] }'
+{"id":"000000469cab0be2c76b8585c081ce3ad84897cdd50e9348b2b0b75a82f4d7aa","pubkey":"","created_at":1710441044,"kind":1,"tags":[["expiration","1710378232"],["nonce","163290","25","2"]],"content":"GM!","sig":""}
 ```

@@ -10,12 +10,15 @@ import org.tbk.nostr.util.MoreTags;
 import java.util.BitSet;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * See <a href="https://github.com/nostr-protocol/nips/blob/master/13.md">NIP-13</a>.
  */
 public final class Nip13 {
     private static final String NONCE_TAG_NAME = "nonce";
+
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private Nip13() {
         throw new UnsupportedOperationException();
@@ -26,7 +29,18 @@ public final class Nip13 {
     }
 
     public static TagValue nonce(String nonce, long targetDifficulty) {
-        return MoreTags.named(NONCE_TAG_NAME, nonce == null ? "" : nonce, Long.toString(targetDifficulty));
+        return nonce(nonce, targetDifficulty, EMPTY_STRING_ARRAY);
+    }
+
+    public static TagValue nonce(long nonce, long targetDifficulty, String... rest) {
+        return nonce(Long.toString(nonce), targetDifficulty, rest);
+    }
+
+    public static TagValue nonce(String nonce, long targetDifficulty, String... rest) {
+        return MoreTags.named(NONCE_TAG_NAME, Stream.concat(
+                Stream.of(nonce == null ? "" : nonce, Long.toString(targetDifficulty)),
+                Stream.of(rest)
+        ).toArray(String[]::new));
     }
 
     public static long calculateDifficulty(Event event) {
@@ -79,10 +93,14 @@ public final class Nip13 {
     }
 
     public static Event.Builder mineEvent(Event.Builder prototype, int targetDifficulty) {
+        return mineEvent(prototype, targetDifficulty, EMPTY_STRING_ARRAY);
+    }
+
+    public static Event.Builder mineEvent(Event.Builder prototype, int targetDifficulty, String... additionalNonceTagValues) {
         int prototypeTagCount = prototype.getTagsCount();
         long nonce = 0; // could also start at Long.MIN_VALUE, but starting at 0 produces smaller events (in bytes)
 
-        TagValue.Builder nonceTagBuilder = nonce(nonce, targetDifficulty).toBuilder();
+        TagValue.Builder nonceTagBuilder = nonce(nonce, targetDifficulty, additionalNonceTagValues).toBuilder();
         Event.Builder eventBuilder = Event.newBuilder(prototype.buildPartial()).addTags(nonceTagBuilder);
 
         long currentEpoch = System.currentTimeMillis() / 1_000;
