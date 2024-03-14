@@ -88,6 +88,11 @@ public final class Nip13 {
         long currentEpoch = System.currentTimeMillis() / 1_000;
         long currentDifficulty = 0;
         while (currentDifficulty < targetDifficulty) {
+            if (Thread.currentThread().isInterrupted()) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(new InterruptedException("Thread interrupted: Abort operation 'mineEvent'."));
+            }
+
             long runEpoch = System.currentTimeMillis() / 1_000;
             if (runEpoch != currentEpoch) {
                 currentEpoch = runEpoch;
