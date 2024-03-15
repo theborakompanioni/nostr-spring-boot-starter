@@ -3,6 +3,8 @@ spring.application.name: 'tbk-nostr-shell'
 spring.lifecycle.timeout-per-shutdown-phase: 30s
 spring.threads.virtual.enabled: true
 
+spring.main.banner-mode: OFF
+
 # LOGGING
 logging.file.path: ./var/log
 logging.file.name: application.log

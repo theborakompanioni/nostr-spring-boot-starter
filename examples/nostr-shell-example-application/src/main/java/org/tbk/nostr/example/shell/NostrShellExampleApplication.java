@@ -25,7 +25,6 @@ public class NostrShellExampleApplication {
         new SpringApplicationBuilder()
                 .sources(NostrShellExampleApplication.class)
                 .listeners(applicationPidFileWriter())
-                .bannerMode(Banner.Mode.OFF)
                 .web(WebApplicationType.NONE)
                 .run(args);
     }
@@ -35,7 +34,7 @@ public class NostrShellExampleApplication {
     }
 
     @Bean
-    public PromptProvider promptProvider() {
+    PromptProvider promptProvider() {
         return () -> new AttributedString("nostr:>", AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA));
     }
 }

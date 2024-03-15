@@ -18,7 +18,7 @@ import static org.awaitility.Awaitility.await;
 class NostrShellExampleApplicationShellTest {
 
     @Autowired
-    ShellTestClient client;
+    private ShellTestClient client;
 
     @Test
     void interactiveShellTest() {

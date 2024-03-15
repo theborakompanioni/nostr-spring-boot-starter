@@ -1,17 +1,12 @@
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
-
 apply plugin: 'org.springframework.boot'
 
 description = 'nostr pow example application package'
-
-
 
 dependencyManagement {
     imports {
         mavenBom "org.springframework.shell:spring-shell-dependencies:${springBootVersion}"
     }
 }
-
 
 bootRun {
     args = [] // overwrite from global gradle build
@@ -25,6 +20,6 @@ dependencies {
 
     implementation 'io.projectreactor:reactor-core'
 
-    implementation "org.springframework.shell:spring-shell-starter"
-    testImplementation "org.springframework.shell:spring-shell-starter-test"
+    implementation 'org.springframework.shell:spring-shell-starter'
+    testImplementation 'org.springframework.shell:spring-shell-starter-test'
 }

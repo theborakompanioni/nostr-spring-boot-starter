@@ -1,5 +1,7 @@
 spring.application.name: 'tbk-nostr-pow-shell'
 
+spring.main.banner-mode: CONSOLE
+
 # LOGGING
 logging.file.path: ./var/log
 logging.file.name: application-dev.log
