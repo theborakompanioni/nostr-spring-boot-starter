@@ -334,7 +334,34 @@ class JsonRequestWriterTest {
                 {
                   "name": "name",
                   "about": "about",
-                  "picture": "https://www.example.com/example.png"
+                  "picture": "https://www.example.com/example.png",
+                  "website": null,
+                  "banner": null,
+                  "display_name": null
+                }
+                """)));
+    }
+
+
+    @Test
+    void itShouldWriteMetadata1() throws IOException {
+        String json = JsonRequestWriter.toJson(Metadata.newBuilder()
+                .name("name")
+                .about("about")
+                .picture(URI.create("https://www.example.com/picture.png"))
+                .displayName("display name")
+                .website(URI.create("https://www.example.com/"))
+                .banner(URI.create("https://www.example.com/banner.png"))
+                .build());
+
+        assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
+                {
+                  "name": "name",
+                  "about": "about",
+                  "picture": "https://www.example.com/picture.png",
+                  "display_name": "display name",
+                  "website": "https://www.example.com/",
+                  "banner": "https://www.example.com/banner.png"
                 }
                 """)));
     }

@@ -35,10 +35,11 @@ class Nip1Test {
     void itShouldCreateMetadata() throws IOException {
         Instant now = Instant.now();
         Event event = Nip1.createMetadata(testPubkey, Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/example.png"))
-                .build()).build();
+                        .name("name")
+                        .about("about")
+                        .picture(URI.create("https://www.example.com/example.png"))
+                        .build())
+                .build();
 
         assertThat(event.getKind(), is(0));
         assertThat(event.getCreatedAt(), is(greaterThanOrEqualTo(now.getEpochSecond())));
@@ -47,7 +48,10 @@ class Nip1Test {
                 {
                   "name": "name",
                   "about": "about",
-                  "picture": "https://www.example.com/example.png"
+                  "picture": "https://www.example.com/example.png",
+                  "website": null,
+                  "banner": null,
+                  "display_name": null
                 }
                 """)));
     }

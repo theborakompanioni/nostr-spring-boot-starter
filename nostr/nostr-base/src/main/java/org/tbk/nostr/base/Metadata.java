@@ -17,4 +17,23 @@ public class Metadata {
 
     @Nullable
     URI picture;
+
+    /**
+     * An alternative, bigger name with richer characters than `name`.
+     * `name` should always be set regardless of the presence of `display_name` in the metadata.
+     */
+    @Nullable
+    String displayName;
+
+    /**
+     * A web URL related in any way to the event author.
+     */
+    @Nullable
+    URI website;
+
+    /**
+     * A web URL to a wide (~1024x768) picture to be optionally displayed in the background of a profile screen.
+     */
+    @Nullable
+    URI banner;
 }

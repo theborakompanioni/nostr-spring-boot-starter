@@ -41,6 +41,13 @@ final class JsonRequestWriter {
                     .put("picture", Optional.ofNullable(val.getPicture())
                             .map(URI::toString)
                             .orElse(null))
+                    .put("display_name", val.getDisplayName())
+                    .put("website", Optional.ofNullable(val.getWebsite())
+                            .map(URI::toString)
+                            .orElse(null))
+                    .put("banner", Optional.ofNullable(val.getBanner())
+                            .map(URI::toString)
+                            .orElse(null))
                     .end()
                     .finish();
         } catch (IOException e) {

@@ -293,7 +293,10 @@ class NostrTemplateApplicationTest {
         Metadata metadata = Metadata.newBuilder()
                 .name("name")
                 .about("about")
-                .picture(URI.create("https://www.example.com/example.png"))
+                .picture(URI.create("https://www.example.com/picture.png"))
+                .displayName("display name")
+                .banner(URI.create("https://www.example.com/banner.png"))
+                .website(URI.create("https://www.example.com/"))
                 .build();
         Event event = MoreEvents.createFinalizedMetadata(signer, metadata);
 
@@ -325,7 +328,6 @@ class NostrTemplateApplicationTest {
                 .build();
 
         assertThat("sanity check", metadata1, not(is(metadata0)));
-
 
         Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata0);
         Event event1 = MoreEvents.finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata1)

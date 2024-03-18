@@ -1,6 +1,5 @@
 package org.tbk.nostr.proto.json;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.*;
@@ -142,6 +141,17 @@ final class JsonResponseReader {
                         .map(String::valueOf)
                         .orElse(null))
                 .picture(Optional.ofNullable(map.get("picture"))
+                        .map(String::valueOf)
+                        .map(URI::create)
+                        .orElse(null))
+                .displayName(Optional.ofNullable(map.get("display_name"))
+                        .map(String::valueOf)
+                        .orElse(null))
+                .website(Optional.ofNullable(map.get("website"))
+                        .map(String::valueOf)
+                        .map(URI::create)
+                        .orElse(null))
+                .banner(Optional.ofNullable(map.get("banner"))
                         .map(String::valueOf)
                         .map(URI::create)
                         .orElse(null))
