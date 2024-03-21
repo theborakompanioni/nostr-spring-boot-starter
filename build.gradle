@@ -338,3 +338,10 @@ configure(subprojects.findAll { project -> project.name.indexOf('-example-applic
     test.onlyIf { true }
     integrationTest.onlyIf { true }
 }
+
+// enable publishing for all subproject except for "example applications"
+configure(subprojects.findAll { project -> project.subprojects.isEmpty() &&
+        !project.pluginManager.hasPlugin('org.springframework.boot') &&
+        project.name.indexOf('-example-application') < 0 }) {
+    apply from: "${project.rootDir}/publish.gradle"
+}
