@@ -13,6 +13,7 @@ need to write scalable and efficient solutions effortlessly.
 - [x] [NIP-6](https://github.com/nostr-protocol/nips/blob/master/06.md)
 - [x] [NIP-9](https://github.com/nostr-protocol/nips/blob/master/09.md)
 - [x] [NIP-10](https://github.com/nostr-protocol/nips/blob/master/10.md)
+- [x] [NIP-13](https://github.com/nostr-protocol/nips/blob/master/13.md)
 - [x] [NIP-24](https://github.com/nostr-protocol/nips/blob/master/24.md)
 - [x] [NIP-40](https://github.com/nostr-protocol/nips/blob/master/40.md)
 
@@ -21,6 +22,18 @@ Planned:
 - [ ] [NIP-19](https://github.com/nostr-protocol/nips/blob/master/19.md)
 - [ ] [NIP-38](https://github.com/nostr-protocol/nips/blob/master/38.md)
 - [ ] [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md)
+
+
+## Examples
+
+[This project contains various examples](examples/) that are stand-alone applications showing basic usage of the functionality provided.
+
+| Application                                                | Description                                                                      |
+|------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [nostr-client](nostr-client-example-application/readme.md) | A simple Nostr client example application that subscribes to all kind `1` notes. |
+| [nostr-relay](nostr-relay-example-application/readme.md)   | A simple Nostr relay example application.                                        |
+| [nostr-shell](nostr-shell-example-application/readme.md)   | A simple Nostr shell example application, e.g. to "mine" notes (NIP-13).         |
+
 
 ## Development
 

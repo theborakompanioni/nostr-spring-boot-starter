@@ -1,7 +1,7 @@
 nostr-relay-example-application
 ===
 
-WIP
+A simple Nostr relay example application. Still WIP.
 
 ## Run
 
