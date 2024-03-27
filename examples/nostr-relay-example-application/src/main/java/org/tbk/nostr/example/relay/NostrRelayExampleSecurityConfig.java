@@ -1,5 +1,6 @@
 package org.tbk.nostr.example.relay;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -15,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
+import org.tbk.nostr.relay.config.NostrRelayProperties;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
@@ -24,6 +26,9 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
 class NostrRelayExampleSecurityConfig implements WebSecurityCustomizer {
+
+    @NonNull
+    private final NostrRelayProperties nostrRelayProperties;
 
     @Override
     public void customize(WebSecurity web) {
@@ -45,7 +50,7 @@ class NostrRelayExampleSecurityConfig implements WebSecurityCustomizer {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers(
-                                antMatcher("/")
+                                antMatcher(nostrRelayProperties.getWebsocketPath())
                         ).permitAll()
                         .anyRequest().authenticated()
                 );

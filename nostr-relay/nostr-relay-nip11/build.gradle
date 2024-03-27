@@ -6,6 +6,7 @@ description = 'nostr relay nip11 package'
 
 dependencies {
     api project(':nostr:nostr-nip11')
+    implementation project(':nostr-relay:nostr-relay-utils')
 
     compileOnly 'jakarta.servlet:jakarta.servlet-api'
     api 'org.springframework:spring-web'

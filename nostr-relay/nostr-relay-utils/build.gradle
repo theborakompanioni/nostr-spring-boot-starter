@@ -1,0 +1,10 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr relay utils package'
+
+dependencies {
+    compileOnly 'jakarta.servlet:jakarta.servlet-api'
+    api 'org.springframework:spring-web'
+}

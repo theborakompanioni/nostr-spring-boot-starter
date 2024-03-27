@@ -19,6 +19,7 @@ include 'nostr-relay:nostr-relay-nip13'
 include 'nostr-relay:nostr-relay-nip40'
 include 'nostr-relay:nostr-relay-autoconfigure'
 include 'nostr-relay:nostr-relay-starter'
+include 'nostr-relay:nostr-relay-utils'
 
 include 'examples:nostr-client-example-application'
 include 'examples:nostr-relay-example-application'

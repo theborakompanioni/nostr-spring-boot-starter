@@ -7,10 +7,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.tbk.nostr.nip11.RelayInfoDocument;
+import org.tbk.nostr.relay.utils.MoreHttpRequests;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
 
 import static java.util.Objects.requireNonNull;
 
@@ -21,6 +21,7 @@ public class RelayInfoWriterFilter implements Filter {
     private final String path;
 
     private final String json;
+
     private final int contentLength;
 
     public RelayInfoWriterFilter(String path, RelayInfoDocument relayInfoDocument) {
@@ -53,57 +54,18 @@ public class RelayInfoWriterFilter implements Filter {
         if (!isGetRequest) {
             return false;
         }
-        boolean isWebSocketHandshakeRequest = isWebSocketHandshakeRequest(request);
-        if (isWebSocketHandshakeRequest) {
+        if (MoreHttpRequests.isWebSocketHandshakeRequest(request)) {
             return false;
         }
-        boolean isWebsocketPath = matches(request, this.path);
+        boolean isWebsocketPath = MoreHttpRequests.requestUriMatches(request, this.path);
         if (!isWebsocketPath) {
             return false;
         }
-        boolean hasHeader = hasHeaderWithValueIgnoreCase(request, HttpHeaders.ACCEPT, APPLICATION_JSON_NOSTR_VALUE);
-        if (!hasHeader) {
+        boolean hasExpectedHeader = MoreHttpRequests.headerMatches(request, HttpHeaders.ACCEPT, APPLICATION_JSON_NOSTR_VALUE::equalsIgnoreCase);
+        if (!hasExpectedHeader) {
             return false;
         }
 
         return true;
-    }
-
-    private boolean isWebSocketHandshakeRequest(HttpServletRequest request) {
-        return hasHeaderWithValueIgnoreCase(request, HttpHeaders.UPGRADE, "websocket");
-    }
-
-    private boolean hasHeaderWithValueIgnoreCase(HttpServletRequest request, String requiredName, String requiredValue) {
-        Enumeration<String> headerNames = request.getHeaderNames();
-        if (headerNames != null) {
-            while (headerNames.hasMoreElements()) {
-                if (requiredName.equalsIgnoreCase(headerNames.nextElement())) {
-                    Enumeration<String> acceptHeaderValues = request.getHeaders(requiredName);
-                    while (acceptHeaderValues.hasMoreElements()) {
-                        if (requiredValue.equalsIgnoreCase(acceptHeaderValues.nextElement())) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private boolean matches(HttpServletRequest request, String url) {
-        String uri = request.getRequestURI();
-        int pathParamIndex = uri.indexOf(';');
-        if (pathParamIndex > 0) {
-            // strip everything after the first semicolon
-            uri = uri.substring(0, pathParamIndex);
-        }
-        if (request.getQueryString() != null) {
-            uri += "?" + request.getQueryString();
-        }
-        if ("".equals(request.getContextPath())) {
-            return uri.equals(url);
-        }
-        return uri.equals(request.getContextPath() + url);
     }
 }

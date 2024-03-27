@@ -4,16 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.boot.web.context.WebServerPortFileWriter;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.example.relay.domain.event.EventEntityService;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.example.relay.domain.event.EventEntityService;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
@@ -39,15 +40,16 @@ public class NostrRelayExampleApplication {
                 .run(args);
     }
 
-    public static ApplicationListener<?> applicationPidFileWriter() {
+    private static ApplicationListener<?> applicationPidFileWriter() {
         return new ApplicationPidFileWriter("application.pid");
     }
 
-    public static ApplicationListener<?> webServerPortFileWriter() {
+    private static ApplicationListener<?> webServerPortFileWriter() {
         return new WebServerPortFileWriter("application.port");
     }
 
     @Bean
+    @ConditionalOnBean(Signer.class)
     ApplicationRunner insertStartupEvents(NostrRelayExampleApplicationProperties properties,
                                           Signer serverSigner,
                                           EventEntityService eventEntityService) {
