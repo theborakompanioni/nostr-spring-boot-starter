@@ -132,6 +132,7 @@ class JsonRequestReaderTest {
                     "since": 21,
                     "until": 42,
                     "limit": -1,
+                    "search": "GM language:en",
                     "unknown_property": "should not end up in the object"
                   }
                 ]
@@ -162,6 +163,7 @@ class JsonRequestReaderTest {
                         .setSince(21)
                         .setUntil(42)
                         .setLimit(-1)
+                        .setSearch("GM language:en")
                         .build())
                 .build()));
     }
@@ -192,6 +194,7 @@ class JsonRequestReaderTest {
                     "since": 21,
                     "until": 42,
                     "limit": -1,
+                    "search": "GM language:en",
                     "unknown_property": "should not end up in the object"
                   },
                   {
@@ -215,6 +218,7 @@ class JsonRequestReaderTest {
                         .setSince(21)
                         .setUntil(42)
                         .setLimit(-1)
+                        .setSearch("GM language:en")
                         .build())
                 .addFilters(Filter.newBuilder()
                         .addAllKinds(List.of(1, 2, 21))
@@ -250,6 +254,9 @@ class JsonRequestReaderTest {
                     "kinds": [1, 2, 21]
                   },
                   {
+                    "search": "GM"
+                  },
+                  {
                     "ids": [
                       "5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"
                     ]
@@ -260,6 +267,9 @@ class JsonRequestReaderTest {
                       "5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36",
                       "5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"
                     ]
+                  },
+                  {
+                    "search": "GM"
                   },
                   {
                     "kinds": [1, 2, 21]
@@ -274,6 +284,9 @@ class JsonRequestReaderTest {
                 .addFilters(Filter.newBuilder().build())
                 .addFilters(Filter.newBuilder()
                         .addAllKinds(List.of(1, 2, 21))
+                        .build())
+                .addFilters(Filter.newBuilder()
+                        .setSearch("GM")
                         .build())
                 .addFilters(Filter.newBuilder()
                         .addIds(ByteString.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"))

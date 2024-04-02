@@ -198,6 +198,9 @@ final class Json {
                 .map(String::valueOf)
                 .map(Integer::parseInt);
 
+        Optional<String> search = Optional.ofNullable(map.get("search"))
+                .map(String::valueOf);
+
         Filter.Builder filterBuilder = filter
                 .addAllIds(ids)
                 .addAllAuthors(authors)
@@ -207,6 +210,7 @@ final class Json {
         since.ifPresent(filterBuilder::setSince);
         until.ifPresent(filterBuilder::setUntil);
         limit.ifPresent(filterBuilder::setLimit);
+        search.ifPresent(filterBuilder::setSearch);
 
         return filterBuilder.build();
     }
@@ -258,6 +262,9 @@ final class Json {
         }
         if (filter.getLimit() > 0L) {
             builder.put("limit", filter.getLimit());
+        }
+        if (!filter.getSearch().isEmpty()) {
+            builder.put("search", filter.getSearch());
         }
 
         return builder.build();

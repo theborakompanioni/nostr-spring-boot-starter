@@ -79,7 +79,8 @@ message CountRequest {
 }*/
 // {"kinds":[0,1,2,3],"authors":["afb74cc9241ed793301b54d3871ca4851dfb2c22e4f0d6ddb8c8fabdba222df1"]},
 // {"kinds":[1,4],"#p":["afb74cc9241ed793301b54d3871ca4851dfb2c22e4f0d6ddb8c8fabdba222df1"]},
-// {"kinds":[4],"authors":["afb74cc9241ed793301b54d3871ca4851dfb2c22e4f0d6ddb8c8fabdba222df1"]]
+// {"kinds":[4],"authors":["afb74cc9241ed793301b54d3871ca4851dfb2c22e4f0d6ddb8c8fabdba222df1"]},
+// {"kinds":[1],"search":"GM language:en"}
 message Filter {
   repeated bytes ids = 1 [json_name = "ids"];
   repeated bytes authors = 2 [json_name = "authors"];
@@ -88,6 +89,8 @@ message Filter {
   uint64 since = 5 [json_name = "since"];
   uint64 until = 6 [json_name = "until"];
   uint32 limit = 7 [json_name = "limit"];
+  // `search` from NIP-50: https://github.com/nostr-protocol/nips/blob/master/50.md
+  string search = 8 [json_name = "search"];
 }
 
 /*
@@ -97,7 +100,6 @@ message Filter {
 ["CLOSED", <subscription_id>, <message>], used to indicate that a subscription was ended on the server side.
 ["NOTICE", <message>]
  */
-
 message Response {
   oneof kind {
     EventResponse event = 1 [json_name = "event"];

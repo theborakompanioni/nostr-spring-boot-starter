@@ -12,7 +12,9 @@ import org.tbk.nostr.util.MoreTags;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HexFormat;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -97,6 +99,127 @@ class JsonRequestWriterTest {
                   "subscription_id",
                   {
                     "ids": ["5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"]
+                  }
+                ]
+                """)));
+    }
+
+    @Test
+    void itShouldWriteReqRequest1() throws IOException {
+        String json = JsonRequestWriter.toJson(Request.newBuilder()
+                .setReq(ReqRequest.newBuilder()
+                        .setId("subscription_id")
+                        .addFilters(Filter.newBuilder()
+                                .addAuthors(ByteString.fromHex("493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef"))
+                                .setLimit(21)
+                                .build())
+                        .build())
+                .build());
+
+        assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
+                [
+                  "REQ",
+                  "subscription_id",
+                  {
+                    "authors": ["493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef"],
+                    "limit": 21
+                  }
+                ]
+                """)));
+    }
+
+    @Test
+    void itShouldWriteReqRequest2SkipUnnecessaryValues() throws IOException {
+        String json = JsonRequestWriter.toJson(Request.newBuilder()
+                .setReq(ReqRequest.newBuilder()
+                        .setId("subscription_id")
+                        .addFilters(Filter.newBuilder()
+                                .addAuthors(ByteString.fromHex("493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef"))
+                                .addAllKinds(Collections.emptyList())
+                                .addTags(MoreTags.named("alt","only single letter tags should be serialized and end up in the object"))
+                                .setSince(-1)
+                                .setUntil(-1)
+                                .setLimit(-1)
+                                .setSearch("")
+                                .build())
+                        .build())
+                .build());
+
+        assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
+                [
+                  "REQ",
+                  "subscription_id",
+                  {
+                    "authors": ["493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef"]
+                  }
+                ]
+                """)));
+    }
+
+    @Test
+    void itShouldWriteReqRequest3() throws IOException {
+        String json = JsonRequestWriter.toJson(Request.newBuilder()
+                .setReq(ReqRequest.newBuilder()
+                        .setId("subscription_id")
+                        .addFilters(Filter.newBuilder()
+                                .addIds(ByteString.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"))
+                                .addIds(ByteString.fromHex("40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"))
+                                .addAuthors(ByteString.fromHex("493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef"))
+                                .addAuthors(ByteString.fromHex("40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"))
+                                .addAllKinds(List.of(-1, 0, 1, 21))
+                                .addTags(MoreTags.e(
+                                        "5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36",
+                                        "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"
+                                ))
+                                .addTags(MoreTags.p(
+                                        "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
+                                        "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"
+                                ))
+                                .addTags(MoreTags.named("a",
+                                        "30023:f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca:abcd",
+                                        "12345:f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca:test"
+                                ))
+                                .addTags(MoreTags.named("Z", "test"))
+                                .addTags(MoreTags.named("alt","only single letter tags should be serialized and end up in the object"))
+                                .setSince(21)
+                                .setUntil(42)
+                                .setLimit(1)
+                                .setSearch("GM language:en")
+                                .build())
+                        .build())
+                .build());
+
+        assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
+                [
+                  "REQ",
+                  "subscription_id",
+                  {
+                    "ids": [
+                        "5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36",
+                        "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"
+                    ],
+                    "authors": [
+                        "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
+                        "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"
+                    ],
+                    "kinds": [ -1, 0, 1, 21 ],
+                    "#e": [
+                        "5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36",
+                        "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"
+                    ],
+                    "#p": [
+                        "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
+                        "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"
+                    ],
+                    "#a": [
+                        "30023:f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca:abcd",
+                        "12345:f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca:test"
+                    ],
+                    "#Z": [ "test" ],
+                    "since": 21,
+                    "until": 42,
+                    "limit": 1,
+                    "search": "GM language:en"
                   }
                 ]
                 """)));
