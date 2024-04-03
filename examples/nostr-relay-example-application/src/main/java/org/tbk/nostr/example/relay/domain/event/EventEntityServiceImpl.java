@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.example.relay.NostrRelayExampleApplicationProperties;
+import org.tbk.nostr.example.relay.domain.event.EventEntity.EventEntityId;
 import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
@@ -52,7 +53,7 @@ class EventEntityServiceImpl implements EventEntityService {
     }
 
     @Override
-    public Optional<EventEntity> findById(EventEntity.EventEntityId eventId) {
+    public Optional<EventEntity> findById(EventEntityId eventId) {
         return events.findById(eventId);
     }
 
@@ -65,7 +66,6 @@ class EventEntityServiceImpl implements EventEntityService {
     public boolean exists(Specification<EventEntity> specs) {
         return events.exists(specs);
     }
-
 
     @Override
     public List<EventId> markDeleted(XonlyPublicKey author, Specification<EventEntity> specs) {
@@ -84,10 +84,18 @@ class EventEntityServiceImpl implements EventEntityService {
 
     @Override
     public EventEntity markExpiresAt(EventId eventId, Instant expiresAt) {
-        EventEntity entity = events.findById(EventEntity.EventEntityId.of(eventId.toHex()))
+        EventEntity entity = events.findById(EventEntityId.of(eventId.toHex()))
                 .orElseThrow(() -> new EntityNotFoundException("Unable to find event with id " + eventId.toHex()));
 
         return events.save(entity.markExpiresAt(expiresAt));
+    }
+
+    @Override
+    public EventEntity addNip50MetaInfo(EventNip50MetaInfoEntity nip50EventMetaInfo) {
+        EventEntity entity = events.findById(EventEntityId.of(nip50EventMetaInfo.getEventId()))
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find event with id " + nip50EventMetaInfo.getEventId()));
+
+        return events.save(entity.addNip50MetaInfo(nip50EventMetaInfo));
     }
 
     @Override

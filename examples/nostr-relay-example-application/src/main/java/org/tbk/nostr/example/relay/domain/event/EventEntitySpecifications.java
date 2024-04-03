@@ -1,5 +1,6 @@
 package org.tbk.nostr.example.relay.domain.event;
 
+import com.github.pemistahl.lingua.api.Language;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
 import fr.acinq.bitcoin.ByteVector32;
@@ -101,8 +102,20 @@ public final class EventEntitySpecifications {
         };
     }
 
-    private static final Descriptors.FieldDescriptor untilFieldDescription = Filter.getDescriptor().findFieldByNumber(Filter.UNTIL_FIELD_NUMBER);
-    private static final Descriptors.FieldDescriptor sinceFieldDescription = Filter.getDescriptor().findFieldByNumber(Filter.SINCE_FIELD_NUMBER);
+    public static Specification<EventEntity> search(Language language, String searchTerm) {
+        return (root, query, criteriaBuilder) -> {
+            Join<TagEntity, EventEntity> metaInfo = root.join("nip50MetaInfos");
+            query.orderBy(criteriaBuilder.desc(root.get("id")));
+            return criteriaBuilder.and(
+                    criteriaBuilder.equal(metaInfo.get("language"), language.getIsoCode639_1().name()),
+                    criteriaBuilder.equal(metaInfo.get("eventNip50MetaInfoEntity"), searchTerm)
+            );
+        };
+    }
+
+    private static final Descriptors.FieldDescriptor untilFieldDescriptor = Filter.getDescriptor().findFieldByNumber(Filter.UNTIL_FIELD_NUMBER);
+    private static final Descriptors.FieldDescriptor sinceFieldDescriptor = Filter.getDescriptor().findFieldByNumber(Filter.SINCE_FIELD_NUMBER);
+    private static final Descriptors.FieldDescriptor searchFieldDescriptor = Filter.getDescriptor().findFieldByNumber(Filter.SEARCH_FIELD_NUMBER);
 
     public static Specification<EventEntity> fromFilter(Filter filter) {
         Specification<EventEntity> idsSpecification = Specification.anyOf(filter.getIdsList().stream()
@@ -120,17 +133,24 @@ public final class EventEntitySpecifications {
                 .toList());
 
         Specification<EventEntity> sinceSpecification = Optional.of(filter)
-                .filter(it -> it.hasField(sinceFieldDescription))
+                .filter(it -> it.hasField(sinceFieldDescriptor))
                 .map(Filter::getSince)
                 .map(Instant::ofEpochSecond)
                 .map(EventEntitySpecifications::isCreatedAfterInclusive)
                 .orElseGet(() -> Specification.where(null));
 
         Specification<EventEntity> untilSpecification = Optional.of(filter)
-                .filter(it -> it.hasField(untilFieldDescription))
+                .filter(it -> it.hasField(untilFieldDescriptor))
                 .map(Filter::getUntil)
                 .map(Instant::ofEpochSecond)
                 .map(EventEntitySpecifications::isCreatedBeforeInclusive)
+                .orElseGet(() -> Specification.where(null));
+
+        Specification<EventEntity> searchSpecification = Optional.of(filter)
+                .filter(it -> it.hasField(searchFieldDescriptor))
+                .map(Filter::getSearch)
+                .filter(it -> !it.isBlank())
+                .map(it -> EventEntitySpecifications.search(Language.ENGLISH, it))
                 .orElseGet(() -> Specification.where(null));
 
         return Specification.allOf(
@@ -138,7 +158,8 @@ public final class EventEntitySpecifications {
                 authorsSpecification,
                 kindsSpecification,
                 sinceSpecification,
-                untilSpecification
+                untilSpecification,
+                searchSpecification
         );
     }
 }

@@ -1,40 +1,24 @@
 package org.tbk.nostr.example.relay.db.migration;
 
-import org.flywaydb.core.api.migration.BaseJavaMigration;
-import org.flywaydb.core.api.migration.Context;
-import org.flywaydb.core.internal.database.DatabaseType;
-import org.flywaydb.core.internal.database.postgresql.PostgreSQLDatabaseType;
-import org.flywaydb.core.internal.database.sqlite.SQLiteDatabaseType;
 import org.springframework.stereotype.Component;
 
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 
 @Component
-public class V1__init extends BaseJavaMigration {
+public class V1__init extends AbstractMigration {
 
     @Override
-    public void migrate(Context context) throws Exception {
-        DatabaseType databaseType = context.getConfiguration().getDatabaseType();
+    protected Collection<String> postgres() {
+        return new Postgres().sql();
+    }
 
-        List<String> sqls = new ArrayList<>();
-        if (databaseType.getName().equals(new PostgreSQLDatabaseType().getName())) {
-            sqls.addAll(new Postgres().sql());
-        } else if (databaseType.getName().equals(new SQLiteDatabaseType().getName())) {
-            sqls.addAll(new Sqlite().sql());
-        } else {
-            throw new IllegalStateException("Unsupported database");
-        }
-
-        for (String sql : sqls) {
-            try (PreparedStatement statement = context.getConnection().prepareStatement(sql)) {
-                statement.execute();
-            }
-        }
+    @Override
+    protected Collection<String> sqlite() {
+        return new Sqlite().sql();
     }
 
     private static class Postgres {
@@ -45,7 +29,6 @@ public class V1__init extends BaseJavaMigration {
                         pubkey text NOT NULL,
                         kind integer NOT NULL,
                         created_at bigint NOT NULL,
-                        tags text,
                         content text NOT NULL,
                         sig bytea NOT NULL,
                         -- other metadata
@@ -98,7 +81,6 @@ public class V1__init extends BaseJavaMigration {
                         pubkey text NOT NULL,
                         kind integer NOT NULL,
                         created_at integer NOT NULL,
-                        tags text,
                         content text NOT NULL,
                         sig blob NOT NULL,
                         -- other metadata

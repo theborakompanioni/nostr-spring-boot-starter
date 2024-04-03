@@ -53,6 +53,5 @@ class NostrRelaySqliteTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(fetchedEvent0, is(eventMatching));
-        assertThat(fetchedEvent0, is(eventMatching));
     }
 }

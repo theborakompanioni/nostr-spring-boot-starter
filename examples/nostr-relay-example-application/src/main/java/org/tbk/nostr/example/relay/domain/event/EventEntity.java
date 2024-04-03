@@ -36,6 +36,7 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
     @Convert(converter = MoreConverter.InstantToSecondsConverter.class)
     private final Instant createdAt;
 
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id", updatable = false)
     @OrderColumn(name = "position", updatable = false)
     private final List<TagEntity> tags = new ArrayList<>();
@@ -59,13 +60,17 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
     @Convert(converter = MoreConverter.InstantToMilliSecondsConverter.class)
     private Instant expiresAt;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "event_id", updatable = false)
+    private final List<EventNip50MetaInfoEntity> nip50MetaInfos = new ArrayList<>();
+
     /**
      * Creates a new {@link EventEntity} for the given {@link Event}.
      *
      * @param event must not be {@literal null}.
      */
     EventEntity(Event event) {
-        this.id = EventEntityId.create(event);
+        this.id = EventEntityId.fromEvent(event);
         this.pubkey = HexFormat.of().formatHex(event.getPubkey().toByteArray());
         this.kind = event.getKind();
         this.createdAt = Instant.ofEpochSecond(event.getCreatedAt());
@@ -116,9 +121,14 @@ public class EventEntity extends AbstractAggregateRoot<EventEntity> implements A
                 .build();
     }
 
+    EventEntity addNip50MetaInfo(EventNip50MetaInfoEntity nip50MetaInfo) {
+        nip50MetaInfos.add(nip50MetaInfo);
+        return this;
+    }
+
     @Value(staticConstructor = "of")
     public static class EventEntityId implements Identifier {
-        static EventEntityId create(Event event) {
+        public static EventEntityId fromEvent(Event event) {
             return EventEntityId.of(HexFormat.of().formatHex(event.getId().toByteArray()));
         }
 

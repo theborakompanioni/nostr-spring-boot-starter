@@ -17,6 +17,9 @@ dependencies {
 
     implementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
 
+    // lingua: language detection for NIP-50 support
+    implementation "com.github.pemistahl:lingua:${linguaVersion}"
+
     implementation 'io.projectreactor:reactor-core'
 
     implementation 'org.flywaydb:flyway-core'

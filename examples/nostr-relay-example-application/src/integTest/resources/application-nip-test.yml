@@ -1,7 +1,6 @@
 spring.application.name: 'tbk-nostr-relay-nip-test'
 
 logging.file.name: application-nip-test.log
-logging.level.org.tbk.nostr: INFO
 
 org.tbk.nostr.nip11:
   enabled: true

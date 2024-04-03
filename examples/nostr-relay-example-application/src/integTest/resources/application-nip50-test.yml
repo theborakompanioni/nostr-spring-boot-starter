@@ -1,8 +1,8 @@
-spring.application.name: 'tbk-nostr-relay-sqlite-test'
+spring.application.name: 'tbk-nostr-relay-nip50-test'
 
-logging.file.name: application-sqlite-test.log
+logging.file.name: application-nip50-test.log
 
-#spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application-sqlite-test.db?foreign_keys=true&journal_mode=WAL&temp_store=MEMORY&page_size=32768&mmap_size=30000000000'
+#spring.datasource.url: 'jdbc:sqlite:nostr_relay_example_application-nip50-test.db?foreign_keys=true&journal_mode=WAL&temp_store=MEMORY&page_size=32768&mmap_size=30000000000'
 spring.datasource.url: 'jdbc:sqlite:file:memory_sqlite_test?mode=memory&foreign_keys=true'
 spring.datasource.driver-class-name: org.sqlite.JDBC
 spring.datasource.hikari.pool-name: SQLitePool

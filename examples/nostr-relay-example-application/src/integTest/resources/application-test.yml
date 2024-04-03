@@ -1,6 +1,8 @@
 spring.application.name: 'tbk-nostr-relay-test'
 spring.http.log-request-details: false
 
+debug: false
+
 logging.file.name: application-test.log
 logging.level.org.tbk.nostr: INFO
 

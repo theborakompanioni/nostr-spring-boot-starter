@@ -54,4 +54,6 @@ public interface EventEntityService {
     List<EventId> markDeleted(XonlyPublicKey author, Specification<EventEntity> specs);
 
     EventEntity markExpiresAt(EventId eventId, Instant expiresAt);
+
+    EventEntity addNip50MetaInfo(EventNip50MetaInfoEntity nip50EventMetaInfo);
 }

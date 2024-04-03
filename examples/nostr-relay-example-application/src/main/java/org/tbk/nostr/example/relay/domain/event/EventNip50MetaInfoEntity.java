@@ -1,0 +1,64 @@
+package org.tbk.nostr.example.relay.domain.event;
+
+
+import com.github.pemistahl.lingua.api.Language;
+import jakarta.persistence.Column;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Value;
+import org.jmolecules.ddd.types.Entity;
+import org.jmolecules.ddd.types.Identifier;
+import org.springframework.data.annotation.ReadOnlyProperty;
+import org.tbk.nostr.proto.Event;
+
+import static java.util.Objects.requireNonNull;
+
+@Getter
+@Table(name = "event_nip50_meta_info")
+public class EventNip50MetaInfoEntity implements Entity<EventEntity, EventNip50MetaInfoEntity.EventNip50MetaInfoEntityId> {
+
+    @NonNull
+    private final EventNip50MetaInfoEntity.EventNip50MetaInfoEntityId id;
+
+    @NonNull
+    @Column(name = "language_iso639_1", nullable = false, updatable = false)
+    private final String language;
+
+    @NonNull
+    @Column(name = "searchable_content", nullable = false, updatable = false)
+    private final String searchableContent;
+
+    // needed in order to stay compatible with sqlite FTS5 query syntax (a column named same as the table)
+    @ReadOnlyProperty
+    @Column(name = "event_nip50_meta_info", nullable = false, updatable = false, insertable = false)
+    private String eventNip50MetaInfoEntity;
+
+    /**
+     * Creates a new {@link EventNip50MetaInfoEntity} for the given {@link Event}.
+     *
+     * @param eventId must not be {@literal null}.
+     */
+    public EventNip50MetaInfoEntity(EventEntity.EventEntityId eventId,
+                                    Language language,
+                                    String content) {
+        this.id = EventNip50MetaInfoEntityId.from(eventId);
+        this.language = requireNonNull(language).getIsoCode639_1().name();
+        this.searchableContent = requireNonNull(content);
+    }
+
+    public String getEventId() {
+        return this.id.getEventId();
+    }
+
+    @Value(staticConstructor = "of")
+    public static class EventNip50MetaInfoEntityId implements Identifier {
+        static EventNip50MetaInfoEntityId from(EventEntity.EventEntityId eventId) {
+            return EventNip50MetaInfoEntityId.of(eventId.getId());
+        }
+
+        @NonNull
+        @Column(name = "event_id", nullable = false, updatable = false)
+        String eventId;
+    }
+}
