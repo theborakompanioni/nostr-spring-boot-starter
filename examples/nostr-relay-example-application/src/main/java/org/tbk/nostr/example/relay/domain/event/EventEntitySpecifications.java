@@ -11,6 +11,8 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Kind;
+import org.tbk.nostr.example.relay.db.dialect.CustomPostgresDialect;
+import org.tbk.nostr.example.relay.impl.nip50.Nip50SearchTerm;
 import org.tbk.nostr.proto.Filter;
 
 import javax.annotation.Nullable;
@@ -102,20 +104,8 @@ public final class EventEntitySpecifications {
         };
     }
 
-    public static Specification<EventEntity> search(Language language, String searchTerm) {
-        return (root, query, criteriaBuilder) -> {
-            Join<TagEntity, EventEntity> metaInfo = root.join("nip50MetaInfos");
-            query.orderBy(criteriaBuilder.desc(root.get("id")));
-            return criteriaBuilder.and(
-                    criteriaBuilder.equal(metaInfo.get("language"), language.getIsoCode639_1().name()),
-                    criteriaBuilder.equal(metaInfo.get("eventNip50MetaInfoEntity"), searchTerm)
-            );
-        };
-    }
-
     private static final Descriptors.FieldDescriptor untilFieldDescriptor = Filter.getDescriptor().findFieldByNumber(Filter.UNTIL_FIELD_NUMBER);
     private static final Descriptors.FieldDescriptor sinceFieldDescriptor = Filter.getDescriptor().findFieldByNumber(Filter.SINCE_FIELD_NUMBER);
-    private static final Descriptors.FieldDescriptor searchFieldDescriptor = Filter.getDescriptor().findFieldByNumber(Filter.SEARCH_FIELD_NUMBER);
 
     public static Specification<EventEntity> fromFilter(Filter filter) {
         Specification<EventEntity> idsSpecification = Specification.anyOf(filter.getIdsList().stream()
@@ -146,20 +136,56 @@ public final class EventEntitySpecifications {
                 .map(EventEntitySpecifications::isCreatedBeforeInclusive)
                 .orElseGet(() -> Specification.where(null));
 
-        Specification<EventEntity> searchSpecification = Optional.of(filter)
-                .filter(it -> it.hasField(searchFieldDescriptor))
-                .map(Filter::getSearch)
-                .filter(it -> !it.isBlank())
-                .map(it -> EventEntitySpecifications.search(Language.ENGLISH, it))
-                .orElseGet(() -> Specification.where(null));
-
         return Specification.allOf(
                 idsSpecification,
                 authorsSpecification,
                 kindsSpecification,
                 sinceSpecification,
-                untilSpecification,
-                searchSpecification
+                untilSpecification
         );
+    }
+
+    static Specification<EventEntity> searchSqlite(Nip50SearchTerm term) {
+        return (root, query, criteriaBuilder) -> {
+            // TODO: What about queries without terms, and just options, e.g. "language:en"?
+            if (!term.hasSearchTerm()) {
+                return null;
+            }
+
+            Join<TagEntity, EventEntity> metaInfo = root.join("nip50MetaInfos");
+            query.orderBy(criteriaBuilder.desc(root.get("id"))); // "ORDER BY" needed to get more than one result
+            return criteriaBuilder.and(
+                    term.getOptions().getLanguage()
+                            .map(Language::getIsoCode639_1)
+                            .map(it -> criteriaBuilder.equal(metaInfo.get("language"), it.name()))
+                            .orElseGet(() -> criteriaBuilder.isNotNull(metaInfo.get("language"))),
+                    criteriaBuilder.equal(metaInfo.get("eventNip50MetaInfoEntity"), term.getSearch())
+            );
+        };
+    }
+
+    static Specification<EventEntity> searchPostgres(Nip50SearchTerm term) {
+        return (root, query, criteriaBuilder) -> {
+            // TODO: What about queries without terms, and just options, e.g. "language:en"?
+            if (!term.hasSearchTerm()) {
+                return null;
+            }
+            Join<TagEntity, EventEntity> metaInfo = root.join("nip50MetaInfos");
+
+            return criteriaBuilder.and(
+                    term.getOptions().getLanguage()
+                            .map(Language::getIsoCode639_1)
+                            .map(it -> criteriaBuilder.equal(metaInfo.get("language"), it.name()))
+                            .orElseGet(() -> criteriaBuilder.isNotNull(metaInfo.get("language"))),
+                    criteriaBuilder.isTrue(
+                            criteriaBuilder.function(
+                                    CustomPostgresDialect.FUNC_TSVECTOR_MATCH,
+                                    Boolean.class,
+                                    metaInfo.get("eventNip50MetaInfoEntity"),
+                                    criteriaBuilder.function("websearch_to_tsquery", String.class, criteriaBuilder.literal(term.getSearch()))
+                            )
+                    )
+            );
+        };
     }
 }

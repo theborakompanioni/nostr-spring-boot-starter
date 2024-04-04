@@ -1,10 +1,5 @@
 package org.tbk.nostr.example.relay;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
@@ -23,28 +18,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = NostrRelayTestConfig.class)
-@ActiveProfiles({"test", "nip50-test"})
-class NostrRelayNip50Test {
+class NostrRelayNip50TestBase {
 
-    @Autowired
-    private NostrRelayExampleApplicationProperties applicationProperties;
-
-    @Autowired
-    private NostrTemplate nostrTemplate;
-
-    @Test
-    void itShouldLoadProperties() {
-        assertThat(applicationProperties.getAsyncExecutor().getMaxPoolSize(), is(1));
-    }
-
-    @Test
-    void itShouldSearchForEventSuccessfully0() {
+    static void itShouldSearchForEventSuccessfully0(NostrTemplate nostrTemplate) {
         Signer signer = SimpleSigner.random();
 
-        Event eventMatching = MoreEvents.createFinalizedTextNote(signer, "This is a sentence in english that will match purple.");
-        Event eventNonMatching = MoreEvents.createFinalizedTextNote(signer, "This is a sentence in english that will match orange.");
+        Event eventMatching = MoreEvents.createFinalizedTextNote(signer, "0 This is a sentence in English that will match purple.");
+        Event eventNonMatching = MoreEvents.createFinalizedTextNote(signer, "0 This is a sentence in English that will match orange.");
 
         List<Event> events = List.of(eventMatching, eventNonMatching);
         List<OkResponse> oks = nostrTemplate.send(events)
@@ -73,13 +53,12 @@ class NostrRelayNip50Test {
         assertThat(fetchedEvents.getFirst(), is(eventMatching));
     }
 
-    @Test
-    void itShouldSearchForEventSuccessfully1() {
+    static void itShouldSearchForEventSuccessfully1(NostrTemplate nostrTemplate) {
         Signer signer = SimpleSigner.random();
 
-        Event event0 = MoreEvents.createFinalizedTextNote(signer, "This is a sentence in english that will match purple.");
-        Event event1 = MoreEvents.createFinalizedTextNote(signer, "This is a sentence in english that will match orange.");
-        Event event2 = MoreEvents.createFinalizedTextNote(signer, "This is a sentence in english that will match black.");
+        Event event0 = MoreEvents.createFinalizedTextNote(signer, "1 This is a sentence in English that will match purple.");
+        Event event1 = MoreEvents.createFinalizedTextNote(signer, "1 This is a sentence in English that will match orange.");
+        Event event2 = MoreEvents.createFinalizedTextNote(signer, "1 This is a sentence in English that will match black.");
 
         List<Event> events = List.of(event0, event1, event2);
         List<OkResponse> oks = nostrTemplate.send(events)

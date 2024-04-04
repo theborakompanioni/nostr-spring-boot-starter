@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.example.relay.NostrRelayExampleApplicationProperties;
+import org.tbk.nostr.example.relay.db.SupportedDatabaseType;
 import org.tbk.nostr.example.relay.domain.event.EventEntity.EventEntityId;
 import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
@@ -30,7 +31,7 @@ import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Transactional
-class EventEntityServiceImpl implements EventEntityService {
+abstract class AbstractEventEntityService implements EventEntityService {
     private static final Sort sortByCreatedAtDesc = Sort.by(Sort.Direction.DESC, "createdAt");
 
     private static final Comparator<EventEntity> compareByCreatedAtDesc = Comparator.
@@ -41,7 +42,8 @@ class EventEntityServiceImpl implements EventEntityService {
 
     private final PageRequest defaultPageRequest;
 
-    public EventEntityServiceImpl(EventEntities events, NostrRelayExampleApplicationProperties properties) {
+    AbstractEventEntityService(EventEntities events,
+                               NostrRelayExampleApplicationProperties properties) {
         requireNonNull(properties);
         this.events = requireNonNull(events);
         this.defaultPageRequest = PageRequest.of(0, properties.getInitialQueryLimit(), sortByCreatedAtDesc);
@@ -112,7 +114,7 @@ class EventEntityServiceImpl implements EventEntityService {
         // filters without limits can be combined
         if (!filterWithoutLimit.isEmpty()) {
             List<Specification<EventEntity>> filterSpecifications = filterWithoutLimit.stream()
-                    .map(EventEntitySpecifications::fromFilter)
+                    .map(this::fromFilter)
                     .toList();
 
             Specification<EventEntity> specification = Specification.allOf(
@@ -129,7 +131,7 @@ class EventEntityServiceImpl implements EventEntityService {
         if (!filterWithLimit.isEmpty()) {
             for (Filter filter : filterWithLimit) {
                 Specification<EventEntity> specification = Specification.allOf(
-                        EventEntitySpecifications.fromFilter(filter),
+                        fromFilter(filter),
                         EventEntitySpecifications.isNotDeleted(),
                         EventEntitySpecifications.isNotExpired()
                 );
@@ -150,6 +152,12 @@ class EventEntityServiceImpl implements EventEntityService {
                     .toList();
         }
     }
+
+    protected Specification<EventEntity> fromFilter(Filter filter) {
+        return EventEntitySpecifications.fromFilter(filter).and(search(filter));
+    }
+
+    protected abstract Specification<EventEntity> search(Filter filter);
 
     @Async
     @EventListener

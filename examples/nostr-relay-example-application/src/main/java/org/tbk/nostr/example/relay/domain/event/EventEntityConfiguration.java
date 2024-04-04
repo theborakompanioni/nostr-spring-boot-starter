@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tbk.nostr.example.relay.NostrRelayExampleApplicationProperties;
+import org.tbk.nostr.example.relay.db.SupportedDatabaseType;
 
 @Slf4j
 @Configuration(proxyBeanMethods = false)
@@ -15,8 +16,20 @@ class EventEntityConfiguration {
     @NonNull
     private final NostrRelayExampleApplicationProperties properties;
 
+    /*
     @Bean
-    EventEntityService eventEntityService(EventEntities events) {
-        return new EventEntityServiceImpl(events, properties);
+    EventEntityService eventEntityService(EventEntities events, SupportedDatabaseType supportedDatabaseType) {
+        return new EventEntityServiceImpl(events, supportedDatabaseType, properties);
+    }*/
+
+    @Bean
+    EventEntityService eventEntityService(EventEntities events,
+                                          NostrRelayExampleApplicationProperties properties,
+                                          SupportedDatabaseType supportedDatabaseType) {
+        return switch (supportedDatabaseType) {
+            case POSTGRES -> new PostgresEventEntityService(events, properties);
+            case SQLITE -> new SqliteEventEntityService(events, properties);
+        };
     }
+
 }

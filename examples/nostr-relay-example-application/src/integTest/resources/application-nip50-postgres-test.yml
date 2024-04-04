@@ -1,0 +1,3 @@
+spring.application.name: 'tbk-nostr-relay-nip50-test'
+
+logging.file.name: application-nip50-postgres-test.log

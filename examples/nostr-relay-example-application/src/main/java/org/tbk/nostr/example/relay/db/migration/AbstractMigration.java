@@ -2,9 +2,7 @@ package org.tbk.nostr.example.relay.db.migration;
 
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-import org.flywaydb.core.internal.database.DatabaseType;
-import org.flywaydb.core.internal.database.postgresql.PostgreSQLDatabaseType;
-import org.flywaydb.core.internal.database.sqlite.SQLiteDatabaseType;
+import org.tbk.nostr.example.relay.db.SupportedDatabaseType;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -15,12 +13,12 @@ public abstract class AbstractMigration extends BaseJavaMigration {
 
     @Override
     public final void migrate(Context context) throws Exception {
-        DatabaseType databaseType = context.getConfiguration().getDatabaseType();
+        SupportedDatabaseType databaseType = SupportedDatabaseType.fromDatabaseType(context.getConfiguration().getDatabaseType());
 
         List<String> sqls = new ArrayList<>();
-        if (databaseType.getName().equals(new PostgreSQLDatabaseType().getName())) {
+        if (databaseType == SupportedDatabaseType.POSTGRES) {
             sqls.addAll(postgres());
-        } else if (databaseType.getName().equals(new SQLiteDatabaseType().getName())) {
+        } else if (databaseType == SupportedDatabaseType.SQLITE) {
             sqls.addAll(sqlite());
         } else {
             throw new IllegalStateException("Unsupported database");

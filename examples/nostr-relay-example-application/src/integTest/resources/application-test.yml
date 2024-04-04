@@ -4,17 +4,17 @@ spring.http.log-request-details: false
 debug: false
 
 logging.file.name: application-test.log
-logging.level.org.tbk.nostr: INFO
+logging.level.org.tbk.nostr: TRACE
 
-spring.jpa.properties.hibernate.format_sql: false
-spring.jpa.properties.hibernate.show_sql: false
+spring.jpa.properties.hibernate.format_sql: true
+spring.jpa.properties.hibernate.show_sql: true
 
 spring.datasource.url: 'jdbc:postgres://regtest_nostr_relay0:regtest_nostr_relay0@regtest_db:15432/regtest_nostr_relay0'
 spring.datasource.driver-class-name: org.postgresql.Driver
 spring.datasource.hikari.pool-name: PostgresPool
 spring.datasource.hikari.maximum-pool-size: 10
 
-spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.dialect: org.tbk.nostr.example.relay.db.dialect.CustomPostgresDialect
 
 spring.docker.compose:
   enabled: true
