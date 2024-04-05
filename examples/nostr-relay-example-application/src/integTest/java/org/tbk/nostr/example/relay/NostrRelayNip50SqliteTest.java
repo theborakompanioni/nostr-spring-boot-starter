@@ -48,4 +48,9 @@ class NostrRelayNip50SqliteTest {
     void itShouldSearchForEventSuccessfully1() {
         NostrRelayNip50TestBase.itShouldSearchForEventSuccessfully1(nostrTemplate);
     }
+
+    @Test
+    void itShouldSearchForEventSuccessfully2Stemming() {
+        NostrRelayNip50TestBase.itShouldSearchForEventSuccessfully2Stemming(nostrTemplate);
+    }
 }
