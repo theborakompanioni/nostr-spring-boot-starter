@@ -25,6 +25,25 @@ Planned:
 - [ ] [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md)
 
 
+## `nostr-proto`
+
+See [nostr-proto](./nostr/nostr-proto/src/main/proto/event.proto) for protobuf definitions of core nostr concepts used throughout most modules (e.g. events, filters, etc.).
+
+```protobuf
+message Event {
+  bytes id = 1 [json_name = "id"];
+  bytes pubkey = 2 [json_name = "pubkey"];
+  uint64 created_at = 3 [json_name = "created_at"];
+  uint32 kind = 4 [json_name = "kind"];
+  repeated TagValue tags = 5 [json_name = "tags"];
+  string content = 6 [json_name = "content"];
+  bytes sig = 7 [json_name = "sig"];
+}
+
+[...]
+```
+
+
 ## Examples
 
 [This project contains various examples](examples/) that are stand-alone applications showing basic usage of the functionality provided.
