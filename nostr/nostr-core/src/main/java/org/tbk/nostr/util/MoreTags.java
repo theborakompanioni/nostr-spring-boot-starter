@@ -9,12 +9,14 @@ import org.tbk.nostr.nips.Nip13;
 import org.tbk.nostr.nips.Nip40;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
+import org.tbk.nostr.proto.TagFilter;
 import org.tbk.nostr.proto.TagValue;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -159,5 +161,31 @@ public final class MoreTags {
         return TagValue.newBuilder().setName(name)
                 .addAllValues(Arrays.asList(values))
                 .build();
+    }
+
+    public static TagFilter filter(IndexedTag tag, String... values) {
+        return filter(tag, Arrays.stream(values).toList());
+    }
+
+    public static TagFilter filter(IndexedTag tag, List<String> values) {
+        if (values.isEmpty()) {
+            throw new IllegalArgumentException("A tag filter must have at least one value.");
+        }
+        return TagFilter.newBuilder()
+                .setName(tag.name())
+                .addAllValues(values)
+                .build();
+    }
+
+    /**
+     * Create a {@link TagFilter} from a {@link TagValue}
+     *
+     * @param tag a tag value (must be an indexed tag, see {@link IndexedTag})
+     * @return a tag filter matching the first value of the given tag
+     */
+    public static TagFilter filter(TagValue tag) {
+        return filter(IndexedTag.valueOf(tag.getName()), tag.getValuesList().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Tag must have a value")));
     }
 }

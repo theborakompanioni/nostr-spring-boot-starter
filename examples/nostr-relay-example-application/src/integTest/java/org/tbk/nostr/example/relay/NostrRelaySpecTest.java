@@ -418,6 +418,39 @@ class NostrRelaySpecTest {
     }
 
     @Test
+    void itShouldFetchEventByTagSuccessfully0() {
+        Signer signer0 = SimpleSigner.random();
+        Signer signer1 = SimpleSigner.random();
+
+        Event eventMatching = MoreEvents.finalize(signer0, Nip1.createTextNote(signer0.getPublicKey(), "GM")
+                .addTags(MoreTags.p(signer0.getPublicKey())));
+        Event eventNonMatching = MoreEvents.finalize(signer1, Nip1.createTextNote(signer1.getPublicKey(), "GM")
+                .addTags(MoreTags.p(signer1.getPublicKey())));
+
+        List<Event> events = List.of(eventMatching, eventNonMatching);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
+
+        List<Event> fetchedEvents = nostrTemplate.fetchEvents(
+                        ReqRequest.newBuilder()
+                                .setId(MoreSubscriptionIds.random().getId())
+                                .addFilters(Filter.newBuilder()
+                                        .addTags(MoreTags.filter(MoreTags.p(signer0.getPublicKey())))
+                                        .build())
+                                .build()
+                )
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(fetchedEvents, hasSize(1));
+        assertThat(fetchedEvents.getFirst(), is(eventMatching));
+    }
+
+    @Test
     void itShouldFetchEventsByKindSuccessfully0() {
         Signer signer = SimpleSigner.random();
 

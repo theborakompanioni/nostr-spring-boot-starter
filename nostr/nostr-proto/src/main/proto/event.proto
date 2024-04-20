@@ -85,13 +85,19 @@ message Filter {
   repeated bytes ids = 1 [json_name = "ids"];
   repeated bytes authors = 2 [json_name = "authors"];
   repeated uint32 kinds = 3 [json_name = "kinds"];
-  repeated TagValue tags = 4 [json_name = "tags"];
+  repeated TagFilter tags = 4 [json_name = "tags"];
   uint64 since = 5 [json_name = "since"];
   uint64 until = 6 [json_name = "until"];
   uint32 limit = 7 [json_name = "limit"];
   // `search` from NIP-50: https://github.com/nostr-protocol/nips/blob/master/50.md
   string search = 8 [json_name = "search"];
 }
+
+message TagFilter {
+  string name = 1 [json_name = "name"];
+  repeated string values = 2 [json_name = "values"];
+}
+
 
 /*
 ["EVENT", <subscription_id>, <event JSON as defined above>], used to send events requested by clients.

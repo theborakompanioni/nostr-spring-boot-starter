@@ -3,6 +3,7 @@ package org.tbk.nostr.util;
 import com.google.protobuf.Descriptors;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
+import org.tbk.nostr.proto.TagFilter;
 import org.tbk.nostr.proto.TagValue;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public final class MoreFilters {
             return false;
         }
         if (filter.getTagsCount() > 0) {
-            for (TagValue filterTag : filter.getTagsList()) {
+            for (TagFilter filterTag : filter.getTagsList()) {
                 List<TagValue> eventTags = MoreTags.findByName(event, filterTag.getName());
                 Optional<String> any = eventTags.stream()
                         .filter(it -> it.getValuesCount() > 0)

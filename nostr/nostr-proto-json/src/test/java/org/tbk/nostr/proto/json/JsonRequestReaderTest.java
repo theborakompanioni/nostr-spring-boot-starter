@@ -2,6 +2,7 @@ package org.tbk.nostr.proto.json;
 
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Test;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.*;
@@ -147,19 +148,19 @@ class JsonRequestReaderTest {
                         .addAuthors(ByteString.fromHex("493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef"))
                         .addAuthors(ByteString.fromHex("40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"))
                         .addAllKinds(List.of(-1, 0, 1, 21))
-                        .addTags(MoreTags.e(
+                        .addTags(MoreTags.filter(IndexedTag.e,
                                 "5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36",
                                 "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"
                         ))
-                        .addTags(MoreTags.p(
+                        .addTags(MoreTags.filter(IndexedTag.p,
                                 "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
                                 "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"
                         ))
-                        .addTags(MoreTags.named("a",
+                        .addTags(MoreTags.filter(IndexedTag.a,
                                 "30023:f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca:abcd",
                                 "12345:f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca:test"
                         ))
-                        .addTags(MoreTags.named("Z", "test"))
+                        .addTags(MoreTags.filter(IndexedTag.Z,"test"))
                         .setSince(21)
                         .setUntil(42)
                         .setLimit(-1)
@@ -212,9 +213,9 @@ class JsonRequestReaderTest {
                         .addAuthors(ByteString.fromHex("493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef"))
                         .addAuthors(ByteString.fromHex("40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"))
                         .addAllKinds(List.of(0, 1))
-                        .addTags(MoreTags.named("e", "0", "1"))
-                        .addTags(MoreTags.named("E", "0", "2"))
-                        .addTags(MoreTags.named("Z", "0", "test"))
+                        .addTags(MoreTags.filter(IndexedTag.e, "0", "1"))
+                        .addTags(MoreTags.filter(IndexedTag.E, "0", "2"))
+                        .addTags(MoreTags.filter(IndexedTag.Z, "0", "test"))
                         .setSince(21)
                         .setUntil(42)
                         .setLimit(-1)

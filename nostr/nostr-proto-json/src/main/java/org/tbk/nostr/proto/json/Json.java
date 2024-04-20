@@ -10,6 +10,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
+import org.tbk.nostr.proto.TagFilter;
 import org.tbk.nostr.proto.TagValue;
 
 import java.io.IOException;
@@ -169,7 +170,7 @@ final class Json {
                 .distinct()
                 .collect(Collectors.toList());
 
-        List<TagValue> singleLetterTags = map.entrySet().stream()
+        List<TagFilter> singleLetterTags = map.entrySet().stream()
                 .filter(entry -> entry.getKey().matches("#[a-zA-Z]"))
                 .map(entry -> {
                     @SuppressWarnings("unchecked")
@@ -179,7 +180,7 @@ final class Json {
                             .distinct()
                             .collect(Collectors.toList());
 
-                    return TagValue.newBuilder()
+                    return TagFilter.newBuilder()
                             .setName(String.valueOf(entry.getKey().charAt(1)))
                             .addAllValues(tagValues)
                             .build();

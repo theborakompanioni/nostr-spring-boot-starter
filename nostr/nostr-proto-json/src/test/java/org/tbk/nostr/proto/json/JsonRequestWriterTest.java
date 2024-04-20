@@ -3,6 +3,7 @@ package org.tbk.nostr.proto.json;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Test;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
@@ -136,7 +137,10 @@ class JsonRequestWriterTest {
                         .addFilters(Filter.newBuilder()
                                 .addAuthors(ByteString.fromHex("493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef"))
                                 .addAllKinds(Collections.emptyList())
-                                .addTags(MoreTags.named("alt","only single letter tags should be serialized and end up in the object"))
+                                .addTags(TagFilter.newBuilder()
+                                        .setName("alt")
+                                        .addValues("only single letter tags should be serialized and end up in the object")
+                                        .build())
                                 .setSince(-1)
                                 .setUntil(-1)
                                 .setLimit(-1)
@@ -167,20 +171,23 @@ class JsonRequestWriterTest {
                                 .addAuthors(ByteString.fromHex("493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef"))
                                 .addAuthors(ByteString.fromHex("40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"))
                                 .addAllKinds(List.of(-1, 0, 1, 21))
-                                .addTags(MoreTags.e(
+                                .addTags(MoreTags.filter(IndexedTag.e,
                                         "5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36",
                                         "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"
                                 ))
-                                .addTags(MoreTags.p(
+                                .addTags(MoreTags.filter(IndexedTag.p,
                                         "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
                                         "40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e"
                                 ))
-                                .addTags(MoreTags.named("a",
+                                .addTags(MoreTags.filter(IndexedTag.a,
                                         "30023:f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca:abcd",
                                         "12345:f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca:test"
                                 ))
-                                .addTags(MoreTags.named("Z", "test"))
-                                .addTags(MoreTags.named("alt","only single letter tags should be serialized and end up in the object"))
+                                .addTags(MoreTags.filter(IndexedTag.Z, "test"))
+                                .addTags(TagFilter.newBuilder()
+                                        .setName("alt")
+                                        .addValues("only single letter tags should be serialized and end up in the object")
+                                        .build())
                                 .setSince(21)
                                 .setUntil(42)
                                 .setLimit(1)
@@ -410,10 +417,13 @@ class JsonRequestWriterTest {
     @Test
     void itShouldWriteFilter4() throws IOException {
         String json = JsonRequestWriter.toJson(Filter.newBuilder()
-                .addTags(MoreTags.e("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"))
-                .addTags(MoreTags.p("f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca"))
-                .addTags(MoreTags.named("a", "30023:f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca:abcd"))
-                .addTags(MoreTags.named("alt", "reply")) // will be ignored - not an "indexed tag" (single char)
+                .addTags(MoreTags.filter(MoreTags.e("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36")))
+                .addTags(MoreTags.filter(MoreTags.p("f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca")))
+                .addTags(MoreTags.filter(MoreTags.named("a", "30023:f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca:abcd")))
+                .addTags(TagFilter.newBuilder()
+                        .setName("alt")  // will be ignored - not an "indexed tag" (single char)
+                        .addValues("reply")
+                        .build())
                 .build());
 
         assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
@@ -428,12 +438,12 @@ class JsonRequestWriterTest {
     @Test
     void itShouldWriteFilter5() throws IOException {
         String json = JsonRequestWriter.toJson(Filter.newBuilder()
-                .addTags(MoreTags.e("e0", "e1"))
-                .addTags(MoreTags.e("e2"))
-                .addTags(MoreTags.p("p0", "p1"))
-                .addTags(MoreTags.p("p2"))
-                .addTags(MoreTags.named("Z", "Z0", "Z1"))
-                .addTags(MoreTags.named("Z", "Z3"))
+                .addTags(MoreTags.filter(IndexedTag.e, "e0", "e1"))
+                .addTags(MoreTags.filter(IndexedTag.e, "e2"))
+                .addTags(MoreTags.filter(IndexedTag.p, "p0", "p1"))
+                .addTags(MoreTags.filter(IndexedTag.p, "p2"))
+                .addTags(MoreTags.filter(IndexedTag.Z, "Z0", "Z1"))
+                .addTags(MoreTags.filter(IndexedTag.Z, "Z3"))
                 .build());
 
         assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
@@ -464,7 +474,6 @@ class JsonRequestWriterTest {
                 }
                 """)));
     }
-
 
     @Test
     void itShouldWriteMetadata1() throws IOException {

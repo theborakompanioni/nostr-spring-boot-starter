@@ -50,12 +50,12 @@ class MoreFiltersTest {
                 .build()), is(false));
         // tags
         assertThat(MoreFilters.matches(event0, Filter.newBuilder()
-                .addTags(MoreTags.named("Z", "any"))
+                .addTags(MoreTags.filter(MoreTags.named("Z", "any")))
                 .build()), is(false));
 
         assertThat(MoreFilters.matches(event1, Filter.newBuilder()
-                .addTags(MoreTags.e(event0, Nip10.Marker.MENTION))
-                .addTags(MoreTags.named("Z", "any"))
+                .addTags(MoreTags.filter(MoreTags.e(event0, Nip10.Marker.MENTION)))
+                .addTags(MoreTags.filter(MoreTags.named("Z", "any")))
                 .build()), is(false));
 
         assertThat(MoreFilters.matches(event0, Filter.newBuilder()
@@ -109,7 +109,7 @@ class MoreFiltersTest {
                 .build()), is(true));
         // tags
         assertThat(MoreFilters.matches(event1, Filter.newBuilder()
-                .addTags(MoreTags.e(event0))
+                .addTags(MoreTags.filter(MoreTags.e(event0)))
                 .build()), is(true));
 
         assertThat(MoreFilters.matches(event0, Filter.newBuilder()
@@ -183,29 +183,29 @@ class MoreFiltersTest {
                 .addTags(MoreTags.p(testSigner0.getPublicKey())));
 
         assertThat(MoreFilters.matches(event1, Filter.newBuilder()
-                .addTags(MoreTags.e(event0, Nip10.Marker.REPLY))
+                .addTags(MoreTags.filter(MoreTags.e(event0, Nip10.Marker.REPLY)))
                 .build()), is(true));
 
         assertThat(MoreFilters.matches(event1, Filter.newBuilder()
-                .addTags(MoreTags.e(event0, Nip10.Marker.ROOT))
+                .addTags(MoreTags.filter(MoreTags.e(event0, Nip10.Marker.ROOT)))
                 .build()), is(true));
 
         assertThat(MoreFilters.matches(event1, Filter.newBuilder()
-                .addTags(MoreTags.e(event0, Nip10.Marker.MENTION))
+                .addTags(MoreTags.filter(MoreTags.e(event0, Nip10.Marker.MENTION)))
                 .build()), is(true));
 
         assertThat(MoreFilters.matches(event1, Filter.newBuilder()
-                .addTags(MoreTags.p(testSigner0.getPublicKey()))
+                .addTags(MoreTags.filter(MoreTags.p(testSigner0.getPublicKey())))
                 .build()), is(true));
 
         assertThat(MoreFilters.matches(event1, Filter.newBuilder()
-                .addTags(MoreTags.e(event0, Nip10.Marker.ROOT))
-                .addTags(MoreTags.p(testSigner0.getPublicKey()))
+                .addTags(MoreTags.filter(MoreTags.e(event0, Nip10.Marker.ROOT)))
+                .addTags(MoreTags.filter(MoreTags.p(testSigner0.getPublicKey())))
                 .build()), is(true));
 
         assertThat(MoreFilters.matches(event1, Filter.newBuilder()
-                .addTags(MoreTags.e(event0, Nip10.Marker.MENTION))
-                .addTags(MoreTags.p(testSigner0.getPublicKey()))
+                .addTags(MoreTags.filter(MoreTags.e(event0, Nip10.Marker.MENTION)))
+                .addTags(MoreTags.filter(MoreTags.p(testSigner0.getPublicKey())))
                 .build()), is(true));
     }
 }

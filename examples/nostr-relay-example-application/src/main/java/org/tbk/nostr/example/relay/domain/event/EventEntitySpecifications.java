@@ -14,10 +14,12 @@ import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.example.relay.db.dialect.CustomPostgresDialect;
 import org.tbk.nostr.example.relay.impl.nip50.Nip50SearchTerm;
 import org.tbk.nostr.proto.Filter;
+import org.tbk.nostr.proto.TagFilter;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class EventEntitySpecifications {
 
@@ -90,6 +92,17 @@ public final class EventEntitySpecifications {
         return (root, cq, cb) -> cb.isNotNull(root.get("deletedAt"));
     }
 
+    private static Specification<EventEntity> hasAnyTag(TagFilter tagFilter) {
+        if (tagFilter.getName().length() != 1) {
+            return Specification.where(null);
+        }
+
+        IndexedTag indexedTag = IndexedTag.valueOf(tagFilter.getName());
+        return Specification.anyOf(tagFilter.getValuesList().stream()
+                .map(it -> hasTagWithFirstValue(indexedTag, it))
+                .collect(Collectors.toList()));
+    }
+
     public static Specification<EventEntity> hasTagWithoutValues(IndexedTag tagName) {
         return hasTagWithFirstValue(tagName, null);
     }
@@ -122,6 +135,10 @@ public final class EventEntitySpecifications {
                 .map(EventEntitySpecifications::hasKind)
                 .toList());
 
+        Specification<EventEntity> tagsSpecification = Specification.anyOf(filter.getTagsList().stream()
+                .map(EventEntitySpecifications::hasAnyTag)
+                .toList());
+
         Specification<EventEntity> sinceSpecification = Optional.of(filter)
                 .filter(it -> it.hasField(sinceFieldDescriptor))
                 .map(Filter::getSince)
@@ -140,6 +157,7 @@ public final class EventEntitySpecifications {
                 idsSpecification,
                 authorsSpecification,
                 kindsSpecification,
+                tagsSpecification,
                 sinceSpecification,
                 untilSpecification
         );
