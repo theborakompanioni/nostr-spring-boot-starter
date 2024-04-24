@@ -214,6 +214,10 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
     @Override
     public Mono<Boolean> reconnect(Duration delay) {
+        if (publisherExecutor.isShutdown()) {
+            return Mono.just(false);
+        }
+
         return Mono.fromCallable(() -> {
             State serviceState = this.state();
             if (serviceState != State.RUNNING) {

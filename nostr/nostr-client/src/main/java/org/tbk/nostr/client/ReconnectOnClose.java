@@ -36,7 +36,7 @@ public class ReconnectOnClose implements OnCloseHandler {
                 .subscribe(success -> {
                     log.info("Reconnect attempt returned: {}", success);
                 }, e -> {
-                    log.error("Error while reconnecting to relay.", e);
+                    log.warn("Error while reconnecting to relay: {}", e.getMessage());
                     Duration proposedNewDelay = delay.plus(delay);
                     Duration maxDelay = Duration.ofMinutes(2);
                     Duration newDelay = proposedNewDelay.compareTo(maxDelay) > 0 ? maxDelay : proposedNewDelay;
