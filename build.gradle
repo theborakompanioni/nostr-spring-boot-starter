@@ -108,6 +108,12 @@ subprojects {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(JavaVersion.VERSION_21.getMajorVersion())
+        }
+    }
+
     repositories {
         mavenCentral()
     }
@@ -261,7 +267,7 @@ subprojects {
 
         enabled = subprojects.isEmpty() && !srcDirs.isEmpty()
 
-        ext.outputDir = file("$layout.buildDirectory/delombok")
+        ext.outputDir = layout.buildDirectory.dir("./delombok").get().asFile
         outputs.dir(outputDir)
         srcDirs.each {
             inputs.dir(it)
