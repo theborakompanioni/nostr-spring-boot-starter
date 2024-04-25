@@ -1,3 +1,6 @@
+[![Build](https://github.com/theborakompanioni/nostr-spring-boot-starter/actions/workflows/build.yml/badge.svg)](https://github.com/theborakompanioni/nostr-spring-boot-starter/actions/workflows/build.yml)
+[![GitHub Release](https://img.shields.io/github/release/theborakompanioni/nostr-spring-boot-starter.svg?maxAge=3600)](https://github.com/theborakompanioni/nostr-spring-boot-starter/releases/latest)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.theborakompanioni/nostr-proto.svg?maxAge=3600)](https://search.maven.org/#search|g%3A%22io.github.theborakompanioni%22)
 [![License](https://img.shields.io/github/license/theborakompanioni/nostr-spring-boot-starter.svg?maxAge=2592000)](https://github.com/theborakompanioni/nostr-spring-boot-starter/blob/master/LICENSE)
 
 nostr-spring-boot-starter
@@ -25,6 +28,16 @@ Planned:
 - [ ] [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md)
 
 
+## Table of Contents
+
+- [Install](#install)
+- [Examples](#examples)
+- [Development](#development)
+- [Contributing](#contributing)
+- [Resources](#resources)
+- [License](#license)
+
+
 ## `nostr-proto`
 
 See [nostr-proto](./nostr/nostr-proto/src/main/proto/event.proto) for protobuf definitions of core nostr concepts used throughout most modules (e.g. events, filters, etc.).
@@ -41,6 +54,22 @@ message Event {
 }
 
 [...]
+```
+
+
+## Install
+
+[Download](https://search.maven.org/#search|g%3A%22io.github.theborakompanioni%22) from Maven Central.
+
+### Gradle
+```groovy
+repositories {
+    mavenCentral()
+}
+```
+
+```groovy
+implementation "io.github.theborakompanioni:nostr-proto:${bitcoinSpringBootStarterVersion}"
 ```
 
 
