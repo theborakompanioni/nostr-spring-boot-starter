@@ -43,8 +43,6 @@ contacts {
     }
 }
 
-def testcontainersRyukDisabled = System.getenv("TESTCONTAINERS_RYUK_DISABLED") ?: "true"
-
 configurations.all {
     resolutionStrategy {
         // check for updates in modules every build
@@ -191,8 +189,6 @@ subprojects {
         bootRun {
             enabled = true
             args = ['--spring.profiles.active=development']
-
-            environment "TESTCONTAINERS_RYUK_DISABLED", testcontainersRyukDisabled
         }
 
         springBoot {
@@ -207,16 +203,12 @@ subprojects {
     }
 
     test {
-        environment "TESTCONTAINERS_RYUK_DISABLED", testcontainersRyukDisabled
-
         finalizedBy jacocoTestReport // report is always generated after tests run
 
         useJUnitPlatform()
     }
 
     integrationTest {
-        environment "TESTCONTAINERS_RYUK_DISABLED", testcontainersRyukDisabled
-
         useJUnitPlatform()
     }
 
