@@ -28,17 +28,7 @@ Planned:
 - [ ] [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md)
 
 
-## Table of Contents
-
-- [Install](#install)
-- [Examples](#examples)
-- [Development](#development)
-- [Contributing](#contributing)
-- [Resources](#resources)
-- [License](#license)
-
-
-## `nostr-proto`
+### `nostr-proto`
 
 See [nostr-proto](./nostr/nostr-proto/src/main/proto/event.proto) for protobuf definitions of core nostr concepts used throughout most modules (e.g. events, filters, etc.).
 
@@ -55,6 +45,16 @@ message Event {
 
 [...]
 ```
+
+
+## Table of Contents
+
+- [Install](#install)
+- [Examples](#examples)
+- [Development](#development)
+- [Contributing](#contributing)
+- [Resources](#resources)
+- [License](#license)
 
 
 ## Install
