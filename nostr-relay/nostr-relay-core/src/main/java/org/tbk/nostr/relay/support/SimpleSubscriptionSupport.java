@@ -30,9 +30,12 @@ public class SimpleSubscriptionSupport implements SubscriptionSupport {
     @Override
     public void remove(SubscriptionKey key) {
         subscriptions.remove(key);
-        sessionIdToSubscriptionKeys.computeIfPresent(key.sessionId(), (foo, oldValue) -> oldValue.stream()
-                .filter(it -> !it.equals(key))
-                .toList());
+        sessionIdToSubscriptionKeys.computeIfPresent(key.sessionId(), (foo, oldValue) -> {
+            List<SubscriptionKey> activeKeys = oldValue.stream()
+                    .filter(it -> !it.equals(key))
+                    .toList();
+            return !activeKeys.isEmpty() ? activeKeys : null;
+        });
     }
 
     @Override

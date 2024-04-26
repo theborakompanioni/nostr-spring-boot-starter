@@ -10,6 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Metadata;
+import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
@@ -1190,5 +1191,27 @@ class NostrRelaySpecTest {
 
         assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
         assertThat(response.getNotice().getMessage(), is("Error while parsing message: Kind not set"));
+    }
+
+    /**
+     * What to do on unknown subscriptions?
+     * Current implementation takes a client friendly approach and just signals it removed it successfully by sending
+     * a "CLOSED" message.
+     */
+    @Test
+    void itShouldSendClosedMessageForUnknownSubscriptions() {
+        SubscriptionId subscriptionId = MoreSubscriptionIds.random();
+        Response response = nostrTemplate.sendPlain("""
+                        [
+                          "CLOSE",
+                          "%s"
+                        ]
+                        """.formatted(subscriptionId.getId()))
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(response.getKindCase(), is(Response.KindCase.CLOSED));
+        assertThat(response.getClosed().getSubscriptionId(), is(subscriptionId.getId()));
+        assertThat(response.getClosed().getMessage(), is(""));
     }
 }
