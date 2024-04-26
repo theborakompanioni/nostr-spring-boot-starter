@@ -1,7 +1,6 @@
 package org.tbk.nostr.example.relay;
 
 import com.google.protobuf.ByteString;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1047,20 +1046,26 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    @Disabled("NostrTemplate should have a method to send plain json")
     void itShouldVerifyParameterizedReplaceableEventBehaviour4NullFirstValueOfDTag() {
-        Signer signer = SimpleSigner.random();
-
-        Event prototype = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "test"));
-        /*
-        // TODO: must serialize as json and send plain
-        OkResponse ok0 = nostrTemplate.send("TODO.. plain json here.. send a `d` tag like `["d", null, "value"]`")
+        Response response = nostrTemplate.sendPlain("""
+                        [
+                          "EVENT",
+                          {
+                            "id": "0cd5d30f035482835ffaeb8bb6ac0b77f0d3cafd310f2067323027715ed61f6f",
+                            "pubkey":"34bed500d9662b4203ceb59609badab4af9b0b8043625372cc797e099db8b1be",
+                            "created_at":1714086553,
+                            "kind":30000,
+                            "tags":[["d", null, "test"]],
+                            "content":"GM",
+                            "sig":"54e3047e7c4d9c7567808edfc55f23ae0f0bca908fa29da22b9e307e67a1762918a48a9a3d83c8915be54701b1d343b3ddb99cde8860c199330bd9a5c0ff2fb4"
+                          }
+                        ]
+                        """)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(ok0.getSuccess(), is(false));
-        assertThat(ok0.getMessage(), is("TODO.. what error message?"));
-         */
+        assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
+        assertThat(response.getNotice().getMessage(), is("Error while parsing message: Element at index 0 is null."));
     }
 
     @Test
@@ -1096,5 +1101,94 @@ class NostrRelaySpecTest {
                 .blockOptional(Duration.ofSeconds(5));
 
         assertThat("COUNT is not supported", countBefore.isEmpty());
+    }
+
+    @Test
+    void itShouldDeclineInvalidMessage0() {
+        Response response = nostrTemplate.sendPlain("")
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
+        assertThat(response.getNotice().getMessage(), startsWith("""
+                Error while parsing message: com.fasterxml.jackson.jr.ob.JSONObjectException: No content to map due to end-of-input
+                """.replace("\n", "")));
+    }
+
+    @Test
+    void itShouldDeclineInvalidMessage1() {
+        Response response = nostrTemplate.sendPlain("null")
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
+        assertThat(response.getNotice().getMessage(), is("Error while parsing message: Cannot read the array length because \"array\" is null"));
+    }
+
+    @Test
+    void itShouldDeclineInvalidMessage2() {
+        Response response = nostrTemplate.sendPlain("[]")
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
+        assertThat(response.getNotice().getMessage(), is("Error while parsing message: Could not parse passed arg"));
+    }
+
+    @Test
+    void itShouldDeclineInvalidMessage3() {
+        Response response = nostrTemplate.sendPlain("GM")
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
+        assertThat(response.getNotice().getMessage(), startsWith("""
+                Error while parsing message: com.fasterxml.jackson.jr.private_.JsonParseException: Unrecognized token 'GM': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+                """.replace("\n", "")));
+    }
+
+    @Test
+    void itShouldDeclineInvalidMessage4EmptyEvent() {
+        Response response = nostrTemplate.sendPlain("""
+                        [
+                          "EVENT",
+                          {}
+                        ]
+                        """)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
+        assertThat(response.getNotice().getMessage(), is("Error while parsing message: Missing property 'id'"));
+    }
+
+    @Test
+    void itShouldDeclineInvalidMessage5UnknownProtoKind() {
+        Response response = nostrTemplate.sendPlain("""
+                        [
+                          "NOTICE",
+                          "GM"
+                        ]
+                        """)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
+        assertThat(response.getNotice().getMessage(), is("Error while parsing message: No enum constant org.tbk.nostr.proto.Request.KindCase.NOTICE"));
+    }
+
+    @Test
+    void itShouldDeclineInvalidMessage6ProtoKindNotSet() {
+        Response response = nostrTemplate.sendPlain("""
+                        [
+                          "KIND_NOT_SET",
+                          {}
+                        ]
+                        """)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
+        assertThat(response.getNotice().getMessage(), is("Error while parsing message: Kind not set"));
     }
 }

@@ -16,9 +16,7 @@ public interface NostrTemplate {
 
     Mono<RelayInfoDocument> fetchRelayInfoDocument(URI uri);
 
-    Mono<OkResponse> send(Event event);
-
-    Flux<OkResponse> send(Collection<Event> events);
+    Flux<Event> fetchEvents(ReqRequest request);
 
     Mono<Event> fetchEventById(EventId id);
 
@@ -30,7 +28,17 @@ public interface NostrTemplate {
 
     Mono<Metadata> fetchMetadataByAuthor(XonlyPublicKey publicKey);
 
-    Flux<Event> fetchEvents(ReqRequest request);
-
     Flux<CountResult> countEvents(CountRequest request);
+
+    Mono<OkResponse> send(Event event);
+
+    Flux<OkResponse> send(Collection<Event> events);
+
+    /**
+     * A helper function to send arbitrary plain strings.
+     * Useful for testing relay behaviour for malformed messages.
+     * @param message the message content (possibly json)
+     * @return the first response of the relay
+     */
+    Mono<Response> sendPlain(String message);
 }

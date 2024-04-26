@@ -373,6 +373,44 @@ public class SimpleNostrTemplate implements NostrTemplate {
         });
     }
 
+    @Override
+    public Mono<Response> sendPlain(String json) {
+        AtomicReference<WebSocketSession> sessionRef = new AtomicReference<>();
+
+        return Mono.<Response>create(sink -> {
+            try {
+                sessionRef.set(webSocketClient.execute(new TextWebSocketHandler() {
+                    @Override
+                    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+                        sink.success();
+                    }
+
+                    @Override
+                    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                        log.debug("handleTextMessage: {}", message.getPayload());
+
+                        try {
+                            Response response = JsonReader.fromJson(message.getPayload(), Response.newBuilder());
+                            sink.success(response);
+                        } catch (Exception e) {
+                            log.warn("Error in handleTextMessage while handling '{}': {}", message, e.getMessage());
+                            sink.error(e);
+                        }
+                    }
+                }, headers, relay.getUri()).get());
+
+                TextMessage message = new TextMessage(json);
+                log.debug("Sending message: {}", message.getPayload());
+                sessionRef.get().sendMessage(message);
+            } catch (InterruptedException | ExecutionException | IOException e) {
+                sink.error(e);
+            }
+        }).doFinally(signalType -> {
+            log.debug("Closing websocket session on signal type: {}", signalType);
+            closeQuietly(sessionRef.get());
+        });
+    }
+
 
     private static SubscriptionId createUniqueSubscriptionId(Set<ByteString> list) {
         return createUniqueSubscriptionId(list.stream()
