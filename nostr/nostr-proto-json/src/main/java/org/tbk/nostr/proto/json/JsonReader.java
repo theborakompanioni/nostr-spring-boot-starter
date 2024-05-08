@@ -1,6 +1,5 @@
 package org.tbk.nostr.proto.json;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;

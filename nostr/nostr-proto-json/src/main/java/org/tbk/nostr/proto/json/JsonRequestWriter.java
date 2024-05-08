@@ -2,6 +2,7 @@ package org.tbk.nostr.proto.json;
 
 import com.fasterxml.jackson.jr.ob.JSONComposer;
 import com.fasterxml.jackson.jr.ob.comp.ArrayComposer;
+import com.fasterxml.jackson.jr.ob.comp.ObjectComposer;
 import com.google.common.annotations.VisibleForTesting;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.*;
@@ -33,7 +34,7 @@ final class JsonRequestWriter {
 
     static String toJson(Metadata val) {
         try {
-            return json
+            ObjectComposer<JSONComposer<String>> builder = json
                     .composeString()
                     .startObject()
                     .put("name", val.getName())
@@ -47,10 +48,15 @@ final class JsonRequestWriter {
                             .orElse(null))
                     .put("banner", Optional.ofNullable(val.getBanner())
                             .map(URI::toString)
-                            .orElse(null))
-                    .put("bot", Boolean.TRUE.equals(val.getBot()))
-                    .end()
-                    .finish();
+                            .orElse(null));
+
+            if (val.getBot() != null) {
+                builder.put("bot", Boolean.TRUE.equals(val.getBot()));
+            }
+            if (val.getNip05() != null) {
+                builder.put("nip05", val.getNip05());
+            }
+            return builder.end().finish();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

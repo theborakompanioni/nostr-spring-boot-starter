@@ -7,8 +7,9 @@ import javax.annotation.Nullable;
 import java.net.URI;
 
 /**
- * As defined in <a href="https://github.com/nostr-protocol/nips/blob/4f33dbc2b86684f9bf26dd1b0fc9789e3cbf2165/24.md">NIP-1</a>
- * and <a href="https://github.com/nostr-protocol/nips/blob/4f33dbc2b86684f9bf26dd1b0fc9789e3cbf2165/24.md">NIP-24: Extra metadata fields and tags</a>.
+ * As defined in <a href="https://github.com/nostr-protocol/nips/blob/4f33dbc2b86684f9bf26dd1b0fc9789e3cbf2165/01.md">NIP-1</a>,
+ * <a href="https://github.com/nostr-protocol/nips/blob/4f33dbc2b86684f9bf26dd1b0fc9789e3cbf2165/05.md">NIP-05</a> and
+ * <a href="https://github.com/nostr-protocol/nips/blob/4f33dbc2b86684f9bf26dd1b0fc9789e3cbf2165/24.md">NIP-24</a>.
  */
 @Value
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
@@ -42,8 +43,18 @@ public class Metadata {
     URI banner;
 
     /**
-     * A boolean to clarify that the content is entirely or partially the result of automation, such as with chatbots or newsfeeds.
+     * A boolean to clarify that the content is entirely or partially the result of automation, such as with chatbots
+     * or newsfeeds.
      */
     @Nullable
     Boolean bot;
+
+    /**
+     * An <a href="https://datatracker.ietf.org/doc/html/rfc5322#section-3.4.1">internet identifier</a>
+     * (an email-like address) as the value. Although there is a link to a very liberal "internet identifier"
+     * specification above, NIP-05 assumes the <local-part> part will be restricted to the characters
+     * <code>a-z0-9-_.</code>, case-insensitive.
+     */
+    @Nullable
+    String nip05;
 }

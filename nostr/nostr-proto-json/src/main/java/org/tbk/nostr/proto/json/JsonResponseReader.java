@@ -133,7 +133,7 @@ final class JsonResponseReader {
     }
 
     private static Metadata metadataFromMap(Map<String, Object> map, Metadata.Builder metadata) {
-        return metadata
+        Metadata.Builder builder = metadata
                 .name(Optional.ofNullable(map.get("name"))
                         .map(String::valueOf)
                         .orElse(null))
@@ -154,11 +154,17 @@ final class JsonResponseReader {
                 .banner(Optional.ofNullable(map.get("banner"))
                         .map(String::valueOf)
                         .map(URI::create)
-                        .orElse(null))
-                .bot(Optional.ofNullable(map.get("bot"))
-                        .map(String::valueOf)
-                        .map(Boolean::parseBoolean)
-                        .orElse(null))
-                .build();
+                        .orElse(null));
+
+        Optional.ofNullable(map.get("bot"))
+                .map(String::valueOf)
+                .map(Boolean::parseBoolean)
+                .ifPresent(builder::bot);
+
+        Optional.ofNullable(map.get("nip05"))
+                .map(String::valueOf)
+                .ifPresent(builder::nip05);
+
+        return builder.build();
     }
 }

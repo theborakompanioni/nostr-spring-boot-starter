@@ -285,7 +285,8 @@ class JsonResponseReaderTest {
                   "display_name": "display name",
                   "website": "https://www.example.com/",
                   "banner": "https://www.example.com/banner.png",
-                  "bot": true
+                  "bot": true,
+                  "nip05": "name@example.com"
                 }
                 """, Metadata.newBuilder());
 
@@ -296,6 +297,7 @@ class JsonResponseReaderTest {
         assertThat(metadata.getWebsite(), is(URI.create("https://www.example.com/")));
         assertThat(metadata.getBanner(), is(URI.create("https://www.example.com/banner.png")));
         assertThat(metadata.getBot(), is(Boolean.TRUE));
+        assertThat(metadata.getNip05(), is("name@example.com"));
     }
 
     @Test
@@ -308,6 +310,8 @@ class JsonResponseReaderTest {
         assertThat(metadata0.getDisplayName(), is(nullValue()));
         assertThat(metadata0.getWebsite(), is(nullValue()));
         assertThat(metadata0.getBanner(), is(nullValue()));
+        assertThat(metadata0.getBot(), is(nullValue()));
+        assertThat(metadata0.getNip05(), is(nullValue()));
 
         Metadata metadata1 = JsonReader.fromJson("""
                 {
@@ -322,6 +326,7 @@ class JsonResponseReaderTest {
         assertThat(metadata1.getWebsite(), is(nullValue()));
         assertThat(metadata1.getBanner(), is(nullValue()));
         assertThat(metadata1.getBot(), is(nullValue()));
+        assertThat(metadata1.getNip05(), is(nullValue()));
 
         Metadata metadata2 = JsonReader.fromJson("""
                 {
@@ -336,6 +341,7 @@ class JsonResponseReaderTest {
         assertThat(metadata2.getWebsite(), is(nullValue()));
         assertThat(metadata2.getBanner(), is(nullValue()));
         assertThat(metadata2.getBot(), is(nullValue()));
+        assertThat(metadata2.getNip05(), is(nullValue()));
 
 
         Metadata metadata3 = JsonReader.fromJson("""
@@ -351,8 +357,35 @@ class JsonResponseReaderTest {
         assertThat(metadata3.getWebsite(), is(nullValue()));
         assertThat(metadata3.getBanner(), is(nullValue()));
         assertThat(metadata3.getBot(), is(nullValue()));
+        assertThat(metadata3.getNip05(), is(nullValue()));
     }
 
+    @Test
+    void itShouldParseMetadata3() {
+        String json = """
+                {
+                  "id":"5bbb27cf3c5079cea00b1a4f5943f5790d7ed855fc4f3700514d58976574240b",
+                  "pubkey":"6e468422dfb74a5738702a8823b9b28168abab8655faacb6853cd0ee15deee93",
+                  "created_at":1714851835,
+                  "kind":0,
+                  "tags":[["alt","User profile for Gigi"]],
+                  "content":"{\\"name\\":\\"Gigi\\",\\"nip05\\":\\"_@dergigi.com\\",\\"about\\":\\"not doing DMs â¢ not writing 21waysbook.com â¢ helping opensats.org â¢ painting twentyone.world â¢ maintaining bitcoin-resources.com & nostr-resources.com â¢ starting toomanyprojects.xyz ð¥\\",\\"lud16\\":\\"dergigi@primal.net\\",\\"display_name\\":\\"Gigi\\",\\"picture\\":\\"https://dergigi.com/assets/images/avatars/07.png\\",\\"banner\\":\\"https://cdn.nostr.build/i/0aeb7560c271bbb1cef00760989acd9dd3f37bdc42b37852eecb0d0b70a3e862.jpg\\",\\"website\\":\\"https://dergigi.com\\"}",
+                  "sig":"a773117b6d866198474655559c44af86cedc230faac589e45399551151ad1125a94701c3008f32444ce332db647eddfd71a2c963f9ad88597cac98ebeaee304b"
+                }
+                """;
+
+        Event event = JsonReader.fromJson(json, Event.newBuilder());
+
+        Metadata metadata = JsonReader.fromJson(event.getContent(), Metadata.newBuilder());
+        assertThat(metadata.getName(), is("Gigi"));
+        assertThat(metadata.getAbout(), is(startsWith("not")));
+        assertThat(metadata.getPicture(), is(URI.create("https://dergigi.com/assets/images/avatars/07.png")));
+        assertThat(metadata.getDisplayName(), is("Gigi"));
+        assertThat(metadata.getWebsite(), is(URI.create("https://dergigi.com")));
+        assertThat(metadata.getBanner(), is(URI.create("https://cdn.nostr.build/i/0aeb7560c271bbb1cef00760989acd9dd3f37bdc42b37852eecb0d0b70a3e862.jpg")));
+        assertThat(metadata.getBot(), is(nullValue()));
+        assertThat(metadata.getNip05(), is("_@dergigi.com"));
+    }
 
     @Test
     void itShouldParseMetadata3FailOnInvalidPictureUri() {
