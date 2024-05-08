@@ -155,6 +155,10 @@ final class JsonResponseReader {
                         .map(String::valueOf)
                         .map(URI::create)
                         .orElse(null))
+                .bot(Optional.ofNullable(map.get("bot"))
+                        .map(String::valueOf)
+                        .map(Boolean::parseBoolean)
+                        .orElse(null))
                 .build();
     }
 }

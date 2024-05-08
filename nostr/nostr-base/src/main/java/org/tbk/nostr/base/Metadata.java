@@ -6,6 +6,10 @@ import lombok.Value;
 import javax.annotation.Nullable;
 import java.net.URI;
 
+/**
+ * As defined in <a href="https://github.com/nostr-protocol/nips/blob/4f33dbc2b86684f9bf26dd1b0fc9789e3cbf2165/24.md">NIP-1</a>
+ * and <a href="https://github.com/nostr-protocol/nips/blob/4f33dbc2b86684f9bf26dd1b0fc9789e3cbf2165/24.md">NIP-24: Extra metadata fields and tags</a>.
+ */
 @Value
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class Metadata {
@@ -36,4 +40,10 @@ public class Metadata {
      */
     @Nullable
     URI banner;
+
+    /**
+     * A boolean to clarify that the content is entirely or partially the result of automation, such as with chatbots or newsfeeds.
+     */
+    @Nullable
+    Boolean bot;
 }

@@ -470,7 +470,8 @@ class JsonRequestWriterTest {
                   "picture": "https://www.example.com/example.png",
                   "website": null,
                   "banner": null,
-                  "display_name": null
+                  "display_name": null,
+                  "bot": false
                 }
                 """)));
     }
@@ -484,6 +485,7 @@ class JsonRequestWriterTest {
                 .displayName("display name")
                 .website(URI.create("https://www.example.com/"))
                 .banner(URI.create("https://www.example.com/banner.png"))
+                .bot(true)
                 .build());
 
         assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
@@ -493,7 +495,8 @@ class JsonRequestWriterTest {
                   "picture": "https://www.example.com/picture.png",
                   "display_name": "display name",
                   "website": "https://www.example.com/",
-                  "banner": "https://www.example.com/banner.png"
+                  "banner": "https://www.example.com/banner.png",
+                  "bot": true
                 }
                 """)));
     }

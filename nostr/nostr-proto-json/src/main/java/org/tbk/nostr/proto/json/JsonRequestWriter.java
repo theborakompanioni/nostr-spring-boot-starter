@@ -48,6 +48,7 @@ final class JsonRequestWriter {
                     .put("banner", Optional.ofNullable(val.getBanner())
                             .map(URI::toString)
                             .orElse(null))
+                    .put("bot", Boolean.TRUE.equals(val.getBot()))
                     .end()
                     .finish();
         } catch (IOException e) {

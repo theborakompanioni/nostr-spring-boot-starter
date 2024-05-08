@@ -284,7 +284,8 @@ class JsonResponseReaderTest {
                   "picture": "https://www.example.com/picture.png",
                   "display_name": "display name",
                   "website": "https://www.example.com/",
-                  "banner": "https://www.example.com/banner.png"
+                  "banner": "https://www.example.com/banner.png",
+                  "bot": true
                 }
                 """, Metadata.newBuilder());
 
@@ -294,6 +295,7 @@ class JsonResponseReaderTest {
         assertThat(metadata.getDisplayName(), is("display name"));
         assertThat(metadata.getWebsite(), is(URI.create("https://www.example.com/")));
         assertThat(metadata.getBanner(), is(URI.create("https://www.example.com/banner.png")));
+        assertThat(metadata.getBot(), is(Boolean.TRUE));
     }
 
     @Test
@@ -319,7 +321,7 @@ class JsonResponseReaderTest {
         assertThat(metadata1.getDisplayName(), is(nullValue()));
         assertThat(metadata1.getWebsite(), is(nullValue()));
         assertThat(metadata1.getBanner(), is(nullValue()));
-
+        assertThat(metadata1.getBot(), is(nullValue()));
 
         Metadata metadata2 = JsonReader.fromJson("""
                 {
@@ -333,6 +335,7 @@ class JsonResponseReaderTest {
         assertThat(metadata2.getDisplayName(), is(nullValue()));
         assertThat(metadata2.getWebsite(), is(nullValue()));
         assertThat(metadata2.getBanner(), is(nullValue()));
+        assertThat(metadata2.getBot(), is(nullValue()));
 
 
         Metadata metadata3 = JsonReader.fromJson("""
@@ -347,6 +350,7 @@ class JsonResponseReaderTest {
         assertThat(metadata3.getDisplayName(), is(nullValue()));
         assertThat(metadata3.getWebsite(), is(nullValue()));
         assertThat(metadata3.getBanner(), is(nullValue()));
+        assertThat(metadata3.getBot(), is(nullValue()));
     }
 
 
