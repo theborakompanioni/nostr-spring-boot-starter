@@ -485,7 +485,8 @@ class JsonRequestWriterTest {
                 .website(URI.create("https://www.example.com/"))
                 .banner(URI.create("https://www.example.com/banner.png"))
                 .bot(true)
-                .nip05("name@example.com")
+                .nip05("nip05@example.com")
+                .lud16("lud16@example.com")
                 .build());
 
         assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
@@ -497,7 +498,8 @@ class JsonRequestWriterTest {
                   "website": "https://www.example.com/",
                   "banner": "https://www.example.com/banner.png",
                   "bot": true,
-                  "nip05": "name@example.com"
+                  "nip05": "nip05@example.com",
+                  "lud16": "lud16@example.com"
                 }
                 """)));
     }

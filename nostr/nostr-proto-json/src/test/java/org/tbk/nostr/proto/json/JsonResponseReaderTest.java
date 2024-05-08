@@ -273,6 +273,9 @@ class JsonResponseReaderTest {
         assertThat(metadata.getDisplayName(), is(nullValue()));
         assertThat(metadata.getWebsite(), is(nullValue()));
         assertThat(metadata.getBanner(), is(nullValue()));
+        assertThat(metadata.getBot(), is(nullValue()));
+        assertThat(metadata.getNip05(), is(nullValue()));
+        assertThat(metadata.getLud16(), is(nullValue()));
     }
 
     @Test
@@ -286,7 +289,8 @@ class JsonResponseReaderTest {
                   "website": "https://www.example.com/",
                   "banner": "https://www.example.com/banner.png",
                   "bot": true,
-                  "nip05": "name@example.com"
+                  "nip05": "nip05@example.com",
+                  "lud16": "lud16@example.com"
                 }
                 """, Metadata.newBuilder());
 
@@ -297,7 +301,8 @@ class JsonResponseReaderTest {
         assertThat(metadata.getWebsite(), is(URI.create("https://www.example.com/")));
         assertThat(metadata.getBanner(), is(URI.create("https://www.example.com/banner.png")));
         assertThat(metadata.getBot(), is(Boolean.TRUE));
-        assertThat(metadata.getNip05(), is("name@example.com"));
+        assertThat(metadata.getNip05(), is("nip05@example.com"));
+        assertThat(metadata.getLud16(), is("lud16@example.com"));
     }
 
     @Test
@@ -312,6 +317,7 @@ class JsonResponseReaderTest {
         assertThat(metadata0.getBanner(), is(nullValue()));
         assertThat(metadata0.getBot(), is(nullValue()));
         assertThat(metadata0.getNip05(), is(nullValue()));
+        assertThat(metadata0.getLud16(), is(nullValue()));
 
         Metadata metadata1 = JsonReader.fromJson("""
                 {
@@ -327,6 +333,7 @@ class JsonResponseReaderTest {
         assertThat(metadata1.getBanner(), is(nullValue()));
         assertThat(metadata1.getBot(), is(nullValue()));
         assertThat(metadata1.getNip05(), is(nullValue()));
+        assertThat(metadata1.getLud16(), is(nullValue()));
 
         Metadata metadata2 = JsonReader.fromJson("""
                 {
@@ -342,6 +349,7 @@ class JsonResponseReaderTest {
         assertThat(metadata2.getBanner(), is(nullValue()));
         assertThat(metadata2.getBot(), is(nullValue()));
         assertThat(metadata2.getNip05(), is(nullValue()));
+        assertThat(metadata2.getLud16(), is(nullValue()));
 
 
         Metadata metadata3 = JsonReader.fromJson("""
@@ -358,6 +366,7 @@ class JsonResponseReaderTest {
         assertThat(metadata3.getBanner(), is(nullValue()));
         assertThat(metadata3.getBot(), is(nullValue()));
         assertThat(metadata3.getNip05(), is(nullValue()));
+        assertThat(metadata3.getLud16(), is(nullValue()));
     }
 
     @Test
@@ -385,6 +394,7 @@ class JsonResponseReaderTest {
         assertThat(metadata.getBanner(), is(URI.create("https://cdn.nostr.build/i/0aeb7560c271bbb1cef00760989acd9dd3f37bdc42b37852eecb0d0b70a3e862.jpg")));
         assertThat(metadata.getBot(), is(nullValue()));
         assertThat(metadata.getNip05(), is("_@dergigi.com"));
+        assertThat(metadata.getLud16(), is("dergigi@primal.net"));
     }
 
     @Test

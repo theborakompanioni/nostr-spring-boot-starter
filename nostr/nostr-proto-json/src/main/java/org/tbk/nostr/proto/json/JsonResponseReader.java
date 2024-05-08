@@ -165,6 +165,10 @@ final class JsonResponseReader {
                 .map(String::valueOf)
                 .ifPresent(builder::nip05);
 
+        Optional.ofNullable(map.get("lud16"))
+                .map(String::valueOf)
+                .ifPresent(builder::lud16);
+
         return builder.build();
     }
 }

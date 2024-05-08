@@ -57,4 +57,7 @@ public class Metadata {
      */
     @Nullable
     String nip05;
+
+    @Nullable
+    String lud16;
 }

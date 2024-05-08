@@ -56,6 +56,9 @@ final class JsonRequestWriter {
             if (val.getNip05() != null) {
                 builder.put("nip05", val.getNip05());
             }
+            if (val.getLud16() != null) {
+                builder.put("lud16", val.getLud16());
+            }
             return builder.end().finish();
         } catch (IOException e) {
             throw new RuntimeException(e);
