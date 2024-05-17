@@ -271,6 +271,40 @@ class JsonRequestWriterTest {
     }
 
     @Test
+    void itShouldWriteAuthRequest0() throws IOException {
+        String json = JsonRequestWriter.toJson(Request.newBuilder()
+                .setAuth(AuthRequest.newBuilder()
+                        .setEvent(MoreEvents.withEventId(Event.newBuilder()
+                                        .setCreatedAt(1)
+                                        .setPubkey(ByteString.fromHex(testSigner.getPublicKey().value.toHex()))
+                                        .setKind(22_242)
+                                        .addTags(MoreTags.named("relay", "wss://relay.example.com/"))
+                                        .addTags(MoreTags.named("challenge", "challengestringhere"))
+                                )
+                                .build())
+                        .build())
+                .build());
+
+        assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
+                [
+                  "AUTH",
+                  {
+                    "id": "54510202f7e5bae8726048933a1d9833c0b865b5a306d311ed7f572a2bb66ba2",
+                    "pubkey": "493557ea5445d54298010d895d964e286c5d8fd704ac03823c6ddb0317643cef",
+                    "created_at" : 1,
+                    "kind": 22242,
+                    "tags": [
+                      ["relay", "wss://relay.example.com/"],
+                      ["challenge", "challengestringhere"]
+                    ],
+                    "content": "",
+                    "sig": ""
+                  }
+                ]
+                """)));
+    }
+
+    @Test
     void itShouldWriteEvent0() throws IOException {
         String json = JsonRequestWriter.toJson(MoreEvents.withEventId(Event.newBuilder()
                         .setCreatedAt(1)

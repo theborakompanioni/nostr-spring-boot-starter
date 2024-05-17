@@ -21,7 +21,8 @@ final class JsonResponseWriter {
             case CLOSED -> toJson(val.getClosed());
             case NOTICE -> toJson(val.getNotice());
             case COUNT -> toJson(val.getCount());
-            case Response.KindCase.KIND_NOT_SET -> throw new IllegalArgumentException("Kind not set");
+            case AUTH -> toJson(val.getAuth());
+            case KIND_NOT_SET -> throw new IllegalArgumentException("Kind not set");
         };
     }
 
@@ -84,5 +85,9 @@ final class JsonResponseWriter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String toJson(AuthResponse val) {
+        return Json.toJsonArray(json, "AUTH", val.getChallenge());
     }
 }

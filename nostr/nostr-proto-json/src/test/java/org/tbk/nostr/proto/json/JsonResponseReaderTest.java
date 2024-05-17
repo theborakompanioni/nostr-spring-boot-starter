@@ -258,6 +258,22 @@ class JsonResponseReaderTest {
     }
 
     @Test
+    void itShouldParseAuthResponse0() {
+        Response res = JsonReader.fromJson("""
+                [
+                  "AUTH",
+                  "challenge"
+                ]
+                """, Response.newBuilder());
+
+        assertThat(res.getKindCase(), is(Response.KindCase.AUTH));
+        assertThat(res.getAuth(), is(notNullValue()));
+
+        AuthResponse auth = res.getAuth();
+        assertThat(auth.getChallenge(), is("challenge"));
+    }
+
+    @Test
     void itShouldParseMetadata0() {
         Metadata metadata = JsonReader.fromJson("""
                 {

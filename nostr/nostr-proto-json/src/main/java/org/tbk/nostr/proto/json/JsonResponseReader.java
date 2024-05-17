@@ -107,6 +107,16 @@ final class JsonResponseReader {
                                         .build())
                                 .build();
                     }
+                    case AUTH -> {
+                        if (array.length < 2) {
+                            throw new IllegalArgumentException("Could not parse passed arg");
+                        }
+                        String challenge = String.valueOf(array[1]);
+                        yield response.setAuth(AuthResponse.newBuilder()
+                                        .setChallenge(challenge)
+                                        .build())
+                                .build();
+                    }
                     case KIND_NOT_SET -> throw new IllegalArgumentException("Kind not set");
                 };
             } else {

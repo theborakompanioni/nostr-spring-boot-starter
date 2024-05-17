@@ -43,6 +43,7 @@ message Request {
     ReqRequest req = 2 [json_name = "req"];
     CloseRequest close = 3 [json_name = "close"];
     CountRequest count = 4 [json_name = "count"];
+    AuthRequest auth = 5 [json_name = "auth"];
   }
 }
 
@@ -66,6 +67,12 @@ message CloseRequest {
 message CountRequest {
   string id = 1 [json_name = "id"];
   repeated Filter filters = 2 [json_name = "filters"];
+}
+
+// `auth` from NIP-42: https://github.com/nostr-protocol/nips/blob/master/42.md
+// ["AUTH", <signed-event-json>]
+message AuthRequest {
+  Event event = 1 [json_name = "event"];
 }
 
 /*{
@@ -105,6 +112,7 @@ message TagFilter {
 ["EOSE", <subscription_id>], used to indicate the end of stored events and the beginning of events newly received in real-time.
 ["CLOSED", <subscription_id>, <message>], used to indicate that a subscription was ended on the server side.
 ["NOTICE", <message>]
+["AUTH", <challenge-string>]
  */
 message Response {
   oneof kind {
@@ -114,6 +122,7 @@ message Response {
     ClosedResponse closed = 4 [json_name = "closed"];
     NoticeResponse notice = 5 [json_name = "notice"];
     CountResponse count = 6 [json_name = "count"];
+    AuthResponse auth = 7 [json_name = "auth"];
   }
 }
 
@@ -149,4 +158,9 @@ message CountResponse {
 message CountResult {
   uint64 count = 1 [json_name = "count"];
   bool approximate = 2 [json_name = "approximate"];
+}
+
+// `auth` from NIP-42: https://github.com/nostr-protocol/nips/blob/master/42.md
+message AuthResponse {
+  string challenge = 1 [json_name = "challenge"];
 }

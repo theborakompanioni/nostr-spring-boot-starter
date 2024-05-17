@@ -191,4 +191,20 @@ class JsonResponseWriterTest {
                 ]
                 """)));
     }
+
+    @Test
+    void itShouldWriteAuthResponse0() throws IOException {
+        String json = JsonWriter.toJson(Response.newBuilder()
+                .setAuth(AuthResponse.newBuilder()
+                        .setChallenge("challenge")
+                        .build())
+                .build());
+
+        assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
+                [
+                  "AUTH",
+                  "challenge"
+                ]
+                """)));
+    }
 }

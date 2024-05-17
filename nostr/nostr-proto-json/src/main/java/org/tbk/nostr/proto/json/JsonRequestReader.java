@@ -89,6 +89,18 @@ final class JsonRequestReader {
                                         .build())
                                 .build();
                     }
+                    case AUTH -> {
+                        if (array.length < 2) {
+                            throw new IllegalArgumentException("Could not parse passed arg");
+                        }
+
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> eventMap = (Map<String, Object>) array[1];
+                        yield request.setAuth(AuthRequest.newBuilder()
+                                        .setEvent(Json.fromMap(eventMap, Event.newBuilder()))
+                                        .build())
+                                .build();
+                    }
                     case KIND_NOT_SET -> throw new IllegalArgumentException("Kind not set");
                 };
             } else {

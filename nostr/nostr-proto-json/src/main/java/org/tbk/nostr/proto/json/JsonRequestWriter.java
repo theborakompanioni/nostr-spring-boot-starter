@@ -24,11 +24,12 @@ final class JsonRequestWriter {
 
     static String toJson(Request val) {
         return switch (val.getKindCase()) {
-            case Request.KindCase.EVENT -> toJson(val.getEvent());
-            case Request.KindCase.REQ -> toJson(val.getReq());
-            case Request.KindCase.CLOSE -> toJson(val.getClose());
-            case Request.KindCase.COUNT -> toJson(val.getCount());
-            case Request.KindCase.KIND_NOT_SET -> throw new IllegalArgumentException("Kind not set");
+            case EVENT -> toJson(val.getEvent());
+            case REQ -> toJson(val.getReq());
+            case CLOSE -> toJson(val.getClose());
+            case COUNT -> toJson(val.getCount());
+            case AUTH -> toJson(val.getAuth());
+            case KIND_NOT_SET -> throw new IllegalArgumentException("Kind not set");
         };
     }
 
@@ -111,17 +112,11 @@ final class JsonRequestWriter {
     }
 
     private static String toJson(EventRequest val) {
-        try {
-            return json
-                    .composeString()
-                    .startArray()
-                    .add("EVENT")
-                    .addObject(Json.asMap(val.getEvent()))
-                    .end()
-                    .finish();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return toJsonWithEvent("EVENT", val.getEvent());
+    }
+
+    private static String toJson(AuthRequest val) {
+        return toJsonWithEvent("AUTH", val.getEvent());
     }
 
     private static String toJson(ReqRequest val) {
@@ -130,6 +125,20 @@ final class JsonRequestWriter {
 
     private static String toJson(CountRequest val) {
         return toJsonWithSubscriptionIdAndFilter("COUNT", val.getId(), val.getFiltersList());
+    }
+
+    private static String toJsonWithEvent(String cmd, Event event) {
+        try {
+            return json
+                    .composeString()
+                    .startArray()
+                    .add(cmd)
+                    .addObject(Json.asMap(event))
+                    .end()
+                    .finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static String toJsonWithSubscriptionIdAndFilter(String cmd, String subscriptionId, List<Filter> filters) {
