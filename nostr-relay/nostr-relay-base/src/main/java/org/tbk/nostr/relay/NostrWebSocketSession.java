@@ -24,6 +24,10 @@ public interface NostrWebSocketSession extends WebSocketSession {
 
     void sendResponseImmediately(Response message) throws IOException;
 
+    boolean isAuthenticated();
+
+    void setAuthenticated(boolean authenticated);
+
     record SessionId(@NonNull String id) {
     }
 }

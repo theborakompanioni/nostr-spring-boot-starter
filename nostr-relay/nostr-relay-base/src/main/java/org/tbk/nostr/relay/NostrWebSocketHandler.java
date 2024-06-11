@@ -7,6 +7,7 @@ public interface NostrWebSocketHandler extends
         EventRequestHandler,
         CloseRequestHandler,
         CountRequestHandler,
+        AuthRequestHandler,
         UnknownRequestHandler,
         ParseErrorHandler {
 }

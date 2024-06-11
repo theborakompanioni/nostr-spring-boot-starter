@@ -44,6 +44,7 @@ public class NostrRequestHandlerExecutionChain {
             case REQ -> handler.handleReqMessage(context, request.getReq());
             case CLOSE -> handler.handleCloseMessage(context, request.getClose());
             case COUNT -> handler.handleCountMessage(context, request.getCount());
+            case AUTH -> handler.handleAuthMessage(context, request.getAuth());
             case KIND_NOT_SET -> handler.handleUnknownMessage(context, request);
         }
     }

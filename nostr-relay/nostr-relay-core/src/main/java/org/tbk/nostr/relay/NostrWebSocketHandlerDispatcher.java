@@ -158,6 +158,16 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
             this.getDelegate().sendMessage(new TextMessage(JsonWriter.toJson(response)));
         }
 
+        @Override
+        public boolean isAuthenticated() {
+            return Boolean.TRUE.equals(getAttributes().get("nip42_auth"));
+        }
+
+        @Override
+        public void setAuthenticated(boolean authenticated) {
+            getAttributes().put("nip42_auth", authenticated);
+        }
+
         private boolean queueMessage(WebSocketMessage<?> message) {
             return this.messageQueue.offer(message);
         }

@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr relay nip42 package'
+
+dependencies {
+
+    // api project(':nostr-relay:nostr-relay-base')
+    // needs to depend on "core" to access DefaultEventValidator!
+    // Consider moving it to an own package, e.g. nostr-event-validation
+    api project(':nostr-relay:nostr-relay-core')
+
+    api 'io.projectreactor:reactor-core'
+}

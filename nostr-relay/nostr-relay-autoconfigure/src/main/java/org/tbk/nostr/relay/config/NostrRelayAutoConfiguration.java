@@ -112,6 +112,13 @@ public class NostrRelayAutoConfiguration {
         return new DefaultCloseRequestHandler();
     }
 
+
+    @Bean
+    @ConditionalOnMissingBean(AuthRequestHandler.class)
+    DefaultAuthRequestHandler defaultAuthRequestHandler() {
+        return new DefaultAuthRequestHandler();
+    }
+
     @Bean
     @ConditionalOnMissingBean(CountRequestHandler.class)
     DefaultCountRequestHandler defaultCountRequestHandler() {
@@ -137,6 +144,7 @@ public class NostrRelayAutoConfiguration {
                                                      EventRequestHandler eventRequestHandler,
                                                      CloseRequestHandler closeRequestHandler,
                                                      CountRequestHandler countRequestHandler,
+                                                     AuthRequestHandler authRequestHandler,
                                                      UnknownRequestHandler unknownRequestHandler,
                                                      ParseErrorHandler parseErrorHandler) {
         return new NostrRequestHandlerSupport(
@@ -144,6 +152,7 @@ public class NostrRelayAutoConfiguration {
                 eventRequestHandler,
                 closeRequestHandler,
                 countRequestHandler,
+                authRequestHandler,
                 unknownRequestHandler,
                 parseErrorHandler
         );

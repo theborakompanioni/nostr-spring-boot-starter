@@ -22,6 +22,9 @@ public class NostrRequestHandlerSupport implements NostrWebSocketHandler {
     private final CountRequestHandler countRequestHandler;
 
     @NonNull
+    private final AuthRequestHandler authRequestHandler;
+
+    @NonNull
     private final UnknownRequestHandler unknownRequestHandler;
 
     @NonNull
@@ -50,6 +53,11 @@ public class NostrRequestHandlerSupport implements NostrWebSocketHandler {
     @Override
     public final void handleCountMessage(NostrRequestContext context, CountRequest count) throws Exception {
         countRequestHandler.handleCountMessage(context, count);
+    }
+
+    @Override
+    public void handleAuthMessage(NostrRequestContext context, AuthRequest event) throws Exception {
+        authRequestHandler.handleAuthMessage(context, event);
     }
 
     @Override
