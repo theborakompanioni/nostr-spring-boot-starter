@@ -23,6 +23,8 @@ dependencies {
     implementation 'io.projectreactor:reactor-core'
 
     implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+
     implementation "org.xerial:sqlite-jdbc:${sqliteVersion}"
     implementation "org.hibernate.orm:hibernate-community-dialects:${hibernateCommunityDialectsVersion}"
 

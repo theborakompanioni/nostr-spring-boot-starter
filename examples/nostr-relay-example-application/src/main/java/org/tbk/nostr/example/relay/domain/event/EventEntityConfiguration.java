@@ -16,12 +16,6 @@ class EventEntityConfiguration {
     @NonNull
     private final NostrRelayExampleApplicationProperties properties;
 
-    /*
-    @Bean
-    EventEntityService eventEntityService(EventEntities events, SupportedDatabaseType supportedDatabaseType) {
-        return new EventEntityServiceImpl(events, supportedDatabaseType, properties);
-    }*/
-
     @Bean
     EventEntityService eventEntityService(EventEntities events,
                                           NostrRelayExampleApplicationProperties properties,

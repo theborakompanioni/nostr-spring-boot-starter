@@ -1,8 +1,8 @@
 package org.tbk.nostr.example.relay.db;
 
 import org.flywaydb.core.internal.database.DatabaseType;
-import org.flywaydb.core.internal.database.postgresql.PostgreSQLDatabaseType;
 import org.flywaydb.core.internal.database.sqlite.SQLiteDatabaseType;
+import org.flywaydb.database.postgresql.PostgreSQLDatabaseType;
 
 public enum SupportedDatabaseType {
     POSTGRES,
