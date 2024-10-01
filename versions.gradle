@@ -18,7 +18,7 @@ ext {
     findsecbugsPluginVersion = '1.12.0'
     springBootGradlePluginVersion = '3.3.3'
     springBootVersion = springBootGradlePluginVersion
-    springShellVersion = '3.3.1'
+    springShellVersion = '3.3.3'
     protobufGradleVersion = '0.9.4'
     bytebuddyPluginVersion = '1.14.14'
 }
