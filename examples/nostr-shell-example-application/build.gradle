@@ -18,6 +18,8 @@ dependencies {
     implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
     implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
 
+    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
+
     implementation 'io.projectreactor:reactor-core'
 
     implementation 'org.springframework.shell:spring-shell-starter'

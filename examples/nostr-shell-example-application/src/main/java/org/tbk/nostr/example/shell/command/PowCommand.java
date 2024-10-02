@@ -1,4 +1,4 @@
-package org.tbk.nostr.example.shell;
+package org.tbk.nostr.example.shell.command;
 
 import com.google.common.base.Stopwatch;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +22,10 @@ import static java.util.Objects.requireNonNull;
 @ShellComponent
 @ShellCommandGroup("Commands")
 @RequiredArgsConstructor
-class NostrShellCommands {
+class PowCommand {
 
     @ShellMethod(key = "pow", value = "Generate NIP-13 Proof of Work Notes")
-    public String pow(
+    public String run(
             @ShellOption(value = "json", help = "note body") String json,
             @ShellOption(value = "target", defaultValue = "8", help = "target difficulty (default: 8)") int targetDifficultyArg,
             @ShellOption(value = "parallelism", defaultValue = "0", help = "parallelism level (default: # of processors / 2)") int parallelismArg

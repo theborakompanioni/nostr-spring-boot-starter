@@ -1,4 +1,4 @@
-package org.tbk.nostr.example.shell;
+package org.tbk.nostr.example.shell.command;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -15,13 +15,13 @@ import static org.awaitility.Awaitility.await;
 @Slf4j
 @ShellTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class NostrShellExampleApplicationShellTest {
+class IdentityCommandTest {
 
     @Autowired
     private ShellTestClient client;
 
     @Test
-    void interactiveShellTest() {
+    void testPowInteractive() {
         ShellTestClient.InteractiveShellSession session = client
                 .interactive()
                 .run();
@@ -32,12 +32,18 @@ class NostrShellExampleApplicationShellTest {
         });
 
         session.write(session.writeSequence()
-                .text("help")
+                .text("identity").space()
                 .carriageReturn()
                 .build());
-        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
+
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
             ShellAssertions.assertThat(session.screen())
-                    .containsText("AVAILABLE COMMANDS");
+                    .containsText("{")
+                    .containsText("\"privateKey\" : \"")
+                    .containsText("\"publicKey\" : \"0")
+                    .containsText("\"nsec\" : \"nsec1")
+                    .containsText("\"npub\" : \"npub1")
+                    .containsText("}");
         });
     }
 }

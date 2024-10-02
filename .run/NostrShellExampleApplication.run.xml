@@ -1,10 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="NostrShellExampleApplication" type="Application" factoryName="Application" nameIsGenerated="true">
     <envs>
-      <!--
-        needs to be passed as env var since application args (`spring.profiles.active=development`)
-        are not (yet) supported. See https://github.com/spring-projects/spring-shell/issues/508 (last checked: 2024-03-15)
-      -->
       <env name="SPRING_PROFILES_ACTIVE" value="development" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="org.tbk.nostr.example.shell.NostrShellExampleApplication" />
@@ -12,7 +8,7 @@
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples/nostr-shell-example-application" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.tbk.nostr.example.shell.*" />
+        <option name="PATTERN" value="org.tbk.nostr.example.shell.command.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
