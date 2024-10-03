@@ -70,7 +70,7 @@ class NostrRelayLoadTest {
         Stopwatch started = Stopwatch.createStarted();
         Flux.just(events)
                 .subscribeOn(Schedulers.single())
-                .flatMap(it -> nostrTemplate.send(it))
+                .flatMap(it -> nostrTemplate.send(it).timeout(Duration.ofSeconds(60)))
                 .doFinally(foo -> {
                     latch.countDown();
                 }).subscribe(ok -> {
@@ -78,7 +78,7 @@ class NostrRelayLoadTest {
                     assertThat(ok.getMessage(), is(""));
                 });
 
-        assert latch.await(60, TimeUnit.SECONDS);
+        assertThat(latch.await(60, TimeUnit.SECONDS), is(true));
 
         log.info("Inserting {} events on single thread took {}", eventCount, started.stop());
     }
@@ -96,7 +96,7 @@ class NostrRelayLoadTest {
         Stopwatch started = Stopwatch.createStarted();
         Flux.fromIterable(events)
                 .subscribeOn(Schedulers.newParallel("load-test"))
-                .flatMap(it -> nostrTemplate.send(it))
+                .flatMap(it -> nostrTemplate.send(it).timeout(Duration.ofSeconds(60)))
                 .doFinally(foo -> {
                     latch.countDown();
                 }).subscribe(ok -> {
@@ -104,7 +104,7 @@ class NostrRelayLoadTest {
                     assertThat(ok.getMessage(), is(""));
                 });
 
-        assert latch.await(60, TimeUnit.SECONDS);
+        assertThat(latch.await(60, TimeUnit.SECONDS), is(true));
 
         log.info("Inserting {} events on multiple threads took {}", eventCount, started.stop());
     }
