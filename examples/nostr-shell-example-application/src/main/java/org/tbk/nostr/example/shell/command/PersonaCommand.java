@@ -43,6 +43,7 @@ class PersonaCommand {
                 .startObject()
                 .put("entropy", HexFormat.of().formatHex(entropy))
                 .put("mnemonic", String.join(" ", mnemonics))
+                .put("keyPath", account.getPath().asString('\''))
                 .put("privateKey", account.getPrivateKey().toHex())
                 .put("publicKey", account.getPublicKey().value.toHex())
                 .put("nsec", Nip19.toNsec(account.getPrivateKey()))
