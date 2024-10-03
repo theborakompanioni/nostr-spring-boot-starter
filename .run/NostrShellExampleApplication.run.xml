@@ -8,7 +8,7 @@
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples/nostr-shell-example-application" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.tbk.nostr.example.shell.command.*" />
+        <option name="PATTERN" value="org.tbk.nostr.example.shell.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
