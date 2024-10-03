@@ -13,15 +13,15 @@ import java.util.concurrent.TimeUnit;
 import static org.awaitility.Awaitility.await;
 
 @Slf4j
-@ShellTest
+@ShellTest(terminalWidth = 120)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class IdentityCommandTest {
+class PersonaCommandTest {
 
     @Autowired
     private ShellTestClient client;
 
     @Test
-    void testIdentityInteractive() {
+    void testPersonaInteractive() {
         ShellTestClient.InteractiveShellSession session = client
                 .interactive()
                 .run();
@@ -32,17 +32,20 @@ class IdentityCommandTest {
         });
 
         session.write(session.writeSequence()
-                .text("identity").space()
+                .text("persona").space()
+                .text("--name").space().text("alice").space()
                 .carriageReturn()
                 .build());
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
             ShellAssertions.assertThat(session.screen())
                     .containsText("{")
-                    .containsText("\"privateKey\" : \"")
-                    .containsText("\"publicKey\" : \"")
-                    .containsText("\"nsec\" : \"nsec1")
-                    .containsText("\"npub\" : \"npub1")
+                    .containsText("\"entropy\" : \"2bd806c97f0e00af1a1fc3328fa763a9\"")
+                    .containsText("\"mnemonic\" : \"cloth scan rather wrap theme fiscal half wear crater large suggest fancy\"")
+                    .containsText("\"privateKey\" : \"7eaab2f5e9359badb538722e23e6e65bb0c8265a707d317ec4b132ccd23aeb72\"")
+                    .containsText("\"publicKey\" : \"f319269a8757e84e9b6dad9325cb74933f64e9497c4c3a8f7757361e78edf564\"")
+                    .containsText("\"nsec\" : \"nsec1064t9a0fxkd6mdfcwghz8ehxtwcvsfj6wp7nzlkykyeve536adeqjksgqj\"")
+                    .containsText("\"npub\" : \"npub17vvjdx582l5yaxmd4kfjtjm5jvlkf62f03xr4rmh2umpu78d74jqxhkuj6\"")
                     .containsText("}");
         });
     }
