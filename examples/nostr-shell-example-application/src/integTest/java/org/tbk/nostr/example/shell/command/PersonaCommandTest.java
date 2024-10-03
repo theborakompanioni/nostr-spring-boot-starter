@@ -51,6 +51,37 @@ class PersonaCommandTest {
     }
 
     @Test
+    void testPersonaAlice15() {
+        ShellTestClient.InteractiveShellSession session = client
+                .interactive()
+                .run();
+
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
+            ShellAssertions.assertThat(session.screen())
+                    .containsText("nostr:>");
+        });
+
+        session.write(session.writeSequence()
+                .text("persona").space()
+                .text("--name").space().text("alice").space()
+                .text("--account").space().text("15").space()
+                .carriageReturn()
+                .build());
+
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            ShellAssertions.assertThat(session.screen())
+                    .containsText("{")
+                    .containsText("\"entropy\" : \"2bd806c97f0e00af1a1fc3328fa763a9\"")
+                    .containsText("\"mnemonic\" : \"cloth scan rather wrap theme fiscal half wear crater large suggest fancy\"")
+                    .containsText("\"privateKey\" : \"223955cda115e533305bc7bb27d598cd807238da2418be3b882450fc812f41e7\"")
+                    .containsText("\"publicKey\" : \"19f322cf03fb653f1bcc7b736d1ea4b6cdf100accec83f4282433010b7ef09b5\"")
+                    .containsText("\"nsec\" : \"nsec1ygu4tndpzhjnxvzmc7aj04vcekq8ywx6ysvtuwugy3g0eqf0g8nse3k7qa\"")
+                    .containsText("\"npub\" : \"npub1r8ej9ncrldjn7x7v0dek684ykmxlzq9vemyr7s5zgvcppdl0px6srjpt4a\"")
+                    .containsText("}");
+        });
+    }
+
+    @Test
     void testPersonaBob0() {
         ShellTestClient.InteractiveShellSession session = client
                 .interactive()
@@ -76,6 +107,37 @@ class PersonaCommandTest {
                     .containsText("\"publicKey\" : \"72603b8a1329cd9cb7e117f1d9d6ae6bb9385ec591d30a3c91ef40aa8aa4c409\"")
                     .containsText("\"nsec\" : \"nsec1mdf536ez4wcz8l0xq9d9v2jk5zw6dm3ytrrhzn95tzhc6azpum3s9xd9wz\"")
                     .containsText("\"npub\" : \"npub1wfsrhzsn98xeedlpzlcan44wdwunshk9j8fs50y3aaq24z4ycsysuspqy8\"")
+                    .containsText("}");
+        });
+    }
+
+    @Test
+    void testPersonaBob15() {
+        ShellTestClient.InteractiveShellSession session = client
+                .interactive()
+                .run();
+
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
+            ShellAssertions.assertThat(session.screen())
+                    .containsText("nostr:>");
+        });
+
+        session.write(session.writeSequence()
+                .text("persona").space()
+                .text("--name").space().text("bob").space()
+                .text("--account").space().text("15").space()
+                .carriageReturn()
+                .build());
+
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            ShellAssertions.assertThat(session.screen())
+                    .containsText("{")
+                    .containsText("\"entropy\" : \"81b637d8fcd2c6da6359e6963113a117\"")
+                    .containsText("\"mnemonic\" : \"like random wage whale cluster honey miracle devote normal mass tribe comfort\"")
+                    .containsText("\"privateKey\" : \"415cdb8c2c397802cde2ea9ec6173379f81e56bf04777d6daea75a93a7dadc1d\"")
+                    .containsText("\"publicKey\" : \"7705f65a3c1a062d762aaf0af656407ea97a86e343cc31829eebaaa905e5da7d\"")
+                    .containsText("\"nsec\" : \"nsec1g9wdhrpv89uq9n0za20vv9en08upu44lq3mh6mdw5adf8f76msws3pzj7t\"")
+                    .containsText("\"npub\" : \"npub1wuzlvk3urgrz6a324u90v4jq065h4phrg0xrrq57aw42jp09mf7ss5xcqq\"")
                     .containsText("}");
         });
     }

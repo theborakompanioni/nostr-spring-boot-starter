@@ -30,7 +30,10 @@ public final class MoreIdentities {
     }
 
     public static PrivateKey fromSeed(byte[] seed) {
-        return Nip6.fromSeed(seed);
+        return fromSeed(seed, 0L);
+    }
+    public static PrivateKey fromSeed(byte[] seed, long accountIndex) {
+        return Nip6.fromSeed(seed, accountIndex);
     }
 
     public static PrivateKey fromMnemonic(String mnemonic) {
@@ -38,7 +41,15 @@ public final class MoreIdentities {
     }
 
     public static PrivateKey fromMnemonic(String mnemonic, String passphrase) {
-        return fromSeed(MnemonicCode.toSeed(mnemonic, passphrase));
+        return fromMnemonic(mnemonic, passphrase, 0L);
+    }
+
+    public static PrivateKey fromMnemonic(String mnemonic, long accountIndex) {
+        return fromMnemonic(mnemonic, "", accountIndex);
+    }
+
+    public static PrivateKey fromMnemonic(String mnemonic, String passphrase, long accountIndex) {
+        return fromSeed(MnemonicCode.toSeed(mnemonic, passphrase), accountIndex);
     }
 
     public static PrivateKey fromMnemonic(List<String> mnemonic) {
@@ -46,6 +57,14 @@ public final class MoreIdentities {
     }
 
     public static PrivateKey fromMnemonic(List<String> mnemonic, String passphrase) {
-        return fromSeed(MnemonicCode.toSeed(mnemonic, passphrase));
+        return fromMnemonic(mnemonic, passphrase, 0L);
+    }
+
+    public static PrivateKey fromMnemonic(List<String> mnemonic, long accountIndex) {
+        return fromMnemonic(mnemonic, "", accountIndex);
+    }
+
+    public static PrivateKey fromMnemonic(List<String> mnemonic, String passphrase, long accountIndex) {
+        return fromMnemonic(String.join(" ", mnemonic), passphrase, accountIndex);
     }
 }

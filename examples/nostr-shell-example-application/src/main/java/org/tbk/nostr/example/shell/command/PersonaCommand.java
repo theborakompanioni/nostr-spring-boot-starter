@@ -27,13 +27,16 @@ class PersonaCommand {
 
     @ShellMethod(key = "persona", value = "Generate nostr personas")
     public String run(
-            @ShellOption(value = "name", help = "persona name (used to derive master key)") String name
+            @ShellOption(value = "name", help = "persona name (used to derive master key)") String name,
+            @ShellOption(value = "account", defaultValue = "0", help = "identity account index (default: 0)") long accountIndexArg
     ) throws IOException {
+        long accountIndex = accountIndexArg >= 0 ? accountIndexArg : 0;
+
         byte[] entropy = Arrays.copyOfRange(Crypto.sha256(name.getBytes(StandardCharsets.UTF_8)), 0, 16);
 
         List<String> mnemonics = MnemonicCode.toMnemonics(entropy);
 
-        PrivateKey privateKey = MoreIdentities.fromMnemonic(mnemonics);
+        PrivateKey privateKey = MoreIdentities.fromMnemonic(mnemonics, accountIndex);
 
         return Json.jsonPretty.composeString()
                 .startObject()
