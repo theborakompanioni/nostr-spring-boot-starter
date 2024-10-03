@@ -1,20 +1,17 @@
 package org.tbk.nostr.example.relay;
 
-import fr.acinq.bitcoin.PrivateKey;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.tbk.nostr.base.RelayUri;
+import org.tbk.nostr.identity.Identity;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.relay.config.NostrRelayProperties;
 import org.tbk.nostr.template.NostrTemplate;
-import org.tbk.nostr.template.SimpleNostrTemplate;
 
 import java.time.Duration;
 import java.util.List;
@@ -65,7 +62,8 @@ class NostrRelayExampleApplicationTest {
         XonlyPublicKey applicationPubkey = applicationProperties.getIdentity()
                 .map(NostrRelayExampleApplicationProperties.IdentityProperties::getSeed)
                 .map(MoreIdentities::fromSeed)
-                .map(PrivateKey::xOnlyPublicKey)
+                .map(it -> it.deriveAccount(0L))
+                .map(Identity.Account::getPublicKey)
                 .orElseThrow();
 
         List<Event> events = nostrTemplate.fetchEventByAuthor(applicationPubkey)

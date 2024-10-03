@@ -15,7 +15,7 @@ public final class Nip6 {
             .derive(hardened(44L))
             .derive(hardened(1237L));
 
-    private static KeyPath nip6Path(long account) {
+    public static KeyPath keyPath(long account) {
         return nip6Base.derive(hardened(account))
                 .derive(0L)
                 .derive(0L);
@@ -46,10 +46,10 @@ public final class Nip6 {
     }
 
     private static PrivateKey fromMasterPrivateKey(DeterministicWallet.ExtendedPrivateKey masterPrivateKey, long account) {
-        return fromMasterPrivateKey(masterPrivateKey, nip6Path(account));
+        return fromMasterPrivateKey(masterPrivateKey, keyPath(account));
     }
 
-    private static PrivateKey fromMasterPrivateKey(DeterministicWallet.ExtendedPrivateKey masterPrivateKey, KeyPath keyPath) {
+    public static PrivateKey fromMasterPrivateKey(DeterministicWallet.ExtendedPrivateKey masterPrivateKey, KeyPath keyPath) {
         return DeterministicWallet.derivePrivateKey(masterPrivateKey, keyPath).getPrivateKey();
     }
 

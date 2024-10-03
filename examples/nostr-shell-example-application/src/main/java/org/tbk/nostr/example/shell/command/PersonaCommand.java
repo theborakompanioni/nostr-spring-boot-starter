@@ -2,7 +2,6 @@ package org.tbk.nostr.example.shell.command;
 
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.MnemonicCode;
-import fr.acinq.bitcoin.PrivateKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.shell.standard.ShellCommandGroup;
@@ -10,6 +9,7 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import org.tbk.nostr.example.shell.util.Json;
+import org.tbk.nostr.identity.Identity;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.nips.Nip19;
 
@@ -36,16 +36,17 @@ class PersonaCommand {
 
         List<String> mnemonics = MnemonicCode.toMnemonics(entropy);
 
-        PrivateKey privateKey = MoreIdentities.fromMnemonic(mnemonics, accountIndex);
+        Identity identity = MoreIdentities.fromMnemonic(mnemonics);
+        Identity.Account account = identity.deriveAccount(accountIndex);
 
         return Json.jsonPretty.composeString()
                 .startObject()
                 .put("entropy", HexFormat.of().formatHex(entropy))
                 .put("mnemonic", String.join(" ", mnemonics))
-                .put("privateKey", privateKey.toHex())
-                .put("publicKey", privateKey.xOnlyPublicKey().value.toHex())
-                .put("nsec", Nip19.toNsec(privateKey))
-                .put("npub", Nip19.toNpub(privateKey.xOnlyPublicKey()))
+                .put("privateKey", account.getPrivateKey().toHex())
+                .put("publicKey", account.getPublicKey().value.toHex())
+                .put("nsec", Nip19.toNsec(account.getPrivateKey()))
+                .put("npub", Nip19.toNpub(account.getPublicKey()))
                 .end()
                 .finish();
     }

@@ -20,7 +20,7 @@ class IdentityCommand {
 
     @ShellMethod(key = "identity", value = "Generate a nostr key pair")
     public String run() throws IOException {
-        PrivateKey privateKey = MoreIdentities.random();
+        PrivateKey privateKey = MoreIdentities.random().deriveAccount(0L).getPrivateKey();
 
         return Json.jsonPretty.composeString()
                 .startObject()

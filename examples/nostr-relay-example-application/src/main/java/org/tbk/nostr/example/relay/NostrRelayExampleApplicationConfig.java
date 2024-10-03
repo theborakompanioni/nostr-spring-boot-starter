@@ -31,7 +31,7 @@ class NostrRelayExampleApplicationConfig {
         return properties.getIdentity()
                 .map(NostrRelayExampleApplicationProperties.IdentityProperties::getSeed)
                 .map(MoreIdentities::fromSeed)
-                .map(SimpleSigner::fromPrivateKey)
+                .map(SimpleSigner::fromIdentity)
                 .orElseThrow();
     }
 
