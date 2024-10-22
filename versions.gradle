@@ -5,7 +5,8 @@ ext {
     protobufVersion = '3.22.3'
     protocVersion = protobufVersion
     postgresqlVersion = '42.7.4'
-    jmoleculesBomVersion = '2023.1.3'
+    jmoleculesBomVersion = '2023.1.6'
+    bytebuddyPluginVersion = '1.15.3' // keep in sync with `jmoleculesBomVersion`
     acinqSecp256k1KmpVersion = '0.15.0'
     acinqBitcoinKmpVersion = '0.20.0' // keep in sync with `acinqSecp256k1KmpVersion`
     acinqLightningKmpVersion = '1.8.4' // keep in sync with `acinqBitcoinKmpVersion`
@@ -20,7 +21,6 @@ ext {
     springBootVersion = springBootGradlePluginVersion
     springShellVersion = '3.3.3'
     protobufGradleVersion = '0.9.4'
-    bytebuddyPluginVersion = '1.14.14'
 }
 
 // hack: 2021-11-10T00:00Z - change this timestamp to invalidate GitHub Actions gradle caches.
