@@ -103,6 +103,9 @@ public class Nip11Properties implements Validator {
         private String version;
 
         @Nullable
+        private String icon;
+
+        @Nullable
         public XonlyPublicKey getPubkey() {
             return pubkey == null ? null : MorePublicKeys.fromHex(this.pubkey);
         }
@@ -153,6 +156,15 @@ public class Nip11Properties implements Validator {
                     errors.rejectValue("software", "software.invalid", errorMessage);
                 }
             }
+
+            if (properties.icon != null) {
+                try {
+                    URI ignoredOnPurpose = URI.create(properties.icon);
+                } catch (IllegalArgumentException e) {
+                    String errorMessage = "'icon' must be a valid URI";
+                    errors.rejectValue("icon", "icon.invalid", errorMessage);
+                }
+            }
         }
 
         public RelayInfoDocument.Builder toRelayInfoDocument() {
@@ -163,7 +175,8 @@ public class Nip11Properties implements Validator {
                     .contact(this.getContact())
                     .supportedNips(this.getSupportedNips())
                     .software(this.getSoftware())
-                    .version(this.getVersion());
+                    .version(this.getVersion())
+                    .icon(this.getIcon());
         }
     }
 }

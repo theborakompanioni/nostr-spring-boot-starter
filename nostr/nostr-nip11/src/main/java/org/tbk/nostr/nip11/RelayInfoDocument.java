@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Primary fields
  * {
  * "name": <string identifying relay>,
  * "description": <string with detailed information>,
@@ -87,6 +88,13 @@ public class RelayInfoDocument {
     @Nullable
     String version;
 
+    /**
+     * A URL pointing to an image to be used as an icon for the relay. Recommended to be squared in shape.
+     * @apiNote Extra field.
+     */
+    @Nullable
+    String icon;
+
     public String toJson() {
         return RelayInfoDocument.toJson(this);
     }
@@ -114,7 +122,10 @@ public class RelayInfoDocument {
                 jsonComposer.put("software", doc.software.toString());
             }
             if (doc.version != null) {
-                jsonComposer.putObject("version", doc.version);
+                jsonComposer.put("version", doc.version);
+            }
+            if (doc.icon != null) {
+                jsonComposer.put("icon", doc.icon);
             }
             return jsonComposer.end().finish();
         } catch (Exception e) {
@@ -143,6 +154,7 @@ public class RelayInfoDocument {
         Collection<Object> supportedNips = (Collection<Object>) map.get("supported_nips");
         Object software = map.get("software");
         Object version = map.get("version");
+        Object icon = map.get("icon");
 
         return builder
                 .name(name == null ? null : String.valueOf(name))
@@ -154,6 +166,7 @@ public class RelayInfoDocument {
                         .boxed().toList())
                 .software(software == null ? null : URI.create(String.valueOf(software)))
                 .version(version == null ? null : String.valueOf(version))
+                .icon(icon == null ? null : String.valueOf(icon))
                 .build();
     }
 }

@@ -37,5 +37,6 @@ class NostrRelayNip11Test {
         assertThat(relayInfo.getVersion(), is("2.43.0"));
         assertThat(relayInfo.getSupportedNips(), hasItems(1, 42, 21000000));
         assertThat(relayInfo.getContact(), is(nullValue()));
+        assertThat(relayInfo.getIcon(), is("https://example.org/favicon.ico"));
     }
 }
