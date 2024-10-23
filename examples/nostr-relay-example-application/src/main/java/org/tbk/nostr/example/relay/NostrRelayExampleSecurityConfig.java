@@ -48,10 +48,13 @@ class NostrRelayExampleSecurityConfig implements WebSecurityCustomizer {
                         .xssProtection(xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers(
                                 antMatcher(nostrRelayProperties.getWebsocketPath())
                         ).permitAll()
+                        .requestMatchers(
+                                PathRequest.toStaticResources().atCommonLocations(),
+                                antMatcher("/index.html"))
+                        .permitAll()
                         .anyRequest().authenticated()
                 );
 

@@ -5,6 +5,24 @@
     <title></title>
 </head>
 <body>
-<h1>It works!</h1>
+<div>Loading...</div>
 </body>
+
+<script>
+    const displayRelayInfoDocument = () => {
+      fetch('/', {
+        headers: {
+            "Accept": "application/nostr+json"
+        },
+      })
+      .then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        document.body.innerHTML = `<pre>${JSON.stringify(json, null, 2)}</pre>`
+      });
+    }
+
+    displayRelayInfoDocument()
+</script>
 </html>
