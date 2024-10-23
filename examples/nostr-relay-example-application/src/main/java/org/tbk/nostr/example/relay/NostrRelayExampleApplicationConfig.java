@@ -8,12 +8,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.tbk.nostr.example.relay.domain.event.EventEntityService;
 import org.tbk.nostr.example.relay.impl.ExampleConnectionEstablishedHandler;
 import org.tbk.nostr.example.relay.impl.NostrSupportService;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
-import org.tbk.nostr.example.relay.domain.event.EventEntityService;
 import org.tbk.nostr.relay.handler.ConnectionEstablishedHandler;
 
 @Slf4j

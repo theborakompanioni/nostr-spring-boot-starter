@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.example.relay.NostrRelayExampleApplicationProperties;
-import org.tbk.nostr.example.relay.db.SupportedDatabaseType;
 import org.tbk.nostr.example.relay.domain.event.EventEntity.EventEntityId;
 import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;

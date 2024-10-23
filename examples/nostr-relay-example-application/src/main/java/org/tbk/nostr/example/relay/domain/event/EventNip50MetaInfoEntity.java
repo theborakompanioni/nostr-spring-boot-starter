@@ -11,7 +11,6 @@ import lombok.Value;
 import org.jmolecules.ddd.types.Entity;
 import org.jmolecules.ddd.types.Identifier;
 import org.springframework.data.annotation.ReadOnlyProperty;
-import org.tbk.nostr.example.relay.db.converter.MoreConverter;
 import org.tbk.nostr.example.relay.impl.nip50.LinguaConverters;
 import org.tbk.nostr.proto.Event;
 
