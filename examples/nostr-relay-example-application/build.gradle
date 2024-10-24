@@ -42,6 +42,22 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    /* replace tomcat with netty /
+    implementation 'org.springframework.boot:spring-boot-starter-jetty'
+    modules {
+        module('org.springframework.boot:spring-boot-starter-tomcat') {
+            replacedBy('org.springframework.boot:spring-boot-starter-jetty')
+        }
+    }*/
+
+    /* replace tomcat with undertow /
+    implementation 'org.springframework.boot:spring-boot-starter-undertow'
+    modules {
+        module('org.springframework.boot:spring-boot-starter-tomcat') {
+            replacedBy('org.springframework.boot:spring-boot-starter-undertow')
+        }
+    }*/
+
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
     testImplementation project(':nostr:nostr-template')
