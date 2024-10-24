@@ -25,7 +25,7 @@ class IdentityCommand {
         return Json.jsonPretty.composeString()
                 .startObject()
                 .put("privateKey", privateKey.toHex())
-                .put("publicKey", privateKey.xOnlyPublicKey().getPublicKey().toHex())
+                .put("publicKey", privateKey.xOnlyPublicKey().value.toHex())
                 .put("nsec", Nip19.toNsec(privateKey))
                 .put("npub", Nip19.toNpub(privateKey.xOnlyPublicKey()))
                 .end()
