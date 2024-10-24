@@ -35,16 +35,29 @@ Commands
        persona: Generate nostr personas
        identity: Generate a nostr key pair
        pow: Generate NIP-13 Proof of Work Notes
+       identity-vanity: Generate a vanity nostr key pair
 ```
 
-#### `pow`
+#### `identity`
 ```shell
-nostr:>pow --target 15 --json "{ \"kind\": 1, \"content\":\"GM!\" }"
-{"id":"000112b43cd320aac4090a8aea6ff587cd690e951c12f985a18fa47dabe4224f","pubkey":"","created_at":1710363515,"kind":1,"tags":[["nonce","984","15"]],"content":"GM!","sig":""}
-nostr:>pow --target 24 --json "{ \"kind\": 1, \"content\":\"GM!\" }"
-{"id":"0000003ab4d37414fd72a009505ef11f98c1ce9c3af6a918235041f3530250ce","pubkey":"","created_at":1710363805,"kind":1,"tags":[["nonce","651487","24"]],"content":"GM!","sig":""}
-nostr:>pow --target 25 --json "{ \"kind\": 1, \"content\":\"GM!\", \"tags\": [[ \"expiration\", \"1710378232\" ]] }"
-{"id":"00000009af73d28a49db7f6047229cca1da09a46180b46129f2ca5a0a1f43a07","pubkey":"","created_at":1710368995,"kind":1,"tags":[["expiration","1710378232"],["nonce","189309","25"]],"content":"GM!","sig":""}
+nostr:>identity
+{
+  "privateKey" : "1f503559eb276c40c8f476c8f486d971a26a99b4505cf483826ed2695339ead3",
+  "publicKey" : "daed4eb7f731ba35c576ed1bb4cfd2d43964a5206a3b841d4998b436de9b4d4c",
+  "nsec" : "nsec1ragr2k0tyakypj85wmy0fpkewx3x4xd52pw0fquzdmfxj5eeatfs47wjtq",
+  "npub" : "npub1mtk5adlhxxart3tka5dmfn7j6sukfffqdgacg82fnz6rdh5mf4xq6tlxsh"
+}
+```
+
+#### `identity-vanity`
+```shell
+nostr:>identity-vanity --npub-prefix sat
+{
+  "privateKey" : "ee08a3217741259ea77c2f9c06d0da3d2cb326bcc812026e51b392433fb883ab",
+  "publicKey" : "8756fa4812c5c14bbfb3a05f16f5d4e3b3e5d3f49cd8992b1655360d2d46b72b",
+  "nsec" : "nsec1acy2xgthgyjeafmu97wqd5x685ktxf4ueqfqymj3kwfyx0acsw4sdz8xyy",
+  "npub" : "npub1sat05jqjchq5h0an5p03daw5uwe7t5l5nnvfj2ck25mq6t2xku4sgur3yv"
+}
 ```
 
 #### `persona`
@@ -61,16 +74,16 @@ nostr:>persona --name alice
 }
 ```
 
-#### `identity`
+#### `pow`
 ```shell
-nostr:>identity
-{
-  "privateKey" : "1f503559eb276c40c8f476c8f486d971a26a99b4505cf483826ed2695339ead3",
-  "publicKey" : "daed4eb7f731ba35c576ed1bb4cfd2d43964a5206a3b841d4998b436de9b4d4c",
-  "nsec" : "nsec1ragr2k0tyakypj85wmy0fpkewx3x4xd52pw0fquzdmfxj5eeatfs47wjtq",
-  "npub" : "npub1mtk5adlhxxart3tka5dmfn7j6sukfffqdgacg82fnz6rdh5mf4xq6tlxsh"
-}
+nostr:>pow --target 15 --json "{ \"kind\": 1, \"content\":\"GM!\" }"
+{"id":"000112b43cd320aac4090a8aea6ff587cd690e951c12f985a18fa47dabe4224f","pubkey":"","created_at":1710363515,"kind":1,"tags":[["nonce","984","15"]],"content":"GM!","sig":""}
+nostr:>pow --target 24 --json "{ \"kind\": 1, \"content\":\"GM!\" }"
+{"id":"0000003ab4d37414fd72a009505ef11f98c1ce9c3af6a918235041f3530250ce","pubkey":"","created_at":1710363805,"kind":1,"tags":[["nonce","651487","24"]],"content":"GM!","sig":""}
+nostr:>pow --target 25 --json "{ \"kind\": 1, \"content\":\"GM!\", \"tags\": [[ \"expiration\", \"1710378232\" ]] }"
+{"id":"00000009af73d28a49db7f6047229cca1da09a46180b46129f2ca5a0a1f43a07","pubkey":"","created_at":1710368995,"kind":1,"tags":[["expiration","1710378232"],["nonce","189309","25"]],"content":"GM!","sig":""}
 ```
+
 
 ### Non-interactive
 ```shell

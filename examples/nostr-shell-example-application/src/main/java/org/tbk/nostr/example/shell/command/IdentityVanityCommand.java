@@ -34,6 +34,10 @@ class IdentityVanityCommand {
         int parallelism = parallelismArg > 0 ? parallelismArg : Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
         String npubPrefix = npubPrefixArg == null ? "" : npubPrefixArg;
 
+        if (!hasValidBech32Chars().test(npubPrefix)) {
+            throw new IllegalArgumentException("npub-prefix contains invalid bech32 chars");
+        }
+
         log.debug("Starting identity-vanity (npub-prefix := {}, parallelism := {}", npubPrefix, parallelism);
 
         Stopwatch stopwatch = Stopwatch.createStarted();
@@ -50,6 +54,14 @@ class IdentityVanityCommand {
                 .put("npub", Nip19.toNpub(account.getPublicKey()))
                 .end()
                 .finish();
+    }
+
+    private static Predicate<String> hasValidBech32Chars() {
+        // from https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki
+        return test -> !test.contains("1") &&
+               !test.contains("b") &&
+               !test.contains("i") &&
+               !test.contains("o");
     }
 
     private static Predicate<Identity.Account> withNpubPrefix(String npubPrefix) {
@@ -76,10 +88,6 @@ class IdentityVanityCommand {
                 .toList()));
     }
 
-    private Identity.Account randomAccount() {
-        return MoreIdentities.random().deriveAccount(0L);
-    }
-
     private Identity.Account mineAccount(Predicate<Identity.Account> predicate) {
         while (true) {
             if (Thread.currentThread().isInterrupted()) {
@@ -93,4 +101,9 @@ class IdentityVanityCommand {
             }
         }
     }
+
+    private Identity.Account randomAccount() {
+        return MoreIdentities.random().deriveAccount(0L);
+    }
+
 }
