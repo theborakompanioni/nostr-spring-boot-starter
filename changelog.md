@@ -7,11 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- upgrade: update spring-boot from v3.2.1 to v3.3.1
+- upgrade: update spring-boot from v3.2.1 to v3.3.4
 - upgrade: update lightning-kmp from v1.7.3 to v1.8.4
+- upgrade: update jmolecules-bom from v2023.1.3 to v2023.1.6
 
 ### Added
 - ability to send plain strings with `NostrTemplate`
+- example(shell): add command `identity`
+- example(shell): add command `persona`
 
 ## [0.0.1] - 2024-04-25
 

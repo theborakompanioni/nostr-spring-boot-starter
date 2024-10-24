@@ -14,7 +14,6 @@ import org.tbk.nostr.util.MoreSubscriptionIds;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;

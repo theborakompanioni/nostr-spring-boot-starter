@@ -2,7 +2,6 @@ package org.tbk.nostr.example.shell;
 
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
-import org.springframework.boot.Banner;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;

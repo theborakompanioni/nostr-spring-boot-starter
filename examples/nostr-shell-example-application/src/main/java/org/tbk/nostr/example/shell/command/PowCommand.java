@@ -42,14 +42,14 @@ class PowCommand {
         Event.Builder builder = requireNonNull(Mono.firstWithValue(IntStream.range(0, parallelism)
                 .mapToObj(Integer::toString)
                 .map(groupLabel -> Mono.fromCallable(() -> {
-                            log.debug("Starting pow thread for group {}", groupLabel);
+                            log.debug("Starting thread for group {}", groupLabel);
                             Event.Builder result = Nip13.mineEvent(protoEvent, difficultyTarget, groupLabel);
-                            log.debug("Found pow result in thread of group {}", groupLabel);
+                            log.debug("Found result in thread of group {}", groupLabel);
                             return result;
                         })
                         .subscribeOn(Schedulers.parallel())
                         .doOnCancel(() -> {
-                            log.debug("Cancelled pow thread for group {}", groupLabel);
+                            log.debug("Cancelled thread for group {}", groupLabel);
                         }))
                 .toList()))
                 .block();
