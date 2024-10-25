@@ -70,12 +70,12 @@ public class NostrSupportService implements NostrSupport, Nip1Support, Nip9Suppo
                 okBuilder.setMessage("Error: %s".formatted("Storage error (%d).".formatted(sqliteException.getResultCode().code)));
                 switch (sqliteException.getResultCode()) {
                     case SQLITE_CONSTRAINT_UNIQUE, SQLITE_CONSTRAINT_PRIMARYKEY ->
-                            okBuilder.setMessage("Error: %s".formatted("Duplicate event."));
+                            okBuilder.setMessage("duplicate: Already have this event.");
                     case SQLITE_CONSTRAINT_CHECK -> okBuilder.setMessage("Error: %s".formatted("Check failed."));
                 }
             }
         } else if (e instanceof DataIntegrityViolationException) {
-            okBuilder.setMessage("Error: %s".formatted("Duplicate event."));
+            okBuilder.setMessage("duplicate: Already have this event.");
         } else {
             okBuilder.setMessage("Error: %s".formatted("Unknown reason."));
         }

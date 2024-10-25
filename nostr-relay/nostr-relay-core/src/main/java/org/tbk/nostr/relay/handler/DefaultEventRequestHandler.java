@@ -38,7 +38,7 @@ public class DefaultEventRequestHandler implements EventRequestHandler {
             if (log.isWarnEnabled()) {
                 log.warn("Unhandled error while creating event: {}", e.getMessage());
             }
-            okBuilder.setMessage("Error: Unknown reason.");
+            okBuilder.setMessage("error: Unknown reason.");
         }
 
         context.add(Response.newBuilder()

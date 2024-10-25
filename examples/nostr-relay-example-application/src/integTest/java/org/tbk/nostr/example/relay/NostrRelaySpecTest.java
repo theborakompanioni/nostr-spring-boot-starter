@@ -78,7 +78,7 @@ class NostrRelaySpecTest {
 
         assertThat(ok1.getEventId(), is(event.getId()));
         assertThat(ok1.getSuccess(), is(false));
-        assertThat(ok1.getMessage(), is("Error: Duplicate event."));
+        assertThat(ok1.getMessage(), is("duplicate: Already have this event."));
     }
 
     @Test
