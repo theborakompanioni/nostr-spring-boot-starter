@@ -67,26 +67,26 @@ public class NostrRelayAutoConfiguration {
     // interceptors
     @Bean
     @Order(0)
-    ValidatingEventRequestHandlerInterceptor validatingEventRequestHandlerInterceptor(List<EventValidator> validators) {
-        return new ValidatingEventRequestHandlerInterceptor(validators);
+    ValidatingEventInterceptor validatingEventRequestHandlerInterceptor(List<EventValidator> validators) {
+        return new ValidatingEventInterceptor(validators);
     }
 
     @Bean
     @Order(10)
-    MaxFilterCountReqRequestHandlerInterceptor maxFilterCountReqRequestHandlerInterceptor() {
-        return new MaxFilterCountReqRequestHandlerInterceptor(relayProperties.getMaxFilterCount());
+    MaxFilterCountInterceptor maxFilterCountReqRequestHandlerInterceptor() {
+        return new MaxFilterCountInterceptor(relayProperties.getMaxFilterCount());
     }
 
     @Bean
     @Order(20)
-    MaxLimitPerFilterReqRequestHandlerInterceptor maxLimitPerFilterReqRequestHandlerInterceptor() {
-        return new MaxLimitPerFilterReqRequestHandlerInterceptor(relayProperties.getMaxLimitPerFilter());
+    MaxLimitPerFilterInterceptor maxLimitPerFilterReqRequestHandlerInterceptor() {
+        return new MaxLimitPerFilterInterceptor(relayProperties.getMaxLimitPerFilter());
     }
 
     @Bean
     @ConditionalOnBean(SubscriptionSupport.class)
-    SubscriptionHandlerInterceptor subscriptionHandlerInterceptor(SubscriptionSupport support) {
-        return new SubscriptionHandlerInterceptor(support);
+    SubscriptionInterceptor subscriptionHandlerInterceptor(SubscriptionSupport support) {
+        return new SubscriptionInterceptor(support);
     }
     // interceptors - end
 

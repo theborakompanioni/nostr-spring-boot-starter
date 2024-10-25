@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.tbk.nostr.relay.config.NostrRelayAutoConfiguration;
 import org.tbk.nostr.relay.nip1.Nip1Support;
-import org.tbk.nostr.relay.nip1.interceptor.EphemeralEventRequestHandlerInterceptor;
-import org.tbk.nostr.relay.nip1.interceptor.ReplaceableEventRequestHandlerInterceptor;
+import org.tbk.nostr.relay.nip1.interceptor.EphemeralEventInterceptor;
+import org.tbk.nostr.relay.nip1.interceptor.ReplaceableEventInterceptor;
 import org.tbk.nostr.relay.nip1.validation.ReplaceableEventValidator;
 
 @Slf4j
@@ -29,13 +29,13 @@ public class Nip1AutoConfiguration {
 
     @Bean
     @ConditionalOnBean(Nip1Support.class)
-    ReplaceableEventRequestHandlerInterceptor replaceableEventRequestHandlerInterceptor(Nip1Support support) {
-        return new ReplaceableEventRequestHandlerInterceptor(support);
+    ReplaceableEventInterceptor replaceableEventRequestHandlerInterceptor(Nip1Support support) {
+        return new ReplaceableEventInterceptor(support);
     }
 
     @Bean
     @ConditionalOnBean(Nip1Support.class)
-    EphemeralEventRequestHandlerInterceptor ephemeralEventRequestHandlerInterceptor(Nip1Support support) {
-        return new EphemeralEventRequestHandlerInterceptor(support);
+    EphemeralEventInterceptor ephemeralEventRequestHandlerInterceptor(Nip1Support support) {
+        return new EphemeralEventInterceptor(support);
     }
 }

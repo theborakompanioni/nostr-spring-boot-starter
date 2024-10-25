@@ -16,7 +16,7 @@ import org.tbk.nostr.relay.handler.ConnectionClosedHandler;
 
 @Slf4j
 @RequiredArgsConstructor
-public class SubscriptionHandlerInterceptor implements RequestHandlerInterceptor, ConnectionClosedHandler {
+public class SubscriptionInterceptor implements RequestHandlerInterceptor, ConnectionClosedHandler {
 
     private final SubscriptionSupport support;
 

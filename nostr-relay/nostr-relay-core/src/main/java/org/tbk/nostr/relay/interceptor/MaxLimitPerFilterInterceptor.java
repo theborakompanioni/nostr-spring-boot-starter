@@ -7,12 +7,12 @@ import org.tbk.nostr.relay.NostrRequestContext;
 
 @Slf4j
 @RequiredArgsConstructor
-public class MaxLimitPerFilterReqRequestHandlerInterceptor implements RequestHandlerInterceptor {
+public class MaxLimitPerFilterInterceptor implements RequestHandlerInterceptor {
 
     private final int maxLimitPerFilter;
 
     @Override
-    public boolean preHandle(NostrRequestContext context, Request request) throws Exception {
+    public boolean preHandle(NostrRequestContext context, Request request) {
         if (request.getKindCase() == Request.KindCase.REQ) {
             return handleReqMessage(context, request.getReq());
         }
@@ -20,7 +20,7 @@ public class MaxLimitPerFilterReqRequestHandlerInterceptor implements RequestHan
         return true;
     }
 
-    private boolean handleReqMessage(NostrRequestContext context, ReqRequest req) throws Exception {
+    private boolean handleReqMessage(NostrRequestContext context, ReqRequest req) {
         for (Filter filter : req.getFiltersList()) {
             if (filter.getLimit() > maxLimitPerFilter) {
                 String message = "Maximum limit per filter in REQ message. Maximum is %d, got %d"

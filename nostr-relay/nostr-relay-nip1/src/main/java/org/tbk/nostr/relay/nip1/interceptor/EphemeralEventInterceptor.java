@@ -16,7 +16,7 @@ import java.time.Duration;
 
 @Slf4j
 @RequiredArgsConstructor
-public class EphemeralEventRequestHandlerInterceptor implements RequestHandlerInterceptor {
+public class EphemeralEventInterceptor implements RequestHandlerInterceptor {
 
     @NonNull
     private final Nip1Support support;

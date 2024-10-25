@@ -8,7 +8,7 @@ import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.relay.NostrRequestContext;
 
 @RequiredArgsConstructor
-public class MaxFilterCountReqRequestHandlerInterceptor implements RequestHandlerInterceptor {
+public class MaxFilterCountInterceptor implements RequestHandlerInterceptor {
 
     private final int maxFilterCount;
 

@@ -26,20 +26,20 @@ import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ReplaceableEventRequestHandlerInterceptor implements RequestHandlerInterceptor {
+public class ReplaceableEventInterceptor implements RequestHandlerInterceptor {
 
     @NonNull
     private final Nip1Support support;
 
     @Override
-    public boolean preHandle(NostrRequestContext context, Request request) throws IOException {
+    public boolean preHandle(NostrRequestContext context, Request request) {
         if (request.getKindCase() == Request.KindCase.EVENT) {
             return handleEvent(context, request.getEvent().getEvent());
         }
         return true;
     }
 
-    private boolean handleEvent(NostrRequestContext context, Event event) throws IOException {
+    private boolean handleEvent(NostrRequestContext context, Event event) {
         if (Nip1.isReplaceableEvent(event) || Nip1.isParameterizedReplaceableEvent(event)) {
             XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
 

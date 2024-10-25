@@ -14,13 +14,13 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ValidatingEventRequestHandlerInterceptor implements RequestHandlerInterceptor {
+public class ValidatingEventInterceptor implements RequestHandlerInterceptor {
 
     @NonNull
     private final List<EventValidator> validators;
 
     @Override
-    public boolean preHandle(NostrRequestContext context, Request request) throws Exception {
+    public boolean preHandle(NostrRequestContext context, Request request) {
         if (request.getKindCase() == Request.KindCase.EVENT) {
             return handleEventMessage(context, request.getEvent());
         }
@@ -28,7 +28,7 @@ public class ValidatingEventRequestHandlerInterceptor implements RequestHandlerI
         return true;
     }
 
-    private boolean handleEventMessage(NostrRequestContext context, EventRequest request) throws Exception {
+    private boolean handleEventMessage(NostrRequestContext context, EventRequest request) {
         Event event = request.getEvent();
         BindException errors = new BindException(event, "event");
 
