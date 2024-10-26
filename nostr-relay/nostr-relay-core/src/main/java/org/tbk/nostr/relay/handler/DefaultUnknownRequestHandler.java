@@ -11,7 +11,7 @@ public class DefaultUnknownRequestHandler implements UnknownRequestHandler {
     public void handleUnknownMessage(NostrRequestContext context, Request request) {
         context.add(Response.newBuilder()
                 .setNotice(NoticeResponse.newBuilder()
-                        .setMessage("Error: %s".formatted("Cannot handle message of unknown type."))
+                        .setMessage("error: %s".formatted("Cannot handle message of unknown type."))
                         .build())
                 .build());
     }

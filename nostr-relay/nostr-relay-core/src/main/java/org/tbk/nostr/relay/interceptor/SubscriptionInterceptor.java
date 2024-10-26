@@ -22,7 +22,7 @@ public class SubscriptionInterceptor implements RequestHandlerInterceptor, Conne
 
     @Override
     public void afterConnectionClosed(NostrWebSocketSession session, CloseStatus closeStatus) {
-        support.removeAll(new NostrWebSocketSession.SessionId(session.getId()));
+        support.removeAll(session.getSessionId());
     }
 
     @Override

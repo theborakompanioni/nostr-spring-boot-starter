@@ -32,5 +32,5 @@ org.tbk.nostr.relay:
   websocket-path: '/'
   max-limit-per-filter: 2100
   max-filter-count: 42
-  created-at-lower-limit: 2
+  created-at-lower-limit: 1000
   created-at-upper-limit: 9223372036854775806 # Long.MAX_VALUE - 1

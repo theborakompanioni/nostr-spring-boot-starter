@@ -31,7 +31,7 @@ public class MaxLimitPerFilterInterceptor implements RequestHandlerInterceptor {
                 context.add(Response.newBuilder()
                         .setClosed(ClosedResponse.newBuilder()
                                 .setSubscriptionId(req.getId())
-                                .setMessage("Error: %s".formatted(message))
+                                .setMessage("error: %s".formatted(message))
                                 .build())
                         .build());
                 return false;

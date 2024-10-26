@@ -30,8 +30,9 @@ public class DeletionEventValidator implements EventValidator {
             }
 
             if (!found) {
-                String errorMessage = "Missing '%s' or '%s' tag.".formatted(IndexedTag.e.name(), IndexedTag.a);
-                errors.rejectValue("kind", "kind.invalid", errorMessage);
+                errors.rejectValue("kind", "kind.invalid",
+                        new Object[]{IndexedTag.e.name(), IndexedTag.a},
+                        "Missing ''{0}'' or ''{1}'' tag.");
                 return;
             }
 

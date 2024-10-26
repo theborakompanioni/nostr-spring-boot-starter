@@ -8,7 +8,7 @@ import org.tbk.nostr.relay.NostrRequestContext;
 public class DefaultParseErrorHandler implements ParseErrorHandler {
 
     @Override
-    public void handleParseError(NostrRequestContext context, TextMessage message, Exception e) throws Exception {
+    public void handleParseError(NostrRequestContext context, TextMessage message, Exception e) {
         context.add(Response.newBuilder()
                 .setNotice(NoticeResponse.newBuilder()
                         .setMessage("Error while parsing message: %s".formatted(e.getMessage()))

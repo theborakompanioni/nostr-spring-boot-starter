@@ -19,7 +19,7 @@ public class DefaultEventRequestHandler implements EventRequestHandler {
     private final NostrSupport support;
 
     @Override
-    public void handleEventMessage(NostrRequestContext context, EventRequest event) throws Exception {
+    public void handleEventMessage(NostrRequestContext context, EventRequest event) {
         OkResponse.Builder okBuilder = OkResponse.newBuilder()
                 .setEventId(event.getEvent().getId())
                 .setSuccess(false);

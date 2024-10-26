@@ -8,7 +8,7 @@ import org.tbk.nostr.relay.NostrRequestContext;
 public class DefaultCountRequestHandler implements CountRequestHandler {
 
     @Override
-    public void handleCountMessage(NostrRequestContext context, CountRequest count) throws Exception {
+    public void handleCountMessage(NostrRequestContext context, CountRequest count) {
         context.add(Response.newBuilder()
                 .setClosed(ClosedResponse.newBuilder()
                         .setSubscriptionId(count.getId())

@@ -29,7 +29,7 @@ public class MaxFilterCountInterceptor implements RequestHandlerInterceptor {
         context.add(Response.newBuilder()
                 .setClosed(ClosedResponse.newBuilder()
                         .setSubscriptionId(req.getId())
-                        .setMessage("Error: %s".formatted(
+                        .setMessage("error: %s".formatted(
                                 "Maximum filter in REQ message. Maximum is %d, got %d".formatted(maxFilterCount, req.getFiltersCount())
                         ))
                         .build())

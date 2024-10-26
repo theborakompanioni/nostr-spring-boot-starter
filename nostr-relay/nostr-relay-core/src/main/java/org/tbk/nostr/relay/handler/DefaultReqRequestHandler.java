@@ -25,7 +25,7 @@ public class DefaultReqRequestHandler implements ReqRequestHandler {
 
             context.add(Response.newBuilder()
                     .setNotice(NoticeResponse.newBuilder()
-                            .setMessage("Error: %s".formatted("Internal error."))
+                            .setMessage("error: %s".formatted("Internal error."))
                             .build())
                     .build());
         }

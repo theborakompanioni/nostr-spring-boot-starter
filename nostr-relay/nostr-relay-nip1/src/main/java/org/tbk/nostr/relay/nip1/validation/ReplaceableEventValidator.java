@@ -20,8 +20,9 @@ public class ReplaceableEventValidator implements EventValidator {
                 if (identifier.name().equals(tag.getName())) {
                     if (found != null) {
                         errors.pushNestedPath("tagsList[%d]".formatted(i));
-                        String errorMessage = "Multiple '%s' tags are not allowed.".formatted(identifier.name());
-                        errors.rejectValue("valuesList", "valuesList.invalid", errorMessage);
+                        errors.rejectValue("valuesList", "valuesList.invalid",
+                                new Object[]{identifier.name()},
+                                "Multiple ''{0}'' tags are not allowed.");
                         errors.popNestedPath();
                         break;
                     }
@@ -44,8 +45,9 @@ public class ReplaceableEventValidator implements EventValidator {
             // TODO: Current implementation CAN NOT handle missing the "d" tag-> should it?
             //  After all, missing a "d" tag is also identifiable.
             if (found == null) {
-                String errorMessage = "Missing '%s' tag.".formatted(identifier.name());
-                errors.rejectValue("kind", "kind.invalid", errorMessage);
+                errors.rejectValue("kind", "kind.invalid",
+                        new Object[]{identifier.name()},
+                        "Missing ''{0}'' tag.");
             }
         }
     }

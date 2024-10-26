@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.tbk.nostr.relay.*;
@@ -67,8 +68,8 @@ public class NostrRelayAutoConfiguration {
     // interceptors
     @Bean
     @Order(0)
-    ValidatingEventInterceptor validatingEventRequestHandlerInterceptor(List<EventValidator> validators) {
-        return new ValidatingEventInterceptor(validators);
+    ValidatingEventInterceptor validatingEventRequestHandlerInterceptor(List<EventValidator> validators, MessageSource messageSource) {
+        return new ValidatingEventInterceptor(validators, messageSource);
     }
 
     @Bean
