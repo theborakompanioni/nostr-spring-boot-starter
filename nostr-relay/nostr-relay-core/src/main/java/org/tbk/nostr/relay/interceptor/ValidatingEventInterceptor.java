@@ -3,8 +3,8 @@ package org.tbk.nostr.relay.interceptor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BindException;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.ValidationUtils;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.NostrRequestContext;
@@ -45,7 +45,7 @@ public class ValidatingEventInterceptor implements RequestHandlerInterceptor {
         }
 
         String message = errors.getAllErrors().stream().findFirst()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .map(ObjectError::getDefaultMessage)
                 .orElse("Invalid event.");
 
         log.debug("Validation of event {} failed: {}", event.getId(), message);
@@ -54,7 +54,7 @@ public class ValidatingEventInterceptor implements RequestHandlerInterceptor {
                 .setOk(OkResponse.newBuilder()
                         .setEventId(event.getId())
                         .setSuccess(false)
-                        .setMessage("Error: %s".formatted(message))
+                        .setMessage("invalid: %s".formatted(message))
                         .build())
                 .build());
 

@@ -30,7 +30,7 @@ public class ProofOfWorkEventValidator implements EventValidator {
         if (!meetsTargetDifficulty) {
             long difficulty = Nip13.calculateDifficulty(event.getId().toByteArray());
 
-            String errorMessage = "Difficulty %d is less than %d".formatted(difficulty, minPowDifficulty);
+            String errorMessage = "Difficulty %d is less than %d.".formatted(difficulty, minPowDifficulty);
             errors.rejectValue("id", "id.invalid", errorMessage);
         }
     }

@@ -41,7 +41,7 @@ class NostrRelayNip9Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok1.getEventId(), is(invalidDeletionEvent0.getId()));
-        assertThat(ok1.getMessage(), is("Error: Missing 'e' or 'a' tag."));
+        assertThat(ok1.getMessage(), is("invalid: Missing 'e' or 'a' tag."));
         assertThat(ok1.getSuccess(), is(false));
 
         EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0.getId().toByteArray());
@@ -64,7 +64,7 @@ class NostrRelayNip9Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok1.getEventId(), is(invalidDeletionEvent0.getId()));
-        assertThat(ok1.getMessage(), is("Error: Referencing events not signed by author is not permitted."));
+        assertThat(ok1.getMessage(), is("invalid: Referencing events not signed by author is not permitted."));
         assertThat(ok1.getSuccess(), is(false));
 
         EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0.getId().toByteArray());

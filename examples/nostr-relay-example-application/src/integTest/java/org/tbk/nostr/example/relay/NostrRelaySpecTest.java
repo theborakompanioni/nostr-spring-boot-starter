@@ -97,7 +97,7 @@ class NostrRelaySpecTest {
 
         assertThat(ok.getEventId(), is(invalidEvent.getId()));
         assertThat(ok.getSuccess(), is(false));
-        assertThat(ok.getMessage(), is("Error: Invalid id."));
+        assertThat(ok.getMessage(), is("invalid: Invalid id."));
     }
 
     @Test
@@ -117,7 +117,7 @@ class NostrRelaySpecTest {
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
-            assertThat(ok.getMessage(), is("Error: Invalid kind."));
+            assertThat(ok.getMessage(), is("invalid: Invalid kind."));
         }
     }
 
@@ -139,7 +139,7 @@ class NostrRelaySpecTest {
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
-            assertThat(ok.getMessage(), is("Error: Invalid created timestamp."));
+            assertThat(ok.getMessage(), is("invalid: Invalid created timestamp."));
         }
     }
 
@@ -168,7 +168,7 @@ class NostrRelaySpecTest {
 
         assertThat(ok.getEventId(), is(invalidEvent.getId()));
         assertThat(ok.getSuccess(), is(false));
-        assertThat(ok.getMessage(), is("Error: Invalid signature."));
+        assertThat(ok.getMessage(), is("invalid: Invalid signature."));
     }
 
     @Test
@@ -195,7 +195,7 @@ class NostrRelaySpecTest {
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
-            assertThat(ok.getMessage(), is("Error: Invalid tag 'e'."));
+            assertThat(ok.getMessage(), is("invalid: Invalid tag 'e'."));
         }
     }
 
@@ -225,7 +225,7 @@ class NostrRelaySpecTest {
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
-            assertThat(ok.getMessage(), is("Error: Invalid tag 'p'."));
+            assertThat(ok.getMessage(), is("invalid: Invalid tag 'p'."));
         }
     }
 
@@ -256,7 +256,7 @@ class NostrRelaySpecTest {
 
         for (OkResponse ok : oks0) {
             assertThat(ok.getSuccess(), is(false));
-            assertThat(ok.getMessage(), is("Error: Invalid tag 'a'."));
+            assertThat(ok.getMessage(), is("invalid: Invalid tag 'a'."));
         }
 
         Event invalidEvent6 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM6")
@@ -272,7 +272,7 @@ class NostrRelaySpecTest {
 
         for (OkResponse ok : oks1) {
             assertThat(ok.getSuccess(), is(false));
-            assertThat(ok.getMessage(), is("Error: Invalid pubkey in tag 'a'."));
+            assertThat(ok.getMessage(), is("invalid: Invalid pubkey in tag 'a'."));
         }
     }
 
@@ -297,7 +297,7 @@ class NostrRelaySpecTest {
 
         for (OkResponse ok : oks) {
             assertThat(ok.getSuccess(), is(false));
-            assertThat(ok.getMessage(), is("Error: Invalid tag name."));
+            assertThat(ok.getMessage(), is("invalid: Invalid tag name."));
         }
     }
 
@@ -314,7 +314,7 @@ class NostrRelaySpecTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        String expectedMessage = "Error: 'created_at' timestamp %d is less than lower limit %d.".formatted(
+        String expectedMessage = "invalid: 'created_at' timestamp %d is less than lower limit %d.".formatted(
                 invalidEvent0.getCreatedAt(),
                 relayProperties.getCreatedAtLowerLimit()
         );
@@ -335,7 +335,7 @@ class NostrRelaySpecTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        String expectedMessage = "Error: 'created_at' timestamp %d is greater than upper limit %d.".formatted(
+        String expectedMessage = "invalid: 'created_at' timestamp %d is greater than upper limit %d.".formatted(
                 invalidEvent0.getCreatedAt(),
                 relayProperties.getCreatedAtUpperLimit()
         );
@@ -775,7 +775,7 @@ class NostrRelaySpecTest {
         OkResponse ok2 = nostrTemplate.send(event2Older)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(ok2.getMessage(), is("Error: A newer version of this replaceable event already exists."));
+        assertThat(ok2.getMessage(), is("error: A newer version of this replaceable event already exists."));
         assertThat(ok2.getSuccess(), is(false));
 
         List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
@@ -865,7 +865,7 @@ class NostrRelaySpecTest {
         OkResponse ok2 = nostrTemplate.send(event1)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(ok2.getMessage(), is("Error: A version of this replaceable event with same timestamp and lower id already exists."));
+        assertThat(ok2.getMessage(), is("error: A version of this replaceable event with same timestamp and lower id already exists."));
         assertThat(ok2.getSuccess(), is(false));
 
         List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
@@ -950,7 +950,7 @@ class NostrRelaySpecTest {
         OkResponse ok2 = nostrTemplate.send(event1Older)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(ok2.getMessage(), is("Error: A newer version of this replaceable event already exists."));
+        assertThat(ok2.getMessage(), is("error: A newer version of this replaceable event already exists."));
         assertThat(ok2.getSuccess(), is(false));
 
         OkResponse ok3 = nostrTemplate.send(event2DifferentTag)
@@ -999,7 +999,7 @@ class NostrRelaySpecTest {
         OkResponse ok2 = nostrTemplate.send(event2Older)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(ok2.getMessage(), is("Error: A newer version of this replaceable event already exists."));
+        assertThat(ok2.getMessage(), is("error: A newer version of this replaceable event already exists."));
         assertThat(ok2.getSuccess(), is(false));
 
         List<Event> fetchedEvents = nostrTemplate.fetchEvents(ReqRequest.newBuilder()
@@ -1028,7 +1028,7 @@ class NostrRelaySpecTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(ok0.getMessage(), is("Error: Missing 'd' tag."));
+        assertThat(ok0.getMessage(), is("invalid: Missing 'd' tag."));
         assertThat(ok0.getSuccess(), is(false));
     }
 
@@ -1082,7 +1082,7 @@ class NostrRelaySpecTest {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
-        assertThat(ok0.getMessage(), is("Error: Multiple 'd' tags are not allowed."));
+        assertThat(ok0.getMessage(), is("invalid: Multiple 'd' tags are not allowed."));
         assertThat(ok0.getSuccess(), is(false));
     }
 

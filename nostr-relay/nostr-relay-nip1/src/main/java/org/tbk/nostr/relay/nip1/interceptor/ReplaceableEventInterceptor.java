@@ -112,8 +112,8 @@ public class ReplaceableEventInterceptor implements RequestHandlerInterceptor {
     @Getter
     @RequiredArgsConstructor
     enum ReplaceableError {
-        NEWER_VERSION("Error: A newer version of this replaceable event already exists."),
-        LOWER_ID("Error: A version of this replaceable event with same timestamp and lower id already exists.");
+        NEWER_VERSION("error: A newer version of this replaceable event already exists."),
+        LOWER_ID("error: A version of this replaceable event with same timestamp and lower id already exists.");
 
         @NonNull
         private final String message;
