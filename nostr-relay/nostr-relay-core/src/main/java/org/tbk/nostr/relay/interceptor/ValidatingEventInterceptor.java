@@ -56,16 +56,32 @@ public class ValidatingEventInterceptor implements RequestHandlerInterceptor {
                 .map(it -> messageSource.getMessage(it, Locale.getDefault()))
                 .orElse("Invalid event.");
 
+
         log.debug("Validation of event {} failed: {}", event.getId(), message);
+
+        String messageWithErrorPrefix = withOkResponseErrorMessagePrefixIfNecessary(message, "invalid");
 
         context.add(Response.newBuilder()
                 .setOk(OkResponse.newBuilder()
                         .setEventId(event.getId())
                         .setSuccess(false)
-                        .setMessage("invalid: %s".formatted(message))
+                        .setMessage(messageWithErrorPrefix)
                         .build())
                 .build());
 
         return false;
+    }
+
+    private String withOkResponseErrorMessagePrefixIfNecessary(String errorMessage, String defaultPrefix) {
+        return hasOkResponseErrorMessagePrefix(errorMessage) ? errorMessage : String.format("%s: %s", defaultPrefix, errorMessage);
+    }
+
+    private boolean hasOkResponseErrorMessagePrefix(String errorMessage) {
+        return errorMessage.startsWith("error:")
+               || errorMessage.startsWith("invalid:")
+               || errorMessage.startsWith("duplicate:")
+               || errorMessage.startsWith("rate-limited:")
+               || errorMessage.startsWith("pow:")
+               || errorMessage.startsWith("blocked:");
     }
 }

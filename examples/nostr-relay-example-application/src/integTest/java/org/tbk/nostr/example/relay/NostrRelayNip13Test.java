@@ -75,7 +75,7 @@ class NostrRelayNip13Test {
         assertThat(ok.getEventId(), is(event.getId()));
         assertThat(ok.getSuccess(), is(false));
 
-        String expectedMessage = "invalid: Difficulty %d is less than %d.".formatted(
+        String expectedMessage = "pow: Difficulty %d is less than %d.".formatted(
                 Nip13.calculateDifficulty(event),
                 nip13ExtensionProperties.getMinPowDifficulty()
         );

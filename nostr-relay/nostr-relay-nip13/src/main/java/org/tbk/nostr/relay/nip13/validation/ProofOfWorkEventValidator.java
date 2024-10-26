@@ -32,7 +32,7 @@ public class ProofOfWorkEventValidator implements EventValidator {
 
             errors.rejectValue("id", "id.invalid",
                     new Object[] { difficulty, minPowDifficulty },
-                    "Difficulty {0, number, integer} is less than {1, number, integer}.");
+                    "pow: Difficulty {0, number, integer} is less than {1, number, integer}.");
         }
     }
 }
