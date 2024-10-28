@@ -30,9 +30,15 @@ public class ProofOfWorkEventValidator implements EventValidator {
         if (!meetsTargetDifficulty) {
             long difficulty = Nip13.calculateDifficulty(event.getId().toByteArray());
 
-            errors.rejectValue("id", "nip13.pow.invalid",
-                    new Object[] { difficulty, minPowDifficulty },
-                    "pow: Difficulty {0, number, integer} is less than {1, number, integer}.");
+            if (requireCommitment && ((long) minPowDifficulty <= difficulty)) {
+                errors.rejectValue("id", "nip13.pow.commitment.invalid",
+                        new Object[]{difficulty, minPowDifficulty},
+                        "pow: Missing or invalid pow commitment.");
+            } else {
+                errors.rejectValue("id", "nip13.pow.invalid",
+                        new Object[]{difficulty, minPowDifficulty},
+                        "pow: Difficulty {0, number, integer} is less than {1, number, integer}.");
+            }
         }
     }
 }

@@ -37,8 +37,19 @@ public final class Nip13 {
     }
 
     public static TagValue nonce(String nonce, long targetDifficulty, String... rest) {
+        return nonceWithoutCommitment(nonce, Stream.concat(
+                        Stream.of(Long.toString(targetDifficulty)),
+                        Stream.of(rest))
+                .toArray(String[]::new));
+    }
+
+    public static TagValue nonceWithoutCommitment(long nonce, String... rest) {
+        return nonceWithoutCommitment(Long.toString(nonce), rest);
+    }
+
+    public static TagValue nonceWithoutCommitment(String nonce, String... rest) {
         return MoreTags.named(NONCE_TAG_NAME, Stream.concat(
-                Stream.of(nonce == null ? "" : nonce, Long.toString(targetDifficulty)),
+                Stream.of(nonce == null ? "" : nonce),
                 Stream.of(rest)
         ).toArray(String[]::new));
     }
@@ -97,10 +108,16 @@ public final class Nip13 {
     }
 
     public static Event.Builder mineEvent(Event.Builder prototype, int targetDifficulty, String... additionalNonceTagValues) {
+        return mineEvent(prototype, targetDifficulty, nonce("", targetDifficulty, additionalNonceTagValues).toBuilder());
+    }
+
+    public static Event.Builder mineEvent(Event.Builder prototype, int targetDifficulty, TagValue.Builder nonceTagPrototype) {
         int prototypeTagCount = prototype.getTagsCount();
         long nonce = 0; // could also start at Long.MIN_VALUE, but starting at 0 produces smaller events (in bytes)
 
-        TagValue.Builder nonceTagBuilder = nonce(nonce, targetDifficulty, additionalNonceTagValues).toBuilder();
+        TagValue.Builder nonceTagBuilder = nonceTagPrototype
+                .setName(NONCE_TAG_NAME)
+                .setValues(0, Long.toString(nonce));
         Event.Builder eventBuilder = Event.newBuilder(prototype.buildPartial()).addTags(nonceTagBuilder);
 
         long currentEpoch = System.currentTimeMillis() / 1_000;
