@@ -30,7 +30,7 @@ public class DeletionEventValidator implements EventValidator {
             }
 
             if (!found) {
-                errors.rejectValue("kind", "kind.invalid",
+                errors.rejectValue("kind", "nip9.tags.invalid",
                         new Object[]{IndexedTag.e.name(), IndexedTag.a},
                         "Missing ''{0}'' or ''{1}'' tag.");
                 return;
@@ -45,7 +45,7 @@ public class DeletionEventValidator implements EventValidator {
             for (EventUri uri : referencedEvents) {
                 if (!authorPublicKeyHex.equals(uri.getPublicKeyHex())) {
                     String errorMessage = "Referencing events not signed by author is not permitted.";
-                    errors.rejectValue("kind", "kind.invalid", errorMessage);
+                    errors.rejectValue("kind", "nip9.refs.invalid", errorMessage);
                     break;
                 }
             }

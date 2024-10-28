@@ -15,16 +15,16 @@ public class DefaultEventValidator implements EventValidator {
     @Override
     public void validateEvent(Event event, Errors errors) {
         if (event.getId().size() != 32) {
-            errors.rejectValue("id", "id.invalid", "Invalid id.");
+            errors.rejectValue("id", "event.id.invalid", "Invalid id.");
         }
         if (!MoreKinds.isValidKind(event.getKind())) {
-            errors.rejectValue("kind", "kind.invalid", "Invalid kind.");
+            errors.rejectValue("kind", "event.kind.invalid", "Invalid kind.");
         }
         if (event.getCreatedAt() < 0L) {
-            errors.rejectValue("createdAt", "createdAt.invalid", "Invalid created timestamp.");
+            errors.rejectValue("createdAt", "event.created_at.invalid", "Invalid created timestamp.");
         }
         if (event.getPubkey().size() != 32) {
-            errors.rejectValue("pubkey", "pubkey.invalid", "Invalid public key.");
+            errors.rejectValue("pubkey", "event.pubkey.invalid", "Invalid public key.");
         }
 
         for (int i = 0; i < event.getTagsCount(); i++) {
@@ -36,15 +36,15 @@ public class DefaultEventValidator implements EventValidator {
         try {
             MoreEvents.verifySignature(event);
         } catch (IllegalArgumentException e) {
-            errors.rejectValue("sig", "sig.invalid", e.getMessage());
+            errors.rejectValue("sig", "event.sig.invalid", e.getMessage());
         }
     }
 
     private void validateTag(TagValue tag, Errors errors) {
         if (tag.getName().isEmpty()) {
-            errors.rejectValue("name", "name.invalid", "Invalid tag name.");
+            errors.rejectValue("name", "event.tag.name.invalid", "Invalid tag name.");
         } else if (tag.getName().length() > 256) {
-            errors.rejectValue("name", "name.invalid", "Invalid tag name.");
+            errors.rejectValue("name", "event.tag.name.invalid", "Invalid tag name.");
         }
 
         switch (tag.getName()) {
@@ -59,38 +59,38 @@ public class DefaultEventValidator implements EventValidator {
 
     private void validateTagE(TagValue tag, Errors errors) {
         if (tag.getValuesCount() <= 0L) {
-            errors.rejectValue("valuesList", "valuesList.invalid", "Invalid tag 'e'.");
+            errors.rejectValue("valuesList", "event.e.tag.value.invalid", "Invalid tag 'e'.");
         } else {
             String supposedEventId = tag.getValues(0);
             if (!EventId.isValidEventIdString(supposedEventId)) {
-                errors.rejectValue("valuesList", "valuesList.invalid", "Invalid tag 'e'.");
+                errors.rejectValue("valuesList", "event.e.tag.value.invalid", "Invalid tag 'e'.");
             }
         }
     }
 
     private void validateTagP(TagValue tag, Errors errors) {
         if (tag.getValuesCount() <= 0L) {
-            errors.rejectValue("valuesList", "valuesList.invalid", "Invalid tag 'p'.");
+            errors.rejectValue("valuesList", "event.p.tag.value.invalid", "Invalid tag 'p'.");
         } else {
             String supposedPublicKey = tag.getValues(0);
             if (!isValidPublicKey(supposedPublicKey)) {
-                errors.rejectValue("valuesList", "valuesList.invalid", "Invalid tag 'p'.");
+                errors.rejectValue("valuesList", "event.p.tag.value.invalid", "Invalid tag 'p'.");
             }
         }
     }
 
     private void validateTagA(TagValue tag, Errors errors) {
         if (tag.getValuesCount() <= 0L) {
-            errors.rejectValue("valuesList", "valuesList.invalid", "Invalid tag 'a'.");
+            errors.rejectValue("valuesList", "event.a.tag.value.invalid", "Invalid tag 'a'.");
         } else {
             String supposedEventUri = tag.getValues(0);
             try {
                 EventUri eventUri = EventUri.fromString(supposedEventUri);
                 if (!isValidPublicKey(eventUri.getPublicKey())) {
-                    errors.rejectValue("valuesList", "valuesList.invalid", "Invalid pubkey in tag 'a'.");
+                    errors.rejectValue("valuesList", "event.a.tag.pubkey.value.invalid", "Invalid pubkey in tag 'a'.");
                 }
             } catch (Exception e) {
-                errors.rejectValue("valuesList", "valuesList.invalid", "Invalid tag 'a'.");
+                errors.rejectValue("valuesList", "event.a.tag.value.invalid", "Invalid tag 'a'.");
             }
         }
     }

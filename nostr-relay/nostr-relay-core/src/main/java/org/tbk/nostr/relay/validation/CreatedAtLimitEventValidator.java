@@ -19,7 +19,7 @@ public class CreatedAtLimitEventValidator implements EventValidator {
     public void validateEvent(Event event, Errors errors) {
         if (createdAtLowerLimit != null) {
             if (event.getCreatedAt() < createdAtLowerLimit) {
-                errors.rejectValue("createdAt", "createdAt.invalid",
+                errors.rejectValue("createdAt", "event.created_at.invalid",
                         new Object[]{String.valueOf(event.getCreatedAt()), String.valueOf(createdAtLowerLimit)},
                         "''created_at'' timestamp {0} is less than lower limit {1}.");
             }
@@ -27,7 +27,7 @@ public class CreatedAtLimitEventValidator implements EventValidator {
 
         if (createdAtUpperLimit != null) {
             if (event.getCreatedAt() > createdAtUpperLimit) {
-                errors.rejectValue("createdAt", "createdAt.invalid",
+                errors.rejectValue("createdAt", "event.created_at.invalid",
                         new Object[]{String.valueOf(event.getCreatedAt()), String.valueOf(createdAtUpperLimit)},
                         "''created_at'' timestamp {0} is greater than upper limit {1}.");
             }
