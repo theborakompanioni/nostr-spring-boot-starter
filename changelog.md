@@ -13,8 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - ability to send plain strings with `NostrTemplate`
+- ability to customize error messages
+- nip11: add icon field to relay document
+- nip6: wrap identity in own class
 - example(shell): add command `identity`
 - example(shell): add command `persona`
+
+### Breaking
+- rename public event interceptor classes
+- nip1: adhere to error message prefix
 
 ## [0.0.1] - 2024-04-25
 
