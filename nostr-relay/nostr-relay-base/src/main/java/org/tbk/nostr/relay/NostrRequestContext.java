@@ -14,4 +14,6 @@ public interface NostrRequestContext {
     void setHandledEvent(Event event);
 
     Optional<Event> getHandledEvent();
+
+    boolean isAuthenticated();
 }

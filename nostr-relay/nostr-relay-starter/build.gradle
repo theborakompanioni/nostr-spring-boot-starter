@@ -11,6 +11,7 @@ dependencies {
     api project(':nostr-relay:nostr-relay-nip11')
     api project(':nostr-relay:nostr-relay-nip13')
     api project(':nostr-relay:nostr-relay-nip40')
+    api project(':nostr-relay:nostr-relay-nip42')
 
     api project(':nostr-relay:nostr-relay-autoconfigure')
 

@@ -124,6 +124,11 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
         public Optional<Event> getHandledEvent() {
             return Optional.ofNullable(event);
         }
+
+        @Override
+        public boolean isAuthenticated() {
+            return getSession().isAuthenticated();
+        }
     }
 
     private static class WebSocketSessionWrapper extends WebSocketSessionDecorator implements NostrWebSocketSession {

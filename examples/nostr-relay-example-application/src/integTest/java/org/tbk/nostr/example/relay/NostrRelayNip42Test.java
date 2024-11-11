@@ -5,9 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.tbk.nostr.proto.ClosedResponse;
-import org.tbk.nostr.proto.Response;
+import org.tbk.nostr.identity.Signer;
+import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.template.NostrTemplate;
+import org.tbk.nostr.util.MoreEvents;
 
 import java.time.Duration;
 
@@ -24,12 +27,15 @@ class NostrRelayNip42Test {
     private NostrTemplate nostrTemplate;
 
     @Test
-    void itShouldReceiveAuthChallenge() {
-        Response response0 = nostrTemplate.sendPlain("")
+    void itShouldShouldDeclineWriteOperationForUnauthenticated() {
+        Signer signer = SimpleSigner.random();
+
+        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
+
+        OkResponse ok = nostrTemplate.send(event)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(response0.getKindCase(), is(Response.KindCase.CLOSED));
-        ClosedResponse closed0 = response0.getClosed();
-        assertThat(closed0.getMessage(), startsWith("auth-required:"));
+        assertThat(ok.getSuccess(), is(false));
+        assertThat(ok.getMessage(), startsWith("auth-required:"));
     }
 }

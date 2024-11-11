@@ -11,6 +11,7 @@ dependencies {
     compileOnly project(':nostr-relay:nostr-relay-nip11')
     compileOnly project(':nostr-relay:nostr-relay-nip13')
     compileOnly project(':nostr-relay:nostr-relay-nip40')
+    compileOnly project(':nostr-relay:nostr-relay-nip42')
 
     compileOnly 'org.springframework:spring-websocket'
     implementation "org.springframework.boot:spring-boot-autoconfigure"
