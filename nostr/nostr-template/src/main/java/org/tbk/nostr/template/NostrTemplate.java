@@ -35,10 +35,28 @@ public interface NostrTemplate {
     Flux<OkResponse> send(Collection<Event> events);
 
     /**
-     * A helper function to send arbitrary plain strings.
-     * Useful for testing relay behaviour for malformed messages.
+     * A helper function for sending an arbitrary plain string.
+     *
      * @param message the message content (possibly json)
-     * @return the first response of the relay
+     * @return responses from the relay
      */
-    Mono<Response> sendPlain(String message);
+    Flux<Response> sendPlain(String message);
+
+    /**
+     * A helper function for sending arbitrary plain strings.
+     *
+     * @param messages the messages contents (possibly json)
+     * @return responses from the relay
+     * @see #sendPlain(String)
+     */
+    Flux<Response> sendPlain(Collection<String> messages);
+
+    /**
+     * A helper function for sending a plain string returning the first response.
+     * Useful for testing relay behaviour for malformed messages.
+     *
+     * @param message the message content (possibly json)
+     * @return the first response from the relay
+     */
+    Mono<Response> sendPlainMono(String message);
 }

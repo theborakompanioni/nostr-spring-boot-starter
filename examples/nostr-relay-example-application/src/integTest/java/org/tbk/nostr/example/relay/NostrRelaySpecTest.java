@@ -1048,7 +1048,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldVerifyParameterizedReplaceableEventBehaviour4NullFirstValueOfDTag() {
-        Response response = nostrTemplate.sendPlain("""
+        Response response = nostrTemplate.sendPlainMono("""
                         [
                           "EVENT",
                           {
@@ -1106,7 +1106,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage0() {
-        Response response = nostrTemplate.sendPlain("")
+        Response response = nostrTemplate.sendPlainMono("")
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
@@ -1118,7 +1118,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage1() {
-        Response response = nostrTemplate.sendPlain("null")
+        Response response = nostrTemplate.sendPlainMono("null")
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
@@ -1128,7 +1128,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage2() {
-        Response response = nostrTemplate.sendPlain("[]")
+        Response response = nostrTemplate.sendPlainMono("[]")
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
@@ -1138,7 +1138,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage3() {
-        Response response = nostrTemplate.sendPlain("GM")
+        Response response = nostrTemplate.sendPlainMono("GM")
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
@@ -1150,7 +1150,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage4EmptyEvent() {
-        Response response = nostrTemplate.sendPlain("""
+        Response response = nostrTemplate.sendPlainMono("""
                         [
                           "EVENT",
                           {}
@@ -1165,7 +1165,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage5UnknownProtoKind() {
-        Response response = nostrTemplate.sendPlain("""
+        Response response = nostrTemplate.sendPlainMono("""
                         [
                           "NOTICE",
                           "GM"
@@ -1180,7 +1180,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage6ProtoKindNotSet() {
-        Response response = nostrTemplate.sendPlain("""
+        Response response = nostrTemplate.sendPlainMono("""
                         [
                           "KIND_NOT_SET",
                           {}
@@ -1201,7 +1201,7 @@ class NostrRelaySpecTest {
     @Test
     void itShouldSendClosedMessageForUnknownSubscriptions() {
         SubscriptionId subscriptionId = MoreSubscriptionIds.random();
-        Response response = nostrTemplate.sendPlain("""
+        Response response = nostrTemplate.sendPlainMono("""
                         [
                           "CLOSE",
                           "%s"

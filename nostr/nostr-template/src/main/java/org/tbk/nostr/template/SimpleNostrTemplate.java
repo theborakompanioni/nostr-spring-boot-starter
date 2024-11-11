@@ -312,18 +312,50 @@ public class SimpleNostrTemplate implements NostrTemplate {
 
     @Override
     public Flux<OkResponse> send(Collection<Event> eventList) {
+        Set<Event> events = Set.copyOf(eventList);
+
+        Set<ByteString> eventIds = events.stream()
+                .map(Event::getId)
+                .collect(Collectors.toSet());
+
+        int eventCount = eventIds.size();
+        ConcurrentHashMap<ByteString, OkResponse> received = new ConcurrentHashMap<>();
+
+        List<String> messages = events.stream()
+                .map(it -> Request.newBuilder()
+                        .setEvent(EventRequest.newBuilder()
+                                .setEvent(it)
+                                .build())
+                        .build())
+                .map(JsonWriter::toJson)
+                .toList();
+
+        return sendPlain(messages)
+                .filter(it -> it.getKindCase() == Response.KindCase.OK)
+                .map(Response::getOk)
+                .filter(ok -> eventIds.contains(ok.getEventId()))
+                .doOnNext(ok -> {
+                    received.put(ok.getEventId(), ok);
+                })
+                .takeUntil(ok -> received.size() >= eventCount);
+    }
+
+    @Override
+    public Mono<Response> sendPlainMono(String message) {
+        return sendPlain(message).next();
+    }
+
+
+    @Override
+    public Flux<Response> sendPlain(String message) {
+        return sendPlain(Collections.singletonList(message));
+    }
+
+    @Override
+    public Flux<Response> sendPlain(Collection<String> messages) {
         AtomicReference<WebSocketSession> sessionRef = new AtomicReference<>();
 
-        return Flux.<OkResponse>create(sink -> {
-            Set<Event> events = Set.copyOf(eventList);
-
-            Set<ByteString> eventIds = events.stream()
-                    .map(Event::getId)
-                    .collect(Collectors.toSet());
-
-            int eventCount = eventIds.size();
-            ConcurrentHashMap<ByteString, OkResponse> received = new ConcurrentHashMap<>();
-
+        return Flux.<Response>create(sink -> {
             try {
                 sessionRef.set(webSocketClient.execute(new TextWebSocketHandler() {
                     @Override
@@ -337,16 +369,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
 
                         try {
                             Response response = JsonReader.fromJson(message.getPayload(), Response.newBuilder());
-                            if (response.getKindCase() == Response.KindCase.OK) {
-                                OkResponse ok = response.getOk();
-                                if (eventIds.contains(ok.getEventId())) {
-                                    received.put(ok.getEventId(), ok);
-                                    sink.next(ok);
-                                    if (received.size() == eventCount) {
-                                        sink.complete();
-                                    }
-                                }
-                            }
+                            sink.next(response);
                         } catch (Exception e) {
                             log.warn("Error in handleTextMessage while handling '{}': {}", message, e.getMessage());
                             sink.error(e);
@@ -354,54 +377,11 @@ public class SimpleNostrTemplate implements NostrTemplate {
                     }
                 }, headers, relay.getUri()).get());
 
-                for (Event event : events) {
-                    TextMessage message = new TextMessage(JsonWriter.toJson(Request.newBuilder()
-                            .setEvent(EventRequest.newBuilder()
-                                    .setEvent(event)
-                                    .build())
-                            .build()));
-
-                    log.debug("Sending message: {}", message.getPayload());
-                    sessionRef.get().sendMessage(message);
+                for (String message : messages) {
+                    TextMessage textMessage = new TextMessage(message);
+                    log.debug("Sending message: {}", textMessage.getPayload());
+                    sessionRef.get().sendMessage(textMessage);
                 }
-            } catch (InterruptedException | ExecutionException | IOException e) {
-                sink.error(e);
-            }
-        }).doFinally(signalType -> {
-            log.debug("Closing websocket session on signal type: {}", signalType);
-            closeQuietly(sessionRef.get());
-        });
-    }
-
-    @Override
-    public Mono<Response> sendPlain(String json) {
-        AtomicReference<WebSocketSession> sessionRef = new AtomicReference<>();
-
-        return Mono.<Response>create(sink -> {
-            try {
-                sessionRef.set(webSocketClient.execute(new TextWebSocketHandler() {
-                    @Override
-                    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-                        sink.success();
-                    }
-
-                    @Override
-                    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-                        log.debug("handleTextMessage: {}", message.getPayload());
-
-                        try {
-                            Response response = JsonReader.fromJson(message.getPayload(), Response.newBuilder());
-                            sink.success(response);
-                        } catch (Exception e) {
-                            log.warn("Error in handleTextMessage while handling '{}': {}", message, e.getMessage());
-                            sink.error(e);
-                        }
-                    }
-                }, headers, relay.getUri()).get());
-
-                TextMessage message = new TextMessage(json);
-                log.debug("Sending message: {}", message.getPayload());
-                sessionRef.get().sendMessage(message);
             } catch (InterruptedException | ExecutionException | IOException e) {
                 sink.error(e);
             }
