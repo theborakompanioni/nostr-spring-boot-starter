@@ -17,6 +17,8 @@ public interface NostrTemplate {
 
     Mono<RelayInfoDocument> fetchRelayInfoDocument(URI uri);
 
+    Flux<Response> fetch(ReqRequest request);
+
     Flux<Event> fetchEvents(ReqRequest request);
 
     Mono<Event> fetchEventById(EventId id);
@@ -36,7 +38,6 @@ public interface NostrTemplate {
     }
 
     Flux<OkResponse> send(Collection<Event> events);
-
 
     default Flux<Response> sendAndCollect(Event event) {
         return sendAndCollect(Collections.singleton(event));
