@@ -3,6 +3,7 @@ package org.tbk.nostr.template;
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.socket.CloseStatus;
@@ -306,11 +307,6 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     @Override
-    public Mono<OkResponse> send(Event event) {
-        return send(Collections.singleton(event)).next();
-    }
-
-    @Override
     public Flux<OkResponse> send(Collection<Event> eventList) {
         Set<Event> events = Set.copyOf(eventList);
 
@@ -321,16 +317,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
         int eventCount = eventIds.size();
         ConcurrentHashMap<ByteString, OkResponse> received = new ConcurrentHashMap<>();
 
-        List<String> messages = events.stream()
-                .map(it -> Request.newBuilder()
-                        .setEvent(EventRequest.newBuilder()
-                                .setEvent(it)
-                                .build())
-                        .build())
-                .map(JsonWriter::toJson)
-                .toList();
-
-        return sendPlain(messages)
+        return sendAndCollect(eventList)
                 .filter(it -> it.getKindCase() == Response.KindCase.OK)
                 .map(Response::getOk)
                 .filter(ok -> eventIds.contains(ok.getEventId()))
@@ -341,14 +328,8 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     @Override
-    public Mono<Response> sendPlainMono(String message) {
-        return sendPlain(message).next();
-    }
-
-
-    @Override
-    public Flux<Response> sendPlain(String message) {
-        return sendPlain(Collections.singletonList(message));
+    public Flux<Response> sendAndCollect(Collection<Event> events) {
+        return sendPlain(toJsonMessages(events));
     }
 
     @Override
@@ -405,6 +386,17 @@ public class SimpleNostrTemplate implements NostrTemplate {
                                 .map(it -> HexFormat.of().formatHex(it))
                                 .collect(Collectors.joining()))))
         );
+    }
+
+    private static List<String> toJsonMessages(Collection<Event> events) {
+        return events.stream()
+                .map(it -> Request.newBuilder()
+                        .setEvent(EventRequest.newBuilder()
+                                .setEvent(it)
+                                .build())
+                        .build())
+                .map(JsonWriter::toJson)
+                .toList();
     }
 
     private static void closeQuietly(@Nullable WebSocketSession session) {

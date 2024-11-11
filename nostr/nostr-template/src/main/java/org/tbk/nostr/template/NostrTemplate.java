@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 
 public interface NostrTemplate {
     Mono<RelayInfoDocument> fetchRelayInfoDocument();
@@ -30,9 +31,18 @@ public interface NostrTemplate {
 
     Flux<CountResult> countEvents(CountRequest request);
 
-    Mono<OkResponse> send(Event event);
+    default Mono<OkResponse> send(Event event) {
+        return send(Collections.singleton(event)).next();
+    }
 
     Flux<OkResponse> send(Collection<Event> events);
+
+
+    default Flux<Response> sendAndCollect(Event event) {
+        return sendAndCollect(Collections.singleton(event));
+    }
+
+    Flux<Response> sendAndCollect(Collection<Event> events);
 
     /**
      * A helper function for sending an arbitrary plain string.
@@ -40,7 +50,9 @@ public interface NostrTemplate {
      * @param message the message content (possibly json)
      * @return responses from the relay
      */
-    Flux<Response> sendPlain(String message);
+    default Flux<Response> sendPlain(String message) {
+        return sendPlain(Collections.singletonList(message));
+    }
 
     /**
      * A helper function for sending arbitrary plain strings.
@@ -58,5 +70,7 @@ public interface NostrTemplate {
      * @param message the message content (possibly json)
      * @return the first response from the relay
      */
-    Mono<Response> sendPlainMono(String message);
+    default Mono<Response> sendPlainMono(String message) {
+        return sendPlain(message).next();
+    }
 }
