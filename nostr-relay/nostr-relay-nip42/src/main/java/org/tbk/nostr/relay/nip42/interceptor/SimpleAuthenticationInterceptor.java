@@ -7,6 +7,8 @@ import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.nip42.Nip42Support;
 
+import java.util.HexFormat;
+
 @Slf4j
 @RequiredArgsConstructor
 public class SimpleAuthenticationInterceptor implements AuthenticationInterceptor {
@@ -21,6 +23,15 @@ public class SimpleAuthenticationInterceptor implements AuthenticationIntercepto
         }
 
         onAuthenticationRequired(context, request);
+
+        byte[] challenge = context.getOrComputeAuthChallenge(it -> nip42Support.createNewChallenge(it.getSession()));
+
+        context.add(Response.newBuilder()
+                .setAuth(AuthResponse.newBuilder()
+                        .setChallenge(HexFormat.of().formatHex(challenge))
+                        .build())
+                .build());
+
         return false;
     }
 

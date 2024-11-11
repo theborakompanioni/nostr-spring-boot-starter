@@ -13,6 +13,7 @@ import org.tbk.nostr.relay.validation.DefaultEventValidator;
 import org.tbk.nostr.relay.validation.EventValidator;
 
 import java.util.List;
+import java.util.Locale;
 
 @RequiredArgsConstructor
 public class SimpleAuthRequestHandler implements AuthRequestHandler {
@@ -35,27 +36,40 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
                     .setOk(OkResponse.newBuilder()
                             .setEventId(authEvent.getId())
                             .setSuccess(false)
-                            .setMessage("Invalid AUTH event: %s".formatted(errors.getMessage()))
+                            .setMessage("error: %s".formatted(errors.getMessage()))
                             .build())
                     .build());
             return;
         }
 
-        nip42Support.handleAuthEvent(context.getSession(), authEvent)
+        nip42Support.handleAuthEvent(context, authEvent)
                 .subscribe(authenticated -> {
                     context.getSession().setAuthenticated(authenticated);
 
-                    context.add(Response.newBuilder()
-                            .setNotice(NoticeResponse.newBuilder()
-                                    .setMessage("Authentication: %s.".formatted(authenticated ? "Success" : "Error"))
-                                    .build())
-                            .build());
+                    if (authenticated) {
+                        context.add(Response.newBuilder()
+                                .setOk(OkResponse.newBuilder()
+                                        .setEventId(authEvent.getId())
+                                        .setSuccess(true)
+                                        .build())
+                                .build());
+                    } else {
+                        context.add(Response.newBuilder()
+                                .setOk(OkResponse.newBuilder()
+                                        .setEventId(authEvent.getId())
+                                        .setSuccess(false)
+                                        .setMessage("error: Not authenticated.")
+                                        .build())
+                                .build());
+                    }
                 }, e -> {
                     context.getSession().setAuthenticated(false);
 
                     context.add(Response.newBuilder()
-                            .setNotice(NoticeResponse.newBuilder()
-                                    .setMessage("Authentication error: %s".formatted(e.getMessage()))
+                            .setOk(OkResponse.newBuilder()
+                                    .setEventId(authEvent.getId())
+                                    .setSuccess(false)
+                                    .setMessage("error: %s".formatted(e.getMessage()))
                                     .build())
                             .build());
                 });

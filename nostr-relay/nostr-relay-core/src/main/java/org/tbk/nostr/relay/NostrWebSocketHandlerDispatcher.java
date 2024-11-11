@@ -16,11 +16,9 @@ import org.tbk.nostr.relay.handler.ConnectionClosedHandler;
 import org.tbk.nostr.relay.handler.ConnectionEstablishedHandler;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -128,6 +126,22 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
         @Override
         public boolean isAuthenticated() {
             return getSession().isAuthenticated();
+        }
+
+        // TODO: move this one level up
+        @Override
+        public Optional<byte[]> getAuthChallenge() {
+            return Optional.ofNullable(getSession().getAttributes().get("nip42_challenge"))
+                    .map(String::valueOf)
+                    .map(it -> HexFormat.of().parseHex(it));
+        }
+
+        @Override
+        public byte[] getOrComputeAuthChallenge(Function<NostrRequestContext, byte[]> factory) {
+            String challengeHex = String.valueOf(getSession().getAttributes().computeIfAbsent("nip42_challenge", foo ->
+                    HexFormat.of().formatHex(factory.apply(this))));
+
+            return HexFormat.of().parseHex(challengeHex);
         }
     }
 

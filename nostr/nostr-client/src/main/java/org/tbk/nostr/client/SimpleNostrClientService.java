@@ -70,26 +70,26 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
                                        @NonNull NostrClientService.SubscribeOptions options) {
     }
 
-    public SimpleNostrClientService(RelayUri relay) {
-        this(relay, new StandardWebSocketClient());
+    public SimpleNostrClientService(RelayUri relayUri) {
+        this(relayUri, new StandardWebSocketClient());
     }
 
-    public SimpleNostrClientService(RelayUri relay,
+    public SimpleNostrClientService(RelayUri relayUri,
                                     WebSocketClient webSocketClient) {
-        this(relay, webSocketClient, defaultHeartbeatInterval);
+        this(relayUri, webSocketClient, defaultHeartbeatInterval);
     }
 
-    public SimpleNostrClientService(RelayUri relay,
+    public SimpleNostrClientService(RelayUri relayUri,
                                     WebSocketClient webSocketClient,
                                     Duration heartbeatInterval) {
-        this(relay, webSocketClient, heartbeatInterval, defaultOnCloseHandler);
+        this(relayUri, webSocketClient, heartbeatInterval, defaultOnCloseHandler);
     }
 
-    public SimpleNostrClientService(RelayUri relay,
+    public SimpleNostrClientService(RelayUri relayUri,
                                     WebSocketClient webSocketClient,
                                     Duration heartbeatInterval,
                                     OnCloseHandler onCloseHandler) {
-        this.relayUri = requireNonNull(relay);
+        this.relayUri = requireNonNull(relayUri);
         this.client = requireNonNull(webSocketClient);
         this.onCloseHandler = requireNonNull(onCloseHandler);
 
@@ -98,6 +98,11 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         this.publisher = new SubmissionPublisher<>(publisherExecutor, Flow.defaultBufferSize());
         this.textWebSocketHandler = new SubmissionPublisherTextWebSocketHandler(this.publisher, this::onConnectionClosed);
         this.subscriptions = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public RelayUri getRelayUri() {
+        return this.relayUri;
     }
 
     @Override
@@ -216,6 +221,18 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         return Mono.fromCallable(() -> {
             this.send(Request.newBuilder()
                     .setEvent(EventRequest.newBuilder()
+                            .setEvent(event)
+                            .build())
+                    .build());
+            return null;
+        });
+    }
+
+    @Override
+    public Mono<Void> auth(Event event) {
+        return Mono.fromCallable(() -> {
+            this.send(Request.newBuilder()
+                    .setAuth(AuthRequest.newBuilder()
                             .setEvent(event)
                             .build())
                     .build());

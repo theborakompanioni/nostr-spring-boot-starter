@@ -8,6 +8,8 @@ import org.tbk.nostr.relay.NostrWebSocketSession;
 import org.tbk.nostr.relay.handler.ConnectionEstablishedHandler;
 import org.tbk.nostr.relay.nip42.Nip42Support;
 
+import java.util.HexFormat;
+
 @RequiredArgsConstructor
 public class AuthConnectionEstablishedHandler implements ConnectionEstablishedHandler {
 
@@ -16,10 +18,10 @@ public class AuthConnectionEstablishedHandler implements ConnectionEstablishedHa
 
     @Override
     public void afterConnectionEstablished(NostrWebSocketSession session) throws Exception {
-        String challenge = nip42Support.createNewChallenge(session);
+        byte[] challenge = nip42Support.createNewChallenge(session);
         session.sendResponseImmediately(Response.newBuilder()
                 .setAuth(AuthResponse.newBuilder()
-                        .setChallenge(challenge)
+                        .setChallenge(HexFormat.of().formatHex(challenge))
                         .build())
                 .build());
     }

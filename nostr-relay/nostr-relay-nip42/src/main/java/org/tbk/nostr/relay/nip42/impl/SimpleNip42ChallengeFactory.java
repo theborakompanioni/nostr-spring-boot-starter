@@ -1,20 +1,21 @@
 package org.tbk.nostr.relay.nip42.impl;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.HexFormat;
 
 final class SimpleNip42ChallengeFactory {
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private static String random() {
+    private static byte[] random() {
         byte[] bytes = new byte[32];
 
         RANDOM.nextBytes(bytes);
 
-        return HexFormat.of().formatHex(bytes);
+        return bytes;
     }
 
-    public String create() {
+    public byte[] create() {
         return random();
     }
 }

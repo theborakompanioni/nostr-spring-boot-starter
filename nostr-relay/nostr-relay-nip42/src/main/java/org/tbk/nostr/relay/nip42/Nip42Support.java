@@ -9,9 +9,9 @@ import reactor.core.publisher.Mono;
 
 public interface Nip42Support {
 
-    String createNewChallenge(NostrWebSocketSession session);
+    byte[] createNewChallenge(NostrWebSocketSession session);
 
-    Mono<Boolean> handleAuthEvent(NostrWebSocketSession session, Event authEvent);
+    Mono<Boolean> handleAuthEvent(NostrRequestContext context, Event authEvent);
 
     Mono<Boolean> needsAuthentication(NostrRequestContext context, Request request);
 }

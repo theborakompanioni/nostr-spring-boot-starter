@@ -2,6 +2,7 @@ package org.tbk.nostr.client;
 
 import lombok.Builder;
 import lombok.Value;
+import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.ReqRequest;
@@ -17,6 +18,8 @@ public interface NostrClientService {
         return this.subscribe(req, SubscribeOptions.defaultOptions());
     }
 
+    RelayUri getRelayUri();
+
     Flux<Event> subscribe(ReqRequest req, SubscribeOptions options);
 
     Flux<Response> attach();
@@ -28,6 +31,8 @@ public interface NostrClientService {
     Mono<Void> close(SubscriptionId id);
 
     Mono<Void> send(Event event);
+
+    Mono<Void> auth(Event event);
 
     boolean isConnected();
 

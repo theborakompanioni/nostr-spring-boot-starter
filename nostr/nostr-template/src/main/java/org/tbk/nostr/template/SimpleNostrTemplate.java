@@ -61,6 +61,11 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     @Override
+    public RelayUri getRelayUri() {
+        return this.relay;
+    }
+
+    @Override
     public Mono<RelayInfoDocument> fetchRelayInfoDocument() {
         return Mono.defer(() -> {
             UriComponents https = UriComponentsBuilder.fromUri(this.relay.getUri())
