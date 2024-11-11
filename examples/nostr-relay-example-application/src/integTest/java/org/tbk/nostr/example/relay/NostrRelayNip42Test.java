@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.tbk.nostr.client.NostrClientService;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.*;
@@ -13,8 +14,10 @@ import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreSubscriptionIds;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -25,6 +28,9 @@ class NostrRelayNip42Test {
 
     @Autowired
     private NostrTemplate nostrTemplate;
+
+    @Autowired
+    private NostrClientService nostrClient;
 
     @Test
     void itShouldReceiveAuthChallenge() {
@@ -57,7 +63,7 @@ class NostrRelayNip42Test {
     }
 
     @Test
-    void itShouldShouldDeclineEventRequestForUnauthenticated() {
+    void itShouldShouldDeclineEventRequestForUnauthenticated0() {
         Signer signer = SimpleSigner.random();
 
         Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
@@ -65,6 +71,31 @@ class NostrRelayNip42Test {
         OkResponse ok = nostrTemplate.send(event)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
+        assertThat(ok.getSuccess(), is(false));
+        assertThat(ok.getMessage(), startsWith("auth-required:"));
+    }
+
+    @Test
+    void itShouldShouldDeclineEventRequestForUnauthenticated1() {
+        Signer signer = SimpleSigner.random();
+
+        Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM0");
+
+        List<Response> responses = requireNonNull(nostrClient.attach()
+                .doOnSubscribe(foo -> {
+                    // force an AUTH response
+                    nostrClient.send(event0).subscribe().dispose();
+                })
+                .bufferTimeout(1, Duration.ofSeconds(3))
+                .defaultIfEmpty(Collections.emptyList())
+                .blockFirst(Duration.ofSeconds(5)));
+
+        OkResponse ok = responses.stream()
+                .filter(it -> it.getKindCase() == Response.KindCase.OK)
+                .map(Response::getOk)
+                .findFirst()
+                .orElseThrow();
+
         assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), startsWith("auth-required:"));
     }
