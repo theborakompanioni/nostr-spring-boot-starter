@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
@@ -107,7 +106,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
         SubscriptionId subscriptionId = SubscriptionId.of(req.getId());
 
-        return this.attachTo(subscriptionId).doOnSubscribe(s -> {
+        return this.attachToEvents(subscriptionId).doOnSubscribe(s -> {
             this.subscriptions.put(subscriptionId, SubscriptionContext.builder()
                     .reqRequest(req)
                     .options(options)
@@ -120,44 +119,55 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
     }
 
     @Override
-    public Flux<Event> attachTo(SubscriptionId id) {
-        checkOpenSession();
+    public Flux<Event> attachToEvents(SubscriptionId id) {
+        return attachTo(id)
+                .filter(it -> Response.KindCase.EVENT.equals(it.getKindCase()))
+                .map(Response::getEvent)
+                .map(EventResponse::getEvent)
+                .filter(MoreEvents::hasValidSignature);
+    }
 
-        return Flux.<TextMessage>from(s -> publisher.subscribe(FlowAdapters.toFlowSubscriber(s)))
-                .map(it -> JsonReader.fromJson(it.getPayload(), Response.newBuilder()))
+    @Override
+    public Flux<Response> attachTo(SubscriptionId id) {
+        return attach()
                 .handle(filterSubscriptionResponses(id))
                 .handle((it, sink) -> {
                     switch (it.getKindCase()) {
                         case CLOSED -> {
                             subscriptions.remove(id);
+                            sink.next(it);
                             sink.complete();
                         }
                         case EOSE -> {
-                            Optional.ofNullable(subscriptions.get(id))
-                                    .filter(ctx -> ctx.options.isCloseOnEndOfStream())
-                                    .ifPresent(ctx -> {
-                                        SubscriptionContext removed = subscriptions.remove(id);
-                                        if (removed != null) {
-                                            sendClose(id);
-                                        }
+                            SubscriptionContext ctx = subscriptions.get(id);
 
-                                        sink.complete();
-                                    });
-                        }
-                        case EVENT -> {
-                            Event event = it.getEvent().getEvent();
-                            if (MoreEvents.hasValidSignature(event)) {
-                                sink.next(event);
+                            if (ctx != null && ctx.options.isCloseOnEndOfStream()) {
+                                SubscriptionContext removed = subscriptions.remove(id);
+                                if (removed != null) {
+                                    sendClose(id);
+                                }
+                                sink.next(it);
+                                sink.complete();
+                            } else {
+                                sink.next(it);
                             }
                         }
                         default -> {
-                            // do nothing on purpose
+                            sink.next(it);
                         }
                     }
                 });
     }
 
-    @NonNull
+    @Override
+    public Flux<Response> attach() {
+        checkOpenSession();
+
+        return Flux.<TextMessage>from(s -> publisher.subscribe(FlowAdapters.toFlowSubscriber(s)))
+                .map(it -> JsonReader.fromJson(it.getPayload(), Response.newBuilder()));
+    }
+
+
     private static BiConsumer<Response, SynchronousSink<Response>> filterSubscriptionResponses(SubscriptionId id) {
         return (it, sink) -> {
             switch (it.getKindCase()) {
@@ -179,8 +189,14 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
                         sink.next(it);
                     }
                 }
+                case COUNT -> {
+                    SubscriptionId subscriptionId = SubscriptionId.of(it.getCount().getSubscriptionId());
+                    if (subscriptionId.equals(id)) {
+                        sink.next(it);
+                    }
+                }
                 default -> {
-                    // do nothing on purpose
+                    sink.next(it);
                 }
             }
         };
@@ -219,6 +235,10 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         }
 
         return Mono.fromCallable(() -> {
+            if (publisherExecutor.isShutdown()) {
+                return false;
+            }
+
             State serviceState = this.state();
             if (serviceState != State.RUNNING) {
                 log.warn("Not reconnecting as service is in state {}", serviceState);
