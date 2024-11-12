@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - NostrTemplate: change signature of method `sendPlain` and rename to `publishPlain`
 - NostrClientService: change return value of method `attachTo`
 - Nip9: change return type of method `kind` from `int` to `Kind`
+- "parameterized replaceable" events are now called "addressable" events
 
 ### Added
 - Ability to easily send auth event with `NostrTemplate`

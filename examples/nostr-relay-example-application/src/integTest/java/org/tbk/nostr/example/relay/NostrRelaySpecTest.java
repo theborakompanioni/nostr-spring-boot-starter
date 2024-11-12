@@ -881,10 +881,10 @@ class NostrRelaySpecTest {
     }
 
     @RepeatedTest(5)
-    void itShouldVerifyParameterizedReplaceableEventBehaviour0() {
+    void itShouldVerifyAddressableEventBehaviour0() {
         Signer signer = SimpleSigner.random();
 
-        Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "d"));
+        Event event0 = MoreEvents.finalize(signer, Nip1.createAddressableEvent(signer.getPublicKey(), "GM", "d"));
         Event event1Newer = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() + 1));
 
         assertThat("sanity check", event1Newer.getCreatedAt(), is(greaterThan(event0.getCreatedAt())));
@@ -920,12 +920,12 @@ class NostrRelaySpecTest {
     }
 
     @RepeatedTest(5)
-    void itShouldVerifyParameterizedReplaceableEventBehaviour1NewerEventsDoNotExist() {
+    void itShouldVerifyAddressableEventBehaviour1NewerEventsDoNotExist() {
         Signer signer = SimpleSigner.random();
 
-        Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "test"));
+        Event event0 = MoreEvents.finalize(signer, Nip1.createAddressableEvent(signer.getPublicKey(), "GM", "test"));
         Event event1Older = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() - 1));
-        Event event2DifferentTag = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM",
+        Event event2DifferentTag = MoreEvents.finalize(signer, Nip1.createAddressableEvent(signer.getPublicKey(), "GM",
                         MoreTags.findByNameSingle(event0, IndexedTag.d.name())
                                 .map(it -> it.getValues(0))
                                 .orElseThrow()
@@ -974,10 +974,10 @@ class NostrRelaySpecTest {
     }
 
     @RepeatedTest(5)
-    void itShouldVerifyParameterizedReplaceableEventBehaviour2NewerEventsExist() {
+    void itShouldVerifyAddressableEventBehaviour2NewerEventsExist() {
         Signer signer = SimpleSigner.random();
 
-        Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "d"));
+        Event event0 = MoreEvents.finalize(signer, Nip1.createAddressableEvent(signer.getPublicKey(), "GM", "d"));
         Event event1Newer = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() + 1));
         Event event2Older = MoreEvents.finalize(signer, event0.toBuilder().setCreatedAt(event0.getCreatedAt() - 1));
 
@@ -1015,10 +1015,10 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldVerifyParameterizedReplaceableEventBehaviour3MissingDTag() {
+    void itShouldVerifyAddressableEventBehaviour3MissingDTag() {
         Signer signer = SimpleSigner.random();
 
-        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "<will me removed>")
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createAddressableEvent(signer.getPublicKey(), "GM", "<will me removed>")
                 .clearTags());
 
         OkResponse ok0 = nostrTemplate.send(invalidEvent0)
@@ -1030,10 +1030,10 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldVerifyParameterizedReplaceableEventBehaviour3MissingFirstValueOfDTag() {
+    void itShouldVerifyAddressableEventBehaviour3MissingFirstValueOfDTag() {
         Signer signer = SimpleSigner.random();
 
-        Event event0WithEmptyDTag = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", null));
+        Event event0WithEmptyDTag = MoreEvents.finalize(signer, Nip1.createAddressableEvent(signer.getPublicKey(), "GM", null));
 
         OkResponse ok0 = nostrTemplate.send(event0WithEmptyDTag)
                 .blockOptional(Duration.ofSeconds(5))
@@ -1044,7 +1044,7 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldVerifyParameterizedReplaceableEventBehaviour4NullFirstValueOfDTag() {
+    void itShouldVerifyAddressableEventBehaviour4NullFirstValueOfDTag() {
         Response response = nostrTemplate.publishPlainMono("""
                         [
                           "EVENT",
@@ -1067,10 +1067,10 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldVerifyParameterizedReplaceableEventBehaviour5MultipleDTags() {
+    void itShouldVerifyAddressableEventBehaviour5MultipleDTags() {
         Signer signer = SimpleSigner.random();
 
-        Event.Builder prototype = Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", null).clearTags();
+        Event.Builder prototype = Nip1.createAddressableEvent(signer.getPublicKey(), "GM", null).clearTags();
         Event event0WithEmptyDTag = MoreEvents.finalize(signer, prototype
                 .addTags(MoreTags.d("0"))
                 .addTags(MoreTags.d()));

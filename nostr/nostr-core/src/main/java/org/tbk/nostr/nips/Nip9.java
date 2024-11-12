@@ -41,11 +41,11 @@ public final class Nip9 {
         XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
         if (Nip1.isReplaceableEvent(event)) {
             return createDeletionEventForReplaceableEvent(publicKey, event.getKind());
-        } else if (Nip1.isParameterizedReplaceableEvent(event)) {
+        } else if (Nip1.isAddressableEvent(event)) {
             String dTagValue = MoreTags.findByNameSingle(event, IndexedTag.d.name())
                     .map(it -> it.getValues(0))
                     .orElseThrow(() -> new IllegalStateException("Expected an `%s` tag".formatted(IndexedTag.d.name())));
-            return createDeletionEventForParameterizedReplaceableEvent(publicKey, event.getKind(), dTagValue);
+            return createDeletionEventForAddressableEvent(publicKey, event.getKind(), dTagValue);
         }
 
         return createDeletionEvent(publicKey, null, Collections.singletonList(EventId.of(event.getId().toByteArray())));
@@ -56,7 +56,7 @@ public final class Nip9 {
     }
 
     public static Event.Builder createDeletionEventForEvent(EventUri eventUri, @Nullable String reason) {
-        return createDeletionEventForParameterizedReplaceableEvent(MorePublicKeys.fromHex(eventUri.getPublicKeyHex()), reason, eventUri.getKind().getValue(), eventUri.getIdentifier().orElse(null));
+        return createDeletionEventForAddressableEvent(MorePublicKeys.fromHex(eventUri.getPublicKeyHex()), reason, eventUri.getKind().getValue(), eventUri.getIdentifier().orElse(null));
     }
 
     public static Event.Builder createDeletionEvent(XonlyPublicKey publicKey, Collection<EventId> eventId) {
@@ -78,11 +78,11 @@ public final class Nip9 {
         return createDeletionEventInternal(publicKey, reason, Collections.singletonList(MoreTags.a(kind, publicKey)));
     }
 
-    public static Event.Builder createDeletionEventForParameterizedReplaceableEvent(XonlyPublicKey publicKey, int kind, @Nullable String dTagValue) {
-        return createDeletionEventForParameterizedReplaceableEvent(publicKey, null, kind, dTagValue);
+    public static Event.Builder createDeletionEventForAddressableEvent(XonlyPublicKey publicKey, int kind, @Nullable String dTagValue) {
+        return createDeletionEventForAddressableEvent(publicKey, null, kind, dTagValue);
     }
 
-    public static Event.Builder createDeletionEventForParameterizedReplaceableEvent(XonlyPublicKey publicKey, @Nullable String reason, int kind, @Nullable String dTagValue) {
+    public static Event.Builder createDeletionEventForAddressableEvent(XonlyPublicKey publicKey, @Nullable String reason, int kind, @Nullable String dTagValue) {
         return createDeletionEventInternal(publicKey, reason, Collections.singletonList(MoreTags.a(kind, publicKey, dTagValue)));
     }
 

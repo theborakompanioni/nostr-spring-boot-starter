@@ -29,12 +29,12 @@ class MoreKindsTest {
     }
 
     @Test
-    void isParameterizedReplaceable() {
-        assertThat(MoreKinds.isParameterizedReplaceable(MoreKinds.kindUserMetadata().getValue()), is(false));
-        assertThat(MoreKinds.isParameterizedReplaceable(MoreKinds.kindShortTextNote().getValue()), is(false));
-        assertThat(MoreKinds.isParameterizedReplaceable(MoreKinds.kindFollows().getValue()), is(false));
-        assertThat(MoreKinds.isParameterizedReplaceable(MoreKinds.kindParameterizedReplaceableRange().lowerEndpoint().getValue()), is(true));
-        assertThat(MoreKinds.isParameterizedReplaceable(MoreKinds.kindParameterizedReplaceableRange().upperEndpoint().getValue()), is(false));
-        assertThat(MoreKinds.isParameterizedReplaceable(Kind.maxValue()), is(false));
+    void isAddressable() {
+        assertThat(MoreKinds.isAddressable(MoreKinds.kindUserMetadata().getValue()), is(false));
+        assertThat(MoreKinds.isAddressable(MoreKinds.kindShortTextNote().getValue()), is(false));
+        assertThat(MoreKinds.isAddressable(MoreKinds.kindFollows().getValue()), is(false));
+        assertThat(MoreKinds.isAddressable(MoreKinds.kindAddressableRange().lowerEndpoint().getValue()), is(true));
+        assertThat(MoreKinds.isAddressable(MoreKinds.kindAddressableRange().upperEndpoint().getValue()), is(false));
+        assertThat(MoreKinds.isAddressable(Kind.maxValue()), is(false));
     }
 }

@@ -268,10 +268,10 @@ class NostrRelayNip9Test {
     }
 
     @Test
-    void itShouldDeleteExistingEventSuccessfully4ParameterizedReplaceableEvent() {
+    void itShouldDeleteExistingEventSuccessfully4AddressableEvent() {
         Signer signer = SimpleSigner.random();
 
-        Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "test"));
+        Event event0 = MoreEvents.finalize(signer, Nip1.createAddressableEvent(signer.getPublicKey(), "GM", "test"));
         Event event1 = MoreEvents.createFinalizedTextNote(signer, "GM1");
 
         List<Event> events = List.of(event0, event1);

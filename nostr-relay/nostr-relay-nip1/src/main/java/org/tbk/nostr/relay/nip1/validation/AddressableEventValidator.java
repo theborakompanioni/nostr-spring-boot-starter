@@ -7,11 +7,11 @@ import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.relay.validation.EventValidator;
 
-public class ReplaceableEventValidator implements EventValidator {
+public class AddressableEventValidator implements EventValidator {
 
     @Override
     public void validateEvent(Event event, Errors errors) {
-        if (Nip1.isParameterizedReplaceableEvent(event)) {
+        if (Nip1.isAddressableEvent(event)) {
             IndexedTag identifier = IndexedTag.d;
 
             TagValue found = null;

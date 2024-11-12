@@ -11,7 +11,7 @@ import org.tbk.nostr.relay.config.NostrRelayAutoConfiguration;
 import org.tbk.nostr.relay.nip1.Nip1Support;
 import org.tbk.nostr.relay.nip1.interceptor.EphemeralEventInterceptor;
 import org.tbk.nostr.relay.nip1.interceptor.ReplaceableEventInterceptor;
-import org.tbk.nostr.relay.nip1.validation.ReplaceableEventValidator;
+import org.tbk.nostr.relay.nip1.validation.AddressableEventValidator;
 
 @Slf4j
 @ConditionalOnClass(Nip1Support.class)
@@ -22,8 +22,8 @@ public class Nip1AutoConfiguration {
     // validators
     @Bean
     @Order(20)
-    ReplaceableEventValidator replaceableEventValidator() {
-        return new ReplaceableEventValidator();
+    AddressableEventValidator addressableEventValidator() {
+        return new AddressableEventValidator();
     }
     // validators - end
 

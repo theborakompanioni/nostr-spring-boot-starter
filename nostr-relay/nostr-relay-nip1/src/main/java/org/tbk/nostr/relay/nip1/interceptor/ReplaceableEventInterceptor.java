@@ -17,7 +17,6 @@ import org.tbk.nostr.util.MorePublicKeys;
 import org.tbk.nostr.util.MoreTags;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -40,7 +39,7 @@ public class ReplaceableEventInterceptor implements RequestHandlerInterceptor {
     }
 
     private boolean handleEvent(NostrRequestContext context, Event event) {
-        if (Nip1.isReplaceableEvent(event) || Nip1.isParameterizedReplaceableEvent(event)) {
+        if (Nip1.isReplaceableEvent(event) || Nip1.isAddressableEvent(event)) {
             XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
 
             Instant eventCreatedAt = Instant.ofEpochSecond(event.getCreatedAt());
@@ -70,7 +69,7 @@ public class ReplaceableEventInterceptor implements RequestHandlerInterceptor {
     private Mono<Void> deleteEventsBefore(Event event, XonlyPublicKey publicKey, Instant eventCreatedAt) {
         if (Nip1.isReplaceableEvent(event)) {
             return support.deleteAllBeforeCreatedAtInclusive(publicKey, event.getKind(), eventCreatedAt);
-        } else if (Nip1.isParameterizedReplaceableEvent(event)) {
+        } else if (Nip1.isAddressableEvent(event)) {
             IndexedTag identifier = IndexedTag.d;
 
             TagValue identifierTag = MoreTags.findByNameSingle(event, identifier.name())
@@ -91,7 +90,7 @@ public class ReplaceableEventInterceptor implements RequestHandlerInterceptor {
                     .collectList()
                     .blockOptional(Duration.ofSeconds(60))
                     .orElseThrow(() -> new IllegalStateException("Error while replacing events: Fetch phase."));
-        } else if (Nip1.isParameterizedReplaceableEvent(event)) {
+        } else if (Nip1.isAddressableEvent(event)) {
             IndexedTag identifier = IndexedTag.d;
 
             TagValue identifierTag = MoreTags.findByNameSingle(event, identifier.name())

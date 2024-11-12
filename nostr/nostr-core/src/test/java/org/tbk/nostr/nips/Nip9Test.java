@@ -47,11 +47,11 @@ class Nip9Test {
     }
 
     @Test
-    void itShouldCreateDeletionEventForEvent2ParameterizedReplaceableEvent() {
+    void itShouldCreateDeletionEventForEvent2AddressableEvent() {
         Signer signer = SimpleSigner.random();
 
-        Event event0 = MoreEvents.finalize(signer, Nip1.createParameterizedReplaceableEvent(signer.getPublicKey(), "GM", "test"));
-        assertThat("sanity check", Nip1.isParameterizedReplaceableEvent(event0));
+        Event event0 = MoreEvents.finalize(signer, Nip1.createAddressableEvent(signer.getPublicKey(), "GM", "test"));
+        assertThat("sanity check", Nip1.isAddressableEvent(event0));
 
         TagValue dTag = MoreTags.findByNameSingle(event0, IndexedTag.d)
                 .orElseThrow(() -> new IllegalStateException("Expected an `d` tag"));

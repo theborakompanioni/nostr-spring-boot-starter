@@ -30,8 +30,8 @@ public final class Nip1 {
         return MoreKinds.isEphemeral(event.getKind());
     }
 
-    public static boolean isParameterizedReplaceableEvent(EventOrBuilder event) {
-        return MoreKinds.isParameterizedReplaceable(event.getKind());
+    public static boolean isAddressableEvent(EventOrBuilder event) {
+        return MoreKinds.isAddressable(event.getKind());
     }
 
     public static Event.Builder createMetadata(XonlyPublicKey publicKey, Metadata metadata) {
@@ -79,12 +79,12 @@ public final class Nip1 {
     }
 
 
-    public static Event.Builder createParameterizedReplaceableEvent(XonlyPublicKey publicKey, String content, @Nullable String dTagValue) {
-        return createParameterizedReplaceableEvent(publicKey, content, MoreKinds.kindParameterizedReplaceableRange().lowerEndpoint().getValue(), dTagValue);
+    public static Event.Builder createAddressableEvent(XonlyPublicKey publicKey, String content, @Nullable String dTagValue) {
+        return createAddressableEvent(publicKey, content, MoreKinds.kindAddressableRange().lowerEndpoint().getValue(), dTagValue);
     }
 
-    public static Event.Builder createParameterizedReplaceableEvent(XonlyPublicKey publicKey, String content, int kind, @Nullable String dTagValue) {
-        MoreKinds.checkParameterizedReplaceable(kind);
+    public static Event.Builder createAddressableEvent(XonlyPublicKey publicKey, String content, int kind, @Nullable String dTagValue) {
+        MoreKinds.checkAddressable(kind);
 
         return MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())

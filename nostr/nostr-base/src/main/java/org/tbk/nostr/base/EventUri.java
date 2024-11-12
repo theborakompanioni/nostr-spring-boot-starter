@@ -11,8 +11,8 @@ import java.util.Optional;
 import static java.util.Objects.requireNonNull;
 
 // "coordinates to an event" in the form of:
-// - "<kind integer>:<32-bytes lowercase hex of a pubkey>" for non-parameterized replaceable events
-// - "<kind integer>:<32-bytes lowercase hex of a pubkey>:<d tag value>" for parameterized replaceable events
+// - "<kind integer>:<32-bytes lowercase hex of a pubkey>" for addressable events
+// - "<kind integer>:<32-bytes lowercase hex of a pubkey>:<d tag value>" for addressable events
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class EventUri {
 
