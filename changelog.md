@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Breaking
 - NostrTemplate: change signature of method `sendPlain`
 - NostrClientService: change return value of method `attachTo`
+- Nip9: change return type of method `kind` from `int` to `Kind`
 
 ## [0.0.2] - 2024-11-01
 

@@ -5,6 +5,7 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.IndexedTag;
+import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.TagValue;
@@ -22,18 +23,18 @@ import java.util.stream.Collectors;
  * See <a href="https://github.com/nostr-protocol/nips/blob/master/09.md">NIP-09</a>.
  */
 public final class Nip9 {
-    private static final int DELETION_EVENT_KIND = 5;
+    private static final Kind DELETION_EVENT_KIND = Kind.of(5);
 
     private Nip9() {
         throw new UnsupportedOperationException();
     }
 
-    public static int kind() {
+    public static Kind kind() {
         return DELETION_EVENT_KIND;
     }
 
     public static boolean isDeletionEvent(EventOrBuilder event) {
-        return event.getKind() == DELETION_EVENT_KIND;
+        return event.getKind() == DELETION_EVENT_KIND.getValue();
     }
 
     public static Event.Builder createDeletionEventForEvent(Event event) {
@@ -91,7 +92,7 @@ public final class Nip9 {
         return MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())
                 .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
-                .setKind(DELETION_EVENT_KIND)
+                .setKind(DELETION_EVENT_KIND.getValue())
                 .addAllTags(tags)
                 .setContent(reason == null ? "" : reason));
     }
