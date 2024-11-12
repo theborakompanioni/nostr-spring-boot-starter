@@ -35,6 +35,8 @@ public interface NostrTemplate {
 
     Mono<Metadata> fetchMetadataByAuthor(XonlyPublicKey publicKey);
 
+    Flux<Response> count(CountRequest request);
+
     Flux<CountResult> countEvents(CountRequest request);
 
     Mono<OkResponse> auth(Event event);

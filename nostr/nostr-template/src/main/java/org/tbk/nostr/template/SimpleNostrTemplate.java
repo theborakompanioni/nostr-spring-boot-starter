@@ -179,6 +179,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
                 .map(EventResponse::getEvent);
     }
 
+    @Override
     public Flux<Response> fetch(ReqRequest request) {
         return publish(Request.newBuilder()
                 .setReq(request)
@@ -190,72 +191,20 @@ public class SimpleNostrTemplate implements NostrTemplate {
 
     @Override
     public Flux<CountResult> countEvents(CountRequest request) {
-        AtomicReference<WebSocketSession> sessionRef = new AtomicReference<>();
-        return Flux.<CountResult>create(sink -> {
-            try {
-                sessionRef.set(webSocketClient.execute(new TextWebSocketHandler() {
-                    @Override
-                    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-                        sink.complete();
-                    }
-
-                    @Override
-                    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-                        log.debug("handleTextMessage: {}", message.getPayload());
-
-                        try {
-                            Response response = JsonReader.fromJson(message.getPayload(), Response.newBuilder());
-                            switch (response.getKindCase()) {
-                                case COUNT -> {
-                                    CountResponse countResponse = response.getCount();
-                                    if (!countResponse.getSubscriptionId().equals(request.getId())) {
-                                        log.warn("{} on unexpected subscription received. Ignoring.", response.getKindCase());
-                                    } else {
-                                        sink.next(countResponse.getResult());
-                                    }
-                                }
-                                case EOSE -> {
-                                    EoseResponse eoseResponse = response.getEose();
-                                    if (!eoseResponse.getSubscriptionId().equals(request.getId())) {
-                                        log.warn("{} on unexpected subscription received. Ignoring.", response.getKindCase());
-                                    } else {
-                                        sink.complete();
-                                    }
-                                }
-                                case CLOSED -> {
-                                    ClosedResponse closedResponse = response.getClosed();
-                                    if (!closedResponse.getSubscriptionId().equals(request.getId())) {
-                                        log.warn("{} on unexpected subscription received. Ignoring.", response.getKindCase());
-                                    } else {
-                                        sink.complete();
-                                    }
-                                }
-                                case OK, NOTICE, EVENT, KIND_NOT_SET -> {
-                                    log.warn("Unexpected message received (type := {}). Ignoring.", response.getKindCase());
-                                }
-                            }
-                        } catch (Exception e) {
-                            log.warn("Error in handleTextMessage while handling '{}': {}", message, e.getMessage());
-                            sink.error(e);
-                        }
-                    }
-                }, headers, relay.getUri()).get());
-
-                TextMessage message = new TextMessage(JsonWriter.toJson(Request.newBuilder()
-                        .setCount(request)
-                        .build()));
-
-                log.debug("Sending message: {}", message.getPayload());
-                sessionRef.get().sendMessage(message);
-            } catch (InterruptedException | ExecutionException | IOException e) {
-                sink.error(e);
-            }
-        }).doFinally(signalType -> {
-            log.debug("Closing websocket session on signal type: {}", signalType);
-            closeQuietly(sessionRef.get());
-        });
+        return count(request)
+                .filter(it -> Response.KindCase.COUNT.equals(it.getKindCase()))
+                .map(Response::getCount)
+                .map(CountResponse::getResult);
     }
 
+    @Override
+    public Flux<Response> count(CountRequest request) {
+        return publish(Request.newBuilder()
+                .setCount(request)
+                .build())
+                .handle(filterSubscriptionResponses(SubscriptionId.of(request.getId())))
+                .takeUntil(it -> Response.KindCase.EOSE.equals(it.getKindCase()) || Response.KindCase.CLOSED.equals(it.getKindCase()));
+    }
     @Override
     public Mono<OkResponse> auth(Event event) {
         return publish(Request.newBuilder()
@@ -328,7 +277,6 @@ public class SimpleNostrTemplate implements NostrTemplate {
             closeQuietly(sessionRef.get());
         });
     }
-
 
     private static SubscriptionId createUniqueSubscriptionId(Set<ByteString> list) {
         return createUniqueSubscriptionId(list.stream()

@@ -14,11 +14,11 @@ import java.time.Duration;
 
 public interface NostrClientService {
 
+    RelayUri getRelayUri();
+
     default Flux<Event> subscribe(ReqRequest req) {
         return this.subscribe(req, SubscribeOptions.defaultOptions());
     }
-
-    RelayUri getRelayUri();
 
     Flux<Event> subscribe(ReqRequest req, SubscribeOptions options);
 
