@@ -6,6 +6,7 @@ import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nip11.RelayInfoDocument;
 import org.tbk.nostr.proto.*;
+import org.tbk.nostr.proto.json.JsonWriter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -44,11 +45,27 @@ public interface NostrTemplate {
 
     Flux<OkResponse> send(Collection<Event> events);
 
-    default Flux<Response> sendAndCollect(Event event) {
-        return sendAndCollect(Collections.singleton(event));
+    default Flux<Response> publish(Request request) {
+        return publishPlain(JsonWriter.toJson(request));
     }
 
-    Flux<Response> sendAndCollect(Collection<Event> events);
+    default Flux<Response> publish(Collection<Request> requests) {
+        return publishPlain(requests.stream().map(JsonWriter::toJson).toList());
+    }
+
+    default Flux<Response> publishEvent(Event event) {
+        return publishEvents(Collections.singleton(event));
+    }
+
+    default Flux<Response> publishEvents(Collection<Event> events) {
+        return publish(events.stream()
+                .map(it -> Request.newBuilder()
+                        .setEvent(EventRequest.newBuilder()
+                                .setEvent(it)
+                                .build())
+                        .build())
+                .toList());
+    }
 
     /**
      * A helper function for sending an arbitrary plain string.
@@ -56,8 +73,8 @@ public interface NostrTemplate {
      * @param message the message content (possibly json)
      * @return responses from the relay
      */
-    default Flux<Response> sendPlain(String message) {
-        return sendPlain(Collections.singletonList(message));
+    default Flux<Response> publishPlain(String message) {
+        return publishPlain(Collections.singletonList(message));
     }
 
     /**
@@ -65,9 +82,9 @@ public interface NostrTemplate {
      *
      * @param messages the messages contents (possibly json)
      * @return responses from the relay
-     * @see #sendPlain(String)
+     * @see #publishPlain(String)
      */
-    Flux<Response> sendPlain(Collection<String> messages);
+    Flux<Response> publishPlain(Collection<String> messages);
 
     /**
      * A helper function for sending a plain string returning the first response.
@@ -76,7 +93,7 @@ public interface NostrTemplate {
      * @param message the message content (possibly json)
      * @return the first response from the relay
      */
-    default Mono<Response> sendPlainMono(String message) {
-        return sendPlain(message).next();
+    default Mono<Response> publishPlainMono(String message) {
+        return publishPlain(message).next();
     }
 }

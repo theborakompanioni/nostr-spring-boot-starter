@@ -180,7 +180,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     public Flux<Response> fetch(ReqRequest request) {
-        return sendAndAttach(Request.newBuilder()
+        return publish(Request.newBuilder()
                 .setReq(request)
                 .build())
                 .handle(filterSubscriptionResponses(SubscriptionId.of(request.getId())))
@@ -258,7 +258,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
 
     @Override
     public Mono<OkResponse> auth(Event event) {
-        return sendAndAttach(Request.newBuilder()
+        return publish(Request.newBuilder()
                 .setAuth(AuthRequest.newBuilder()
                         .setEvent(event)
                         .build())
@@ -279,7 +279,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
         int eventCount = eventIds.size();
         ConcurrentHashMap<ByteString, OkResponse> received = new ConcurrentHashMap<>();
 
-        return sendAndCollect(eventList)
+        return publishEvents(eventList)
                 .filter(it -> it.getKindCase() == Response.KindCase.OK)
                 .map(Response::getOk)
                 .filter(ok -> eventIds.contains(ok.getEventId()))
@@ -290,20 +290,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     @Override
-    public Flux<Response> sendAndCollect(Collection<Event> events) {
-        return sendAndAttach(toEventRequest(events));
-    }
-
-    private  Flux<Response> sendAndAttach(Request request) {
-        return sendAndAttach(Collections.singleton(request));
-    }
-
-    private  Flux<Response> sendAndAttach(Collection<Request> requests) {
-        return sendPlain(requests.stream().map(JsonWriter::toJson).toList());
-    }
-
-    @Override
-    public Flux<Response> sendPlain(Collection<String> messages) {
+    public Flux<Response> publishPlain(Collection<String> messages) {
         AtomicReference<WebSocketSession> sessionRef = new AtomicReference<>();
 
         return Flux.<Response>create(sink -> {
@@ -356,20 +343,6 @@ public class SimpleNostrTemplate implements NostrTemplate {
                                 .map(it -> HexFormat.of().formatHex(it))
                                 .collect(Collectors.joining()))))
         );
-    }
-
-    private static List<Request> toEventRequest(Collection<Event> events) {
-        return events.stream()
-                .map(SimpleNostrTemplate::toEventRequest)
-                .toList();
-    }
-
-    private static Request toEventRequest(Event event) {
-        return Request.newBuilder()
-                .setEvent(EventRequest.newBuilder()
-                        .setEvent(event)
-                        .build())
-                .build();
     }
 
     private static BiConsumer<Response, SynchronousSink<Response>> filterSubscriptionResponses(SubscriptionId subscriptionId) {

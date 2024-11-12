@@ -51,7 +51,7 @@ class NostrRelayNip42Test {
 
         Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
 
-        List<Response> responses = nostrTemplate.sendAndCollect(event)
+        List<Response> responses = nostrTemplate.publishEvent(event)
                 .bufferTimeout(2, Duration.ofSeconds(3))
                 .next()
                 .blockOptional(Duration.ofSeconds(5))

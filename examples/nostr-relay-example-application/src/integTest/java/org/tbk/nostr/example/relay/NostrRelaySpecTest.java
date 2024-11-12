@@ -1049,7 +1049,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldVerifyParameterizedReplaceableEventBehaviour4NullFirstValueOfDTag() {
-        Response response = nostrTemplate.sendPlainMono("""
+        Response response = nostrTemplate.publishPlainMono("""
                         [
                           "EVENT",
                           {
@@ -1107,7 +1107,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage0() {
-        Response response = nostrTemplate.sendPlainMono("")
+        Response response = nostrTemplate.publishPlainMono("")
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
@@ -1119,7 +1119,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage1() {
-        Response response = nostrTemplate.sendPlainMono("null")
+        Response response = nostrTemplate.publishPlainMono("null")
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
@@ -1129,7 +1129,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage2() {
-        Response response = nostrTemplate.sendPlainMono("[]")
+        Response response = nostrTemplate.publishPlainMono("[]")
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
@@ -1139,7 +1139,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage3() {
-        Response response = nostrTemplate.sendPlainMono("GM")
+        Response response = nostrTemplate.publishPlainMono("GM")
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
@@ -1151,7 +1151,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage4EmptyEvent() {
-        Response response = nostrTemplate.sendPlainMono("""
+        Response response = nostrTemplate.publishPlainMono("""
                         [
                           "EVENT",
                           {}
@@ -1166,7 +1166,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage5UnknownProtoKind() {
-        Response response = nostrTemplate.sendPlainMono("""
+        Response response = nostrTemplate.publishPlainMono("""
                         [
                           "NOTICE",
                           "GM"
@@ -1181,7 +1181,7 @@ class NostrRelaySpecTest {
 
     @Test
     void itShouldDeclineInvalidMessage6ProtoKindNotSet() {
-        Response response = nostrTemplate.sendPlainMono("""
+        Response response = nostrTemplate.publishPlainMono("""
                         [
                           "KIND_NOT_SET",
                           {}
@@ -1202,7 +1202,7 @@ class NostrRelaySpecTest {
     @Test
     void itShouldSendClosedMessageForUnknownSubscriptions() {
         SubscriptionId subscriptionId = MoreSubscriptionIds.random();
-        Response response = nostrTemplate.sendPlainMono("""
+        Response response = nostrTemplate.publishPlainMono("""
                         [
                           "CLOSE",
                           "%s"
@@ -1215,6 +1215,7 @@ class NostrRelaySpecTest {
         assertThat(response.getClosed().getSubscriptionId(), is(subscriptionId.getId()));
         assertThat(response.getClosed().getMessage(), is(""));
     }
+
 
     @Test
     void itShouldVerifyErrorResponseIfAuthIsNotSupported() {
@@ -1231,5 +1232,29 @@ class NostrRelaySpecTest {
         assertThat(response.getEventId(), is(authEvent.getId()));
         assertThat(response.getSuccess(), is(false));
         assertThat(response.getMessage(), is("error: AUTH is not supported."));
+    }
+
+    @Test
+    void itShouldVerifyErrorResponseIfCountIsNotSupported() {
+        Signer signer = SimpleSigner.random();
+
+        String subscriptionId = MoreSubscriptionIds.random().getId();
+        Response response = nostrTemplate.publish(Request.newBuilder()
+                        .setCount(CountRequest.newBuilder()
+                                .setId(subscriptionId)
+                                .addFilters(Filter.newBuilder()
+                                        .addAuthors(ByteString.fromHex(signer.getPublicKey().value.toHex()))
+                                        .build())
+                                .build()).build())
+                .next()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(response.getKindCase(), is(Response.KindCase.CLOSED));
+
+        ClosedResponse closed = response.getClosed();
+
+        assertThat(closed.getSubscriptionId(), is(subscriptionId));
+        assertThat(closed.getMessage(), is("error: COUNT is not supported."));
     }
 }

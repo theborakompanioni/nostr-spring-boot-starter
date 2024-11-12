@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Breaking
-- NostrTemplate: change signature of method `sendPlain`
+- NostrTemplate: change signature of method `sendPlain` and rename to `publishPlain`
 - NostrClientService: change return value of method `attachTo`
 - Nip9: change return type of method `kind` from `int` to `Kind`
+
+### Added
+- Ability to easily send auth event with `NostrTemplate`
 
 ## [0.0.2] - 2024-11-01
 
