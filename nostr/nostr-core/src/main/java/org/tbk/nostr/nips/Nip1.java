@@ -23,7 +23,6 @@ public final class Nip1 {
     private static final int PARAMETERIZED_REPLACEABLE_KIND_LOWER_BOUND_INCLUSIVE = EPHEMERAL_KIND_UPPER_BOUND_EXCLUSIVE;
     private static final int PARAMETERIZED_REPLACEABLE_KIND_UPPER_BOUND_EXCLUSIVE = 40_000;
 
-
     private Nip1() {
         throw new UnsupportedOperationException();
     }

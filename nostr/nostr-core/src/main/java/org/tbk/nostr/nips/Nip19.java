@@ -19,6 +19,10 @@ import java.util.Optional;
  */
 public final class Nip19 {
 
+    private Nip19() {
+        throw new UnsupportedOperationException();
+    }
+
     public static XonlyPublicKey fromNpub(String bech32) {
         return decode(bech32, XonlyPublicKey.class);
     }

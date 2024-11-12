@@ -7,6 +7,7 @@ import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nips.Nip42;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
@@ -277,7 +278,7 @@ class JsonRequestWriterTest {
                         .setEvent(MoreEvents.withEventId(Event.newBuilder()
                                         .setCreatedAt(1)
                                         .setPubkey(ByteString.fromHex(testSigner.getPublicKey().value.toHex()))
-                                        .setKind(22_242)
+                                        .setKind(Nip42.kind().getValue())
                                         .addTags(MoreTags.named("relay", "wss://relay.example.com/"))
                                         .addTags(MoreTags.named("challenge", "challengestringhere"))
                                 )

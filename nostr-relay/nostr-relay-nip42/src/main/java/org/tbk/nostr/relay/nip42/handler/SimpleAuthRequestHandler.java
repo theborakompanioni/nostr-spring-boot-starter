@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
+import org.tbk.nostr.nips.Nip42;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.handler.AuthRequestHandler;
@@ -91,8 +92,8 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
 
         @Override
         public void validateEvent(Event authEvent, Errors errors) {
-            if (authEvent.getKind() != 22_242) {
-                String errorMessage = "Kind must be be %d".formatted(22_242);
+            if (authEvent.getKind() != Nip42.kind().getValue()) {
+                String errorMessage = "Kind must be %d".formatted(Nip42.kind().getValue());
                 errors.rejectValue("kind", "kind.invalid", errorMessage);
             }
         }

@@ -20,6 +20,14 @@ public final class Nip42 {
     private static final String CHALLENGE_TAG_NAME = "challenge";
     private static final String RELAY_TAG_NAME = "relay";
 
+    private Nip42() {
+        throw new UnsupportedOperationException();
+    }
+
+    public static Kind kind() {
+        return AUTH_EVENT_KIND;
+    }
+
     public static TagValue challenge(String challenge) {
         return MoreTags.named(CHALLENGE_TAG_NAME, challenge);
     }
