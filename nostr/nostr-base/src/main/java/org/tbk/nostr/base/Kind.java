@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public final class Kind {
+public final class Kind implements Comparable<Kind> {
 
     private static final int MIN_KIND_VALUE = 0;
     private static final int MAX_KIND_VALUE = 65_535;
@@ -64,5 +64,10 @@ public final class Kind {
 
     public int getValue() {
         return value;
+    }
+
+    @Override
+    public int compareTo(Kind anotherKind) {
+        return Integer.compare(this.value, anotherKind.value);
     }
 }

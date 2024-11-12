@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.base.IndexedTag;
-import org.tbk.nostr.base.Metadata;
-import org.tbk.nostr.base.SubscriptionId;
+import org.tbk.nostr.base.*;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
@@ -20,7 +17,6 @@ import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.config.NostrRelayProperties;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
-import org.tbk.nostr.util.MoreKinds;
 import org.tbk.nostr.util.MoreSubscriptionIds;
 import org.tbk.nostr.util.MoreTags;
 
@@ -237,9 +233,9 @@ class NostrRelaySpecTest {
         Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
                 .addTags(MoreTags.a("")));
         Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1")
-                .addTags(MoreTags.a(MoreKinds.minValue() - 1, signer.getPublicKey())));
+                .addTags(MoreTags.a(Kind.minValue() - 1, signer.getPublicKey())));
         Event invalidEvent2 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM2")
-                .addTags(MoreTags.a(MoreKinds.maxValue() + 1, signer.getPublicKey())));
+                .addTags(MoreTags.a(Kind.maxValue() + 1, signer.getPublicKey())));
         Event invalidEvent3 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM3")
                 .addTags(MoreTags.a("", signer.getPublicKey().value.toHex())));
         Event invalidEvent4 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM4")
@@ -371,7 +367,7 @@ class NostrRelaySpecTest {
         Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
                 .addTags(MoreTags.named("e", "00".repeat(32)))
                 .addTags(MoreTags.named("e", "00".repeat(32)))
-                .addTags(MoreTags.named("a", "%d:%s".formatted(MoreKinds.maxValue(), signer.getPublicKey().value.toHex())))
+                .addTags(MoreTags.named("a", "%d:%s".formatted(Kind.maxValue(), signer.getPublicKey().value.toHex())))
                 .addTags(MoreTags.named("any", "1"))
                 .addTags(MoreTags.named("any", "2"))
                 .addTags(MoreTags.named("any", "3"))

@@ -3,10 +3,10 @@ package org.tbk.nostr.relay.validation;
 import org.springframework.validation.Errors;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.EventUri;
+import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
-import org.tbk.nostr.util.MoreKinds;
 import org.tbk.nostr.util.MorePublicKeys;
 
 import java.util.HexFormat;
@@ -17,7 +17,7 @@ public class DefaultEventValidator implements EventValidator {
         if (event.getId().size() != 32) {
             errors.rejectValue("id", "event.id.invalid", "Invalid id.");
         }
-        if (!MoreKinds.isValidKind(event.getKind())) {
+        if (!Kind.isValidKind(event.getKind())) {
             errors.rejectValue("kind", "event.kind.invalid", "Invalid kind.");
         }
         if (event.getCreatedAt() < 0L) {
