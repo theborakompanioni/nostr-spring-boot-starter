@@ -26,9 +26,9 @@ public interface NostrWebSocketSession extends WebSocketSession {
 
     void sendResponseImmediately(Response message) throws IOException;
 
-    boolean isAuthenticated();
+    Optional<Principal> getAuthentication();
 
-    void setAuthentication(Principal authenticated);
+    void setAuthentication(Principal principal);
 
     default void clearAuthentication() {
         setAuthentication(null);

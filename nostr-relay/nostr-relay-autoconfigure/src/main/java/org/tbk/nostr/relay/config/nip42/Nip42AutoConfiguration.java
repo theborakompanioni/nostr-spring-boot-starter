@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.tbk.nostr.relay.config.NostrRelayAutoConfiguration;
 import org.tbk.nostr.relay.handler.AuthRequestHandler;
@@ -48,8 +49,8 @@ class Nip42AutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(AuthRequestHandler.class)
-    AuthRequestHandler simpleAuthRequestHandler(Nip42Support nip42Support) {
-        return new SimpleAuthRequestHandler(nip42Support);
+    AuthRequestHandler simpleAuthRequestHandler(Nip42Support nip42Support, ApplicationEventPublisher eventPublisher) {
+        return new SimpleAuthRequestHandler(nip42Support, eventPublisher);
     }
 
     @Bean

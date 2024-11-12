@@ -25,12 +25,12 @@ public class SimpleNip42Support implements Nip42Support {
     }
 
     @Override
-    public Mono<Boolean> needsAuthentication(NostrRequestContext context, Request request) {
+    public Mono<Boolean> requiresAuthentication(NostrRequestContext context, Request request) {
         return Mono.just(true);
     }
 
     @Override
-    public Mono<Authentication> handleAuthEvent(NostrRequestContext context, Event authEvent) {
+    public Mono<Authentication> attemptAuthentication(NostrRequestContext context, Event authEvent) {
         return Mono.defer(() -> {
             String expectedChallenge = context.getAuthenticationChallenge()
                     .orElseThrow(() -> new IllegalStateException("No auth challenge associated."));

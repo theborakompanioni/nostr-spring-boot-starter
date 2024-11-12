@@ -7,8 +7,6 @@ import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.nip42.Nip42Support;
 
-import java.util.Optional;
-
 @Slf4j
 @RequiredArgsConstructor
 public class SimpleAuthenticationInterceptor implements AuthenticationInterceptor {
@@ -18,7 +16,7 @@ public class SimpleAuthenticationInterceptor implements AuthenticationIntercepto
 
     @Override
     public boolean preHandleUnauthenticated(NostrRequestContext context, Request request) {
-        if (Boolean.FALSE.equals(nip42Support.needsAuthentication(context, request).block())) {
+        if (Boolean.FALSE.equals(nip42Support.requiresAuthentication(context, request).block())) {
             return true;
         }
 

@@ -17,9 +17,11 @@ import org.tbk.nostr.relay.handler.ConnectionEstablishedHandler;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -126,7 +128,7 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
 
         @Override
         public boolean isAuthenticated() {
-            return getSession().isAuthenticated();
+            return getSession().getAuthentication().isPresent();
         }
 
         @Override
@@ -178,8 +180,9 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
         }
 
         @Override
-        public boolean isAuthenticated() {
-            return getAttributes().get("nip42_auth") != null;
+        public Optional<Principal> getAuthentication() {
+            return Optional.ofNullable(getAttributes().get("nip42_auth"))
+                    .map(Principal.class::cast);
         }
 
         @Override

@@ -12,7 +12,7 @@ public interface Nip42Support {
 
     String createNewChallenge(NostrWebSocketSession session);
 
-    Mono<Authentication> handleAuthEvent(NostrRequestContext context, Event authEvent);
+    Mono<Authentication> attemptAuthentication(NostrRequestContext context, Event authEvent);
 
-    Mono<Boolean> needsAuthentication(NostrRequestContext context, Request request);
+    Mono<Boolean> requiresAuthentication(NostrRequestContext context, Request request);
 }

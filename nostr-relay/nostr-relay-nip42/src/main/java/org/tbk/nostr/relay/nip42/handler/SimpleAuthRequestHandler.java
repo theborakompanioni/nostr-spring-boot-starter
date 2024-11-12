@@ -2,6 +2,8 @@ package org.tbk.nostr.relay.nip42.handler;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.tbk.nostr.nips.Nip42;
 import org.tbk.nostr.proto.AuthRequest;
 import org.tbk.nostr.proto.Event;
@@ -16,6 +18,9 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
 
     @NonNull
     private final Nip42Support nip42Support;
+
+    @NonNull
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void handleAuthMessage(NostrRequestContext context, AuthRequest request) {
@@ -32,7 +37,7 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
             return;
         }
 
-        nip42Support.handleAuthEvent(context, authEvent)
+        nip42Support.attemptAuthentication(context, authEvent)
                 .subscribe(authentication -> {
                     context.setAuthentication(authentication);
 
@@ -42,6 +47,8 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
                                     .setSuccess(true)
                                     .build())
                             .build());
+
+                    this.eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()));
                 }, e -> {
                     context.clearAuthentication();
 
