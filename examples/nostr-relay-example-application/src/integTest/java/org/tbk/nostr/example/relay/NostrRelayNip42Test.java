@@ -14,6 +14,7 @@ import org.tbk.nostr.proto.*;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreSubscriptionIds;
+import org.tbk.nostr.util.MoreTags;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -217,6 +218,187 @@ class NostrRelayNip42Test {
     }
 
     @Test
+    void itShouldVerifyErrorOnInvalidAuthEvent0NoChallengeAssociated() {
+        Signer signer = SimpleSigner.random();
+
+        Event authEvent = MoreEvents.finalize(signer, Nip42.createAuthEvent(signer.getPublicKey(),
+                "challengestringhere",
+                nostrClient.getRelayUri()));
+
+        List<Response> response = requireNonNull(nostrClient.attach()
+                .doOnSubscribe(foo -> {
+                    nostrClient.auth(authEvent).subscribe().dispose();
+                })
+                .bufferTimeout(1, Duration.ofSeconds(3))
+                .defaultIfEmpty(Collections.emptyList())
+                .blockFirst(Duration.ofSeconds(5)));
+
+        OkResponse ok = response.stream()
+                .filter(it -> it.getKindCase() == Response.KindCase.OK)
+                .map(Response::getOk)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(ok.getEventId(), is(authEvent.getId()));
+        assertThat(ok.getSuccess(), is(false));
+        assertThat(ok.getMessage(), is("error: No auth challenge associated."));
+    }
+
+    @Test
+    void itShouldVerifyErrorOnInvalidAuthEvent1UnknownChallenge() {
+        Signer signer = SimpleSigner.random();
+
+        Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM0");
+
+        List<Response> response0 = requireNonNull(nostrClient.attach()
+                .doOnSubscribe(foo -> {
+                    nostrClient.send(event0).subscribe().dispose();
+                })
+                .bufferTimeout(2, Duration.ofSeconds(3))
+                .defaultIfEmpty(Collections.emptyList())
+                .blockFirst(Duration.ofSeconds(5)));
+
+        OkResponse ok0 = response0.stream()
+                .filter(it -> it.getKindCase() == Response.KindCase.OK)
+                .map(Response::getOk)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(ok0.getEventId(), is(event0.getId()));
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), startsWith("auth-required:"));
+
+        AuthResponse auth0 = response0.stream()
+                .filter(it -> it.getKindCase() == Response.KindCase.AUTH)
+                .map(Response::getAuth)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(auth0.getChallenge(), is(notNullValue()));
+
+        Event authEvent = MoreEvents.finalize(signer, Nip42.createAuthEvent(signer.getPublicKey(),
+                "00" + auth0.getChallenge(),
+                nostrClient.getRelayUri()));
+
+        List<Response> response1 = requireNonNull(nostrClient.attach()
+                .doOnSubscribe(foo -> {
+                    nostrClient.auth(authEvent).subscribe().dispose();
+                })
+                .bufferTimeout(1, Duration.ofSeconds(3))
+                .defaultIfEmpty(Collections.emptyList())
+                .blockFirst(Duration.ofSeconds(5)));
+
+        OkResponse ok1 = response1.stream()
+                .filter(it -> it.getKindCase() == Response.KindCase.OK)
+                .map(Response::getOk)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(ok1.getEventId(), is(authEvent.getId()));
+        assertThat(ok1.getSuccess(), is(false));
+        assertThat(ok1.getMessage(), is("error: Not authenticated."));
+    }
+
+    @Test
+    void itShouldVerifyErrorOnInvalidAuthEvent2InvalidKind() {
+        Signer signer = SimpleSigner.random();
+
+        Event authEvent = MoreEvents.finalize(signer, Nip42.createAuthEvent(signer.getPublicKey(),
+                        "challengestringhere",
+                        nostrClient.getRelayUri())
+                .setKind(Nip42.kind().getValue() + 1));
+
+        List<Response> response = requireNonNull(nostrClient.attach()
+                .doOnSubscribe(foo -> {
+                    nostrClient.auth(authEvent).subscribe().dispose();
+                })
+                .bufferTimeout(1, Duration.ofSeconds(3))
+                .defaultIfEmpty(Collections.emptyList())
+                .blockFirst(Duration.ofSeconds(5)));
+
+        OkResponse ok = response.stream()
+                .filter(it -> it.getKindCase() == Response.KindCase.OK)
+                .map(Response::getOk)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(ok.getEventId(), is(authEvent.getId()));
+        assertThat(ok.getSuccess(), is(false));
+        assertThat(ok.getMessage(), is("invalid: Kind must be 22242"));
+    }
+
+    @Test
+    void itShouldVerifyErrorOnInvalidAuthEvent2MissingTags() {
+        Signer signer = SimpleSigner.random();
+
+        Event authEvent = MoreEvents.finalize(signer, Nip42.createAuthEvent(signer.getPublicKey(),
+                        "challengestringhere",
+                        nostrClient.getRelayUri())
+                .clearTags());
+
+        List<Response> response = requireNonNull(nostrClient.attach()
+                .doOnSubscribe(foo -> {
+                    nostrClient.auth(authEvent).subscribe().dispose();
+                })
+                .bufferTimeout(1, Duration.ofSeconds(3))
+                .defaultIfEmpty(Collections.emptyList())
+                .blockFirst(Duration.ofSeconds(5)));
+
+        OkResponse ok = response.stream()
+                .filter(it -> it.getKindCase() == Response.KindCase.OK)
+                .map(Response::getOk)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(ok.getEventId(), is(authEvent.getId()));
+        assertThat(ok.getSuccess(), is(false));
+        assertThat(ok.getMessage(), is("invalid: Missing 'challenge' tag."));
+    }
+
+    @Test
+    void itShouldVerifyErrorOnInvalidAuthEvent3InvalidSig() {
+        Signer signer = SimpleSigner.random();
+
+        Event.Builder authEventBuilder = Nip42.createAuthEvent(signer.getPublicKey(),
+                "challengestringhere",
+                nostrClient.getRelayUri());
+        Event verifiedEvent0 = MoreEvents.verifySignature(MoreEvents.finalize(signer, authEventBuilder));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent0), is(true));
+
+        Event verifiedEvent1 = MoreEvents.verifySignature(MoreEvents.finalize(signer, Nip42.createAuthEvent(signer.getPublicKey(),
+                Nip42.getChallenge(authEventBuilder) + "!",
+                nostrClient.getRelayUri())));
+        assertThat("sanity check", MoreEvents.hasValidSignature(verifiedEvent1), is(true));
+
+        assertThat("sanity check - id differs", verifiedEvent1.getId(), not(is(verifiedEvent0.getId())));
+        assertThat("sanity check - sig differs", verifiedEvent1.getSig(), not(is(verifiedEvent0.getSig())));
+
+        Event invalidEvent = verifiedEvent1.toBuilder()
+                .setSig(verifiedEvent0.getSig())
+                .build();
+
+        assertThat(MoreEvents.hasValidSignature(invalidEvent), is(false));
+
+        List<Response> response = requireNonNull(nostrClient.attach()
+                .doOnSubscribe(foo -> {
+                    nostrClient.auth(invalidEvent).subscribe().dispose();
+                })
+                .bufferTimeout(1, Duration.ofSeconds(3))
+                .defaultIfEmpty(Collections.emptyList())
+                .blockFirst(Duration.ofSeconds(5)));
+
+        OkResponse ok = response.stream()
+                .filter(it -> it.getKindCase() == Response.KindCase.OK)
+                .map(Response::getOk)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(ok.getEventId(), is(invalidEvent.getId()));
+        assertThat(ok.getSuccess(), is(false));
+        assertThat(ok.getMessage(), is("invalid: Invalid signature."));
+    }
+
+    @Test
     void itShouldAuthenticateSuccessfully0() {
         Signer signer = SimpleSigner.random();
 
@@ -278,7 +460,6 @@ class NostrRelayNip42Test {
                 .bufferTimeout(1, Duration.ofSeconds(3))
                 .defaultIfEmpty(Collections.emptyList())
                 .blockFirst(Duration.ofSeconds(5)));
-
 
         OkResponse ok2 = response2.stream()
                 .filter(it -> it.getKindCase() == Response.KindCase.OK)

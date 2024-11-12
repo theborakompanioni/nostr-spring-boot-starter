@@ -2,27 +2,17 @@ package org.tbk.nostr.relay.nip42.handler;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.BindException;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
 import org.tbk.nostr.nips.Nip42;
-import org.tbk.nostr.proto.*;
+import org.tbk.nostr.proto.AuthRequest;
+import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.OkResponse;
+import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.handler.AuthRequestHandler;
 import org.tbk.nostr.relay.nip42.Nip42Support;
-import org.tbk.nostr.relay.validation.DefaultEventValidator;
-import org.tbk.nostr.relay.validation.EventValidator;
-
-import java.util.List;
-import java.util.Locale;
 
 @RequiredArgsConstructor
 public class SimpleAuthRequestHandler implements AuthRequestHandler {
-
-    private static final List<EventValidator> validators = List.of(
-            new DefaultEventValidator(),
-            new AuthEventValidator()
-    );
 
     @NonNull
     private final Nip42Support nip42Support;
@@ -31,13 +21,12 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
     public void handleAuthMessage(NostrRequestContext context, AuthRequest request) {
         Event authEvent = request.getEvent();
 
-        BindException errors = validateAuthEvent(authEvent);
-        if (errors.hasErrors()) {
+        if (authEvent.getKind() != Nip42.kind().getValue()) {
             context.add(Response.newBuilder()
                     .setOk(OkResponse.newBuilder()
                             .setEventId(authEvent.getId())
                             .setSuccess(false)
-                            .setMessage("error: %s".formatted(errors.getMessage()))
+                            .setMessage("invalid: Kind must be %d".formatted(Nip42.kind().getValue()))
                             .build())
                     .build());
             return;
@@ -76,26 +65,4 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
                 });
     }
 
-    private static BindException validateAuthEvent(Event authEvent) {
-        BindException errors = new BindException(authEvent, "event");
-        for (EventValidator validator : validators) {
-            ValidationUtils.invokeValidator(validator, authEvent, errors);
-
-            if (errors.hasErrors()) {
-                break;
-            }
-        }
-        return errors;
-    }
-
-    private static class AuthEventValidator implements EventValidator {
-
-        @Override
-        public void validateEvent(Event authEvent, Errors errors) {
-            if (authEvent.getKind() != Nip42.kind().getValue()) {
-                String errorMessage = "Kind must be %d".formatted(Nip42.kind().getValue());
-                errors.rejectValue("kind", "kind.invalid", errorMessage);
-            }
-        }
-    }
 }

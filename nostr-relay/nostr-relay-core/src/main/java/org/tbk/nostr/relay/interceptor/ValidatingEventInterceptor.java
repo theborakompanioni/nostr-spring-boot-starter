@@ -4,15 +4,15 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BindException;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.ValidationUtils;
-import org.tbk.nostr.proto.*;
+import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.OkResponse;
+import org.tbk.nostr.proto.Request;
+import org.tbk.nostr.proto.Response;
 import org.tbk.nostr.relay.NostrRequestContext;
 import org.tbk.nostr.relay.validation.EventValidator;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,15 +28,14 @@ public class ValidatingEventInterceptor implements RequestHandlerInterceptor {
 
     @Override
     public boolean preHandle(NostrRequestContext context, Request request) {
-        if (request.getKindCase() == Request.KindCase.EVENT) {
-            return handleEventMessage(context, request.getEvent());
-        }
-
-        return true;
+        return switch (request.getKindCase()) {
+            case Request.KindCase.EVENT -> handleEventMessage(context, request.getEvent().getEvent());
+            case Request.KindCase.AUTH -> handleEventMessage(context, request.getAuth().getEvent());
+            default -> true;
+        };
     }
 
-    private boolean handleEventMessage(NostrRequestContext context, EventRequest request) {
-        Event event = request.getEvent();
+    private boolean handleEventMessage(NostrRequestContext context, Event event) {
         BindException errors = new BindException(event, "event");
 
         for (EventValidator validator : validators) {
@@ -55,7 +54,6 @@ public class ValidatingEventInterceptor implements RequestHandlerInterceptor {
         String message = errors.getAllErrors().stream().findFirst()
                 .map(it -> messageSource.getMessage(it, Locale.getDefault()))
                 .orElse("Invalid event.");
-
 
         log.debug("Validation of event {} failed: {}", event.getId(), message);
 

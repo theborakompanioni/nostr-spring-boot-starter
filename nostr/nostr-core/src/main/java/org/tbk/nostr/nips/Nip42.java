@@ -5,6 +5,7 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
@@ -28,6 +29,10 @@ public final class Nip42 {
         return AUTH_EVENT_KIND;
     }
 
+    public static boolean isAuthEvent(EventOrBuilder event) {
+        return event.getKind() == AUTH_EVENT_KIND.getValue();
+    }
+
     public static TagValue challenge(String challenge) {
         return MoreTags.named(CHALLENGE_TAG_NAME, challenge);
     }
@@ -36,13 +41,13 @@ public final class Nip42 {
         return MoreTags.named(RELAY_TAG_NAME, relayUri.getUri().toString());
     }
 
-    public static Optional<String> getChallenge(Event event) {
+    public static Optional<String> getChallenge(EventOrBuilder event) {
         return MoreTags.findByNameSingle(event, CHALLENGE_TAG_NAME)
                 .filter(it -> it.getValuesCount() > 0)
                 .map(it -> it.getValues(0));
     }
 
-    public static Optional<RelayUri> getRelay(Event event) {
+    public static Optional<RelayUri> getRelay(EventOrBuilder event) {
         return MoreTags.findByNameSingle(event, RELAY_TAG_NAME)
                 .filter(it -> it.getValuesCount() > 0)
                 .map(it -> RelayUri.of(it.getValues(0)));

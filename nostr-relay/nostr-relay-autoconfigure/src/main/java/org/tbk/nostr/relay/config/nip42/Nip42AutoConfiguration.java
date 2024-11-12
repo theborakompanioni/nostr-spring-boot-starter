@@ -17,6 +17,7 @@ import org.tbk.nostr.relay.nip42.handler.SimpleAuthRequestHandler;
 import org.tbk.nostr.relay.nip42.impl.SimpleNip42Support;
 import org.tbk.nostr.relay.nip42.interceptor.AuthenticationInterceptor;
 import org.tbk.nostr.relay.nip42.interceptor.SimpleAuthenticationInterceptor;
+import org.tbk.nostr.relay.nip42.validation.AuthEventValidator;
 
 @AutoConfiguration
 @AutoConfigureBefore(NostrRelayAutoConfiguration.class)
@@ -38,6 +39,11 @@ class Nip42AutoConfiguration {
     @Bean
     AuthConnectionEstablishedHandler authConnectionEstablishedHandler(Nip42Support nip42Support) {
         return new AuthConnectionEstablishedHandler(nip42Support);
+    }
+
+    @Bean
+    AuthEventValidator authEventValidator() {
+        return new AuthEventValidator();
     }
 
     @Bean
