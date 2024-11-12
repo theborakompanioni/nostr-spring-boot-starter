@@ -36,6 +36,8 @@ public interface NostrTemplate {
 
     Flux<CountResult> countEvents(CountRequest request);
 
+    Mono<OkResponse> auth(Event event);
+
     default Mono<OkResponse> send(Event event) {
         return send(Collections.singleton(event)).next();
     }

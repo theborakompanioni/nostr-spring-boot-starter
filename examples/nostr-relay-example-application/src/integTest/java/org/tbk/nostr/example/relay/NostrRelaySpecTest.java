@@ -15,6 +15,7 @@ import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.nips.Nip13;
+import org.tbk.nostr.nips.Nip42;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.relay.config.NostrRelayProperties;
 import org.tbk.nostr.template.NostrTemplate;
@@ -1213,5 +1214,22 @@ class NostrRelaySpecTest {
         assertThat(response.getKindCase(), is(Response.KindCase.CLOSED));
         assertThat(response.getClosed().getSubscriptionId(), is(subscriptionId.getId()));
         assertThat(response.getClosed().getMessage(), is(""));
+    }
+
+    @Test
+    void itShouldVerifyErrorResponseIfAuthIsNotSupported() {
+        Signer signer = SimpleSigner.random();
+
+        Event authEvent = MoreEvents.finalize(signer, Nip42.createAuthEvent(signer.getPublicKey(),
+                "challengestringhere",
+                nostrTemplate.getRelayUri()));
+
+        OkResponse response = nostrTemplate.auth(authEvent)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(response.getEventId(), is(authEvent.getId()));
+        assertThat(response.getSuccess(), is(false));
+        assertThat(response.getMessage(), is("error: AUTH is not supported."));
     }
 }

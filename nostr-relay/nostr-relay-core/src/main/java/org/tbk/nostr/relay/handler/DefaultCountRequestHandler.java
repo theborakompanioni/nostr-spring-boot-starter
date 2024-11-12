@@ -12,7 +12,7 @@ public class DefaultCountRequestHandler implements CountRequestHandler {
         context.add(Response.newBuilder()
                 .setClosed(ClosedResponse.newBuilder()
                         .setSubscriptionId(count.getId())
-                        .setMessage("COUNT ist not supported.")
+                        .setMessage("error: COUNT is not supported.")
                         .build())
                 .build());
     }

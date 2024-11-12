@@ -180,9 +180,9 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     public Flux<Response> fetch(ReqRequest request) {
-        return sendPlain(JsonWriter.toJson(Request.newBuilder()
+        return sendAndAttach(Request.newBuilder()
                 .setReq(request)
-                .build()))
+                .build())
                 .handle(filterSubscriptionResponses(SubscriptionId.of(request.getId())))
                 .map(verifyEventSignature())
                 .takeUntil(it -> Response.KindCase.EOSE.equals(it.getKindCase()) || Response.KindCase.CLOSED.equals(it.getKindCase()));
@@ -257,6 +257,18 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     @Override
+    public Mono<OkResponse> auth(Event event) {
+        return sendAndAttach(Request.newBuilder()
+                .setAuth(AuthRequest.newBuilder()
+                        .setEvent(event)
+                        .build())
+                .build())
+                .filter(it -> it.getKindCase() == Response.KindCase.OK)
+                .map(Response::getOk)
+                .next();
+    }
+
+    @Override
     public Flux<OkResponse> send(Collection<Event> eventList) {
         Set<Event> events = Set.copyOf(eventList);
 
@@ -279,7 +291,15 @@ public class SimpleNostrTemplate implements NostrTemplate {
 
     @Override
     public Flux<Response> sendAndCollect(Collection<Event> events) {
-        return sendPlain(toJsonMessages(events));
+        return sendAndAttach(toEventRequest(events));
+    }
+
+    private  Flux<Response> sendAndAttach(Request request) {
+        return sendAndAttach(Collections.singleton(request));
+    }
+
+    private  Flux<Response> sendAndAttach(Collection<Request> requests) {
+        return sendPlain(requests.stream().map(JsonWriter::toJson).toList());
     }
 
     @Override
@@ -338,15 +358,18 @@ public class SimpleNostrTemplate implements NostrTemplate {
         );
     }
 
-    private static List<String> toJsonMessages(Collection<Event> events) {
+    private static List<Request> toEventRequest(Collection<Event> events) {
         return events.stream()
-                .map(it -> Request.newBuilder()
-                        .setEvent(EventRequest.newBuilder()
-                                .setEvent(it)
-                                .build())
-                        .build())
-                .map(JsonWriter::toJson)
+                .map(SimpleNostrTemplate::toEventRequest)
                 .toList();
+    }
+
+    private static Request toEventRequest(Event event) {
+        return Request.newBuilder()
+                .setEvent(EventRequest.newBuilder()
+                        .setEvent(event)
+                        .build())
+                .build();
     }
 
     private static BiConsumer<Response, SynchronousSink<Response>> filterSubscriptionResponses(SubscriptionId subscriptionId) {
