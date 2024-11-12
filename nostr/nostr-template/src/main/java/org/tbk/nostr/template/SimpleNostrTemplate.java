@@ -3,7 +3,6 @@ package org.tbk.nostr.template;
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.socket.CloseStatus;
@@ -26,6 +25,7 @@ import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.util.MoreEvents;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SynchronousSink;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLException;
@@ -39,8 +39,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -183,7 +183,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
         return sendPlain(JsonWriter.toJson(Request.newBuilder()
                 .setReq(request)
                 .build()))
-                .filter(matchingSubscriptionId(request))
+                .handle(filterSubscriptionResponses(SubscriptionId.of(request.getId())))
                 .map(verifyEventSignature())
                 .takeUntil(it -> Response.KindCase.EOSE.equals(it.getKindCase()) || Response.KindCase.CLOSED.equals(it.getKindCase()));
     }
@@ -349,35 +349,21 @@ public class SimpleNostrTemplate implements NostrTemplate {
                 .toList();
     }
 
-    private static Predicate<Response> matchingSubscriptionId(ReqRequest request) {
-        return it -> {
-            if (Response.KindCase.EVENT.equals(it.getKindCase())) {
-                EventResponse eventResponse = it.getEvent();
-                if (!eventResponse.getSubscriptionId().equals(request.getId())) {
-                    log.warn("{} on unexpected subscription received. Ignoring.", it.getKindCase());
-                    return false;
-                }
-            } else if (Response.KindCase.EOSE.equals(it.getKindCase())) {
-                EoseResponse eoseResponse = it.getEose();
-                if (!eoseResponse.getSubscriptionId().equals(request.getId())) {
-                    log.warn("{} on unexpected subscription received. Ignoring.", it.getKindCase());
-                    return false;
-                }
-            } else if (Response.KindCase.CLOSED.equals(it.getKindCase())) {
-                ClosedResponse closedResponse = it.getClosed();
-                if (!closedResponse.getSubscriptionId().equals(request.getId())) {
-                    log.warn("{} on unexpected subscription received. Ignoring.", it.getKindCase());
-                    return false;
-                }
-            } else if (Response.KindCase.COUNT.equals(it.getKindCase())) {
-                CountResponse countResponse = it.getCount();
-                if (!countResponse.getSubscriptionId().equals(request.getId())) {
-                    log.warn("{} on unexpected subscription received. Ignoring.", it.getKindCase());
-                    return false;
-                }
-            }
+    private static BiConsumer<Response, SynchronousSink<Response>> filterSubscriptionResponses(SubscriptionId subscriptionId) {
+        return (it, sink) -> {
+            boolean apply = Optional.ofNullable(switch (it.getKindCase()) {
+                        case CLOSED -> it.getClosed().getSubscriptionId();
+                        case EOSE -> it.getEose().getSubscriptionId();
+                        case EVENT -> it.getEvent().getSubscriptionId();
+                        case COUNT -> it.getCount().getSubscriptionId();
+                        default -> null;
+                    }).map(SubscriptionId::of)
+                    .map(subId -> subId.equals(subscriptionId))
+                    .orElse(true);
 
-            return true;
+            if (apply) {
+                sink.next(it);
+            }
         };
     }
 

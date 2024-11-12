@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
@@ -157,9 +158,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
                                 sink.next(it);
                             }
                         }
-                        default -> {
-                            sink.next(it);
-                        }
+                        default -> sink.next(it);
                     }
                 });
     }
@@ -170,41 +169,6 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
 
         return Flux.<TextMessage>from(s -> publisher.subscribe(FlowAdapters.toFlowSubscriber(s)))
                 .map(it -> JsonReader.fromJson(it.getPayload(), Response.newBuilder()));
-    }
-
-
-    private static BiConsumer<Response, SynchronousSink<Response>> filterSubscriptionResponses(SubscriptionId id) {
-        return (it, sink) -> {
-            switch (it.getKindCase()) {
-                case CLOSED -> {
-                    SubscriptionId subscriptionId = SubscriptionId.of(it.getClosed().getSubscriptionId());
-                    if (subscriptionId.equals(id)) {
-                        sink.next(it);
-                    }
-                }
-                case EOSE -> {
-                    SubscriptionId subscriptionId = SubscriptionId.of(it.getEose().getSubscriptionId());
-                    if (subscriptionId.equals(id)) {
-                        sink.next(it);
-                    }
-                }
-                case EVENT -> {
-                    SubscriptionId subscriptionId = SubscriptionId.of(it.getEvent().getSubscriptionId());
-                    if (subscriptionId.equals(id)) {
-                        sink.next(it);
-                    }
-                }
-                case COUNT -> {
-                    SubscriptionId subscriptionId = SubscriptionId.of(it.getCount().getSubscriptionId());
-                    if (subscriptionId.equals(id)) {
-                        sink.next(it);
-                    }
-                }
-                default -> {
-                    sink.next(it);
-                }
-            }
-        };
     }
 
     @Override
@@ -440,5 +404,23 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
             log.debug("Connection closed to {}: {}", session.getRemoteAddress(), status);
             onConnectionClosed.accept(status);
         }
+    }
+
+    private static BiConsumer<Response, SynchronousSink<Response>> filterSubscriptionResponses(SubscriptionId subscriptionId) {
+        return (it, sink) -> {
+            boolean apply = Optional.ofNullable(switch (it.getKindCase()) {
+                        case CLOSED -> it.getClosed().getSubscriptionId();
+                        case EOSE -> it.getEose().getSubscriptionId();
+                        case EVENT -> it.getEvent().getSubscriptionId();
+                        case COUNT -> it.getCount().getSubscriptionId();
+                        default -> null;
+                    })
+                    .map(subId -> subId.equals(subscriptionId.getId()))
+                    .orElse(true);
+
+            if (apply) {
+                sink.next(it);
+            }
+        };
     }
 }
