@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Ability to easily send auth event with `NostrTemplate`
+- nip42: authentication of clients to relays
 
 ## [0.0.2] - 2024-11-01
 

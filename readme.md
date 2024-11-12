@@ -19,6 +19,7 @@ need to write scalable and efficient solutions effortlessly.
 - [x] [NIP-13](https://github.com/nostr-protocol/nips/blob/master/13.md)
 - [x] [NIP-24](https://github.com/nostr-protocol/nips/blob/master/24.md)
 - [x] [NIP-40](https://github.com/nostr-protocol/nips/blob/master/40.md)
+- [x] [NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md)
 - [x] [NIP-50](https://github.com/nostr-protocol/nips/blob/master/50.md)
 
 Planned:
