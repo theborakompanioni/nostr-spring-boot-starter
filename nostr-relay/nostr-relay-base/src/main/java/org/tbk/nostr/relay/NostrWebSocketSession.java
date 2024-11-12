@@ -5,6 +5,8 @@ import org.springframework.web.socket.WebSocketSession;
 import org.tbk.nostr.proto.Response;
 
 import java.io.IOException;
+import java.security.Principal;
+import java.util.Optional;
 
 public interface NostrWebSocketSession extends WebSocketSession {
 
@@ -26,7 +28,15 @@ public interface NostrWebSocketSession extends WebSocketSession {
 
     boolean isAuthenticated();
 
-    void setAuthenticated(boolean authenticated);
+    void setAuthentication(Principal authenticated);
+
+    default void clearAuthentication() {
+        setAuthentication(null);
+    }
+
+    void setAuthenticationChallenge(String challenge);
+
+    Optional<String> getAuthenticationChallenge();
 
     record SessionId(@NonNull String id) {
     }

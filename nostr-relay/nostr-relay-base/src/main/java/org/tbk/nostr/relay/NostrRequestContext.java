@@ -3,6 +3,7 @@ package org.tbk.nostr.relay;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Response;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -16,10 +17,15 @@ public interface NostrRequestContext {
 
     Optional<Event> getHandledEvent();
 
+    Optional<String> getAuthenticationChallenge();
+
+    void setAuthenticationChallenge(String challenge);
+
     boolean isAuthenticated();
 
-    // TODO: move this one level up
-    Optional<byte[]> getAuthChallenge();
+    void setAuthentication(Principal principal);
 
-    byte[] getOrComputeAuthChallenge(Function<NostrRequestContext, byte[]> factory);
+    default void clearAuthentication() {
+        setAuthentication(null);
+    }
 }

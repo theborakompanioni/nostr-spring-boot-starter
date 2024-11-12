@@ -241,7 +241,7 @@ class NostrRelayNip42Test {
 
         assertThat(ok.getEventId(), is(authEvent.getId()));
         assertThat(ok.getSuccess(), is(false));
-        assertThat(ok.getMessage(), is("error: No auth challenge associated."));
+        assertThat(ok.getMessage(), is("error: Unknown auth challenge."));
     }
 
     @Test
@@ -296,7 +296,7 @@ class NostrRelayNip42Test {
 
         assertThat(ok1.getEventId(), is(authEvent.getId()));
         assertThat(ok1.getSuccess(), is(false));
-        assertThat(ok1.getMessage(), is("error: Not authenticated."));
+        assertThat(ok1.getMessage(), is("error: Unknown auth challenge."));
     }
 
     @Test

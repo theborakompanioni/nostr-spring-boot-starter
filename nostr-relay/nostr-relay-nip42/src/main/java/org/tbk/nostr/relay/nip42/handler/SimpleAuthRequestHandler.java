@@ -33,27 +33,17 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
         }
 
         nip42Support.handleAuthEvent(context, authEvent)
-                .subscribe(authenticated -> {
-                    context.getSession().setAuthenticated(authenticated);
+                .subscribe(authentication -> {
+                    context.setAuthentication(authentication);
 
-                    if (authenticated) {
-                        context.add(Response.newBuilder()
-                                .setOk(OkResponse.newBuilder()
-                                        .setEventId(authEvent.getId())
-                                        .setSuccess(true)
-                                        .build())
-                                .build());
-                    } else {
-                        context.add(Response.newBuilder()
-                                .setOk(OkResponse.newBuilder()
-                                        .setEventId(authEvent.getId())
-                                        .setSuccess(false)
-                                        .setMessage("error: Not authenticated.")
-                                        .build())
-                                .build());
-                    }
+                    context.add(Response.newBuilder()
+                            .setOk(OkResponse.newBuilder()
+                                    .setEventId(authEvent.getId())
+                                    .setSuccess(true)
+                                    .build())
+                            .build());
                 }, e -> {
-                    context.getSession().setAuthenticated(false);
+                    context.clearAuthentication();
 
                     context.add(Response.newBuilder()
                             .setOk(OkResponse.newBuilder()

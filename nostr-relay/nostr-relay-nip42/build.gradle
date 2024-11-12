@@ -11,5 +11,7 @@ dependencies {
     // Consider moving it to an own package, e.g. nostr-event-validation
     api project(':nostr-relay:nostr-relay-core')
 
+    compileOnly 'org.springframework.security:spring-security-core'
+
     api 'io.projectreactor:reactor-core'
 }

@@ -16,6 +16,7 @@ import org.tbk.nostr.relay.handler.ConnectionClosedHandler;
 import org.tbk.nostr.relay.handler.ConnectionEstablishedHandler;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
@@ -128,20 +129,19 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
             return getSession().isAuthenticated();
         }
 
-        // TODO: move this one level up
         @Override
-        public Optional<byte[]> getAuthChallenge() {
-            return Optional.ofNullable(getSession().getAttributes().get("nip42_challenge"))
-                    .map(String::valueOf)
-                    .map(it -> HexFormat.of().parseHex(it));
+        public void setAuthentication(Principal principal) {
+            getSession().setAuthentication(principal);
         }
 
         @Override
-        public byte[] getOrComputeAuthChallenge(Function<NostrRequestContext, byte[]> factory) {
-            String challengeHex = String.valueOf(getSession().getAttributes().computeIfAbsent("nip42_challenge", foo ->
-                    HexFormat.of().formatHex(factory.apply(this))));
+        public Optional<String> getAuthenticationChallenge() {
+            return getSession().getAuthenticationChallenge();
+        }
 
-            return HexFormat.of().parseHex(challengeHex);
+        @Override
+        public void setAuthenticationChallenge(String challenge) {
+            getSession().setAuthenticationChallenge(challenge);
         }
     }
 
@@ -179,12 +179,30 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
 
         @Override
         public boolean isAuthenticated() {
-            return Boolean.TRUE.equals(getAttributes().get("nip42_auth"));
+            return getAttributes().get("nip42_auth") != null;
         }
 
         @Override
-        public void setAuthenticated(boolean authenticated) {
-            getAttributes().put("nip42_auth", authenticated);
+        public void setAuthentication(Principal principal) {
+            if (principal == null) {
+                getAttributes().remove("nip42_auth");
+            } else {
+                getAttributes().put("nip42_auth", principal);
+            }
+        }
+
+        @Override
+        public Optional<String> getAuthenticationChallenge() {
+            return Optional.ofNullable(getAttributes().get("nip42_challenge")).map(String::valueOf);
+        }
+
+        @Override
+        public void setAuthenticationChallenge(String challenge) {
+            if (challenge == null) {
+                getAttributes().remove("nip42_challenge");
+            } else {
+                getAttributes().put("nip42_challenge", challenge);
+            }
         }
 
         private boolean queueMessage(WebSocketMessage<?> message) {
