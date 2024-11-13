@@ -3,6 +3,7 @@ package org.tbk.nostr.util;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.IndexedTag;
+import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nips.Nip10;
 import org.tbk.nostr.nips.Nip13;
@@ -105,6 +106,9 @@ public final class MoreTags {
         return named(IndexedTag.d.name(), values);
     }
 
+    public static TagValue p(Event event) {
+        return p(MorePublicKeys.fromEvent(event));
+    }
 
     public static TagValue p(XonlyPublicKey publicKey) {
         return named(IndexedTag.p.name(), publicKey.value.toHex());
@@ -142,6 +146,18 @@ public final class MoreTags {
      */
     public static TagValue a(String... values) {
         return named(IndexedTag.a.name(), values);
+    }
+
+    public static TagValue k(Event event) {
+        return k(event.getKind());
+    }
+
+    public static TagValue k(Kind kind) {
+        return k(kind.getValue());
+    }
+
+    public static TagValue k(int kind) {
+        return named(IndexedTag.k.name(), String.valueOf(kind));
     }
 
     public static TagValue expiration(Duration duration) {
