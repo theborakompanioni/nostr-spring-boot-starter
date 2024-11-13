@@ -21,7 +21,6 @@ import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.nip11.RelayInfoDocument;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.proto.json.JsonReader;
-import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.util.MoreEvents;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,9 +34,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -47,6 +47,7 @@ import static java.util.Objects.requireNonNull;
 
 @Slf4j
 public class SimpleNostrTemplate implements NostrTemplate {
+    private static final Duration defaultSocketTimeout = Duration.ofSeconds(60);
 
     private final RelayUri relay;
 
@@ -205,6 +206,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
                 .handle(filterSubscriptionResponses(SubscriptionId.of(request.getId())))
                 .takeUntil(it -> Response.KindCase.EOSE.equals(it.getKindCase()) || Response.KindCase.CLOSED.equals(it.getKindCase()));
     }
+
     @Override
     public Mono<OkResponse> auth(Event event) {
         return publish(Request.newBuilder()
@@ -262,7 +264,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
                             sink.error(e);
                         }
                     }
-                }, headers, relay.getUri()).get());
+                }, headers, relay.getUri()).get(defaultSocketTimeout.toMillis(), TimeUnit.MILLISECONDS));
 
                 for (String message : messages) {
                     TextMessage textMessage = new TextMessage(message);

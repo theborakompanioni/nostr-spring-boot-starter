@@ -72,7 +72,6 @@ class NostrRelayLoadTest {
         Flux.just(events)
                 .subscribeOn(Schedulers.single())
                 .flatMap(it -> nostrTemplate.send(it).timeout(TIMEOUT))
-                .timeout(TIMEOUT)
                 .doFinally(foo -> {
                     latch.countDown();
                 }).subscribe(ok -> {
@@ -99,7 +98,6 @@ class NostrRelayLoadTest {
         Flux.fromIterable(events)
                 .subscribeOn(Schedulers.newParallel("load-test"))
                 .flatMap(it -> nostrTemplate.send(it).timeout(TIMEOUT))
-                .timeout(TIMEOUT)
                 .doFinally(foo -> {
                     latch.countDown();
                 }).subscribe(ok -> {

@@ -40,6 +40,8 @@ import static java.util.Objects.requireNonNull;
 
 @Slf4j
 public class SimpleNostrClientService extends AbstractScheduledService implements NostrClientService {
+    private static final Duration defaultSocketTimeout = Duration.ofSeconds(60);
+
     private final static OnCloseHandler defaultOnCloseHandler = new ReconnectOnClose();
     private final static Duration defaultHeartbeatInterval = Duration.ofSeconds(30);
 
@@ -252,7 +254,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
     }
 
     @Override
-    protected void startUp() throws ExecutionException, InterruptedException {
+    protected void startUp() throws ExecutionException, InterruptedException, TimeoutException {
         openSession();
     }
 
@@ -313,7 +315,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         }
     }
 
-    private void openSession() throws InterruptedException, ExecutionException {
+    private void openSession() throws InterruptedException, ExecutionException, TimeoutException {
         log.info("Trying to connect to relay {}", relayUri.getUri());
 
         if (this.session != null && this.session.isOpen()) {
@@ -323,7 +325,7 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
         this.session = client.execute(textWebSocketHandler, headers, relayUri.getUri())
                 .thenApply(it -> new ConcurrentWebSocketSessionDecorator(it, (int) Duration.ofSeconds(60).toMillis(), 512 * 1024))
-                .get();
+                .get(defaultSocketTimeout.toMillis(), TimeUnit.MILLISECONDS);
 
         log.info("Successfully connected to relay {}", relayUri.getUri());
     }
