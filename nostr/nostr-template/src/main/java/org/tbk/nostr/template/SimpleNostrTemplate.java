@@ -269,7 +269,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
                     log.debug("Sending message: {}", textMessage.getPayload());
                     sessionRef.get().sendMessage(textMessage);
                 }
-            } catch (InterruptedException | ExecutionException | IOException e) {
+            } catch (Exception e) {
                 sink.error(e);
             }
         }).doFinally(signalType -> {

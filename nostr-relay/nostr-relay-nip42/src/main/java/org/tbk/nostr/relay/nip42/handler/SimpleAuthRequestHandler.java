@@ -3,7 +3,11 @@ package org.tbk.nostr.relay.nip42.handler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.tbk.nostr.nips.Nip42;
 import org.tbk.nostr.proto.AuthRequest;
 import org.tbk.nostr.proto.Event;
@@ -26,40 +30,56 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
     public void handleAuthMessage(NostrRequestContext context, AuthRequest request) {
         Event authEvent = request.getEvent();
 
-        if (authEvent.getKind() != Nip42.kind().getValue()) {
+        try {
+            checkAuthEvent(context, authEvent);
+
+            Authentication authentication = nip42Support.attemptAuthentication(context, authEvent)
+                    .blockOptional()
+                    .orElseThrow(() -> new InternalAuthenticationServiceException("error: Provider error."));
+
+            context.setAuthentication(authentication);
+
+            context.add(Response.newBuilder()
+                    .setOk(OkResponse.newBuilder()
+                            .setEventId(authEvent.getId())
+                            .setSuccess(true)
+                            .build())
+                    .build());
+
+            this.eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()));
+        } catch (Exception e) {
+            context.clearAuthentication();
+
+            String errorMessage = switch (e) {
+                case AuthenticationException ae -> ae.getMessage();
+                default -> "error: Unknown error.";
+            };
+
             context.add(Response.newBuilder()
                     .setOk(OkResponse.newBuilder()
                             .setEventId(authEvent.getId())
                             .setSuccess(false)
-                            .setMessage("invalid: Kind must be %d".formatted(Nip42.kind().getValue()))
+                            .setMessage(errorMessage)
                             .build())
                     .build());
-            return;
         }
 
-        nip42Support.attemptAuthentication(context, authEvent)
-                .subscribe(authentication -> {
-                    context.setAuthentication(authentication);
-
-                    context.add(Response.newBuilder()
-                            .setOk(OkResponse.newBuilder()
-                                    .setEventId(authEvent.getId())
-                                    .setSuccess(true)
-                                    .build())
-                            .build());
-
-                    this.eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()));
-                }, e -> {
-                    context.clearAuthentication();
-
-                    context.add(Response.newBuilder()
-                            .setOk(OkResponse.newBuilder()
-                                    .setEventId(authEvent.getId())
-                                    .setSuccess(false)
-                                    .setMessage("error: %s".formatted(e.getMessage()))
-                                    .build())
-                            .build());
-                });
     }
 
+    private static void checkAuthEvent(NostrRequestContext context, Event authEvent) throws AuthenticationException {
+        if (authEvent.getKind() != Nip42.kind().getValue()) {
+            throw new AuthenticationServiceException("invalid: Kind must be %d".formatted(Nip42.kind().getValue()));
+        }
+
+        String expectedChallenge = context.getAuthenticationChallenge()
+                .orElseThrow(() -> new AuthenticationServiceException("error: No auth challenge associated."));
+
+        String givenChallenge = Nip42.getChallenge(authEvent)
+                .orElseThrow(() -> new AuthenticationServiceException("invalid: No auth challenge found."));
+
+        // TODO: check everything according to https://github.com/nostr-protocol/nips/blob/master/42.md#signed-event-verification
+        if (!expectedChallenge.equals(givenChallenge)) {
+            throw new AuthenticationServiceException("error: Unknown auth challenge.");
+        }
+    }
 }
