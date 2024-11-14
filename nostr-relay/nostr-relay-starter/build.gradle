@@ -10,6 +10,7 @@ dependencies {
     api project(':nostr-relay:nostr-relay-nip9')
     api project(':nostr-relay:nostr-relay-nip11')
     api project(':nostr-relay:nostr-relay-nip13')
+    api project(':nostr-relay:nostr-relay-nip18')
     api project(':nostr-relay:nostr-relay-nip40')
     api project(':nostr-relay:nostr-relay-nip42')
 

@@ -7,8 +7,10 @@ import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Metadata;
+import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nips.Nip1;
+import org.tbk.nostr.nips.Nip18;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.json.JsonWriter;
@@ -79,5 +81,9 @@ public final class MoreEvents {
 
     public static Optional<EventId> findLowestEventId(Collection<EventId> eventIds) {
         return eventIds.stream().min(Comparator.naturalOrder());
+    }
+
+    public static Event createFinalizedRepost(Signer signer, Event event, RelayUri relayUri) {
+        return finalize(signer, Nip18.repost(signer.getPublicKey(), event, relayUri));
     }
 }
