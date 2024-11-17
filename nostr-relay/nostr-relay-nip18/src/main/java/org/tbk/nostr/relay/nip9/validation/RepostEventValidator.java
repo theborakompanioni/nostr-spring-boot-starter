@@ -9,9 +9,12 @@ import org.springframework.validation.ValidationUtils;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip18;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.proto.json.JsonReader;
 import org.tbk.nostr.relay.validation.EventValidator;
 import org.tbk.nostr.util.MoreTags;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class RepostEventValidator implements EventValidator {
@@ -37,15 +40,23 @@ public class RepostEventValidator implements EventValidator {
                     }
                 }
 
-                boolean hasETagOfRepostedEvent = MoreTags.findByName(event, IndexedTag.e).stream()
-                        .map(it -> ByteString.fromHex(it.getValues(0)))
-                        .anyMatch(it -> repostedEvent.getId().equals(it));
+                Optional<TagValue> eTagRepostedEventRefOrEmpty = MoreTags.findByName(event, IndexedTag.e).stream()
+                        .filter(it -> repostedEvent.getId().equals(ByteString.fromHex(it.getValues(0))))
+                        .findFirst();
 
-                if (!hasETagOfRepostedEvent) {
+                if (eTagRepostedEventRefOrEmpty.isEmpty()) {
                     errors.rejectValue("kind", "nip18.tags.invalid",
                             new Object[]{IndexedTag.e.name()},
                             "Invalid ''{0}'' tag. Must include reposted event id.");
                     return;
+                } else {
+                    TagValue eTagRepostedEventRef = eTagRepostedEventRefOrEmpty.get();
+                    if (eTagRepostedEventRef.getValuesCount() < 2) {
+                        errors.rejectValue("kind", "nip18.tags.invalid",
+                                new Object[]{IndexedTag.e.name()},
+                                "Invalid ''{0}'' tag. Missing relay URL.");
+                        return;
+                    }
                 }
 
                 BindException innerEventErrors = new BindException(repostedEvent, "event");
