@@ -3,6 +3,12 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.theborakompanioni/nostr-proto.svg?maxAge=3600)](https://search.maven.org/#search|g%3A%22io.github.theborakompanioni%22)
 [![License](https://img.shields.io/github/license/theborakompanioni/nostr-spring-boot-starter.svg?maxAge=2592000)](https://github.com/theborakompanioni/nostr-spring-boot-starter/blob/master/LICENSE)
 
+
+<p align="center">
+    <img src="https://github.com/theborakompanioni/nostr-spring-boot-starter/blob/master/docs/assets/images/logo.png" alt="Logo" width="255" />
+</p>
+
+
 nostr-spring-boot-starter
 ===
 
