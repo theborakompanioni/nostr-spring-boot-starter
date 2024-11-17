@@ -16,7 +16,7 @@ class Nip18Test {
     @Test
     void repostShortTextNote() {
         Signer signer = SimpleSigner.random();
-        RelayUri relayUri = RelayUri.of("ws://localhost:%d".formatted(8080));
+        RelayUri relayUri = RelayUri.fromString("ws://localhost:%d".formatted(8080));
 
         Event repost = Nip18.repostShortTextNote(signer.getPublicKey(),
                         MoreEvents.createFinalizedTextNote(signer, "GM!"),
@@ -29,7 +29,7 @@ class Nip18Test {
     @Test
     void repostShortTextNoteFail() {
         Signer signer = SimpleSigner.random();
-        RelayUri relayUri = RelayUri.of("ws://localhost:%d".formatted(8080));
+        RelayUri relayUri = RelayUri.fromString("ws://localhost:%d".formatted(8080));
 
         Event repost = Nip18.repostShortTextNote(signer.getPublicKey(),
                         MoreEvents.createFinalizedTextNote(signer, "GM!"),
@@ -51,11 +51,11 @@ class Nip18Test {
 
         Event repost = Nip18.repostShortTextNote(signer.getPublicKey(),
                         MoreEvents.createFinalizedTextNote(signer, "GM!"),
-                        RelayUri.of("ws://localhost:%d".formatted(8080)))
+                        RelayUri.fromString("ws://localhost:%d".formatted(8080)))
                 .build();
         Event genericRepost = Nip18.repostGenericEvent(signer.getPublicKey(),
                         repost,
-                        RelayUri.of("ws://localhost:%d".formatted(8080)))
+                        RelayUri.fromString("ws://localhost:%d".formatted(8080)))
                 .build();
 
         assertThat(genericRepost.getKind(), is(16));
@@ -64,7 +64,7 @@ class Nip18Test {
     @Test
     void repostGenericEventFail() {
         Signer signer = SimpleSigner.random();
-        RelayUri relayUri = RelayUri.of("ws://localhost:%d".formatted(8080));
+        RelayUri relayUri = RelayUri.fromString("ws://localhost:%d".formatted(8080));
 
         Event event = MoreEvents.createFinalizedTextNote(signer, "GM!");
 

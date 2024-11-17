@@ -4,12 +4,11 @@ import org.springframework.validation.Errors;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.Kind;
+import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MorePublicKeys;
-
-import java.util.HexFormat;
 
 public class DefaultEventValidator implements EventValidator {
     @Override
@@ -73,7 +72,7 @@ public class DefaultEventValidator implements EventValidator {
             errors.rejectValue("valuesList", "event.p.tag.value.invalid", "Invalid tag 'p'.");
         } else {
             String supposedPublicKey = tag.getValues(0);
-            if (!isValidPublicKey(supposedPublicKey)) {
+            if (!MorePublicKeys.isValidPublicKeyString(supposedPublicKey)) {
                 errors.rejectValue("valuesList", "event.p.tag.value.invalid", "Invalid tag 'p'.");
             }
         }
@@ -86,34 +85,12 @@ public class DefaultEventValidator implements EventValidator {
             String supposedEventUri = tag.getValues(0);
             try {
                 EventUri eventUri = EventUri.fromString(supposedEventUri);
-                if (!isValidPublicKey(eventUri.getPublicKey())) {
+                if (!MorePublicKeys.isValidPublicKey(eventUri.getPublicKey())) {
                     errors.rejectValue("valuesList", "event.a.tag.pubkey.value.invalid", "Invalid pubkey in tag 'a'.");
                 }
             } catch (Exception e) {
                 errors.rejectValue("valuesList", "event.a.tag.value.invalid", "Invalid tag 'a'.");
             }
-        }
-    }
-
-    private boolean isValidPublicKey(String value) {
-        if (value.length() != 64) {
-            return false;
-        }
-        try {
-            return isValidPublicKey(HexFormat.of().parseHex(value));
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean isValidPublicKey(byte[] raw) {
-        if (raw.length != 32) {
-            return false;
-        }
-        try {
-            return MorePublicKeys.isValidPublicKey(raw);
-        } catch (Exception e) {
-            return false;
         }
     }
 }

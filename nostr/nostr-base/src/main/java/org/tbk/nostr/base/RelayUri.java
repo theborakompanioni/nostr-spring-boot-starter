@@ -10,7 +10,17 @@ import static java.util.Objects.requireNonNull;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 public final class RelayUri {
-    public static RelayUri of(String uri) {
+
+    public static boolean isValidRelayUriString(String value) {
+        try {
+            fromString(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static RelayUri fromString(String uri) {
         return of(URI.create(uri));
     }
 

@@ -12,8 +12,21 @@ public final class MorePublicKeys {
         throw new UnsupportedOperationException();
     }
 
+    public static boolean isValidPublicKeyString(String value) {
+        if (value.length() != 64) {
+            return false;
+        }
+        try {
+            return isValidPublicKey(HexFormat.of().parseHex(value));
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     public static boolean isValidPublicKey(byte[] raw) {
+        if (raw.length != 32) {
+            return false;
+        }
         try {
             XonlyPublicKey publicKey = fromBytes(raw);
             return publicKey.getPublicKey().isValid();

@@ -23,7 +23,7 @@ class NostrRelayTestConfig {
 
     @Bean
     RelayUri relayUri() {
-        return RelayUri.of("ws://localhost:%d".formatted(serverPort));
+        return RelayUri.fromString("ws://localhost:%d".formatted(serverPort));
     }
 
     @Bean

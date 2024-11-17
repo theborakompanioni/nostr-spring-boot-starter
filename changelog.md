@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Default connection timeouts for `NostrTemplate` and `NostrClientService` implementations
 
+### Breaking
+- RelayUri: change signature of method `of(String)` and rename to `fromString`
+
 ## [0.0.3] - 2024-11-12
 
 ### Breaking

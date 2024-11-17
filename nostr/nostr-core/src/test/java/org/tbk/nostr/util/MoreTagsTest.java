@@ -35,7 +35,7 @@ class MoreTagsTest {
 
     @Test
     void itShouldCreateETag() {
-        TagValue tag0 = MoreTags.e(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), RelayUri.of("wss://nostr.example.com"));
+        TagValue tag0 = MoreTags.e(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), RelayUri.fromString("wss://nostr.example.com"));
         TagValue tag1 = MoreTags.e("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36", "wss://nostr.example.com");
 
         assertThat(tag0, is(TagValue.newBuilder()
@@ -68,8 +68,8 @@ class MoreTagsTest {
 
     @Test
     void itShouldCreateETagWithNip10Marker1() {
-        TagValue tag0 = MoreTags.e(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), RelayUri.of("wss://nostr.example.com"), Nip10.Marker.MENTION);
-        TagValue tag1 = Nip10.Marker.MENTION.tag(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), RelayUri.of("wss://nostr.example.com"));
+        TagValue tag0 = MoreTags.e(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), RelayUri.fromString("wss://nostr.example.com"), Nip10.Marker.MENTION);
+        TagValue tag1 = Nip10.Marker.MENTION.tag(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), RelayUri.fromString("wss://nostr.example.com"));
         TagValue tag2 = MoreTags.e("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36", "wss://nostr.example.com", "mention");
 
         assertThat(tag0, is(TagValue.newBuilder()
