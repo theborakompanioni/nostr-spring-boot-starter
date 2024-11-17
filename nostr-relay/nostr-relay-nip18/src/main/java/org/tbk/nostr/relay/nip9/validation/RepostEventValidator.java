@@ -1,14 +1,17 @@
 package org.tbk.nostr.relay.nip9.validation;
 
+import com.google.protobuf.ByteString;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.nips.Nip18;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.json.JsonReader;
 import org.tbk.nostr.relay.validation.EventValidator;
+import org.tbk.nostr.util.MoreTags;
 
 @RequiredArgsConstructor
 public class RepostEventValidator implements EventValidator {
@@ -25,11 +28,24 @@ public class RepostEventValidator implements EventValidator {
                 if (event.getKind() == Nip18.kindRepost().getValue()) {
                     if (repostedEvent.getKind() != 1) {
                         errors.rejectValue("kind", "nip18.refs.invalid", "Reposted event must be a short text note.");
+                        return;
                     }
                 } else if (event.getKind() == Nip18.kindGenericRepost().getValue()) {
                     if (repostedEvent.getKind() == 1) {
                         errors.rejectValue("kind", "nip18.refs.invalid", "Reposted event must not be a short text note.");
+                        return;
                     }
+                }
+
+                boolean hasETagOfRepostedEvent = MoreTags.findByName(event, IndexedTag.e).stream()
+                        .map(it -> ByteString.fromHex(it.getValues(0)))
+                        .anyMatch(it -> repostedEvent.getId().equals(it));
+
+                if (!hasETagOfRepostedEvent) {
+                    errors.rejectValue("kind", "nip18.tags.invalid",
+                            new Object[]{IndexedTag.e.name()},
+                            "Invalid ''{0}'' tag. Must include reposted event id.");
+                    return;
                 }
 
                 BindException innerEventErrors = new BindException(repostedEvent, "event");

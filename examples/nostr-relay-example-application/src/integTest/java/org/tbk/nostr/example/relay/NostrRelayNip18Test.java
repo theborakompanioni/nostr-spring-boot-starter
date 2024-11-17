@@ -169,4 +169,38 @@ class NostrRelayNip18Test {
         assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("invalid: Invalid tag 'e'."));
     }
+
+    @Test
+    void itShouldDeclineRepostEventWithMissingETag() {
+        Signer signer = SimpleSigner.random();
+
+        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
+        Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri())
+                .clearTags());
+
+        OkResponse ok0 = nostrTemplate.send(repost)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok0.getEventId(), is(repost.getId()));
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is("invalid: Invalid 'e' tag. Must include reposted event id."));
+    }
+
+    @Test
+    void itShouldDeclineRepostEventWithETagNotReferencingRepostedNote() {
+        Signer signer = SimpleSigner.random();
+
+        Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM0");
+        Event event1 = MoreEvents.createFinalizedTextNote(signer, "GM1");
+        Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event0, nostrTemplate.getRelayUri())
+                .clearTags()
+                .addTags(MoreTags.e(event1)));
+
+        OkResponse ok0 = nostrTemplate.send(repost)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok0.getEventId(), is(repost.getId()));
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is("invalid: Invalid 'e' tag. Must include reposted event id."));
+    }
 }
