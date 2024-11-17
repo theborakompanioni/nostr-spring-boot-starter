@@ -30,6 +30,11 @@ public final class Nip18 {
         return GENERIC_REPOST_EVENT_KIND;
     }
 
+    public static boolean isRepostEvent(Event event) {
+        return event.getKind() == Nip18.kindRepost().getValue() ||
+               event.getKind() == Nip18.kindGenericRepost().getValue();
+    }
+
     public static Event.Builder repost(XonlyPublicKey publicKey, Event event, RelayUri relayUri) {
         return event.getKind() == 1 ? repostShortTextNote(publicKey, event, relayUri) : repostGenericEvent(publicKey, event, relayUri);
     }

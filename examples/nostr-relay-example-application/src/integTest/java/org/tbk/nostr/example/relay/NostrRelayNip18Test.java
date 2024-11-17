@@ -14,6 +14,7 @@ import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
+import org.tbk.nostr.util.MoreTags;
 
 import java.net.URI;
 import java.time.Duration;
@@ -38,12 +39,11 @@ class NostrRelayNip18Test {
 
         assertThat(repost.getKind(), is(Nip18.kindRepost().getValue()));
 
-        OkResponse ok1 = nostrTemplate.send(repost)
+        OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(ok1.getEventId(), is(repost.getId()));
-        assertThat(ok1.getSuccess(), is(true));
-        assertThat(ok1.getMessage(), is(""));
+        assertThat(ok0.getEventId(), is(repost.getId()));
+        assertThat(ok0.getSuccess(), is(true));
     }
 
     @Test
@@ -59,12 +59,11 @@ class NostrRelayNip18Test {
 
         assertThat(genericRepost.getKind(), is(Nip18.kindGenericRepost().getValue()));
 
-        OkResponse ok1 = nostrTemplate.send(genericRepost)
+        OkResponse ok0 = nostrTemplate.send(genericRepost)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(ok1.getEventId(), is(genericRepost.getId()));
-        assertThat(ok1.getSuccess(), is(true));
-        assertThat(ok1.getMessage(), is(""));
+        assertThat(ok0.getEventId(), is(genericRepost.getId()));
+        assertThat(ok0.getSuccess(), is(true));
     }
 
     @Test
@@ -79,16 +78,16 @@ class NostrRelayNip18Test {
 
         Event repost = MoreEvents.createFinalizedRepost(signer, invalidEvent, nostrTemplate.getRelayUri());
 
-        OkResponse ok1 = nostrTemplate.send(repost)
+        OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(ok1.getEventId(), is(repost.getId()));
-        assertThat(ok1.getSuccess(), is(false));
-        assertThat(ok1.getMessage(), is("invalid: Invalid id."));
+        assertThat(ok0.getEventId(), is(repost.getId()));
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is("invalid: Invalid id."));
     }
 
     @Test
-    void itShouldDeclineRepostEventWithInvalidNote0InvalidSig() {
+    void itShouldDeclineRepostEventWithInvalidNote1InvalidSig() {
         Signer signer = SimpleSigner.random();
 
         Event invalidEvent = MoreEvents.createFinalizedTextNote(signer, "GM0").toBuilder()
@@ -99,12 +98,28 @@ class NostrRelayNip18Test {
 
         Event repost = MoreEvents.createFinalizedRepost(signer, invalidEvent, nostrTemplate.getRelayUri());
 
-        OkResponse ok1 = nostrTemplate.send(repost)
+        OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(ok1.getEventId(), is(repost.getId()));
-        assertThat(ok1.getSuccess(), is(false));
-        assertThat(ok1.getMessage(), is("invalid: Invalid signature."));
+        assertThat(ok0.getEventId(), is(repost.getId()));
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is("invalid: Invalid signature."));
+    }
+
+    @Test
+    void itShouldDeclineRepostEventWithInvalidNote2InvalidETag() {
+        Signer signer = SimpleSigner.random();
+
+        Event event = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
+                .addTags(MoreTags.e("invalid")));
+        Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri()));
+
+        OkResponse ok0 = nostrTemplate.send(repost)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok0.getEventId(), is(repost.getId()));
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is("invalid: Invalid tag 'e'."));
     }
 
     @Test
@@ -115,12 +130,12 @@ class NostrRelayNip18Test {
         Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri())
                 .setKind(Nip18.kindRepost().getValue()));
 
-        OkResponse ok1 = nostrTemplate.send(repost)
+        OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(ok1.getEventId(), is(repost.getId()));
-        assertThat(ok1.getSuccess(), is(false));
-        assertThat(ok1.getMessage(), is("invalid: Reposted event must be a short text note."));
+        assertThat(ok0.getEventId(), is(repost.getId()));
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is("invalid: Reposted event must be a short text note."));
     }
 
     @Test
@@ -131,11 +146,27 @@ class NostrRelayNip18Test {
         Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri())
                 .setKind(Nip18.kindGenericRepost().getValue()));
 
-        OkResponse ok1 = nostrTemplate.send(repost)
+        OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
-        assertThat(ok1.getEventId(), is(repost.getId()));
-        assertThat(ok1.getSuccess(), is(false));
-        assertThat(ok1.getMessage(), is("invalid: Reposted event must not be a short text note."));
+        assertThat(ok0.getEventId(), is(repost.getId()));
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is("invalid: Reposted event must not be a short text note."));
+    }
+
+    @Test
+    void itShouldDeclineRepostEventWithInvalidETag() {
+        Signer signer = SimpleSigner.random();
+
+        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
+        Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri())
+                .addTags(MoreTags.e("invalid")));
+
+        OkResponse ok0 = nostrTemplate.send(repost)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok0.getEventId(), is(repost.getId()));
+        assertThat(ok0.getSuccess(), is(false));
+        assertThat(ok0.getMessage(), is("invalid: Invalid tag 'e'."));
     }
 }

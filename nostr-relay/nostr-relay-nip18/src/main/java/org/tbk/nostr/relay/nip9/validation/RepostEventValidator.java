@@ -18,9 +18,7 @@ public class RepostEventValidator implements EventValidator {
 
     @Override
     public void validateEvent(Event event, Errors errors) {
-        if (event.getKind() == Nip18.kindRepost().getValue() ||
-            event.getKind() == Nip18.kindGenericRepost().getValue()) {
-
+        if (Nip18.isRepostEvent(event)) {
             try {
                 Event repostedEvent = JsonReader.fromJson(event.getContent(), Event.newBuilder());
 
@@ -33,7 +31,6 @@ public class RepostEventValidator implements EventValidator {
                         errors.rejectValue("kind", "nip18.refs.invalid", "Reposted event must not be a short text note.");
                     }
                 }
-
 
                 BindException innerEventErrors = new BindException(repostedEvent, "event");
                 ValidationUtils.invokeValidator(repostedEventValidator, repostedEvent, innerEventErrors);
