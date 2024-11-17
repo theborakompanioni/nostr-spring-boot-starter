@@ -5,25 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.tbk.nostr.base.RelayUri;
+import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
-import org.tbk.nostr.nip11.RelayInfoDocument;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.nips.Nip18;
-import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
-import org.tbk.nostr.util.MorePublicKeys;
 
 import java.net.URI;
 import java.time.Duration;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = NostrRelayTestConfig.class)
@@ -40,10 +36,33 @@ class NostrRelayNip18Test {
         Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
         Event repost = MoreEvents.createFinalizedRepost(signer, event, nostrTemplate.getRelayUri());
 
+        assertThat(repost.getKind(), is(Nip18.kindRepost().getValue()));
+
         OkResponse ok1 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok1.getEventId(), is(repost.getId()));
+        assertThat(ok1.getSuccess(), is(true));
+        assertThat(ok1.getMessage(), is(""));
+    }
+
+    @Test
+    void itShouldAcceptGenericRepostEvent() {
+        Signer signer = SimpleSigner.random();
+
+        Event event = MoreEvents.createFinalizedMetadata(signer, Metadata.newBuilder()
+                .name("name")
+                .about("about")
+                .picture(URI.create("https://www.example.com/example.png"))
+                .build());
+        Event genericRepost = MoreEvents.createFinalizedRepost(signer, event, nostrTemplate.getRelayUri());
+
+        assertThat(genericRepost.getKind(), is(Nip18.kindGenericRepost().getValue()));
+
+        OkResponse ok1 = nostrTemplate.send(genericRepost)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+        assertThat(ok1.getEventId(), is(genericRepost.getId()));
         assertThat(ok1.getSuccess(), is(true));
         assertThat(ok1.getMessage(), is(""));
     }
