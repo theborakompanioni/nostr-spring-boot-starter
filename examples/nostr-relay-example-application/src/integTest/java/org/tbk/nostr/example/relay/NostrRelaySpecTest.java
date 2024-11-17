@@ -169,7 +169,7 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldNotifyOnInvalidEvent3InvalidETag() {
+    void itShouldNotifyOnInvalidEvent4InvalidETag() {
         Signer signer = SimpleSigner.random();
 
         Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
@@ -183,6 +183,29 @@ class NostrRelaySpecTest {
                 .addTags(MoreTags.e("00".repeat(16))));
 
         List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2, invalidEvent3);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks, hasSize(events.size()));
+
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("invalid: Invalid tag 'e'."));
+        }
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent4InvalidETagRelayUri() {
+        Signer signer = SimpleSigner.random();
+
+        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
+                .addTags(MoreTags.e(EventId.of(event.getId().toByteArray()).toHex(), "https://example.org")));
+
+        List<Event> events = List.of(invalidEvent0);
         List<OkResponse> oks = nostrTemplate.send(events)
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
@@ -213,6 +236,27 @@ class NostrRelaySpecTest {
                 .addTags(MoreTags.p("00".repeat(32))));
 
         List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2, invalidEvent3, invalidEvent4);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks, hasSize(events.size()));
+
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("invalid: Invalid tag 'p'."));
+        }
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent4InvalidPTagRelayUri() {
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
+                .addTags(MoreTags.p(signer.getPublicKey().value.toHex(), "https://example.org")));
+
+        List<Event> events = List.of(invalidEvent0);
         List<OkResponse> oks = nostrTemplate.send(events)
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
@@ -270,6 +314,27 @@ class NostrRelaySpecTest {
         for (OkResponse ok : oks1) {
             assertThat(ok.getSuccess(), is(false));
             assertThat(ok.getMessage(), is("invalid: Invalid pubkey in tag 'a'."));
+        }
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent5InvalidATagRelayUri() {
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
+                .addTags(MoreTags.a("%d:%s:%s".formatted(1, signer.getPublicKey().value.toHex(), ""), "https://example.org")));
+
+        List<Event> events = List.of(invalidEvent0);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks, hasSize(events.size()));
+
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("invalid: Invalid tag 'a'."));
         }
     }
 

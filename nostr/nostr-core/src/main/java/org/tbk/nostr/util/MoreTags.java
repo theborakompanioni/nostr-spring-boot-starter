@@ -138,7 +138,7 @@ public final class MoreTags {
     }
 
     public static TagValue a(int kind, XonlyPublicKey publicKey, String dTagValue, RelayUri recommendedRelay) {
-        return a("%d:%s%s".formatted(kind, publicKey, dTagValue), recommendedRelay.getUri().toString());
+        return a("%d:%s:%s".formatted(kind, publicKey, dTagValue), recommendedRelay.getUri().toString());
     }
 
     /**

@@ -56,6 +56,11 @@ public class DefaultEventValidator implements EventValidator {
         }
     }
 
+    /**
+     * The 'e' tag, used to refer to an event: ["e", <32-bytes lowercase hex of the id of another event>, <recommended relay URL, optional>]
+     *
+     * @see <a href="https://github.com/nostr-protocol/nips/blob/master/01.md#tags">NIP-01</a>
+     */
     private void validateTagE(TagValue tag, Errors errors) {
         if (tag.getValuesCount() <= 0L) {
             errors.rejectValue("valuesList", "event.e.tag.value.invalid", "Invalid tag 'e'.");
@@ -64,9 +69,20 @@ public class DefaultEventValidator implements EventValidator {
             if (!EventId.isValidEventIdString(supposedEventId)) {
                 errors.rejectValue("valuesList", "event.e.tag.value.invalid", "Invalid tag 'e'.");
             }
+            if (tag.getValuesCount() >= 2) {
+                String supposedRelayUri = tag.getValues(1);
+                if (!RelayUri.isValidRelayUriString(supposedRelayUri)) {
+                    errors.rejectValue("valuesList", "event.e.tag.value.invalid", "Invalid tag 'e'.");
+                }
+            }
         }
     }
 
+    /**
+     * The 'p' tag, used to refer to another user: ["p", <32-bytes lowercase hex of a pubkey>, <recommended relay URL, optional>]
+     *
+     * @see <a href="https://github.com/nostr-protocol/nips/blob/master/01.md#tags">NIP-01</a>
+     */
     private void validateTagP(TagValue tag, Errors errors) {
         if (tag.getValuesCount() <= 0L) {
             errors.rejectValue("valuesList", "event.p.tag.value.invalid", "Invalid tag 'p'.");
@@ -75,9 +91,24 @@ public class DefaultEventValidator implements EventValidator {
             if (!MorePublicKeys.isValidPublicKeyString(supposedPublicKey)) {
                 errors.rejectValue("valuesList", "event.p.tag.value.invalid", "Invalid tag 'p'.");
             }
+            if (tag.getValuesCount() >= 2) {
+                String supposedRelayUri = tag.getValues(1);
+                if (!RelayUri.isValidRelayUriString(supposedRelayUri)) {
+                    errors.rejectValue("valuesList", "event.p.tag.value.invalid", "Invalid tag 'p'.");
+                }
+            }
         }
     }
 
+    /**
+     * The 'a' tag, used to refer to an addressable or replaceable event
+     * <ul>
+     *   <li>for an addressable event: ["a", <kind integer>:<32-bytes lowercase hex of a pubkey>:<d tag value>, <recommended relay URL, optional>]</li>
+     *   <li>for a normal replaceable event: ["a", <kind integer>:<32-bytes lowercase hex of a pubkey>:, <recommended relay URL, optional>]</li>
+     * </ul>
+     *
+     * @see <a href="https://github.com/nostr-protocol/nips/blob/master/01.md#tags">NIP-01</a>
+     */
     private void validateTagA(TagValue tag, Errors errors) {
         if (tag.getValuesCount() <= 0L) {
             errors.rejectValue("valuesList", "event.a.tag.value.invalid", "Invalid tag 'a'.");
@@ -90,6 +121,12 @@ public class DefaultEventValidator implements EventValidator {
                 }
             } catch (Exception e) {
                 errors.rejectValue("valuesList", "event.a.tag.value.invalid", "Invalid tag 'a'.");
+            }
+            if (tag.getValuesCount() >= 2) {
+                String supposedRelayUri = tag.getValues(1);
+                if (!RelayUri.isValidRelayUriString(supposedRelayUri)) {
+                    errors.rejectValue("valuesList", "event.a.tag.value.invalid", "Invalid tag 'a'.");
+                }
             }
         }
     }
