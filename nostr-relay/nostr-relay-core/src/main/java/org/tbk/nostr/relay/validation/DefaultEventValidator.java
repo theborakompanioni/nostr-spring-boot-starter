@@ -1,10 +1,7 @@
 package org.tbk.nostr.relay.validation;
 
 import org.springframework.validation.Errors;
-import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.base.EventUri;
-import org.tbk.nostr.base.Kind;
-import org.tbk.nostr.base.RelayUri;
+import org.tbk.nostr.base.*;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
@@ -46,10 +43,12 @@ public class DefaultEventValidator implements EventValidator {
             errors.rejectValue("name", "event.tag.name.invalid", "Invalid tag name.");
         }
 
+
         switch (tag.getName()) {
             case "e" -> validateTagE(tag, errors);
             case "p" -> validateTagP(tag, errors);
             case "a" -> validateTagA(tag, errors);
+            case "k" -> validateTagK(tag, errors);
             default -> {
                 // empty on purpose
             }
@@ -127,6 +126,17 @@ public class DefaultEventValidator implements EventValidator {
                 if (!RelayUri.isValidRelayUriString(supposedRelayUri)) {
                     errors.rejectValue("valuesList", "event.a.tag.value.invalid", "Invalid tag 'a'.");
                 }
+            }
+        }
+    }
+
+    private void validateTagK(TagValue tag, Errors errors) {
+        if (tag.getValuesCount() <= 0L) {
+            errors.rejectValue("valuesList", "event.k.tag.value.invalid", "Invalid tag 'k'.");
+        } else {
+            String supposedKind = tag.getValues(0);
+            if (!Kind.isValidKindString(supposedKind)) {
+                errors.rejectValue("valuesList", "event.k.tag.value.invalid", "Invalid tag 'k'.");
             }
         }
     }

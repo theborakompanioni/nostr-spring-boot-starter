@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Default connection timeouts for `NostrTemplate` and `NostrClientService` implementations
+- Validation of relay URL in standard tags
+- Validation of 'k' tag
 
 ### Breaking
 - RelayUri: change signature of method `of(String)` and rename to `fromString`

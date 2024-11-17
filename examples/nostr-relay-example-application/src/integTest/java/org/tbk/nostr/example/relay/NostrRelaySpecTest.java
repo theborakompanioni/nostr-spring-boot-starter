@@ -220,7 +220,7 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldNotifyOnInvalidEvent4InvalidPTag() {
+    void itShouldNotifyOnInvalidEvent5InvalidPTag() {
         Signer signer = SimpleSigner.random();
 
         Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
@@ -250,7 +250,7 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldNotifyOnInvalidEvent4InvalidPTagRelayUri() {
+    void itShouldNotifyOnInvalidEvent5InvalidPTagRelayUri() {
         Signer signer = SimpleSigner.random();
 
         Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
@@ -271,7 +271,7 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldNotifyOnInvalidEvent5InvalidATag() {
+    void itShouldNotifyOnInvalidEvent6InvalidATag() {
         Signer signer = SimpleSigner.random();
 
         Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
@@ -318,7 +318,7 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldNotifyOnInvalidEvent5InvalidATagRelayUri() {
+    void itShouldNotifyOnInvalidEvent6InvalidATagRelayUri() {
         Signer signer = SimpleSigner.random();
 
         Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
@@ -339,7 +339,35 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldNotifyOnInvalidEvent6InvalidTagName() {
+    void itShouldNotifyOnInvalidEvent7InvalidKTag() {
+        Signer signer = SimpleSigner.random();
+
+        Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
+                .addTags(MoreTags.k(Kind.minValue() - 1)));
+        Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1")
+                .addTags(MoreTags.k(Kind.maxValue() + 1)));
+        Event invalidEvent2 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM2")
+                .addTags(MoreTags.named(IndexedTag.k.name(), "")));
+        Event invalidEvent3 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM3")
+                .addTags(MoreTags.named(IndexedTag.k.name(), "invalid")));
+        ;
+
+        List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2, invalidEvent3);
+        List<OkResponse> oks = nostrTemplate.send(events)
+                .collectList()
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(oks, hasSize(events.size()));
+
+        for (OkResponse ok : oks) {
+            assertThat(ok.getSuccess(), is(false));
+            assertThat(ok.getMessage(), is("invalid: Invalid tag 'k'."));
+        }
+    }
+
+    @Test
+    void itShouldNotifyOnInvalidEvent8InvalidTagName() {
         Signer signer = SimpleSigner.random();
 
         Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
@@ -364,7 +392,7 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldNotifyOnInvalidEvent7CreatedAtLessThanLowerLimit() {
+    void itShouldNotifyOnInvalidEvent9CreatedAtLessThanLowerLimit() {
         assertThat("sanity check", relayProperties.getCreatedAtLowerLimit(), is(notNullValue()));
 
         Signer signer = SimpleSigner.random();
@@ -385,7 +413,7 @@ class NostrRelaySpecTest {
     }
 
     @Test
-    void itShouldNotifyOnInvalidEvent8CreatedAtGreaterThanUpperLimit() {
+    void itShouldNotifyOnInvalidEvent10CreatedAtGreaterThanUpperLimit() {
         assertThat("sanity check", relayProperties.getCreatedAtUpperLimit(), is(notNullValue()));
 
         Signer signer = SimpleSigner.random();
