@@ -80,7 +80,6 @@ class Nip19Test {
 
     @Test
     void itShouldConvertNprofileSuccessfully() {
-        // decode
         Nip19.Nprofile nprofile = Nip19.fromNprofile("nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p");
 
         assertThat(nprofile.getPublicKey().value.toHex(), is("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"));
@@ -88,5 +87,15 @@ class Nip19Test {
         assertThat(nprofile.getRelays(), hasSize(2));
         assertThat(nprofile.getRelays().get(0), is(RelayUri.fromString("wss://r.x.com")));
         assertThat(nprofile.getRelays().get(1), is(RelayUri.fromString("wss://djbas.sadkb.com")));
+    }
+
+    @Test
+    void itShouldConvertNaddrSuccessfully() {
+        Nip19.Naddr naddr = Nip19.fromNaddr("naddr1qqyk67tswfhkv6tvv5pzqwlsccluhy6xxsr6l9a9uhhxf75g85g8a709tprjcn4e42h053vaqvzqqqqy6gq3zamnwvaz7tm90psk6urvv5hxxmmdpmcy2t");
+
+        assertThat(naddr.getUri().toString(), is("1234:3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d:myprofile"));
+
+        assertThat(naddr.getRelays(), hasSize(1));
+        assertThat(naddr.getRelays().get(0), is(RelayUri.fromString("wss://example.com")));
     }
 }

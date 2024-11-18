@@ -12,6 +12,7 @@ import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.util.MorePublicKeys;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -55,17 +56,33 @@ public final class Nip19 {
         return decode(bech32, Nprofile.class);
     }
 
+    public static Naddr fromNaddr(String bech32) {
+        return decode(bech32, Naddr.class);
+    }
+
     @Getter
     @RequiredArgsConstructor
-    public enum EntityType {
+    private enum EntityType {
         NPUB("npub"),
         NSEC("nsec"),
         NOTE("note"),
         NPROFILE("nprofile"),
+        NADDR("naddr"),
         ;
 
         @NonNull
         private final String hrp;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    private enum TlvType {
+        SPECIAL(0),
+        RELAY(1),
+        AUTHOR(2),
+        KIND(3);
+
+        private final int value;
     }
 
     private static byte[] decode(String bech32) {
@@ -194,6 +211,56 @@ public final class Nip19 {
             }
             return privateKey;
         }
+    }, new Transformer<Naddr>() {
+        @Override
+        public boolean supports(String hrp, Class<?> clazz) {
+            return EntityType.NADDR.getHrp().equals(hrp) && clazz.isAssignableFrom(Naddr.class);
+        }
+
+        @Override
+        public Naddr decode(String hrp, byte[] data) {
+            List<TLV.Entry> entries = TLV.parse(data);
+
+            TLV.Entry specialEntry = entries.stream()
+                    .filter(it -> it.getType() == TlvType.SPECIAL.getValue())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.SPECIAL.getValue())));
+
+            String dTagValue = new String(specialEntry.getValue(), StandardCharsets.UTF_8);
+
+            List<RelayUri> relayEntries = entries.stream()
+                    .filter(it -> it.getType() == TlvType.RELAY.getValue())
+                    .map(it -> new String(it.getValue(), StandardCharsets.US_ASCII))
+                    .map(RelayUri::tryFromString)
+                    .flatMap(Optional::stream)
+                    .toList();
+
+            TLV.Entry authorEntry = entries.stream()
+                    .filter(it -> it.getType() == TlvType.AUTHOR.getValue())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.AUTHOR.getValue())));
+
+            XonlyPublicKey author = Optional.of(authorEntry.getValue())
+                    .map(MorePublicKeys::fromBytes)
+                    .filter(it -> it.getPublicKey().isValid())
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: Invalid value with type %d.".formatted(TlvType.AUTHOR.getValue())));
+
+            TLV.Entry kindEntry = entries.stream()
+                    .filter(it -> it.getType() == TlvType.KIND.getValue())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.KIND.getValue())));
+
+            Kind kind = Optional.of(kindEntry.getValue())
+                    .map(it -> ByteBuffer.wrap(it).getInt())
+                    .filter(Kind::isValidKind)
+                    .map(Kind::of)
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: Invalid value with type %d.".formatted(TlvType.KIND.getValue())));
+
+            return Naddr.builder()
+                    .uri(EventUri.of(kind, author.value.toHex(), dTagValue))
+                    .relays(relayEntries)
+                    .build();
+        }
     }, new Transformer<Nprofile>() {
         @Override
         public boolean supports(String hrp, Class<?> clazz) {
@@ -204,17 +271,25 @@ public final class Nip19 {
         public Nprofile decode(String hrp, byte[] data) {
             List<TLV.Entry> entries = TLV.parse(data);
 
-            TLV.Entry specialEntry = entries.stream().filter(it -> it.getType() == 0).findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type 0."));
+            TLV.Entry specialEntry = entries.stream()
+                    .filter(it -> it.getType() == TlvType.SPECIAL.getValue())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.SPECIAL.getValue())));
 
-            List<RelayUri> relayEntries = entries.stream().filter(it -> it.getType() == 1)
+            XonlyPublicKey publicKey = Optional.of(specialEntry.getValue())
+                    .map(MorePublicKeys::fromBytes)
+                    .filter(it -> it.getPublicKey().isValid())
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: Invalid value with type %d.".formatted(TlvType.SPECIAL.getValue())));
+
+            List<RelayUri> relayEntries = entries.stream()
+                    .filter(it -> it.getType() == TlvType.RELAY.getValue())
                     .map(it -> new String(it.getValue(), StandardCharsets.US_ASCII))
                     .map(RelayUri::tryFromString)
                     .flatMap(Optional::stream)
                     .toList();
 
             return Nprofile.builder()
-                    .publicKey(MorePublicKeys.fromBytes(specialEntry.getValue()))
+                    .publicKey(publicKey)
                     .relays(relayEntries)
                     .build();
         }
