@@ -70,7 +70,7 @@ public class DefaultEventValidator implements EventValidator {
             }
             if (tag.getValuesCount() >= 2) {
                 String supposedRelayUri = tag.getValues(1);
-                if (!RelayUri.isValidRelayUriString(supposedRelayUri)) {
+                if (!supposedRelayUri.isEmpty() && !RelayUri.isValidRelayUriString(supposedRelayUri)) {
                     errors.rejectValue("valuesList", "event.e.tag.value.invalid", "Invalid tag 'e'.");
                 }
             }
@@ -92,7 +92,7 @@ public class DefaultEventValidator implements EventValidator {
             }
             if (tag.getValuesCount() >= 2) {
                 String supposedRelayUri = tag.getValues(1);
-                if (!RelayUri.isValidRelayUriString(supposedRelayUri)) {
+                if (!supposedRelayUri.isEmpty() && !RelayUri.isValidRelayUriString(supposedRelayUri)) {
                     errors.rejectValue("valuesList", "event.p.tag.value.invalid", "Invalid tag 'p'.");
                 }
             }
@@ -123,7 +123,7 @@ public class DefaultEventValidator implements EventValidator {
             }
             if (tag.getValuesCount() >= 2) {
                 String supposedRelayUri = tag.getValues(1);
-                if (!RelayUri.isValidRelayUriString(supposedRelayUri)) {
+                if (!supposedRelayUri.isEmpty() && !RelayUri.isValidRelayUriString(supposedRelayUri)) {
                     errors.rejectValue("valuesList", "event.a.tag.value.invalid", "Invalid tag 'a'.");
                 }
             }

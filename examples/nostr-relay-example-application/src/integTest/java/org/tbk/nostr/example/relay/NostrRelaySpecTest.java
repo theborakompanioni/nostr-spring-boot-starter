@@ -56,6 +56,26 @@ class NostrRelaySpecTest {
     }
 
     @Test
+    void itShouldPublishSimpleEventSuccessfully1WithPTags() {
+        Signer signer = SimpleSigner.random();
+
+        TagValue p0 = MoreTags.p(signer.getPublicKey());
+        TagValue p1EmptyRelayUri = MoreTags.named(IndexedTag.p.name(), signer.getPublicKey().value.toHex(), "");
+        TagValue p2 = MoreTags.p(signer.getPublicKey(), nostrTemplate.getRelayUri());
+
+        Event event = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
+                .addAllTags(List.of(p0, p1EmptyRelayUri, p2)));
+
+        OkResponse ok = nostrTemplate.send(event)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElseThrow();
+
+        assertThat(ok.getEventId(), is(event.getId()));
+        assertThat(ok.getSuccess(), is(true));
+        assertThat(ok.getMessage(), is(""));
+    }
+
+    @Test
     void itShouldNotifyOnDuplicateEvent() {
         Signer signer = SimpleSigner.random();
 
