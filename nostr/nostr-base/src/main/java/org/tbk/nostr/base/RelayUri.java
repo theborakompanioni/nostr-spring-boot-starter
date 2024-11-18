@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.net.URI;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -22,6 +23,14 @@ public final class RelayUri {
 
     public static RelayUri fromString(String uri) {
         return of(URI.create(uri));
+    }
+
+    public static Optional<RelayUri> tryFromString(String uri) {
+        try {
+            return Optional.of(fromString(uri));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     public static RelayUri of(URI uri) {

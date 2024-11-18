@@ -4,13 +4,13 @@ import fr.acinq.bitcoin.PrivateKey;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.util.MorePublicKeys;
 
 import java.util.HexFormat;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -76,5 +76,17 @@ class Nip19Test {
         // encode
         String note0 = Nip19.toNote(EventId.fromHex("87a351b42ddd95e4954f58a129286b94dc9d467ef76ebdaf6dec968d5ae639de"));
         assertThat(note0, is("note1s734rdpdmk27f920tzsjj2rtjnwf63n77ahtmtmdajtg6khx880q99zyw6"));
+    }
+
+    @Test
+    void itShouldConvertNprofileSuccessfully() {
+        // decode
+        Nip19.Nprofile nprofile = Nip19.fromNprofile("nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p");
+
+        assertThat(nprofile.getPublicKey().value.toHex(), is("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"));
+
+        assertThat(nprofile.getRelays(), hasSize(2));
+        assertThat(nprofile.getRelays().get(0), is(RelayUri.fromString("wss://r.x.com")));
+        assertThat(nprofile.getRelays().get(1), is(RelayUri.fromString("wss://djbas.sadkb.com")));
     }
 }

@@ -5,12 +5,16 @@ import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.PrivateKey;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import kotlin.Triple;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.EventUri;
+import org.tbk.nostr.base.Kind;
+import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.util.MorePublicKeys;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,18 +51,24 @@ public final class Nip19 {
         return encode(EntityType.NOTE, data.toByteArray());
     }
 
+    public static Nprofile fromNprofile(String bech32) {
+        return decode(bech32, Nprofile.class);
+    }
+
     @Getter
     @RequiredArgsConstructor
     public enum EntityType {
         NPUB("npub"),
         NSEC("nsec"),
-        NOTE("note");
+        NOTE("note"),
+        NPROFILE("nprofile"),
+        ;
 
         @NonNull
         private final String hrp;
     }
 
-    public static byte[] decode(String bech32) {
+    private static byte[] decode(String bech32) {
         try {
             return Bech32.decodeBytes(bech32, false).component2();
         } catch (Exception e) {
@@ -66,7 +76,7 @@ public final class Nip19 {
         }
     }
 
-    public static <T> Optional<T> tryDecode(String bech32, Class<T> clazz) {
+    private static <T> Optional<T> tryDecode(String bech32, Class<T> clazz) {
         try {
             return Optional.ofNullable(decode(bech32, clazz));
         } catch (Exception e) {
@@ -74,7 +84,7 @@ public final class Nip19 {
         }
     }
 
-    public static <T> T decode(String bech32, Class<T> clazz) {
+    private static <T> T decode(String bech32, Class<T> clazz) {
         try {
             Triple<String, byte[], Bech32.Encoding> decoded = Bech32.decodeBytes(bech32, false);
 
@@ -90,7 +100,7 @@ public final class Nip19 {
         }
     }
 
-    public static String encode(EntityType type, byte[] data) {
+    private static String encode(EntityType type, byte[] data) {
         try {
             return Bech32.encodeBytes(type.getHrp(), data, Bech32.Encoding.Bech32);
         } catch (Exception e) {
@@ -98,7 +108,49 @@ public final class Nip19 {
         }
     }
 
-    interface Transformer<T> {
+    @Value
+    @Builder
+    public static class Nprofile {
+        @NonNull
+        XonlyPublicKey publicKey;
+
+        @Singular("relay")
+        List<RelayUri> relays;
+    }
+
+    @Value
+    @Builder
+    public static class Nevent {
+        @NonNull
+        EventId id;
+
+        @Singular("relay")
+        List<RelayUri> relays;
+
+        XonlyPublicKey publicKey;
+
+        Kind kind;
+
+        public Optional<XonlyPublicKey> getPublicKey() {
+            return Optional.ofNullable(publicKey);
+        }
+
+        public Optional<Kind> getKind() {
+            return Optional.ofNullable(kind);
+        }
+    }
+
+    @Value
+    @Builder
+    public static class Naddr {
+        @NonNull
+        EventUri uri;
+
+        @Singular("relay")
+        List<RelayUri> relays;
+    }
+
+    private interface Transformer<T> {
         boolean supports(String hrp, Class<?> clazz);
 
         T decode(String hrp, byte[] data);
@@ -142,5 +194,63 @@ public final class Nip19 {
             }
             return privateKey;
         }
+    }, new Transformer<Nprofile>() {
+        @Override
+        public boolean supports(String hrp, Class<?> clazz) {
+            return EntityType.NPROFILE.getHrp().equals(hrp) && clazz.isAssignableFrom(Nprofile.class);
+        }
+
+        @Override
+        public Nprofile decode(String hrp, byte[] data) {
+            List<TLV.Entry> entries = TLV.parse(data);
+
+            TLV.Entry specialEntry = entries.stream().filter(it -> it.getType() == 0).findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type 0."));
+
+            List<RelayUri> relayEntries = entries.stream().filter(it -> it.getType() == 1)
+                    .map(it -> new String(it.getValue(), StandardCharsets.US_ASCII))
+                    .map(RelayUri::tryFromString)
+                    .flatMap(Optional::stream)
+                    .toList();
+
+            return Nprofile.builder()
+                    .publicKey(MorePublicKeys.fromBytes(specialEntry.getValue()))
+                    .relays(relayEntries)
+                    .build();
+        }
     });
+
+    private static class TLV {
+        static List<TLV.Entry> parse(byte[] raw) {
+            int i = 0;
+
+            List<Entry> entries = new LinkedList<>();
+            while (i + 1 < raw.length) {
+                int type = Byte.toUnsignedInt(raw[i]);
+                int length = Byte.toUnsignedInt(raw[i + 1]);
+
+                if (i + 2 + length > raw.length) {
+                    break;
+                }
+
+                byte[] value = Arrays.copyOfRange(raw, i + 2, i + 2 + length);
+
+                entries.add(Entry.builder()
+                        .type(type)
+                        .value(value)
+                        .build());
+
+                i = i + 2 + length;
+            }
+
+            return entries;
+        }
+
+        @Value
+        @Builder
+        static class Entry {
+            int type;
+            byte[] value;
+        }
+    }
 }
