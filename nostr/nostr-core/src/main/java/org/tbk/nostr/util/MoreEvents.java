@@ -10,6 +10,7 @@ import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nips.Nip1;
+import org.tbk.nostr.nips.Nip65;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.json.JsonWriter;
@@ -76,6 +77,10 @@ public final class MoreEvents {
 
     public static Event createFinalizedMetadata(Signer signer, Metadata metadata) {
         return finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata));
+    }
+
+    public static Event finalizeRelayList(Signer signer, Collection<RelayUri> readWriteRelays) {
+        return finalize(signer, Nip65.createRelayListEvent(signer.getPublicKey(), new HashSet<>(readWriteRelays)));
     }
 
     public static Optional<EventId> findLowestEventId(Collection<EventId> eventIds) {

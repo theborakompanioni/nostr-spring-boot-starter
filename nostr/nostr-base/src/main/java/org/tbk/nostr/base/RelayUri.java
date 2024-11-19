@@ -41,7 +41,7 @@ public final class RelayUri {
         if (!"ws".equalsIgnoreCase(uri.getScheme()) && !"wss".equalsIgnoreCase(uri.getScheme())) {
             throw new IllegalArgumentException("Unsupported scheme");
         }
-        this.uri = uri;
+        this.uri = uri.normalize();
     }
 
     public URI getUri() {

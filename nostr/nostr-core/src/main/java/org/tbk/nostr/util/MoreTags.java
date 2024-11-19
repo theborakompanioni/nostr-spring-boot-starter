@@ -8,12 +8,14 @@ import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nips.Nip10;
 import org.tbk.nostr.nips.Nip13;
 import org.tbk.nostr.nips.Nip40;
+import org.tbk.nostr.nips.Nip65;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.TagFilter;
 import org.tbk.nostr.proto.TagValue;
 
 import javax.annotation.Nullable;
+import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -170,6 +172,18 @@ public final class MoreTags {
 
     public static TagValue q(EventId eventId, RelayUri recommendedRelay, XonlyPublicKey publicKey) {
         return named(IndexedTag.q.name(), eventId.toHex(), recommendedRelay.getUri().toString(), publicKey.value.toHex());
+    }
+
+    public static TagValue r(URI uri) {
+        return named(IndexedTag.r.name(), uri.toString());
+    }
+
+    public static TagValue r(RelayUri relay) {
+        return Nip65.r(relay);
+    }
+
+    public static TagValue r(RelayUri relay, Nip65.Marker marker) {
+        return Nip65.r(relay, marker);
     }
 
     public static TagValue expiration(Duration duration) {
