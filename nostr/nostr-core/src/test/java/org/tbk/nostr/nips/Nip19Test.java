@@ -2,8 +2,10 @@ package org.tbk.nostr.nips;
 
 import fr.acinq.bitcoin.PrivateKey;
 import fr.acinq.bitcoin.XonlyPublicKey;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.util.MorePublicKeys;
 
@@ -22,7 +24,7 @@ class Nip19Test {
     void itShouldConvertNpubSuccessfully() {
         // decode0
         XonlyPublicKey publicKey0 = Nip19.fromNpub("npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg");
-        assertThat(publicKey0.value.toHex(), is("7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e"));
+        assertThat(publicKey0, is(MorePublicKeys.fromHex("7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e")));
 
         // encode0
         String npub0 = Nip19.toNpub(MorePublicKeys.fromHex("7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e"));
@@ -30,7 +32,7 @@ class Nip19Test {
 
         // decode1
         XonlyPublicKey publicKey1 = Nip19.fromNpub("npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6");
-        assertThat(publicKey1.value.toHex(), is("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"));
+        assertThat(publicKey1, is(MorePublicKeys.fromHex("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")));
 
         // encode1
         String npub1 = Nip19.toNpub(MorePublicKeys.fromHex("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"));
@@ -82,11 +84,69 @@ class Nip19Test {
     void itShouldConvertNprofileSuccessfully() {
         Nip19.Nprofile nprofile = Nip19.fromNprofile("nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p");
 
-        assertThat(nprofile.getPublicKey().value.toHex(), is("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"));
+        assertThat(nprofile.getPublicKey(), is(MorePublicKeys.fromHex("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")));
 
         assertThat(nprofile.getRelays(), hasSize(2));
         assertThat(nprofile.getRelays().get(0), is(RelayUri.fromString("wss://r.x.com")));
         assertThat(nprofile.getRelays().get(1), is(RelayUri.fromString("wss://djbas.sadkb.com")));
+    }
+
+    @Test
+    void itShouldConvertNeventSuccessfully0() {
+        Nip19.Nevent nevent = Nip19.fromNevent("nevent1qvzqqqqqqypzp7wadfmz2p3xpvu295l9k3jzz0pwglarsa6znl57uc8qwx335p7hqyvhwumn8ghj7enfv96x5ctx9ehx7um5wgcjucm0d5hszymhwden5te0dehhxarj9ehkumewwfjj7qgcwaehxw309ahx7um5wghx6ctnwdkh27pwvdhk6tcpzemhxue69uhkzat5dqhxummnw3erztnrdakj7qgewaehxw309ahx7um5wgh8yctyd9u8yct59e3k7mf0qqsp8vh0ggzy5smdstg6vxv8rfmhhwjltuekj6fq6m7p8n9uujmev6qxt0hez");
+
+        assertThat(nevent.getId(), is(EventId.fromHex("13b2ef42044a436d82d1a619871a777bba5f5f33696920d6fc13ccbce4b79668")));
+        assertThat(nevent.getPublicKey().isPresent(), is(true));
+        assertThat(nevent.getPublicKey().orElseThrow(), is(MorePublicKeys.fromHex("f9dd6a762506260b38a2d3e5b464213c2e47fa3877429fe9ee60e071a31a07d7")));
+
+        assertThat(nevent.getRelays(), hasSize(5));
+        assertThat(nevent.getRelays().get(0), is(RelayUri.fromString("wss://fiatjaf.nostr1.com/")));
+        assertThat(nevent.getRelays().get(1), is(RelayUri.fromString("wss://nostr.ono.re/")));
+        assertThat(nevent.getRelays().get(2), is(RelayUri.fromString("wss://nostr.massmux.com/")));
+        assertThat(nevent.getRelays().get(3), is(RelayUri.fromString("wss://auth.nostr1.com/")));
+        assertThat(nevent.getRelays().get(4), is(RelayUri.fromString("wss://nostr.radixrat.com/")));
+
+        assertThat(nevent.getKind().isPresent(), is(true));
+        assertThat(nevent.getKind().orElseThrow(), is(Kind.of(1)));
+    }
+
+    @Test
+    void itShouldConvertNeventSuccessfully1Minimal() {
+        Nip19.Nevent nevent = Nip19.fromNevent("nevent1qqsgas23d6gvwlv90g5pg4jpacsy55h2ag2ylk8pwp7dfleutknl0tsav9sc2");
+
+        assertThat(nevent.getId(), is(EventId.fromHex("8ec1516e90c77d857a28145641ee204a52eaea144fd8e1707cd4ff3c5da7f7ae")));
+        assertThat(nevent.getPublicKey().isPresent(), is(false));
+
+        assertThat(nevent.getRelays(), hasSize(0));
+
+        assertThat(nevent.getKind().isPresent(), is(false));
+    }
+
+    @Test
+    void itShouldConvertNeventSuccessfully2NoPublicKey() {
+        Nip19.Nevent nevent = Nip19.fromNevent("nevent1qqsy457zer9nuep8cjav6284stkr7qsk65t8jl8vf7e8f9ga0qmne6qprdmhxue69uhhyetvv9ujuam9wd6x2unwvf6xxtnrdakj7qexlv3");
+
+        assertThat(nevent.getId(), is(EventId.fromHex("4ad3c2c8cb3e6427c4bacd28f582ec3f0216d516797cec4fb274951d78373ce8")));
+        assertThat(nevent.getPublicKey().isPresent(), is(false));
+
+        assertThat(nevent.getRelays(), hasSize(1));
+        assertThat(nevent.getRelays().get(0), is(RelayUri.fromString("wss://relay.westernbtc.com/")));
+
+        assertThat(nevent.getKind().isPresent(), is(false));
+    }
+
+    @Test
+    void itShouldFailToConvertInvalidNevent() {
+        // this nevent string is missing the special (type := 0) TLV entry
+        String invalidNeventString = "nevent1qgsqlkuslr3rf56qpmd0m5ndfyl39m7q6l0zcmuly8ue0praxwkjagcpz3mhxue69uhhyetvv9ujuerpd46hxtnfduqs6amnwvaz7tmwdaejumr0dspsgqqqqqqs03k8v3";
+
+        try {
+            Nip19.Nevent ignoredOnPurpose = Nip19.fromNevent(invalidNeventString);
+            Assertions.fail("Should have thrown exception");
+        } catch (Exception e) {
+            assertThat(e.getMessage(), is("Error while decoding bech32"));
+            assertThat(e.getCause().getMessage(), is("Decoding failed: No value with type 0."));
+        }
     }
 
     @Test

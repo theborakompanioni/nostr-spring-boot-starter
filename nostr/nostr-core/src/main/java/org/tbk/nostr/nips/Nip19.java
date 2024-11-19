@@ -56,8 +56,54 @@ public final class Nip19 {
         return decode(bech32, Nprofile.class);
     }
 
+    public static Nevent fromNevent(String bech32) {
+        return decode(bech32, Nevent.class);
+    }
+
     public static Naddr fromNaddr(String bech32) {
         return decode(bech32, Naddr.class);
+    }
+
+    @Value
+    @Builder
+    public static class Nprofile {
+        @NonNull
+        XonlyPublicKey publicKey;
+
+        @Singular("relay")
+        List<RelayUri> relays;
+    }
+
+    @Value
+    @Builder
+    public static class Nevent {
+        @NonNull
+        EventId id;
+
+        @Singular("relay")
+        List<RelayUri> relays;
+
+        XonlyPublicKey publicKey;
+
+        Kind kind;
+
+        public Optional<XonlyPublicKey> getPublicKey() {
+            return Optional.ofNullable(publicKey);
+        }
+
+        public Optional<Kind> getKind() {
+            return Optional.ofNullable(kind);
+        }
+    }
+
+    @Value
+    @Builder
+    public static class Naddr {
+        @NonNull
+        EventUri uri;
+
+        @Singular("relay")
+        List<RelayUri> relays;
     }
 
     @Getter
@@ -67,6 +113,7 @@ public final class Nip19 {
         NSEC("nsec"),
         NOTE("note"),
         NPROFILE("nprofile"),
+        NEVENT("nevent"),
         NADDR("naddr"),
         ;
 
@@ -125,48 +172,6 @@ public final class Nip19 {
         }
     }
 
-    @Value
-    @Builder
-    public static class Nprofile {
-        @NonNull
-        XonlyPublicKey publicKey;
-
-        @Singular("relay")
-        List<RelayUri> relays;
-    }
-
-    @Value
-    @Builder
-    public static class Nevent {
-        @NonNull
-        EventId id;
-
-        @Singular("relay")
-        List<RelayUri> relays;
-
-        XonlyPublicKey publicKey;
-
-        Kind kind;
-
-        public Optional<XonlyPublicKey> getPublicKey() {
-            return Optional.ofNullable(publicKey);
-        }
-
-        public Optional<Kind> getKind() {
-            return Optional.ofNullable(kind);
-        }
-    }
-
-    @Value
-    @Builder
-    public static class Naddr {
-        @NonNull
-        EventUri uri;
-
-        @Singular("relay")
-        List<RelayUri> relays;
-    }
-
     private interface Transformer<T> {
         boolean supports(String hrp, Class<?> clazz);
 
@@ -210,6 +215,88 @@ public final class Nip19 {
                 throw new IllegalArgumentException("Invalid private key value");
             }
             return privateKey;
+        }
+    }, new Transformer<Nprofile>() {
+        @Override
+        public boolean supports(String hrp, Class<?> clazz) {
+            return EntityType.NPROFILE.getHrp().equals(hrp) && clazz.isAssignableFrom(Nprofile.class);
+        }
+
+        @Override
+        public Nprofile decode(String hrp, byte[] data) {
+            List<TLV.Entry> entries = TLV.parse(data);
+
+            TLV.Entry specialEntry = entries.stream()
+                    .filter(it -> it.getType() == TlvType.SPECIAL.getValue())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.SPECIAL.getValue())));
+
+            XonlyPublicKey publicKey = Optional.of(specialEntry.getValue())
+                    .map(MorePublicKeys::fromBytes)
+                    .filter(it -> it.getPublicKey().isValid())
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: Invalid value with type %d.".formatted(TlvType.SPECIAL.getValue())));
+
+            List<RelayUri> relayEntries = entries.stream()
+                    .filter(it -> it.getType() == TlvType.RELAY.getValue())
+                    .map(it -> new String(it.getValue(), StandardCharsets.US_ASCII))
+                    .map(RelayUri::tryFromString)
+                    .flatMap(Optional::stream)
+                    .toList();
+
+            return Nprofile.builder()
+                    .publicKey(publicKey)
+                    .relays(relayEntries)
+                    .build();
+        }
+    }, new Transformer<Nevent>() {
+        @Override
+        public boolean supports(String hrp, Class<?> clazz) {
+            return EntityType.NEVENT.getHrp().equals(hrp) && clazz.isAssignableFrom(Nevent.class);
+        }
+
+        @Override
+        public Nevent decode(String hrp, byte[] data) {
+            List<TLV.Entry> entries = TLV.parse(data);
+
+            TLV.Entry specialEntry = entries.stream()
+                    .filter(it -> it.getType() == TlvType.SPECIAL.getValue())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.SPECIAL.getValue())));
+
+            EventId eventId = EventId.of(specialEntry.getValue());
+
+            List<RelayUri> relayEntries = entries.stream()
+                    .filter(it -> it.getType() == TlvType.RELAY.getValue())
+                    .map(it -> new String(it.getValue(), StandardCharsets.US_ASCII))
+                    .map(RelayUri::tryFromString)
+                    .flatMap(Optional::stream)
+                    .toList();
+
+            Optional<TLV.Entry> authorEntry = entries.stream()
+                    .filter(it -> it.getType() == TlvType.AUTHOR.getValue())
+                    .findFirst();
+
+            Optional<XonlyPublicKey> author = authorEntry
+                    .map(TLV.Entry::getValue)
+                    .map(MorePublicKeys::fromBytes)
+                    .filter(it -> it.getPublicKey().isValid());
+
+            Optional<TLV.Entry> kindEntry = entries.stream()
+                    .filter(it -> it.getType() == TlvType.KIND.getValue())
+                    .findFirst();
+
+            Optional<Kind> kind = kindEntry
+                    .map(TLV.Entry::getValue)
+                    .map(it -> ByteBuffer.wrap(it).getInt())
+                    .filter(Kind::isValidKind)
+                    .map(Kind::of);
+
+            return Nevent.builder()
+                    .id(eventId)
+                    .relays(relayEntries)
+                    .publicKey(author.orElse(null))
+                    .kind(kind.orElse(null))
+                    .build();
         }
     }, new Transformer<Naddr>() {
         @Override
@@ -258,38 +345,6 @@ public final class Nip19 {
 
             return Naddr.builder()
                     .uri(EventUri.of(kind, author.value.toHex(), dTagValue))
-                    .relays(relayEntries)
-                    .build();
-        }
-    }, new Transformer<Nprofile>() {
-        @Override
-        public boolean supports(String hrp, Class<?> clazz) {
-            return EntityType.NPROFILE.getHrp().equals(hrp) && clazz.isAssignableFrom(Nprofile.class);
-        }
-
-        @Override
-        public Nprofile decode(String hrp, byte[] data) {
-            List<TLV.Entry> entries = TLV.parse(data);
-
-            TLV.Entry specialEntry = entries.stream()
-                    .filter(it -> it.getType() == TlvType.SPECIAL.getValue())
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.SPECIAL.getValue())));
-
-            XonlyPublicKey publicKey = Optional.of(specialEntry.getValue())
-                    .map(MorePublicKeys::fromBytes)
-                    .filter(it -> it.getPublicKey().isValid())
-                    .orElseThrow(() -> new IllegalArgumentException("Decoding failed: Invalid value with type %d.".formatted(TlvType.SPECIAL.getValue())));
-
-            List<RelayUri> relayEntries = entries.stream()
-                    .filter(it -> it.getType() == TlvType.RELAY.getValue())
-                    .map(it -> new String(it.getValue(), StandardCharsets.US_ASCII))
-                    .map(RelayUri::tryFromString)
-                    .flatMap(Optional::stream)
-                    .toList();
-
-            return Nprofile.builder()
-                    .publicKey(publicKey)
                     .relays(relayEntries)
                     .build();
         }
