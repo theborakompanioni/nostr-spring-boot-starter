@@ -85,14 +85,42 @@ class Nip19Test {
     }
 
     @Test
-    void itShouldConvertNprofileSuccessfully() {
-        Nprofile nprofile = Nip19.fromNprofile("nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p");
+    void itShouldConvertNprofileSuccessfully0() {
+        String nprofileEncoded = "nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p";
+        Nprofile nprofile = Nip19.fromNprofile(nprofileEncoded);
 
         assertThat(nprofile.getPublicKey(), is(MorePublicKeys.fromHex("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")));
 
         assertThat(nprofile.getRelays(), hasSize(2));
         assertThat(nprofile.getRelays().get(0), is(RelayUri.fromString("wss://r.x.com")));
         assertThat(nprofile.getRelays().get(1), is(RelayUri.fromString("wss://djbas.sadkb.com")));
+
+        // encode
+        assertThat(Nip19.toNprofile(nprofile), is(nprofileEncoded));
+    }
+
+    @Test
+    void itShouldConvertNprofileSuccessfully1Minimal() {
+        String nprofileEncoded = "nprofile1qqs0xxfxn2r406zwndk6mye9ed6fx0mya9yhcnp63am4wds70rkl2eqzv68se";
+        Nprofile nprofile = Nip19.fromNprofile(nprofileEncoded);
+
+        assertThat(nprofile.getPublicKey(), is(MorePublicKeys.fromHex("f319269a8757e84e9b6dad9325cb74933f64e9497c4c3a8f7757361e78edf564")));
+        assertThat(nprofile.getRelays(), hasSize(0));
+
+        // encode
+        assertThat(Nip19.toNprofile(nprofile), is(nprofileEncoded));
+    }
+
+    @Test
+    void itShouldEncodePublicKeyAsNprofile0() {
+        SimpleSigner signer = SimpleSigner.fromIdentity(Persona.bob());
+
+        String nprofileEncoded = Nip19.toNprofile(signer.getPublicKey());
+        assertThat(nprofileEncoded, is("nprofile1qqs8ycpm3gfjnnvukls30uwe66hxhwfctmzer5c28jg77s9232jvgzgvv90vj"));
+
+        Nprofile nprofile = Nip19.fromNprofile(nprofileEncoded);
+        assertThat(nprofile.getPublicKey(), is(MorePublicKeys.fromHex("72603b8a1329cd9cb7e117f1d9d6ae6bb9385ec591d30a3c91ef40aa8aa4c409")));
+        assertThat(nprofile.getRelays(), hasSize(0));
     }
 
     @Test

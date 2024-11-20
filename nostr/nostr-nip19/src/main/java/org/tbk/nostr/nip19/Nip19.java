@@ -48,16 +48,27 @@ public final class Nip19 {
         return Codecs.decode(bech32, Nprofile.class);
     }
 
+    public static String toNprofile(Nprofile data) {
+        return Codecs.encode(EntityType.NPROFILE.getHrp(), data);
+    }
+
+    public static String toNprofile(XonlyPublicKey publicKey) {
+        return toNprofile(publicKey, Collections.emptyList());
+    }
+
+    public static String toNprofile(XonlyPublicKey publicKey, Collection<RelayUri> relays) {
+        return toNprofile(Nprofile.builder()
+                .publicKey(publicKey)
+                .relays(relays)
+                .build());
+    }
+
     public static Nevent fromNevent(String bech32) {
         return Codecs.decode(bech32, Nevent.class);
     }
 
     public static String toNevent(Nevent data) {
         return Codecs.encode(EntityType.NEVENT.getHrp(), data);
-    }
-
-    public static Naddr fromNaddr(String bech32) {
-        return Codecs.decode(bech32, Naddr.class);
     }
 
     public static String toNevent(Event event) {
@@ -71,5 +82,9 @@ public final class Nip19 {
                 .publicKey(MorePublicKeys.fromEvent(event))
                 .kind(Kind.of(event.getKind()))
                 .build());
+    }
+
+    public static Naddr fromNaddr(String bech32) {
+        return Codecs.decode(bech32, Naddr.class);
     }
 }

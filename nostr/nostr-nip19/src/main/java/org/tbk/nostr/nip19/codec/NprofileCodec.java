@@ -9,6 +9,7 @@ import org.tbk.nostr.nip19.codec.util.TlvType;
 import org.tbk.nostr.util.MorePublicKeys;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +48,17 @@ public class NprofileCodec implements Codec<Nprofile> {
 
     @Override
     public byte[] encode(String hrp, Object data) {
-        throw new UnsupportedOperationException();
+        if (!supports(hrp, data.getClass())) {
+            throw new IllegalArgumentException("Unsupported argument types");
+        }
+        Nprofile value = ((Nprofile) data);
+
+        List<TLV.Entry> entries = new LinkedList<>();
+        entries.add(TLV.Entry.builder().type(TlvType.SPECIAL.getValue()).value(value.getPublicKey().value.toByteArray()).build());
+        value.getRelays().forEach(it -> {
+            entries.add(TLV.Entry.builder().type(TlvType.RELAY.getValue()).value(it.getUri().toASCIIString().getBytes()).build());
+        });
+
+        return TLV.encode(entries);
     }
 }
