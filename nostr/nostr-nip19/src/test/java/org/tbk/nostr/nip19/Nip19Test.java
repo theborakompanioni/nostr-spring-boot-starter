@@ -86,7 +86,7 @@ class Nip19Test {
 
     @Test
     void itShouldConvertNprofileSuccessfully() {
-        Nip19.Nprofile nprofile = Nip19.fromNprofile("nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p");
+        Nprofile nprofile = Nip19.fromNprofile("nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p");
 
         assertThat(nprofile.getPublicKey(), is(MorePublicKeys.fromHex("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")));
 
@@ -98,7 +98,7 @@ class Nip19Test {
     @Test
     void itShouldConvertNeventSuccessfully0() {
         String neventEncoded = "nevent1qvzqqqqqqypzp7wadfmz2p3xpvu295l9k3jzz0pwglarsa6znl57uc8qwx335p7hqyvhwumn8ghj7enfv96x5ctx9ehx7um5wgcjucm0d5hszymhwden5te0dehhxarj9ehkumewwfjj7qgcwaehxw309ahx7um5wghx6ctnwdkh27pwvdhk6tcpzemhxue69uhkzat5dqhxummnw3erztnrdakj7qgewaehxw309ahx7um5wgh8yctyd9u8yct59e3k7mf0qqsp8vh0ggzy5smdstg6vxv8rfmhhwjltuekj6fq6m7p8n9uujmev6qxt0hez";
-        Nip19.Nevent nevent = Nip19.fromNevent(neventEncoded);
+        Nevent nevent = Nip19.fromNevent(neventEncoded);
 
         assertThat(nevent.getEventId(), is(EventId.fromHex("13b2ef42044a436d82d1a619871a777bba5f5f33696920d6fc13ccbce4b79668")));
         assertThat(nevent.getPublicKey().isPresent(), is(true));
@@ -122,7 +122,7 @@ class Nip19Test {
     @Test
     void itShouldConvertNeventSuccessfully1Minimal() {
         String neventEncoded = "nevent1qqsgas23d6gvwlv90g5pg4jpacsy55h2ag2ylk8pwp7dfleutknl0tsav9sc2";
-        Nip19.Nevent nevent = Nip19.fromNevent(neventEncoded);
+        Nevent nevent = Nip19.fromNevent(neventEncoded);
 
         assertThat(nevent.getEventId(), is(EventId.fromHex("8ec1516e90c77d857a28145641ee204a52eaea144fd8e1707cd4ff3c5da7f7ae")));
         assertThat(nevent.getPublicKey().isPresent(), is(false));
@@ -138,7 +138,7 @@ class Nip19Test {
     @Test
     void itShouldConvertNeventSuccessfully2NoPublicKey() {
         String neventEncoded = "nevent1qqsy457zer9nuep8cjav6284stkr7qsk65t8jl8vf7e8f9ga0qmne6qprdmhxue69uhhyetvv9ujuam9wd6x2unwvf6xxtnrdakj7qexlv3";
-        Nip19.Nevent nevent = Nip19.fromNevent(neventEncoded);
+        Nevent nevent = Nip19.fromNevent(neventEncoded);
 
         assertThat(nevent.getEventId(), is(EventId.fromHex("4ad3c2c8cb3e6427c4bacd28f582ec3f0216d516797cec4fb274951d78373ce8")));
         assertThat(nevent.getPublicKey().isPresent(), is(false));
@@ -158,7 +158,7 @@ class Nip19Test {
         String invalidNeventString = "nevent1qgsqlkuslr3rf56qpmd0m5ndfyl39m7q6l0zcmuly8ue0praxwkjagcpz3mhxue69uhhyetvv9ujuerpd46hxtnfduqs6amnwvaz7tmwdaejumr0dspsgqqqqqqs03k8v3";
 
         try {
-            Nip19.Nevent ignoredOnPurpose = Nip19.fromNevent(invalidNeventString);
+            Nevent ignoredOnPurpose = Nip19.fromNevent(invalidNeventString);
             Assertions.fail("Should have thrown exception");
         } catch (Exception e) {
             assertThat(e.getMessage(), is("Error while decoding bech32"));
@@ -176,7 +176,7 @@ class Nip19Test {
         String neventEncoded = Nip19.toNevent(event);
         assertThat(neventEncoded, is("nevent1qqsqmtm0ave40kvaw72e4a04ed0evcy6fnsc7latu9wtpl24r3c6avqzyre3jf56sat7sn5mdkkexfwtwjfn7e8ff97ycw50watnv8ncah6kgqcyqqqqqqgrnkc3n"));
 
-        Nip19.Nevent nevent = Nip19.fromNevent(neventEncoded);
+        Nevent nevent = Nip19.fromNevent(neventEncoded);
         assertThat(nevent.getEventId(), is(EventId.of(event.getId().toByteArray())));
         assertThat(nevent.getRelays(), hasSize(0));
         assertThat(nevent.getPublicKey().orElseThrow(), is(MorePublicKeys.fromBytes(event.getPubkey().toByteArray())));
@@ -186,7 +186,7 @@ class Nip19Test {
     @Test
     void itShouldConvertNaddrSuccessfully() {
         String naddrEncoded = "naddr1qqyk67tswfhkv6tvv5pzqwlsccluhy6xxsr6l9a9uhhxf75g85g8a709tprjcn4e42h053vaqvzqqqqy6gq3zamnwvaz7tm90psk6urvv5hxxmmdpmcy2t";
-        Nip19.Naddr naddr = Nip19.fromNaddr(naddrEncoded);
+        Naddr naddr = Nip19.fromNaddr(naddrEncoded);
 
         assertThat(naddr.getUri().toString(), is("1234:3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d:myprofile"));
 
