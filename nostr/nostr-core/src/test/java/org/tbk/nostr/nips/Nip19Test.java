@@ -7,7 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
+import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MorePublicKeys;
+import org.tbk.nostr.util.Persona;
 
 import java.util.HexFormat;
 
@@ -93,9 +97,10 @@ class Nip19Test {
 
     @Test
     void itShouldConvertNeventSuccessfully0() {
-        Nip19.Nevent nevent = Nip19.fromNevent("nevent1qvzqqqqqqypzp7wadfmz2p3xpvu295l9k3jzz0pwglarsa6znl57uc8qwx335p7hqyvhwumn8ghj7enfv96x5ctx9ehx7um5wgcjucm0d5hszymhwden5te0dehhxarj9ehkumewwfjj7qgcwaehxw309ahx7um5wghx6ctnwdkh27pwvdhk6tcpzemhxue69uhkzat5dqhxummnw3erztnrdakj7qgewaehxw309ahx7um5wgh8yctyd9u8yct59e3k7mf0qqsp8vh0ggzy5smdstg6vxv8rfmhhwjltuekj6fq6m7p8n9uujmev6qxt0hez");
+        String neventEncoded = "nevent1qvzqqqqqqypzp7wadfmz2p3xpvu295l9k3jzz0pwglarsa6znl57uc8qwx335p7hqyvhwumn8ghj7enfv96x5ctx9ehx7um5wgcjucm0d5hszymhwden5te0dehhxarj9ehkumewwfjj7qgcwaehxw309ahx7um5wghx6ctnwdkh27pwvdhk6tcpzemhxue69uhkzat5dqhxummnw3erztnrdakj7qgewaehxw309ahx7um5wgh8yctyd9u8yct59e3k7mf0qqsp8vh0ggzy5smdstg6vxv8rfmhhwjltuekj6fq6m7p8n9uujmev6qxt0hez";
+        Nip19.Nevent nevent = Nip19.fromNevent(neventEncoded);
 
-        assertThat(nevent.getId(), is(EventId.fromHex("13b2ef42044a436d82d1a619871a777bba5f5f33696920d6fc13ccbce4b79668")));
+        assertThat(nevent.getEventId(), is(EventId.fromHex("13b2ef42044a436d82d1a619871a777bba5f5f33696920d6fc13ccbce4b79668")));
         assertThat(nevent.getPublicKey().isPresent(), is(true));
         assertThat(nevent.getPublicKey().orElseThrow(), is(MorePublicKeys.fromHex("f9dd6a762506260b38a2d3e5b464213c2e47fa3877429fe9ee60e071a31a07d7")));
 
@@ -108,31 +113,43 @@ class Nip19Test {
 
         assertThat(nevent.getKind().isPresent(), is(true));
         assertThat(nevent.getKind().orElseThrow(), is(Kind.of(1)));
+
+        // we are using a different order of the TLV values, so the encoded string does not match
+        // let's only check for object equality
+        assertThat(Nip19.fromNevent(Nip19.toNevent(nevent)), is(nevent));
     }
 
     @Test
     void itShouldConvertNeventSuccessfully1Minimal() {
-        Nip19.Nevent nevent = Nip19.fromNevent("nevent1qqsgas23d6gvwlv90g5pg4jpacsy55h2ag2ylk8pwp7dfleutknl0tsav9sc2");
+        String neventEncoded = "nevent1qqsgas23d6gvwlv90g5pg4jpacsy55h2ag2ylk8pwp7dfleutknl0tsav9sc2";
+        Nip19.Nevent nevent = Nip19.fromNevent(neventEncoded);
 
-        assertThat(nevent.getId(), is(EventId.fromHex("8ec1516e90c77d857a28145641ee204a52eaea144fd8e1707cd4ff3c5da7f7ae")));
+        assertThat(nevent.getEventId(), is(EventId.fromHex("8ec1516e90c77d857a28145641ee204a52eaea144fd8e1707cd4ff3c5da7f7ae")));
         assertThat(nevent.getPublicKey().isPresent(), is(false));
 
         assertThat(nevent.getRelays(), hasSize(0));
 
         assertThat(nevent.getKind().isPresent(), is(false));
+
+        // encode
+        assertThat(Nip19.toNevent(nevent), is(neventEncoded));
     }
 
     @Test
     void itShouldConvertNeventSuccessfully2NoPublicKey() {
-        Nip19.Nevent nevent = Nip19.fromNevent("nevent1qqsy457zer9nuep8cjav6284stkr7qsk65t8jl8vf7e8f9ga0qmne6qprdmhxue69uhhyetvv9ujuam9wd6x2unwvf6xxtnrdakj7qexlv3");
+        String neventEncoded = "nevent1qqsy457zer9nuep8cjav6284stkr7qsk65t8jl8vf7e8f9ga0qmne6qprdmhxue69uhhyetvv9ujuam9wd6x2unwvf6xxtnrdakj7qexlv3";
+        Nip19.Nevent nevent = Nip19.fromNevent(neventEncoded);
 
-        assertThat(nevent.getId(), is(EventId.fromHex("4ad3c2c8cb3e6427c4bacd28f582ec3f0216d516797cec4fb274951d78373ce8")));
+        assertThat(nevent.getEventId(), is(EventId.fromHex("4ad3c2c8cb3e6427c4bacd28f582ec3f0216d516797cec4fb274951d78373ce8")));
         assertThat(nevent.getPublicKey().isPresent(), is(false));
 
         assertThat(nevent.getRelays(), hasSize(1));
         assertThat(nevent.getRelays().get(0), is(RelayUri.fromString("wss://relay.westernbtc.com/")));
 
         assertThat(nevent.getKind().isPresent(), is(false));
+
+        // encode
+        assertThat(Nip19.toNevent(nevent), is(neventEncoded));
     }
 
     @Test
@@ -150,8 +167,26 @@ class Nip19Test {
     }
 
     @Test
+    void itShouldEncodeEventAsNevent0() {
+        SimpleSigner signer = SimpleSigner.fromIdentity(Persona.alice());
+
+        Event event = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
+                .setCreatedAt(1));
+
+        String neventEncoded = Nip19.toNevent(event);
+        assertThat(neventEncoded, is("nevent1qqsqmtm0ave40kvaw72e4a04ed0evcy6fnsc7latu9wtpl24r3c6avqzyre3jf56sat7sn5mdkkexfwtwjfn7e8ff97ycw50watnv8ncah6kgqcyqqqqqqgrnkc3n"));
+
+        Nip19.Nevent nevent = Nip19.fromNevent(neventEncoded);
+        assertThat(nevent.getEventId(), is(EventId.of(event.getId().toByteArray())));
+        assertThat(nevent.getRelays(), hasSize(0));
+        assertThat(nevent.getPublicKey().orElseThrow(), is(MorePublicKeys.fromBytes(event.getPubkey().toByteArray())));
+        assertThat(nevent.getKind().orElseThrow(), is(Kind.of(event.getKind())));
+    }
+
+    @Test
     void itShouldConvertNaddrSuccessfully() {
-        Nip19.Naddr naddr = Nip19.fromNaddr("naddr1qqyk67tswfhkv6tvv5pzqwlsccluhy6xxsr6l9a9uhhxf75g85g8a709tprjcn4e42h053vaqvzqqqqy6gq3zamnwvaz7tm90psk6urvv5hxxmmdpmcy2t");
+        String naddrEncoded = "naddr1qqyk67tswfhkv6tvv5pzqwlsccluhy6xxsr6l9a9uhhxf75g85g8a709tprjcn4e42h053vaqvzqqqqy6gq3zamnwvaz7tm90psk6urvv5hxxmmdpmcy2t";
+        Nip19.Naddr naddr = Nip19.fromNaddr(naddrEncoded);
 
         assertThat(naddr.getUri().toString(), is("1234:3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d:myprofile"));
 

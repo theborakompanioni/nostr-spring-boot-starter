@@ -10,14 +10,12 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
+import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.util.MorePublicKeys;
 
-import java.nio.ByteBuffer;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * See <a href="https://github.com/nostr-protocol/nips/blob/master/19.md">NIP-19</a>.
@@ -60,8 +58,36 @@ public final class Nip19 {
         return decode(bech32, Nevent.class);
     }
 
+    public static String toNevent(Nevent nevent) {
+        List<TLV.Entry> entries = new LinkedList<>();
+        entries.add(TLV.Entry.builder().type(TlvType.SPECIAL.value).value(nevent.getEventId().toByteArray()).build());
+        nevent.getRelays().forEach(it -> {
+            entries.add(TLV.Entry.builder().type(TlvType.RELAY.value).value(it.getUri().toASCIIString().getBytes()).build());
+        });
+        nevent.getPublicKey().ifPresent(it -> {
+            entries.add(TLV.Entry.builder().type(TlvType.AUTHOR.value).value(it.value.toByteArray()).build());
+        });
+        nevent.getKind().ifPresent(it -> {
+            entries.add(TLV.Entry.builder().type(TlvType.KIND.value).value(Ints.toByteArray(it.getValue())).build());
+        });
+        return encode(EntityType.NEVENT, TLV.encode(entries));
+    }
+
     public static Naddr fromNaddr(String bech32) {
         return decode(bech32, Naddr.class);
+    }
+
+    public static String toNevent(Event event) {
+        return toNevent(event, Collections.emptyList());
+    }
+
+    public static String toNevent(Event event, Collection<RelayUri> relays) {
+        return toNevent(Nevent.builder()
+                .eventId(EventId.of(event.getId().toByteArray()))
+                .relays(relays)
+                .publicKey(MorePublicKeys.fromEvent(event))
+                .kind(Kind.of(event.getKind()))
+                .build());
     }
 
     @Value
@@ -78,7 +104,7 @@ public final class Nip19 {
     @Builder
     public static class Nevent {
         @NonNull
-        EventId id;
+        EventId eventId;
 
         @Singular("relay")
         List<RelayUri> relays;
@@ -124,12 +150,12 @@ public final class Nip19 {
     @Getter
     @RequiredArgsConstructor
     private enum TlvType {
-        SPECIAL(0),
-        RELAY(1),
-        AUTHOR(2),
-        KIND(3);
+        SPECIAL((byte) 0),
+        RELAY((byte) 1),
+        AUTHOR((byte) 2),
+        KIND((byte) 3);
 
-        private final int value;
+        private final byte value;
     }
 
     private static byte[] decode(String bech32) {
@@ -224,7 +250,7 @@ public final class Nip19 {
 
         @Override
         public Nprofile decode(String hrp, byte[] data) {
-            List<TLV.Entry> entries = TLV.parse(data);
+            List<TLV.Entry> entries = TLV.decode(data);
 
             TLV.Entry specialEntry = entries.stream()
                     .filter(it -> it.getType() == TlvType.SPECIAL.getValue())
@@ -256,7 +282,7 @@ public final class Nip19 {
 
         @Override
         public Nevent decode(String hrp, byte[] data) {
-            List<TLV.Entry> entries = TLV.parse(data);
+            List<TLV.Entry> entries = TLV.decode(data);
 
             TLV.Entry specialEntry = entries.stream()
                     .filter(it -> it.getType() == TlvType.SPECIAL.getValue())
@@ -287,12 +313,12 @@ public final class Nip19 {
 
             Optional<Kind> kind = kindEntry
                     .map(TLV.Entry::getValue)
-                    .map(it -> ByteBuffer.wrap(it).getInt())
+                    .map(Ints::fromByteArray)
                     .filter(Kind::isValidKind)
                     .map(Kind::of);
 
             return Nevent.builder()
-                    .id(eventId)
+                    .eventId(eventId)
                     .relays(relayEntries)
                     .publicKey(author.orElse(null))
                     .kind(kind.orElse(null))
@@ -306,7 +332,7 @@ public final class Nip19 {
 
         @Override
         public Naddr decode(String hrp, byte[] data) {
-            List<TLV.Entry> entries = TLV.parse(data);
+            List<TLV.Entry> entries = TLV.decode(data);
 
             TLV.Entry specialEntry = entries.stream()
                     .filter(it -> it.getType() == TlvType.SPECIAL.getValue())
@@ -338,7 +364,7 @@ public final class Nip19 {
                     .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.KIND.getValue())));
 
             Kind kind = Optional.of(kindEntry.getValue())
-                    .map(it -> ByteBuffer.wrap(it).getInt())
+                    .map(Ints::fromByteArray)
                     .filter(Kind::isValidKind)
                     .map(Kind::of)
                     .orElseThrow(() -> new IllegalArgumentException("Decoding failed: Invalid value with type %d.".formatted(TlvType.KIND.getValue())));
@@ -351,12 +377,18 @@ public final class Nip19 {
     });
 
     private static class TLV {
-        static List<TLV.Entry> parse(byte[] raw) {
+
+        static byte[] encode(List<TLV.Entry> entries) {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            entries.forEach(it -> outputStream.writeBytes(it.toByteArray()));
+            return outputStream.toByteArray();
+        }
+
+        static List<TLV.Entry> decode(byte[] raw) {
             int i = 0;
 
             List<Entry> entries = new LinkedList<>();
             while (i + 1 < raw.length) {
-                int type = Byte.toUnsignedInt(raw[i]);
                 int length = Byte.toUnsignedInt(raw[i + 1]);
 
                 if (i + 2 + length > raw.length) {
@@ -364,9 +396,8 @@ public final class Nip19 {
                 }
 
                 byte[] value = Arrays.copyOfRange(raw, i + 2, i + 2 + length);
-
                 entries.add(Entry.builder()
-                        .type(type)
+                        .type(raw[i])
                         .value(value)
                         .build());
 
@@ -379,8 +410,37 @@ public final class Nip19 {
         @Value
         @Builder
         static class Entry {
-            int type;
+            byte type;
             byte[] value;
+
+            public byte[] getValue() {
+                return Arrays.copyOf(this.value, this.value.length);
+            }
+
+            public byte[] toByteArray() {
+                byte[] bytes = new byte[value.length + 2];
+                bytes[0] = type;
+                bytes[1] = Integer.valueOf(value.length).byteValue();
+                System.arraycopy(value, 0, bytes, 2, value.length);
+                return bytes;
+            }
+        }
+    }
+
+    private static class Ints {
+        public static byte[] toByteArray(int value) {
+            return new byte[]{(byte) (value >> 24), (byte) (value >> 16), (byte) (value >> 8), (byte) value};
+        }
+
+        public static int fromByteArray(byte[] bytes) {
+            if (bytes.length < 4) {
+                throw new IllegalArgumentException("array too small: %d < %d".formatted(bytes.length, 4));
+            }
+            return fromBytes(bytes[0], bytes[1], bytes[2], bytes[3]);
+        }
+
+        private static int fromBytes(byte b1, byte b2, byte b3, byte b4) {
+            return b1 << 24 | (b2 & 255) << 16 | (b3 & 255) << 8 | b4 & 255;
         }
     }
 }

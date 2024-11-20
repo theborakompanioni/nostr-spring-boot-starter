@@ -21,8 +21,13 @@ public class SimpleSigner implements Signer {
     public static SimpleSigner fromPrivateKey(PrivateKey privateKey) {
         return new SimpleSigner(privateKey);
     }
+
     public static SimpleSigner fromIdentity(Identity identity) {
-        return fromPrivateKey(identity.deriveAccount(0L).getPrivateKey());
+        return fromAccount(identity.deriveAccount(0L));
+    }
+
+    public static SimpleSigner fromAccount(Identity.Account account) {
+        return fromPrivateKey(account.getPrivateKey());
     }
 
     private final PrivateKey privateKey;
