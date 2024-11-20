@@ -1,4 +1,4 @@
-package org.tbk.nostr.util;
+package org.tbk.nostr.nip19;
 
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.MnemonicCode;
@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+// TODO: move to own package
 public class Persona {
     private Persona() {
         throw new UnsupportedOperationException();

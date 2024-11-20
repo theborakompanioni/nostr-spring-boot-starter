@@ -1,4 +1,4 @@
-package org.tbk.nostr.nips;
+package org.tbk.nostr.nip19;
 
 import fr.acinq.bitcoin.Bech32;
 import fr.acinq.bitcoin.ByteVector32;

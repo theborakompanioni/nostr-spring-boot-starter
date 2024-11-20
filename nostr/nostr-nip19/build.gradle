@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr nip19 package'
+
+dependencies {
+    implementation project(':nostr:nostr-core')
+    
+    api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
+
+    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
+}

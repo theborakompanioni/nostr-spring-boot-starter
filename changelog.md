@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking
 - RelayUri: change signature of method `of(String)` and rename to `fromString`
+- nip19: move from `nostr-core` to module `nostr-nip19`
 
 ## [0.0.3] - 2024-11-12
 

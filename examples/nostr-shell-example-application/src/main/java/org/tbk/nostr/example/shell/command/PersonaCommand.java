@@ -11,7 +11,7 @@ import org.springframework.shell.standard.ShellOption;
 import org.tbk.nostr.example.shell.util.Json;
 import org.tbk.nostr.identity.Identity;
 import org.tbk.nostr.identity.MoreIdentities;
-import org.tbk.nostr.nips.Nip19;
+import org.tbk.nostr.nip19.Nip19;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

@@ -9,7 +9,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.client.NostrClientService;
-import org.tbk.nostr.nips.Nip19;
+import org.tbk.nostr.nip19.Nip19;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.ReqRequest;
 import org.tbk.nostr.util.MorePublicKeys;

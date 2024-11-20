@@ -1,4 +1,4 @@
-package org.tbk.nostr.nips;
+package org.tbk.nostr.nip19;
 
 import fr.acinq.bitcoin.PrivateKey;
 import fr.acinq.bitcoin.XonlyPublicKey;
@@ -8,10 +8,10 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MorePublicKeys;
-import org.tbk.nostr.util.Persona;
 
 import java.util.HexFormat;
 
