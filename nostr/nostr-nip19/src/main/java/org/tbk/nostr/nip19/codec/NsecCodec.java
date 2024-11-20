@@ -1,9 +1,10 @@
-package org.tbk.nostr.nip19;
+package org.tbk.nostr.nip19.codec;
 
 import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.PrivateKey;
+import org.tbk.nostr.nip19.EntityType;
 
-class NsecCodec implements Codec<PrivateKey> {
+public class NsecCodec implements Codec<PrivateKey> {
     @Override
     public boolean supports(String hrp, Class<?> clazz) {
         return EntityType.NSEC.getHrp().equals(hrp) && clazz.isAssignableFrom(PrivateKey.class);

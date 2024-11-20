@@ -1,9 +1,10 @@
-package org.tbk.nostr.nip19;
+package org.tbk.nostr.nip19.codec;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
+import org.tbk.nostr.nip19.EntityType;
 import org.tbk.nostr.util.MorePublicKeys;
 
-class NpubCodec implements Codec<XonlyPublicKey> {
+public class NpubCodec implements Codec<XonlyPublicKey> {
     @Override
     public boolean supports(String hrp, Class<?> clazz) {
         return EntityType.NPUB.getHrp().equals(hrp) && clazz.isAssignableFrom(XonlyPublicKey.class);

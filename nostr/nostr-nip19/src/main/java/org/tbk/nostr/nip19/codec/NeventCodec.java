@@ -1,9 +1,14 @@
-package org.tbk.nostr.nip19;
+package org.tbk.nostr.nip19.codec;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
+import org.tbk.nostr.nip19.EntityType;
+import org.tbk.nostr.nip19.Nevent;
+import org.tbk.nostr.nip19.codec.util.Ints;
+import org.tbk.nostr.nip19.codec.util.TLV;
+import org.tbk.nostr.nip19.codec.util.TlvType;
 import org.tbk.nostr.util.MorePublicKeys;
 
 import java.nio.charset.StandardCharsets;
@@ -11,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-class NeventCodec implements Codec<Nevent> {
+public class NeventCodec implements Codec<Nevent> {
     @Override
     public boolean supports(String hrp, Class<?> clazz) {
         return EntityType.NEVENT.getHrp().equals(hrp) && clazz.isAssignableFrom(Nevent.class);

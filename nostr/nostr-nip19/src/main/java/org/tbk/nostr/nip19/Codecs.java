@@ -2,6 +2,7 @@ package org.tbk.nostr.nip19;
 
 import fr.acinq.bitcoin.Bech32;
 import kotlin.Triple;
+import org.tbk.nostr.nip19.codec.*;
 
 import java.util.ArrayList;
 import java.util.List;

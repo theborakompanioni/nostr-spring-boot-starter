@@ -1,16 +1,21 @@
-package org.tbk.nostr.nip19;
+package org.tbk.nostr.nip19.codec;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
+import org.tbk.nostr.nip19.EntityType;
+import org.tbk.nostr.nip19.Naddr;
+import org.tbk.nostr.nip19.codec.util.Ints;
+import org.tbk.nostr.nip19.codec.util.TLV;
+import org.tbk.nostr.nip19.codec.util.TlvType;
 import org.tbk.nostr.util.MorePublicKeys;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
-class NaddrCodec implements Codec<Naddr> {
+public class NaddrCodec implements Codec<Naddr> {
     @Override
     public boolean supports(String hrp, Class<?> clazz) {
         return EntityType.NADDR.getHrp().equals(hrp) && clazz.isAssignableFrom(Naddr.class);

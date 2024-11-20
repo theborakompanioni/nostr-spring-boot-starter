@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-enum EntityType {
+public enum EntityType {
     NPUB("npub"),
     NSEC("nsec"),
     NOTE("note"),

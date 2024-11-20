@@ -1,4 +1,4 @@
-package org.tbk.nostr.nip19;
+package org.tbk.nostr.nip19.codec.util;
 
 import lombok.Builder;
 import lombok.Value;
@@ -8,18 +8,18 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-class TLV {
+public class TLV {
     private TLV() {
         throw new UnsupportedOperationException();
     }
 
-    static byte[] encode(List<Entry> entries) {
+    public static byte[] encode(List<Entry> entries) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         entries.forEach(it -> outputStream.writeBytes(it.toByteArray()));
         return outputStream.toByteArray();
     }
 
-    static List<Entry> decode(byte[] raw) {
+    public static List<Entry> decode(byte[] raw) {
         int i = 0;
 
         List<Entry> entries = new LinkedList<>();
@@ -44,7 +44,7 @@ class TLV {
 
     @Value
     @Builder
-    static class Entry {
+    public static class Entry {
         byte type;
         byte[] value;
 

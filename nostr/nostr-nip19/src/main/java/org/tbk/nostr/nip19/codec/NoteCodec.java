@@ -1,8 +1,9 @@
-package org.tbk.nostr.nip19;
+package org.tbk.nostr.nip19.codec;
 
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.nip19.EntityType;
 
-class NoteCodec implements Codec<EventId> {
+public class NoteCodec implements Codec<EventId> {
     @Override
     public boolean supports(String hrp, Class<?> clazz) {
         return EntityType.NOTE.getHrp().equals(hrp) && clazz.isAssignableFrom(EventId.class);

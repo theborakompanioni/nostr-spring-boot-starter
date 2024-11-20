@@ -1,14 +1,18 @@
-package org.tbk.nostr.nip19;
+package org.tbk.nostr.nip19.codec;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.RelayUri;
+import org.tbk.nostr.nip19.EntityType;
+import org.tbk.nostr.nip19.Nprofile;
+import org.tbk.nostr.nip19.codec.util.TLV;
+import org.tbk.nostr.nip19.codec.util.TlvType;
 import org.tbk.nostr.util.MorePublicKeys;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
-class NprofileCodec implements Codec<Nprofile> {
+public class NprofileCodec implements Codec<Nprofile> {
     @Override
     public boolean supports(String hrp, Class<?> clazz) {
         return EntityType.NPROFILE.getHrp().equals(hrp) && clazz.isAssignableFrom(Nprofile.class);

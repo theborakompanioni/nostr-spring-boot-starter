@@ -1,4 +1,4 @@
-package org.tbk.nostr.nip19;
+package org.tbk.nostr.nip19.codec;
 
 public interface Codec<T> {
     boolean supports(String hrp, Class<?> clazz);
