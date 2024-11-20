@@ -7,6 +7,7 @@ import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.util.MorePublicKeys;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,5 +60,27 @@ class NeventCodec implements Codec<Nevent> {
                 .publicKey(author.orElse(null))
                 .kind(kind.orElse(null))
                 .build();
+    }
+
+    @Override
+    public byte[] encode(String hrp, Object data) {
+        if (!supports(hrp, data.getClass())) {
+            throw new IllegalArgumentException("Unsupported argument types");
+        }
+        Nevent value = ((Nevent) data);
+
+        List<TLV.Entry> entries = new LinkedList<>();
+        entries.add(TLV.Entry.builder().type(TlvType.SPECIAL.getValue()).value(value.getEventId().toByteArray()).build());
+        value.getRelays().forEach(it -> {
+            entries.add(TLV.Entry.builder().type(TlvType.RELAY.getValue()).value(it.getUri().toASCIIString().getBytes()).build());
+        });
+        value.getPublicKey().ifPresent(it -> {
+            entries.add(TLV.Entry.builder().type(TlvType.AUTHOR.getValue()).value(it.value.toByteArray()).build());
+        });
+        value.getKind().ifPresent(it -> {
+            entries.add(TLV.Entry.builder().type(TlvType.KIND.getValue()).value(Ints.toByteArray(it.getValue())).build());
+        });
+
+        return TLV.encode(entries);
     }
 }

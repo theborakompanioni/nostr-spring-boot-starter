@@ -60,4 +60,9 @@ class NaddrCodec implements Codec<Naddr> {
                 .relays(relayEntries)
                 .build();
     }
+
+    @Override
+    public byte[] encode(String hrp, Object data) {
+        throw new UnsupportedOperationException();
+    }
 }

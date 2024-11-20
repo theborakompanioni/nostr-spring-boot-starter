@@ -40,4 +40,9 @@ class NprofileCodec implements Codec<Nprofile> {
                 .relays(relayEntries)
                 .build();
     }
+
+    @Override
+    public byte[] encode(String hrp, Object data) {
+        throw new UnsupportedOperationException();
+    }
 }

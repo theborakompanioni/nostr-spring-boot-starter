@@ -17,4 +17,12 @@ class NpubCodec implements Codec<XonlyPublicKey> {
         }
         return publicKey;
     }
+
+    @Override
+    public byte[] encode(String hrp, Object data) {
+        if (!supports(hrp, data.getClass())) {
+            throw new IllegalArgumentException("Unsupported argument types");
+        }
+        return ((XonlyPublicKey) data).value.toByteArray();
+    }
 }

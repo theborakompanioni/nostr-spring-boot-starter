@@ -12,4 +12,12 @@ class NoteCodec implements Codec<EventId> {
     public EventId decode(String hrp, byte[] data) {
         return EventId.of(data);
     }
+
+    @Override
+    public byte[] encode(String hrp, Object data) {
+        if (!supports(hrp, data.getClass())) {
+            throw new IllegalArgumentException("Unsupported argument types");
+        }
+        return ((EventId) data).toByteArray();
+    }
 }

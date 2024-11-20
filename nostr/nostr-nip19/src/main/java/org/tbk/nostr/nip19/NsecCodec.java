@@ -17,4 +17,12 @@ class NsecCodec implements Codec<PrivateKey> {
         }
         return privateKey;
     }
+
+    @Override
+    public byte[] encode(String hrp, Object data) {
+        if (!supports(hrp, data.getClass())) {
+            throw new IllegalArgumentException("Unsupported argument types");
+        }
+        return ((PrivateKey) data).value.toByteArray();
+    }
 }
