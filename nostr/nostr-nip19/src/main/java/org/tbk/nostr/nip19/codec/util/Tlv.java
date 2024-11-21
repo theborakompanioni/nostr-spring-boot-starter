@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public final class TLV {
-    private TLV() {
+public final class Tlv {
+    private Tlv() {
         throw new UnsupportedOperationException();
     }
 

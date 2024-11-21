@@ -4,7 +4,7 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nip19.EntityType;
 import org.tbk.nostr.nip19.Nprofile;
-import org.tbk.nostr.nip19.codec.util.TLV;
+import org.tbk.nostr.nip19.codec.util.Tlv;
 import org.tbk.nostr.nip19.codec.util.TlvType;
 import org.tbk.nostr.util.MorePublicKeys;
 
@@ -21,9 +21,9 @@ public class NprofileCodec implements Codec<Nprofile> {
 
     @Override
     public Nprofile decode(String hrp, byte[] data) {
-        List<TLV.Entry> entries = TLV.decode(data);
+        List<Tlv.Entry> entries = Tlv.decode(data);
 
-        TLV.Entry specialEntry = entries.stream()
+        Tlv.Entry specialEntry = entries.stream()
                 .filter(it -> it.getType() == TlvType.SPECIAL.getValue())
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.SPECIAL.getValue())));
@@ -53,12 +53,12 @@ public class NprofileCodec implements Codec<Nprofile> {
         }
         Nprofile value = ((Nprofile) data);
 
-        List<TLV.Entry> entries = new LinkedList<>();
-        entries.add(TLV.Entry.builder().type(TlvType.SPECIAL.getValue()).value(value.getPublicKey().value.toByteArray()).build());
+        List<Tlv.Entry> entries = new LinkedList<>();
+        entries.add(Tlv.Entry.builder().type(TlvType.SPECIAL.getValue()).value(value.getPublicKey().value.toByteArray()).build());
         value.getRelays().forEach(it -> {
-            entries.add(TLV.Entry.builder().type(TlvType.RELAY.getValue()).value(it.getUri().toASCIIString().getBytes()).build());
+            entries.add(Tlv.Entry.builder().type(TlvType.RELAY.getValue()).value(it.getUri().toASCIIString().getBytes()).build());
         });
 
-        return TLV.encode(entries);
+        return Tlv.encode(entries);
     }
 }

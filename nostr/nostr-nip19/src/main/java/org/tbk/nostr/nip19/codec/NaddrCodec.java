@@ -7,7 +7,7 @@ import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nip19.EntityType;
 import org.tbk.nostr.nip19.Naddr;
 import org.tbk.nostr.nip19.codec.util.Ints;
-import org.tbk.nostr.nip19.codec.util.TLV;
+import org.tbk.nostr.nip19.codec.util.Tlv;
 import org.tbk.nostr.nip19.codec.util.TlvType;
 import org.tbk.nostr.util.MorePublicKeys;
 
@@ -24,9 +24,9 @@ public class NaddrCodec implements Codec<Naddr> {
 
     @Override
     public Naddr decode(String hrp, byte[] data) {
-        List<TLV.Entry> entries = TLV.decode(data);
+        List<Tlv.Entry> entries = Tlv.decode(data);
 
-        TLV.Entry specialEntry = entries.stream()
+        Tlv.Entry specialEntry = entries.stream()
                 .filter(it -> it.getType() == TlvType.SPECIAL.getValue())
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.SPECIAL.getValue())));
@@ -40,7 +40,7 @@ public class NaddrCodec implements Codec<Naddr> {
                 .flatMap(Optional::stream)
                 .toList();
 
-        TLV.Entry authorEntry = entries.stream()
+        Tlv.Entry authorEntry = entries.stream()
                 .filter(it -> it.getType() == TlvType.AUTHOR.getValue())
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.AUTHOR.getValue())));
@@ -50,7 +50,7 @@ public class NaddrCodec implements Codec<Naddr> {
                 .filter(it -> it.getPublicKey().isValid())
                 .orElseThrow(() -> new IllegalArgumentException("Decoding failed: Invalid value with type %d.".formatted(TlvType.AUTHOR.getValue())));
 
-        TLV.Entry kindEntry = entries.stream()
+        Tlv.Entry kindEntry = entries.stream()
                 .filter(it -> it.getType() == TlvType.KIND.getValue())
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Decoding failed: No value with type %d.".formatted(TlvType.KIND.getValue())));
@@ -74,28 +74,28 @@ public class NaddrCodec implements Codec<Naddr> {
         }
         Naddr value = ((Naddr) data);
 
-        List<TLV.Entry> entries = new LinkedList<>();
-        entries.add(TLV.Entry.builder()
+        List<Tlv.Entry> entries = new LinkedList<>();
+        entries.add(Tlv.Entry.builder()
                 .type(TlvType.SPECIAL.getValue())
                 .value(value.getEventUri().getIdentifier().orElse("").getBytes(StandardCharsets.UTF_8))
                 .build());
 
         value.getRelays().forEach(it -> {
-            entries.add(TLV.Entry.builder()
+            entries.add(Tlv.Entry.builder()
                     .type(TlvType.RELAY.getValue())
                     .value(it.getUri().toASCIIString().getBytes())
                     .build());
         });
-        entries.add(TLV.Entry.builder()
+        entries.add(Tlv.Entry.builder()
                 .type(TlvType.AUTHOR.getValue())
                 .value(value.getEventUri().getPublicKey())
                 .build());
 
-        entries.add(TLV.Entry.builder()
+        entries.add(Tlv.Entry.builder()
                 .type(TlvType.KIND.getValue())
                 .value(Ints.toByteArray(value.getEventUri().getKind().getValue()))
                 .build());
 
-        return TLV.encode(entries);
+        return Tlv.encode(entries);
     }
 }
