@@ -3,7 +3,9 @@ package org.tbk.nostr.nip19.codec.util;
 import lombok.Builder;
 import lombok.Value;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,23 +22,34 @@ public final class Tlv {
     }
 
     public static List<Entry> decode(byte[] raw) {
-        int i = 0;
-
         List<Entry> entries = new LinkedList<>();
-        while (i + 1 < raw.length) {
-            int length = Byte.toUnsignedInt(raw[i + 1]);
 
-            if (i + 2 + length > raw.length) {
+        ByteArrayInputStream in = new ByteArrayInputStream(raw);
+
+        while (true) {
+            int type = in.read();
+            if (type == -1) {
+                break;
+            }
+            int length = in.read();
+            if (length == -1) {
                 break;
             }
 
-            byte[] value = Arrays.copyOfRange(raw, i + 2, i + 2 + length);
-            entries.add(Entry.builder()
-                    .type(raw[i])
-                    .value(value)
-                    .build());
+            try {
+                byte[] value = in.readNBytes(length);
+                if (value.length != length) {
+                    break;
+                }
 
-            i = i + 2 + length;
+                entries.add(Entry.builder()
+                        .type((byte) type)
+                        .value(value)
+                        .build());
+
+            } catch (IOException e) {
+                break;
+            }
         }
 
         return entries;
