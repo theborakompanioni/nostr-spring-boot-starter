@@ -72,7 +72,7 @@ public class ReplaceableEventInterceptor implements RequestHandlerInterceptor {
         } else if (Nip1.isAddressableEvent(event)) {
             IndexedTag identifier = IndexedTag.d;
 
-            TagValue identifierTag = MoreTags.findByNameSingle(event, identifier.name())
+            TagValue identifierTag = MoreTags.findByNameSingle(event, identifier)
                     .orElseThrow(() -> new IllegalStateException("Error while replacing events: Missing or conflicting '%s' tag.".formatted(identifier.name())));
 
             String firstIdentifierValueOrNull = identifierTag.getValuesCount() == 0 ? null : identifierTag.getValues(0);
@@ -93,7 +93,7 @@ public class ReplaceableEventInterceptor implements RequestHandlerInterceptor {
         } else if (Nip1.isAddressableEvent(event)) {
             IndexedTag identifier = IndexedTag.d;
 
-            TagValue identifierTag = MoreTags.findByNameSingle(event, identifier.name())
+            TagValue identifierTag = MoreTags.findByNameSingle(event, identifier)
                     .orElseThrow(() -> new IllegalStateException("Error while replacing events: Missing or conflicting '%s' tag.".formatted(identifier.name())));
 
             String firstIdentifierValueOrNull = identifierTag.getValuesCount() == 0 ? null : identifierTag.getValues(0);

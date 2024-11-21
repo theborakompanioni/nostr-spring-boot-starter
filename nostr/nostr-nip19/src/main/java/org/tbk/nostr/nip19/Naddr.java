@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 public class Naddr {
     @NonNull
-    EventUri uri;
+    EventUri eventUri;
 
     @Singular("relay")
     List<RelayUri> relays;

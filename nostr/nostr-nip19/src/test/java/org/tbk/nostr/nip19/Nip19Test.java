@@ -195,7 +195,7 @@ class Nip19Test {
     }
 
     @Test
-    void itShouldEncodeEventAsNevent0() {
+    void itShouldEncodeNevent0Event() {
         SimpleSigner signer = SimpleSigner.fromIdentity(Persona.alice());
 
         Event event = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
@@ -212,13 +212,85 @@ class Nip19Test {
     }
 
     @Test
+    void itShouldEncodeNevent1ReplaceableEvent() {
+        SimpleSigner signer = SimpleSigner.fromIdentity(Persona.alice());
+
+        Event event = MoreEvents.finalize(signer, Nip1.createReplaceableEvent(signer.getPublicKey(), "GM")
+                .setCreatedAt(1));
+        assertThat("sanity check", Nip1.isReplaceableEvent(event), is(true));
+
+        String neventEncoded = Nip19.toNevent(event);
+        assertThat(neventEncoded, is("nevent1qqs2malx2x2fmdevyk8t9axknszspq2erntvr3qsgnpe5needmhn2rczyre3jf56sat7sn5mdkkexfwtwjfn7e8ff97ycw50watnv8ncah6kgqcyqqqzwyqdqd6t6"));
+
+        Nevent nevent = Nip19.fromNevent(neventEncoded);
+        assertThat(nevent.getEventId(), is(EventId.of(event.getId().toByteArray())));
+        assertThat(nevent.getRelays(), hasSize(0));
+        assertThat(nevent.getPublicKey().orElseThrow(), is(MorePublicKeys.fromBytes(event.getPubkey().toByteArray())));
+        assertThat(nevent.getKind().orElseThrow(), is(Kind.of(event.getKind())));
+    }
+
+    @Test
+    void itShouldEncodeNevent2AddressableEvent() {
+        SimpleSigner signer = SimpleSigner.fromIdentity(Persona.alice());
+
+        Event event = MoreEvents.finalize(signer, Nip1.createAddressableEvent(signer.getPublicKey(), "GM", "d-tag")
+                .setCreatedAt(1));
+        assertThat("sanity check", Nip1.isAddressableEvent(event), is(true));
+
+        String neventEncoded = Nip19.toNevent(event);
+        assertThat(neventEncoded, is("nevent1qqs8quc49hrxy6pvhqceg7hqmcqw4e2hdewyp0377cacxlqrfmxxc9szyre3jf56sat7sn5mdkkexfwtwjfn7e8ff97ycw50watnv8ncah6kgqcyqqq82vq94w7ta"));
+
+        Nevent nevent = Nip19.fromNevent(neventEncoded);
+        assertThat(nevent.getEventId(), is(EventId.of(event.getId().toByteArray())));
+        assertThat(nevent.getRelays(), hasSize(0));
+        assertThat(nevent.getPublicKey().orElseThrow(), is(MorePublicKeys.fromBytes(event.getPubkey().toByteArray())));
+        assertThat(nevent.getKind().orElseThrow(), is(Kind.of(event.getKind())));
+    }
+
+    @Test
     void itShouldConvertNaddrSuccessfully() {
         String naddrEncoded = "naddr1qqyk67tswfhkv6tvv5pzqwlsccluhy6xxsr6l9a9uhhxf75g85g8a709tprjcn4e42h053vaqvzqqqqy6gq3zamnwvaz7tm90psk6urvv5hxxmmdpmcy2t";
         Naddr naddr = Nip19.fromNaddr(naddrEncoded);
 
-        assertThat(naddr.getUri().toString(), is("1234:3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d:myprofile"));
+        assertThat(naddr.getEventUri().toString(), is("1234:3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d:myprofile"));
 
         assertThat(naddr.getRelays(), hasSize(1));
         assertThat(naddr.getRelays().get(0), is(RelayUri.fromString("wss://example.com")));
+
+        // we are using a different order of the TLV values, so the encoded string does not match
+        // let's only check for object equality
+        assertThat(Nip19.fromNaddr(Nip19.toNaddr(naddr)), is(naddr));
+    }
+
+    @Test
+    void itShouldEncodeEventAsNaddr0ReplaceableEvent() {
+        SimpleSigner signer = SimpleSigner.fromIdentity(Persona.alice());
+
+        Event event = MoreEvents.finalize(signer, Nip1.createReplaceableEvent(signer.getPublicKey(), "GM")
+                .setCreatedAt(1));
+        assertThat("sanity check", Nip1.isReplaceableEvent(event), is(true));
+
+        String naddrEncoded = Nip19.toNaddr(event);
+        assertThat(naddrEncoded, is("naddr1qqqqyg8nrynf4p6hap8fkmddjvjukayn8ajwjjtufsag7a6hxc083m04vspsgqqqyugq9fj9gq"));
+
+        Naddr naddr = Nip19.fromNaddr(naddrEncoded);
+        assertThat(naddr.getEventUri().toString(), is("10000:f319269a8757e84e9b6dad9325cb74933f64e9497c4c3a8f7757361e78edf564:"));
+        assertThat(naddr.getRelays(), hasSize(0));
+    }
+
+    @Test
+    void itShouldEncodeEventAsNaddr0AddressableEvent() {
+        SimpleSigner signer = SimpleSigner.fromIdentity(Persona.alice());
+
+        Event event = MoreEvents.finalize(signer, Nip1.createAddressableEvent(signer.getPublicKey(), "GM", "d-tag")
+                .setCreatedAt(1));
+        assertThat("sanity check", Nip1.isAddressableEvent(event), is(true));
+
+        String naddrEncoded = Nip19.toNaddr(event);
+        assertThat(naddrEncoded, is("naddr1qqzkgtt5v9nsyg8nrynf4p6hap8fkmddjvjukayn8ajwjjtufsag7a6hxc083m04vspsgqqqw5cqrvgmwa"));
+
+        Naddr naddr = Nip19.fromNaddr(naddrEncoded);
+        assertThat(naddr.getEventUri().toString(), is("30000:f319269a8757e84e9b6dad9325cb74933f64e9497c4c3a8f7757361e78edf564:d-tag"));
+        assertThat(naddr.getRelays(), hasSize(0));
     }
 }

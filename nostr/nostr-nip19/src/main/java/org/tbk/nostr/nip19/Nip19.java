@@ -2,11 +2,11 @@ package org.tbk.nostr.nip19;
 
 import fr.acinq.bitcoin.PrivateKey;
 import fr.acinq.bitcoin.XonlyPublicKey;
-import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.base.Kind;
-import org.tbk.nostr.base.RelayUri;
+import org.tbk.nostr.base.*;
+import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.util.MorePublicKeys;
+import org.tbk.nostr.util.MoreTags;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -86,5 +86,39 @@ public final class Nip19 {
 
     public static Naddr fromNaddr(String bech32) {
         return Codecs.decode(bech32, Naddr.class);
+    }
+
+    public static String toNaddr(Naddr data) {
+        return Codecs.encode(EntityType.NADDR.getHrp(), data);
+    }
+
+    public static String toNaddr(EventUri eventUri) {
+        return toNaddr(eventUri, Collections.emptyList());
+    }
+
+    public static String toNaddr(EventUri eventUri, Collection<RelayUri> relays) {
+        return toNaddr(Naddr.builder()
+                .eventUri(eventUri)
+                .relays(relays)
+                .build());
+    }
+
+    public static String toNaddr(Event event) {
+        if (!Nip1.isReplaceableEvent(event) && !Nip1.isAddressableEvent(event)) {
+            throw new IllegalArgumentException("Event must be replaceable or addressable: Got kind %d.".formatted(event.getKind()));
+        }
+
+        XonlyPublicKey publicKey = MorePublicKeys.fromEvent(event);
+
+        if (Nip1.isReplaceableEvent(event)) {
+            return toNaddr(EventUri.of(event.getKind(), publicKey.value.toHex()));
+        }
+
+        String dTagValue = MoreTags.findByNameSingle(event, IndexedTag.d)
+                .filter(it -> it.getValuesCount() > 0)
+                .map(it -> it.getValues(0))
+                .orElseThrow(() -> new IllegalStateException("Missing or conflicting '%s' tag.".formatted(IndexedTag.d)));
+
+        return toNaddr(EventUri.of(event.getKind(), publicKey.value.toHex(), dTagValue));
     }
 }
