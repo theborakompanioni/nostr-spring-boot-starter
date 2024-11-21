@@ -9,10 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default connection timeouts for `NostrTemplate` and `NostrClientService` implementations
 - Validation of relay URL in standard tags
 - Validation of 'k' tag
+- nip19: encode/decode `nprofile`, `nevent`, `naddr`
 
 ### Breaking
 - RelayUri: change signature of method `of(String)` and rename to `fromString`
 - nip19: move from `nostr-core` to module `nostr-nip19`
+- nip19: rename method from `from*` to `decode*`
+- nip19: rename methods from `to*` to `encode*`
 
 ## [0.0.3] - 2024-11-12
 

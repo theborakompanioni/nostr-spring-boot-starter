@@ -1,6 +1,6 @@
 package org.tbk.nostr.nip19.codec.util;
 
-public class Ints {
+public final class Ints {
     private Ints() {
         throw new UnsupportedOperationException();
     }

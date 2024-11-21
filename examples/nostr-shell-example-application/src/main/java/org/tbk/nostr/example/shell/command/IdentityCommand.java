@@ -26,8 +26,8 @@ class IdentityCommand {
                 .startObject()
                 .put("privateKey", account.getPrivateKey().toHex())
                 .put("publicKey", account.getPublicKey().value.toHex())
-                .put("nsec", Nip19.toNsec(account.getPrivateKey()))
-                .put("npub", Nip19.toNpub(account.getPublicKey()))
+                .put("nsec", Nip19.encodeNsec(account.getPrivateKey()))
+                .put("npub", Nip19.encodeNpub(account.getPublicKey()))
                 .end()
                 .finish();
     }

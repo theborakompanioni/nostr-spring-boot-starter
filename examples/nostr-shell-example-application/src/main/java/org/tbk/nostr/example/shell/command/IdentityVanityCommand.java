@@ -50,8 +50,8 @@ class IdentityVanityCommand {
                 .startObject()
                 .put("privateKey", account.getPrivateKey().toHex())
                 .put("publicKey", account.getPublicKey().value.toHex())
-                .put("nsec", Nip19.toNsec(account.getPrivateKey()))
-                .put("npub", Nip19.toNpub(account.getPublicKey()))
+                .put("nsec", Nip19.encodeNsec(account.getPrivateKey()))
+                .put("npub", Nip19.encodeNpub(account.getPublicKey()))
                 .end()
                 .finish();
     }
@@ -65,7 +65,7 @@ class IdentityVanityCommand {
     }
 
     private static Predicate<Identity.Account> withNpubPrefix(String npubPrefix) {
-        return account -> Nip19.toNpub(account.getPublicKey()).startsWith("npub1" + npubPrefix);
+        return account -> Nip19.encodeNpub(account.getPublicKey()).startsWith("npub1" + npubPrefix);
     }
 
     private Mono<Identity.Account> randomAccountWithNpubHavingPrefix(String npubPrefix, int parallelism) {
