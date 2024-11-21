@@ -9,6 +9,7 @@ import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 
 /**
@@ -35,11 +36,19 @@ public final class Nip18 {
                event.getKind() == Nip18.kindGenericRepost().getValue();
     }
 
+    public static Event.Builder repost(XonlyPublicKey publicKey, Event event) {
+        return event.getKind() == 1 ? repostShortTextNote(publicKey, event) : repostGenericEvent(publicKey, event);
+    }
+
     public static Event.Builder repost(XonlyPublicKey publicKey, Event event, RelayUri relayUri) {
         return event.getKind() == 1 ? repostShortTextNote(publicKey, event, relayUri) : repostGenericEvent(publicKey, event, relayUri);
     }
 
-    public static Event.Builder repostShortTextNote(XonlyPublicKey publicKey, Event event, RelayUri relayUri) {
+    public static Event.Builder repostShortTextNote(XonlyPublicKey publicKey, Event event) {
+        return repostShortTextNote(publicKey, event, null);
+    }
+
+    public static Event.Builder repostShortTextNote(XonlyPublicKey publicKey, Event event, @Nullable RelayUri relayUri) {
         if (event.getKind() != 1) {
             throw new IllegalArgumentException("Can only repost short text notes. Expected kind 1, but got %d.".formatted(event.getKind()));
         }
@@ -52,7 +61,11 @@ public final class Nip18 {
                 .addTags(MoreTags.p(event)));
     }
 
-    public static Event.Builder repostGenericEvent(XonlyPublicKey publicKey, Event event, RelayUri relayUri) {
+    public static Event.Builder repostGenericEvent(XonlyPublicKey publicKey, Event event) {
+        return repostGenericEvent(publicKey, event);
+    }
+
+    public static Event.Builder repostGenericEvent(XonlyPublicKey publicKey, Event event, @Nullable RelayUri relayUri) {
         if (event.getKind() == 1) {
             throw new IllegalArgumentException("Can only repost events other than short text notes. Expected kind != 1, but got %d.".formatted(event.getKind()));
         }

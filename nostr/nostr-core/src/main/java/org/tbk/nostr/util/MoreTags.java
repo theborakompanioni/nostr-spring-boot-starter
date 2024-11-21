@@ -71,7 +71,7 @@ public final class MoreTags {
         return e(EventId.of(event.getId().toByteArray()), marker);
     }
 
-    public static TagValue e(Event event, RelayUri recommendedRelay) {
+    public static TagValue e(Event event, @Nullable RelayUri recommendedRelay) {
         return e(EventId.of(event.getId().toByteArray()), recommendedRelay);
     }
 
@@ -87,8 +87,8 @@ public final class MoreTags {
         return marker.tag(eventId);
     }
 
-    public static TagValue e(EventId eventId, RelayUri recommendedRelay) {
-        return named(IndexedTag.e.name(), eventId.toHex(), recommendedRelay.getUri().toString());
+    public static TagValue e(EventId eventId, @Nullable RelayUri recommendedRelay) {
+        return named(IndexedTag.e.name(), eventId.toHex(), recommendedRelay == null ? "" : recommendedRelay.getUri().toString());
     }
 
     public static TagValue e(EventId eventId, @Nullable RelayUri recommendedRelay, Nip10.Marker marker) {
