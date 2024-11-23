@@ -3,6 +3,7 @@ package org.tbk.nostr.nip19;
 import fr.acinq.bitcoin.PrivateKey;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.*;
+import org.tbk.nostr.identity.Identity;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.util.MorePublicKeys;
@@ -44,12 +45,20 @@ public final class Nip19 {
         return encode(Npub.builder().publicKey(publicKey).build());
     }
 
+    public static String encodeNpub(Identity.Account account) {
+        return encodeNpub(account.getPublicKey());
+    }
+
     public static Nsec decodeNsec(String bech32) {
         return decodeStrict(bech32, Nsec.class);
     }
 
     public static String encodeNsec(PrivateKey privateKey) {
         return encode(Nsec.builder().privateKey(privateKey).build());
+    }
+
+    public static String encodeNsec(Identity.Account account) {
+        return encodeNsec(account.getPrivateKey());
     }
 
     public static Note decodeNote(String bech32) {
@@ -73,6 +82,14 @@ public final class Nip19 {
                 .publicKey(publicKey)
                 .relays(relays)
                 .build());
+    }
+
+    public static String encodeNprofile(Identity.Account account) {
+        return encodeNprofile(account.getPublicKey());
+    }
+
+    public static String encodeNprofile(Identity.Account account, Collection<RelayUri> relays) {
+        return encodeNprofile(account.getPublicKey(), relays);
     }
 
     public static Nevent decodeNevent(String bech32) {

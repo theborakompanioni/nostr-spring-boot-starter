@@ -70,7 +70,8 @@ nostr:>persona --name alice
   "privateKey" : "7eaab2f5e9359badb538722e23e6e65bb0c8265a707d317ec4b132ccd23aeb72",
   "publicKey" : "f319269a8757e84e9b6dad9325cb74933f64e9497c4c3a8f7757361e78edf564",
   "nsec" : "nsec1064t9a0fxkd6mdfcwghz8ehxtwcvsfj6wp7nzlkykyeve536adeqjksgqj",
-  "npub" : "npub17vvjdx582l5yaxmd4kfjtjm5jvlkf62f03xr4rmh2umpu78d74jqxhkuj6"
+  "npub" : "npub17vvjdx582l5yaxmd4kfjtjm5jvlkf62f03xr4rmh2umpu78d74jqxhkuj6",
+  "nprofile" : "nprofile1qqs0xxfxn2r406zwndk6mye9ed6fx0mya9yhcnp63am4wds70rkl2eqzv68se"
 }
 ```
 

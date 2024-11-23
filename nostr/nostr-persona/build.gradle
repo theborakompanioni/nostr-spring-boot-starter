@@ -1,0 +1,11 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr persona package'
+
+dependencies {
+    api project(':nostr:nostr-identity')
+
+    testImplementation project(':nostr:nostr-nip19')
+}

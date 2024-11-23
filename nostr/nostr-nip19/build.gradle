@@ -10,4 +10,6 @@ dependencies {
     api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
 
     implementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
+
+    testImplementation project(':nostr:nostr-persona')
 }

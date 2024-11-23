@@ -8,6 +8,7 @@ import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
+import org.tbk.nostr.persona.Persona;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MorePublicKeys;

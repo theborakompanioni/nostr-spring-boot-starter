@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validation of relay URL in standard tags
 - Validation of 'k' tag
 - nip19: encode/decode `nprofile`, `nevent`, `naddr`
+- persona: add new module `nostr-persona`
 
 ### Breaking
 - RelayUri: change signature of method `of(String)` and rename to `fromString`

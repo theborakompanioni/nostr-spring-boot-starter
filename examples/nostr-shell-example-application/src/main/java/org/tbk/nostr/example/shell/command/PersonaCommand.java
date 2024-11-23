@@ -46,8 +46,9 @@ class PersonaCommand {
                 .put("keyPath", account.getPath().asString('\''))
                 .put("privateKey", account.getPrivateKey().toHex())
                 .put("publicKey", account.getPublicKey().value.toHex())
-                .put("nsec", Nip19.encodeNsec(account.getPrivateKey()))
-                .put("npub", Nip19.encodeNpub(account.getPublicKey()))
+                .put("nsec", Nip19.encodeNsec(account))
+                .put("npub", Nip19.encodeNpub(account))
+                .put("nprofile", Nip19.encodeNprofile(account))
                 .end()
                 .finish();
     }
