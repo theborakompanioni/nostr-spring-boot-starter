@@ -1,9 +1,11 @@
 package org.tbk.nostr.nip19.codec;
 
-public interface Codec<T> {
-    boolean supports(String hrp, Class<?> clazz);
+import org.tbk.nostr.nip19.Nip19Entity;
 
-    T decode(String hrp, byte[] data);
+public interface Codec<T extends Nip19Entity> {
+    boolean supports(Class<? extends Nip19Entity> clazz);
 
-    byte[] encode(String hrp, Object data);
+    T decode(byte[] data);
+
+    byte[] encode(Nip19Entity data);
 }

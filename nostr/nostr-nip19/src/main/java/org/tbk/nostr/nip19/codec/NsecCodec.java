@@ -2,28 +2,29 @@ package org.tbk.nostr.nip19.codec;
 
 import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.PrivateKey;
-import org.tbk.nostr.nip19.EntityType;
+import org.tbk.nostr.nip19.Nip19Entity;
+import org.tbk.nostr.nip19.Nsec;
 
-public class NsecCodec implements Codec<PrivateKey> {
+public class NsecCodec implements Codec<Nsec> {
     @Override
-    public boolean supports(String hrp, Class<?> clazz) {
-        return EntityType.NSEC.getHrp().equals(hrp) && clazz.isAssignableFrom(PrivateKey.class);
+    public boolean supports(Class<? extends Nip19Entity> clazz) {
+        return clazz.isAssignableFrom(Nsec.class);
     }
 
     @Override
-    public PrivateKey decode(String hrp, byte[] data) {
+    public Nsec decode(byte[] data) {
         PrivateKey privateKey = new PrivateKey(new ByteVector32(data));
         if (!privateKey.isValid()) {
             throw new IllegalArgumentException("Invalid private key value");
         }
-        return privateKey;
+        return Nsec.builder().privateKey(privateKey).build();
     }
 
     @Override
-    public byte[] encode(String hrp, Object data) {
-        if (!supports(hrp, data.getClass())) {
+    public byte[] encode(Nip19Entity data) {
+        if (!supports(data.getClass())) {
             throw new IllegalArgumentException("Unsupported argument types");
         }
-        return ((PrivateKey) data).value.toByteArray();
+        return ((Nsec) data).getPrivateKey().value.toByteArray();
     }
 }

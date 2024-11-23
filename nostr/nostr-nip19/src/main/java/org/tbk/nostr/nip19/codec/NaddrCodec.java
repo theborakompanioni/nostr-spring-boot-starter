@@ -4,8 +4,8 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
-import org.tbk.nostr.nip19.EntityType;
 import org.tbk.nostr.nip19.Naddr;
+import org.tbk.nostr.nip19.Nip19Entity;
 import org.tbk.nostr.nip19.codec.util.Ints;
 import org.tbk.nostr.nip19.codec.util.Tlv;
 import org.tbk.nostr.nip19.codec.util.TlvType;
@@ -18,12 +18,12 @@ import java.util.Optional;
 
 public class NaddrCodec implements Codec<Naddr> {
     @Override
-    public boolean supports(String hrp, Class<?> clazz) {
-        return EntityType.NADDR.getHrp().equals(hrp) && clazz.isAssignableFrom(Naddr.class);
+    public boolean supports(Class<? extends Nip19Entity> clazz) {
+        return clazz.isAssignableFrom(Naddr.class);
     }
 
     @Override
-    public Naddr decode(String hrp, byte[] data) {
+    public Naddr decode(byte[] data) {
         List<Tlv.Entry> entries = Tlv.decode(data);
 
         Tlv.Entry specialEntry = entries.stream()
@@ -68,8 +68,8 @@ public class NaddrCodec implements Codec<Naddr> {
     }
 
     @Override
-    public byte[] encode(String hrp, Object data) {
-        if (!supports(hrp, data.getClass())) {
+    public byte[] encode(Nip19Entity data) {
+        if (!supports(data.getClass())) {
             throw new IllegalArgumentException("Unsupported argument types");
         }
         Naddr value = ((Naddr) data);

@@ -2,7 +2,7 @@ package org.tbk.nostr.nip19.codec;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.RelayUri;
-import org.tbk.nostr.nip19.EntityType;
+import org.tbk.nostr.nip19.Nip19Entity;
 import org.tbk.nostr.nip19.Nprofile;
 import org.tbk.nostr.nip19.codec.util.Tlv;
 import org.tbk.nostr.nip19.codec.util.TlvType;
@@ -15,12 +15,12 @@ import java.util.Optional;
 
 public class NprofileCodec implements Codec<Nprofile> {
     @Override
-    public boolean supports(String hrp, Class<?> clazz) {
-        return EntityType.NPROFILE.getHrp().equals(hrp) && clazz.isAssignableFrom(Nprofile.class);
+    public boolean supports(Class<? extends Nip19Entity> clazz) {
+        return clazz.isAssignableFrom(Nprofile.class);
     }
 
     @Override
-    public Nprofile decode(String hrp, byte[] data) {
+    public Nprofile decode(byte[] data) {
         List<Tlv.Entry> entries = Tlv.decode(data);
 
         Tlv.Entry specialEntry = entries.stream()
@@ -47,8 +47,8 @@ public class NprofileCodec implements Codec<Nprofile> {
     }
 
     @Override
-    public byte[] encode(String hrp, Object data) {
-        if (!supports(hrp, data.getClass())) {
+    public byte[] encode(Nip19Entity data) {
+        if (!supports(data.getClass())) {
             throw new IllegalArgumentException("Unsupported argument types");
         }
         Nprofile value = ((Nprofile) data);

@@ -1,7 +1,6 @@
 package org.tbk.nostr.nip19;
 
 import fr.acinq.bitcoin.PrivateKey;
-import fr.acinq.bitcoin.XonlyPublicKey;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.base.EventId;
@@ -25,18 +24,39 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class Nip19Test {
 
     @Test
+    void itShouldDecodeToClass() {
+        Nip19Entity npub = Nip19.decode("npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg");
+        assertThat(npub, is(instanceOf(Npub.class)));
+
+        Nip19Entity nsec = Nip19.decode("nsec1vl029mgpspedva04g90vltkh6fvh240zqtv9k0t9af8935ke9laqsnlfe5");
+        assertThat(nsec, is(instanceOf(Nsec.class)));
+
+        Nip19Entity note = Nip19.decode("note1s734rdpdmk27f920tzsjj2rtjnwf63n77ahtmtmdajtg6khx880q99zyw6");
+        assertThat(note, is(instanceOf(Note.class)));
+
+        Nip19Entity nprofile = Nip19.decode("nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p");
+        assertThat(nprofile, is(instanceOf(Nprofile.class)));
+
+        Nip19Entity nevent = Nip19.decode("nevent1qqsgas23d6gvwlv90g5pg4jpacsy55h2ag2ylk8pwp7dfleutknl0tsav9sc2");
+        assertThat(nevent, is(instanceOf(Nevent.class)));
+
+        Nip19Entity naddr = Nip19.decode("naddr1qqqqyg8nrynf4p6hap8fkmddjvjukayn8ajwjjtufsag7a6hxc083m04vspsgqqqyugq9fj9gq");
+        assertThat(naddr, is(instanceOf(Naddr.class)));
+    }
+
+    @Test
     void itShouldDecodeNpubSuccessfully() {
         // decode0
-        XonlyPublicKey publicKey0 = Nip19.decodeNpub("npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg");
-        assertThat(publicKey0, is(MorePublicKeys.fromHex("7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e")));
+        Npub publicKey0 = Nip19.decodeNpub("npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg");
+        assertThat(publicKey0.getPublicKey(), is(MorePublicKeys.fromHex("7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e")));
 
         // encode0
         String npub0 = Nip19.encodeNpub(MorePublicKeys.fromHex("7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e"));
         assertThat(npub0, is("npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg"));
 
         // decode1
-        XonlyPublicKey publicKey1 = Nip19.decodeNpub("npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6");
-        assertThat(publicKey1, is(MorePublicKeys.fromHex("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")));
+        Npub publicKey1 = Nip19.decodeNpub("npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6");
+        assertThat(publicKey1.getPublicKey(), is(MorePublicKeys.fromHex("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")));
 
         // encode1
         String npub1 = Nip19.encodeNpub(MorePublicKeys.fromHex("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"));
@@ -46,7 +66,7 @@ class Nip19Test {
         String odellNpub = "npub1qny3tkh0acurzla8x3zy4nhrjz5zd8l9sy9jys09umwng00manysew95gx";
         String odellPubkey = "04c915daefee38317fa734444acee390a8269fe5810b2241e5e6dd343dfbecc9";
 
-        assertThat(Nip19.decodeNpub(odellNpub).value.toHex(), is(odellPubkey));
+        assertThat(Nip19.decodeNpub(odellNpub).getPublicKey().value.toHex(), is(odellPubkey));
         assertThat(Nip19.encodeNpub(MorePublicKeys.fromHex(odellPubkey)), is(odellNpub));
     }
 
@@ -65,8 +85,8 @@ class Nip19Test {
     @Test
     void itShouldDecodeNsecSuccessfully() {
         // decode
-        PrivateKey privateKey0 = Nip19.decodeNsec("nsec1vl029mgpspedva04g90vltkh6fvh240zqtv9k0t9af8935ke9laqsnlfe5");
-        assertThat(privateKey0.value.toHex(), is("67dea2ed018072d675f5415ecfaed7d2597555e202d85b3d65ea4e58d2d92ffa"));
+        Nsec privateKey0 = Nip19.decodeNsec("nsec1vl029mgpspedva04g90vltkh6fvh240zqtv9k0t9af8935ke9laqsnlfe5");
+        assertThat(privateKey0.getPrivateKey().value.toHex(), is("67dea2ed018072d675f5415ecfaed7d2597555e202d85b3d65ea4e58d2d92ffa"));
 
         // encode
         String nsec0 = Nip19.encodeNsec(new PrivateKey(HexFormat.of().parseHex("67dea2ed018072d675f5415ecfaed7d2597555e202d85b3d65ea4e58d2d92ffa")));
@@ -76,8 +96,8 @@ class Nip19Test {
     @Test
     void itShouldDecodeNoteSuccessfully() {
         // decode
-        EventId eventId = Nip19.decodeNote("note1s734rdpdmk27f920tzsjj2rtjnwf63n77ahtmtmdajtg6khx880q99zyw6");
-        assertThat(eventId.toHex(), is("87a351b42ddd95e4954f58a129286b94dc9d467ef76ebdaf6dec968d5ae639de"));
+        Note note = Nip19.decodeNote("note1s734rdpdmk27f920tzsjj2rtjnwf63n77ahtmtmdajtg6khx880q99zyw6");
+        assertThat(note.getEventId().toHex(), is("87a351b42ddd95e4954f58a129286b94dc9d467ef76ebdaf6dec968d5ae639de"));
 
         // encode
         String note0 = Nip19.encodeNote(EventId.fromHex("87a351b42ddd95e4954f58a129286b94dc9d467ef76ebdaf6dec968d5ae639de"));
@@ -96,7 +116,7 @@ class Nip19Test {
         assertThat(nprofile.getRelays().get(1), is(RelayUri.fromString("wss://djbas.sadkb.com")));
 
         // encode
-        assertThat(Nip19.encodeNprofile(nprofile), is(nprofileEncoded));
+        assertThat(Nip19.encode(nprofile), is(nprofileEncoded));
     }
 
     @Test
@@ -108,7 +128,7 @@ class Nip19Test {
         assertThat(nprofile.getRelays(), hasSize(0));
 
         // encode
-        assertThat(Nip19.encodeNprofile(nprofile), is(nprofileEncoded));
+        assertThat(Nip19.encode(nprofile), is(nprofileEncoded));
     }
 
     @Test
@@ -144,7 +164,7 @@ class Nip19Test {
 
         // we are using a different order of the TLV values, so the encoded string does not match
         // let's only check for object equality
-        assertThat(Nip19.decodeNevent(Nip19.encodeNevent(nevent)), is(nevent));
+        assertThat(Nip19.decodeNevent(Nip19.encode(nevent)), is(nevent));
     }
 
     @Test
@@ -160,7 +180,7 @@ class Nip19Test {
         assertThat(nevent.getKind().isPresent(), is(false));
 
         // encode
-        assertThat(Nip19.encodeNevent(nevent), is(neventEncoded));
+        assertThat(Nip19.encode(nevent), is(neventEncoded));
     }
 
     @Test
@@ -177,7 +197,7 @@ class Nip19Test {
         assertThat(nevent.getKind().isPresent(), is(false));
 
         // encode
-        assertThat(Nip19.encodeNevent(nevent), is(neventEncoded));
+        assertThat(Nip19.encode(nevent), is(neventEncoded));
     }
 
     @Test
@@ -259,7 +279,7 @@ class Nip19Test {
 
         // we are using a different order of the TLV values, so the encoded string does not match
         // let's only check for object equality
-        assertThat(Nip19.decodeNaddr(Nip19.encodeNaddr(naddr)), is(naddr));
+        assertThat(Nip19.decodeNaddr(Nip19.encode(naddr)), is(naddr));
     }
 
     @Test

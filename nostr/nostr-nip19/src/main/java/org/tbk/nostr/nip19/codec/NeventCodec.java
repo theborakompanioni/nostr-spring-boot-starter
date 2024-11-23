@@ -4,8 +4,8 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
-import org.tbk.nostr.nip19.EntityType;
 import org.tbk.nostr.nip19.Nevent;
+import org.tbk.nostr.nip19.Nip19Entity;
 import org.tbk.nostr.nip19.codec.util.Ints;
 import org.tbk.nostr.nip19.codec.util.Tlv;
 import org.tbk.nostr.nip19.codec.util.TlvType;
@@ -18,12 +18,12 @@ import java.util.Optional;
 
 public class NeventCodec implements Codec<Nevent> {
     @Override
-    public boolean supports(String hrp, Class<?> clazz) {
-        return EntityType.NEVENT.getHrp().equals(hrp) && clazz.isAssignableFrom(Nevent.class);
+    public boolean supports(Class<? extends Nip19Entity> clazz) {
+        return clazz.isAssignableFrom(Nevent.class);
     }
 
     @Override
-    public Nevent decode(String hrp, byte[] data) {
+    public Nevent decode(byte[] data) {
         List<Tlv.Entry> entries = Tlv.decode(data);
 
         Tlv.Entry specialEntry = entries.stream()
@@ -68,8 +68,8 @@ public class NeventCodec implements Codec<Nevent> {
     }
 
     @Override
-    public byte[] encode(String hrp, Object data) {
-        if (!supports(hrp, data.getClass())) {
+    public byte[] encode(Nip19Entity data) {
+        if (!supports(data.getClass())) {
             throw new IllegalArgumentException("Unsupported argument types");
         }
         Nevent value = ((Nevent) data);

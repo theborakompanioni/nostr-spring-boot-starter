@@ -77,11 +77,12 @@ class MoreTagsTest {
     @Test
     void itShouldCreatePTag() {
         TagValue tag0 = MoreTags.p(new XonlyPublicKey(ByteVector32.fromValidHex("f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca")));
-        TagValue tag1 = MoreTags.p("f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca");
+        TagValue tag1 = MoreTags.p("f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca", "");
 
         assertThat(tag0, is(TagValue.newBuilder()
                 .setName("p")
                 .addValues("f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca")
+                .addValues("")
                 .build()));
         assertThat(tag1, is(tag0));
     }

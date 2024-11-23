@@ -1,29 +1,30 @@
 package org.tbk.nostr.nip19.codec;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
-import org.tbk.nostr.nip19.EntityType;
+import org.tbk.nostr.nip19.Nip19Entity;
+import org.tbk.nostr.nip19.Npub;
 import org.tbk.nostr.util.MorePublicKeys;
 
-public class NpubCodec implements Codec<XonlyPublicKey> {
+public class NpubCodec implements Codec<Npub> {
     @Override
-    public boolean supports(String hrp, Class<?> clazz) {
-        return EntityType.NPUB.getHrp().equals(hrp) && clazz.isAssignableFrom(XonlyPublicKey.class);
+    public boolean supports(Class<? extends Nip19Entity> clazz) {
+        return clazz.isAssignableFrom(Npub.class);
     }
 
     @Override
-    public XonlyPublicKey decode(String hrp, byte[] data) {
+    public Npub decode(byte[] data) {
         XonlyPublicKey publicKey = MorePublicKeys.fromBytes(data);
         if (!publicKey.getPublicKey().isValid()) {
             throw new IllegalArgumentException("Invalid public key value");
         }
-        return publicKey;
+        return Npub.builder().publicKey(publicKey).build();
     }
 
     @Override
-    public byte[] encode(String hrp, Object data) {
-        if (!supports(hrp, data.getClass())) {
+    public byte[] encode(Nip19Entity data) {
+        if (!supports(data.getClass())) {
             throw new IllegalArgumentException("Unsupported argument types");
         }
-        return ((XonlyPublicKey) data).value.toByteArray();
+        return ((Npub) data).getPublicKey().value.toByteArray();
     }
 }

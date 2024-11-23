@@ -11,10 +11,15 @@ import java.util.List;
 
 @Value
 @Builder
-public class Naddr {
+public class Naddr implements Nip19Entity {
     @NonNull
     EventUri eventUri;
 
     @Singular("relay")
     List<RelayUri> relays;
+
+    @Override
+    public Nip19Type getEntityType() {
+        return Nip19Type.NADDR;
+    }
 }

@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Value
 @Builder
-public class Nevent {
+public class Nevent implements Nip19Entity {
     @NonNull
     EventId eventId;
 
@@ -24,6 +24,11 @@ public class Nevent {
     XonlyPublicKey publicKey;
 
     Kind kind;
+
+    @Override
+    public Nip19Type getEntityType() {
+        return Nip19Type.NEVENT;
+    }
 
     public Optional<XonlyPublicKey> getPublicKey() {
         return Optional.ofNullable(publicKey);

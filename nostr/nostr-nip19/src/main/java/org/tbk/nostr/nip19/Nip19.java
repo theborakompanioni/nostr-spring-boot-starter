@@ -20,36 +20,48 @@ public final class Nip19 {
         throw new UnsupportedOperationException();
     }
 
-    public static XonlyPublicKey decodeNpub(String bech32) {
-        return Codecs.decode(bech32, XonlyPublicKey.class);
+    public static String encode(Nip19Entity data) {
+        return Codecs.encode(data);
     }
 
-    public static String encodeNpub(XonlyPublicKey data) {
-        return Codecs.encode(EntityType.NPUB.getHrp(), data);
+    public static Nip19Entity decode(String bech32) {
+        return Codecs.decode(bech32);
     }
 
-    public static PrivateKey decodeNsec(String bech32) {
-        return Codecs.decode(bech32, PrivateKey.class);
+    public static <T extends Nip19Entity> T decodeStrict(String bech32, Class<T> clazz) {
+        Nip19Entity decoded = Codecs.decode(bech32);
+        if (clazz.isAssignableFrom(decoded.getClass())) {
+            return clazz.cast(decoded);
+        }
+        throw new IllegalArgumentException("Could not decode to %s".formatted(clazz.getSimpleName()));
     }
 
-    public static String encodeNsec(PrivateKey data) {
-        return Codecs.encode(EntityType.NSEC.getHrp(), data);
+    public static Npub decodeNpub(String bech32) {
+        return decodeStrict(bech32, Npub.class);
     }
 
-    public static EventId decodeNote(String bech32) {
-        return Codecs.decode(bech32, EventId.class);
+    public static String encodeNpub(XonlyPublicKey publicKey) {
+        return encode(Npub.builder().publicKey(publicKey).build());
     }
 
-    public static String encodeNote(EventId data) {
-        return Codecs.encode(EntityType.NOTE.getHrp(), data);
+    public static Nsec decodeNsec(String bech32) {
+        return decodeStrict(bech32, Nsec.class);
+    }
+
+    public static String encodeNsec(PrivateKey privateKey) {
+        return encode(Nsec.builder().privateKey(privateKey).build());
+    }
+
+    public static Note decodeNote(String bech32) {
+        return decodeStrict(bech32, Note.class);
+    }
+
+    public static String encodeNote(EventId eventId) {
+        return encode(Note.builder().eventId(eventId).build());
     }
 
     public static Nprofile decodeNprofile(String bech32) {
-        return Codecs.decode(bech32, Nprofile.class);
-    }
-
-    public static String encodeNprofile(Nprofile data) {
-        return Codecs.encode(EntityType.NPROFILE.getHrp(), data);
+        return decodeStrict(bech32, Nprofile.class);
     }
 
     public static String encodeNprofile(XonlyPublicKey publicKey) {
@@ -57,18 +69,14 @@ public final class Nip19 {
     }
 
     public static String encodeNprofile(XonlyPublicKey publicKey, Collection<RelayUri> relays) {
-        return encodeNprofile(Nprofile.builder()
+        return encode(Nprofile.builder()
                 .publicKey(publicKey)
                 .relays(relays)
                 .build());
     }
 
     public static Nevent decodeNevent(String bech32) {
-        return Codecs.decode(bech32, Nevent.class);
-    }
-
-    public static String encodeNevent(Nevent data) {
-        return Codecs.encode(EntityType.NEVENT.getHrp(), data);
+        return decodeStrict(bech32, Nevent.class);
     }
 
     public static String encodeNevent(Event event) {
@@ -76,7 +84,7 @@ public final class Nip19 {
     }
 
     public static String encodeNevent(Event event, Collection<RelayUri> relays) {
-        return encodeNevent(Nevent.builder()
+        return encode(Nevent.builder()
                 .eventId(EventId.of(event.getId().toByteArray()))
                 .relays(relays)
                 .publicKey(MorePublicKeys.fromEvent(event))
@@ -85,11 +93,7 @@ public final class Nip19 {
     }
 
     public static Naddr decodeNaddr(String bech32) {
-        return Codecs.decode(bech32, Naddr.class);
-    }
-
-    public static String encodeNaddr(Naddr data) {
-        return Codecs.encode(EntityType.NADDR.getHrp(), data);
+        return decodeStrict(bech32, Naddr.class);
     }
 
     public static String encodeNaddr(EventUri eventUri) {
@@ -97,7 +101,7 @@ public final class Nip19 {
     }
 
     public static String encodeNaddr(EventUri eventUri, Collection<RelayUri> relays) {
-        return encodeNaddr(Naddr.builder()
+        return encode(Naddr.builder()
                 .eventUri(eventUri)
                 .relays(relays)
                 .build());

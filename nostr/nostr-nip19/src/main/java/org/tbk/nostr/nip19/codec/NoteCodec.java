@@ -1,24 +1,25 @@
 package org.tbk.nostr.nip19.codec;
 
 import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.nip19.EntityType;
+import org.tbk.nostr.nip19.Nip19Entity;
+import org.tbk.nostr.nip19.Note;
 
-public class NoteCodec implements Codec<EventId> {
+public class NoteCodec implements Codec<Note> {
     @Override
-    public boolean supports(String hrp, Class<?> clazz) {
-        return EntityType.NOTE.getHrp().equals(hrp) && clazz.isAssignableFrom(EventId.class);
+    public boolean supports(Class<? extends Nip19Entity> clazz) {
+        return clazz.isAssignableFrom(Note.class);
     }
 
     @Override
-    public EventId decode(String hrp, byte[] data) {
-        return EventId.of(data);
+    public Note decode(byte[] data) {
+        return Note.builder().eventId(EventId.of(data)).build();
     }
 
     @Override
-    public byte[] encode(String hrp, Object data) {
-        if (!supports(hrp, data.getClass())) {
+    public byte[] encode(Nip19Entity data) {
+        if (!supports(data.getClass())) {
             throw new IllegalArgumentException("Unsupported argument types");
         }
-        return ((EventId) data).toByteArray();
+        return ((Note) data).getEventId().toByteArray();
     }
 }
