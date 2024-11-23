@@ -48,11 +48,8 @@ class MoreTagsTest {
 
     @Test
     void itShouldCreateETagWithNip10Marker0() {
-        TagValue tag0 = MoreTags.e(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), Nip10.Marker.ROOT);
-        TagValue tag1 = MoreTags.e(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), null, Nip10.Marker.ROOT);
-        TagValue tag2 = Nip10.Marker.ROOT.tag(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), null);
-        TagValue tag3 = Nip10.Marker.ROOT.tag(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"));
-        TagValue tag4 = MoreTags.e("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36", "", "root");
+        TagValue tag0 = MoreTags.e(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), null, Nip10.Marker.ROOT);
+        TagValue tag1 = MoreTags.e("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36", "", "root");
 
         assertThat(tag0, is(TagValue.newBuilder()
                 .setName("e")
@@ -61,16 +58,12 @@ class MoreTagsTest {
                 .addValues("root")
                 .build()));
         assertThat(tag1, is(tag0));
-        assertThat(tag2, is(tag0));
-        assertThat(tag3, is(tag0));
-        assertThat(tag4, is(tag0));
     }
 
     @Test
     void itShouldCreateETagWithNip10Marker1() {
         TagValue tag0 = MoreTags.e(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), RelayUri.fromString("wss://nostr.example.com"), Nip10.Marker.MENTION);
-        TagValue tag1 = Nip10.Marker.MENTION.tag(EventId.fromHex("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36"), RelayUri.fromString("wss://nostr.example.com"));
-        TagValue tag2 = MoreTags.e("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36", "wss://nostr.example.com", "mention");
+        TagValue tag1 = MoreTags.e("5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36", "wss://nostr.example.com", "mention");
 
         assertThat(tag0, is(TagValue.newBuilder()
                 .setName("e")
@@ -79,7 +72,6 @@ class MoreTagsTest {
                 .addValues("mention")
                 .build()));
         assertThat(tag1, is(tag0));
-        assertThat(tag2, is(tag0));
     }
 
     @Test

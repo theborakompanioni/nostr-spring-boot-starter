@@ -67,32 +67,40 @@ public final class MoreTags {
         return e(EventId.of(event.getId().toByteArray()));
     }
 
-    public static TagValue e(Event event, Nip10.Marker marker) {
-        return e(EventId.of(event.getId().toByteArray()), marker);
+    public static TagValue e(Event event, RelayUri recommendedRelay) {
+        return e(EventId.of(event.getId().toByteArray()), recommendedRelay);
     }
 
-    public static TagValue e(Event event, @Nullable RelayUri recommendedRelay) {
-        return e(EventId.of(event.getId().toByteArray()), recommendedRelay);
+    public static TagValue e(Event event, Nip10.Marker marker) {
+        return e(EventId.of(event.getId().toByteArray()), null, marker);
     }
 
     public static TagValue e(Event event, @Nullable RelayUri recommendedRelay, Nip10.Marker marker) {
         return e(EventId.of(event.getId().toByteArray()), recommendedRelay, marker);
     }
 
+    public static TagValue e(Event event, @Nullable RelayUri recommendedRelay, Nip10.Marker marker, XonlyPublicKey publicKey) {
+        return Nip10.e(EventId.of(event.getId().toByteArray()), recommendedRelay, marker, publicKey);
+    }
+
     public static TagValue e(EventId eventId) {
-        return named(IndexedTag.e.name(), eventId.toHex());
+        return Nip10.e(eventId);
+    }
+
+    public static TagValue e(EventId eventId, RelayUri recommendedRelay) {
+        return Nip10.e(eventId, recommendedRelay);
     }
 
     public static TagValue e(EventId eventId, Nip10.Marker marker) {
-        return marker.tag(eventId);
-    }
-
-    public static TagValue e(EventId eventId, @Nullable RelayUri recommendedRelay) {
-        return named(IndexedTag.e.name(), eventId.toHex(), recommendedRelay == null ? "" : recommendedRelay.getUri().toString());
+        return Nip10.e(eventId, null, marker);
     }
 
     public static TagValue e(EventId eventId, @Nullable RelayUri recommendedRelay, Nip10.Marker marker) {
-        return marker.tag(eventId, recommendedRelay);
+        return Nip10.e(eventId, recommendedRelay, marker);
+    }
+
+    public static TagValue e(EventId eventId, @Nullable RelayUri recommendedRelay, Nip10.Marker marker, XonlyPublicKey publicKey) {
+        return Nip10.e(eventId, recommendedRelay, marker, publicKey);
     }
 
     /**
@@ -102,20 +110,16 @@ public final class MoreTags {
         return named(IndexedTag.e.name(), values);
     }
 
-    public static TagValue d(String... values) {
-        return named(IndexedTag.d.name(), values);
-    }
-
     public static TagValue p(Event event) {
         return p(MorePublicKeys.fromEvent(event));
     }
 
     public static TagValue p(XonlyPublicKey publicKey) {
-        return named(IndexedTag.p.name(), publicKey.value.toHex());
+        return Nip10.p(publicKey);
     }
 
     public static TagValue p(XonlyPublicKey publicKey, RelayUri recommendedRelay) {
-        return named(IndexedTag.p.name(), publicKey.value.toHex(), recommendedRelay.getUri().toString());
+        return Nip10.p(publicKey, recommendedRelay);
     }
 
     /**
@@ -146,6 +150,10 @@ public final class MoreTags {
      */
     public static TagValue a(String... values) {
         return named(IndexedTag.a.name(), values);
+    }
+
+    public static TagValue d(String... values) {
+        return named(IndexedTag.d.name(), values);
     }
 
     public static TagValue k(Event event) {

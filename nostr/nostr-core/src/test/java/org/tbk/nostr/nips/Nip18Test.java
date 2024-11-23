@@ -17,48 +17,33 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class Nip18Test {
+    private static final RelayUri dummyRelayUri = RelayUri.fromString("ws://localhost:%d".formatted(8080));
 
     @Test
     void repostShortTextNote0() {
         Signer signer = SimpleSigner.random();
 
         Event event = MoreEvents.createFinalizedTextNote(signer, "GM!");
-        Event repost = Nip18.repostShortTextNote(signer.getPublicKey(), event).build();
+        Event repost = Nip18.repostShortTextNote(signer.getPublicKey(), event, dummyRelayUri).build();
 
         assertThat(repost.getKind(), is(6));
 
         TagValue eTag = MoreTags.findByNameSingle(repost, IndexedTag.e).orElseThrow();
         assertThat(eTag.getValues(0), is(HexFormat.of().formatHex(event.getId().toByteArray())));
-        assertThat(eTag.getValues(1), is(""));
-    }
-
-    @Test
-    void repostShortTextNote1() {
-        Signer signer = SimpleSigner.random();
-        RelayUri relayUri = RelayUri.fromString("ws://localhost:%d".formatted(8080));
-
-        Event event = MoreEvents.createFinalizedTextNote(signer, "GM!");
-        Event repost = Nip18.repostShortTextNote(signer.getPublicKey(), event, relayUri).build();
-
-        assertThat(repost.getKind(), is(6));
-
-        TagValue eTag = MoreTags.findByNameSingle(repost, IndexedTag.e).orElseThrow();
-        assertThat(eTag.getValues(0), is(HexFormat.of().formatHex(event.getId().toByteArray())));
-        assertThat(eTag.getValues(1), is(relayUri.getUri().toString()));
+        assertThat(eTag.getValues(1), is(dummyRelayUri.getUri().toString()));
     }
 
     @Test
     void repostShortTextNoteFail() {
         Signer signer = SimpleSigner.random();
-        RelayUri relayUri = RelayUri.fromString("ws://localhost:%d".formatted(8080));
 
         Event repost = Nip18.repostShortTextNote(signer.getPublicKey(),
                         MoreEvents.createFinalizedTextNote(signer, "GM!"),
-                        relayUri)
+                        dummyRelayUri)
                 .build();
 
         try {
-            Nip18.repostShortTextNote(signer.getPublicKey(), repost, relayUri).build();
+            Nip18.repostShortTextNote(signer.getPublicKey(), repost, dummyRelayUri).build();
 
             fail("Should have thrown exception");
         } catch (IllegalArgumentException e) {
@@ -72,11 +57,9 @@ class Nip18Test {
 
         Event repost = Nip18.repostShortTextNote(signer.getPublicKey(),
                         MoreEvents.createFinalizedTextNote(signer, "GM!"),
-                        RelayUri.fromString("ws://localhost:%d".formatted(8080)))
+                        dummyRelayUri)
                 .build();
-        Event genericRepost = Nip18.repostGenericEvent(signer.getPublicKey(),
-                        repost,
-                        RelayUri.fromString("ws://localhost:%d".formatted(8080)))
+        Event genericRepost = Nip18.repostGenericEvent(signer.getPublicKey(), repost, dummyRelayUri)
                 .build();
 
         assertThat(genericRepost.getKind(), is(16));
@@ -85,12 +68,11 @@ class Nip18Test {
     @Test
     void repostGenericEventFail() {
         Signer signer = SimpleSigner.random();
-        RelayUri relayUri = RelayUri.fromString("ws://localhost:%d".formatted(8080));
 
         Event event = MoreEvents.createFinalizedTextNote(signer, "GM!");
 
         try {
-            Nip18.repostGenericEvent(signer.getPublicKey(), event, relayUri).build();
+            Nip18.repostGenericEvent(signer.getPublicKey(), event, dummyRelayUri).build();
 
             fail("Should have thrown exception");
         } catch (IllegalArgumentException e) {

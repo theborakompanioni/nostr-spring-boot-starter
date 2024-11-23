@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - nip19: move from `nostr-core` to module `nostr-nip19`
 - nip19: rename method from `from*` to `decode*`
 - nip19: rename methods from `to*` to `encode*`
+- nip10: remove `tag` method from markers
 
 ## [0.0.3] - 2024-11-12
 

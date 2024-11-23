@@ -1,8 +1,10 @@
 package org.tbk.nostr.nips;
 
+import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreTags;
@@ -24,18 +26,54 @@ public final class Nip10 {
         ROOT("root"),
         MENTION("mention");
 
-        final String value;
+        private final String value;
+    }
 
-        public TagValue tag(EventId eventId) {
-            return tag(eventId, null);
-        }
+    public static TagValue e(EventId eventId) {
+        return e(eventId, "");
+    }
 
-        public TagValue tag(EventId eventId, @Nullable RelayUri recommendedRelay) {
-            if (recommendedRelay == null) {
-                return MoreTags.e(eventId.toHex(), "", this.value);
-            } else {
-                return MoreTags.e(eventId.toHex(), recommendedRelay.getUri().toString(), this.value);
-            }
-        }
+    private static TagValue e(EventId eventId, String relayUrlOrEmpty) {
+        return MoreTags.named(
+                IndexedTag.e.name(),
+                eventId.toHex(),
+                relayUrlOrEmpty
+        );
+    }
+
+    public static TagValue e(EventId eventId, RelayUri recommendedRelay) {
+        return e(eventId, recommendedRelay == null ? "" : recommendedRelay.getUri().toString());
+    }
+
+    public static TagValue e(EventId eventId, Nip10.Marker marker) {
+        return e(eventId, null, marker);
+    }
+
+    public static TagValue e(EventId eventId, @Nullable RelayUri recommendedRelay, Nip10.Marker marker) {
+        return e(eventId, recommendedRelay).toBuilder()
+                .addValues(marker.getValue())
+                .build();
+    }
+
+    public static TagValue e(EventId eventId, @Nullable RelayUri recommendedRelay, Nip10.Marker marker, XonlyPublicKey publicKey) {
+        return e(eventId, recommendedRelay, marker).toBuilder()
+                .addValues(publicKey.value.toHex())
+                .build();
+    }
+
+    public static TagValue p(XonlyPublicKey publicKey) {
+        return p(publicKey, "");
+    }
+
+    private static TagValue p(XonlyPublicKey publicKey, String relayUrlOrEmpty) {
+        return MoreTags.named(
+                IndexedTag.p.name(),
+                publicKey.value.toHex(),
+                relayUrlOrEmpty
+        );
+    }
+
+    public static TagValue p(XonlyPublicKey publicKey, RelayUri recommendedRelay) {
+        return p(publicKey, recommendedRelay == null ? "" : recommendedRelay.getUri().toString());
     }
 }

@@ -7,6 +7,7 @@ import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.util.MoreEvents;
+import org.tbk.nostr.util.MorePublicKeys;
 import org.tbk.nostr.util.MoreTags;
 
 import javax.annotation.Nullable;
@@ -36,19 +37,11 @@ public final class Nip18 {
                event.getKind() == Nip18.kindGenericRepost().getValue();
     }
 
-    public static Event.Builder repost(XonlyPublicKey publicKey, Event event) {
-        return event.getKind() == 1 ? repostShortTextNote(publicKey, event) : repostGenericEvent(publicKey, event);
-    }
-
     public static Event.Builder repost(XonlyPublicKey publicKey, Event event, RelayUri relayUri) {
         return event.getKind() == 1 ? repostShortTextNote(publicKey, event, relayUri) : repostGenericEvent(publicKey, event, relayUri);
     }
 
-    public static Event.Builder repostShortTextNote(XonlyPublicKey publicKey, Event event) {
-        return repostShortTextNote(publicKey, event, null);
-    }
-
-    public static Event.Builder repostShortTextNote(XonlyPublicKey publicKey, Event event, @Nullable RelayUri relayUri) {
+    public static Event.Builder repostShortTextNote(XonlyPublicKey publicKey, Event event, RelayUri relayUri) {
         if (event.getKind() != 1) {
             throw new IllegalArgumentException("Can only repost short text notes. Expected kind 1, but got %d.".formatted(event.getKind()));
         }
@@ -57,12 +50,12 @@ public final class Nip18 {
                 .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
                 .setKind(kindRepost().getValue())
                 .setContent(JsonWriter.toJson(event))
-                .addTags(MoreTags.e(event, relayUri))
+                .addTags(MoreTags.e(event, relayUri, Nip10.Marker.ROOT, MorePublicKeys.fromEvent(event)))
                 .addTags(MoreTags.p(event)));
     }
 
     public static Event.Builder repostGenericEvent(XonlyPublicKey publicKey, Event event) {
-        return repostGenericEvent(publicKey, event);
+        return repostGenericEvent(publicKey, event, null);
     }
 
     public static Event.Builder repostGenericEvent(XonlyPublicKey publicKey, Event event, @Nullable RelayUri relayUri) {
