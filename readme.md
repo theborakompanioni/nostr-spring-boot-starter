@@ -33,8 +33,12 @@ need to write scalable and efficient solutions effortlessly.
 
 Planned:
 - [ ] [NIP-11](https://github.com/nostr-protocol/nips/blob/master/11.md)
+- [ ] [NIP-25](https://github.com/nostr-protocol/nips/blob/master/25.md)
 - [ ] [NIP-38](https://github.com/nostr-protocol/nips/blob/master/38.md)
 - [ ] [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md)
+- [ ] [NIP-64](https://github.com/nostr-protocol/nips/blob/master/64.md)
+- [ ] [NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md)
+- [ ] [NIP-70](https://github.com/nostr-protocol/nips/blob/master/70.md)
 
 
 ### `nostr-proto`

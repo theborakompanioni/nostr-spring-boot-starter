@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default connection timeouts for `NostrTemplate` and `NostrClientService` implementations
 - Validation of relay URL in standard tags
 - Validation of 'k' tag
+- nip18: repost events
 - nip19: encode/decode `nprofile`, `nevent`, `naddr`
+- nip21: `nostr:` URI scheme
 - persona: add new module `nostr-persona`
 
 ### Breaking
