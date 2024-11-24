@@ -71,7 +71,7 @@ public class DeletionEventHandlerInterceptor implements RequestHandlerIntercepto
             if (!aTags.isEmpty()) {
                 Set<EventUri> deletableEventUris = aTags.stream()
                         .map(it -> it.getValues(0))
-                        .map(EventUri::fromString)
+                        .map(EventUri::parse)
                         .collect(Collectors.toSet());
 
                 if (deletableEventUris.isEmpty()) {

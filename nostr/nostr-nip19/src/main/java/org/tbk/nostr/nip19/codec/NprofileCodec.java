@@ -36,7 +36,7 @@ public class NprofileCodec implements Codec<Nprofile> {
         List<RelayUri> relayEntries = entries.stream()
                 .filter(it -> it.getType() == TlvType.RELAY.getValue())
                 .map(it -> new String(it.getValue(), StandardCharsets.US_ASCII))
-                .map(RelayUri::tryFromString)
+                .map(RelayUri::tryParse)
                 .flatMap(Optional::stream)
                 .toList();
 

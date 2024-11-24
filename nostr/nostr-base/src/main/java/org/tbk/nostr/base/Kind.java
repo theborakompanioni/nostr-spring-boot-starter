@@ -4,6 +4,8 @@ package org.tbk.nostr.base;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.Optional;
+
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 public final class Kind implements Comparable<Kind> {
@@ -39,11 +41,19 @@ public final class Kind implements Comparable<Kind> {
         return Kind.of(MAX_KIND_VALUE);
     }
 
-    public static Kind fromString(String kindString) {
+    public static Kind parse(String kindString) {
         if (!isValidKindString(kindString)) {
             throw new IllegalArgumentException("Kind must be between %d and %d".formatted(MIN_KIND_VALUE, MAX_KIND_VALUE));
         }
         return of(Integer.parseInt(kindString));
+    }
+
+    public static Optional<Kind> tryParse(String kindString) {
+        try {
+            return Optional.of(parse(kindString));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     public static Kind of(int kind) {

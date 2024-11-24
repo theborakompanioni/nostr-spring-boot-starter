@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 class Nip18Test {
-    private static final RelayUri dummyRelayUri = RelayUri.fromString("ws://localhost:%d".formatted(8080));
+    private static final RelayUri dummyRelayUri = RelayUri.parse("ws://localhost:%d".formatted(8080));
 
     @Test
     void repostShortTextNote0() {

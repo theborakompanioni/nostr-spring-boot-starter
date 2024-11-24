@@ -17,12 +17,7 @@ import static java.util.Objects.requireNonNull;
 public final class EventUri {
 
     public static boolean isValidEventUriString(String value) {
-        try {
-            fromString(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return tryParse(value).isPresent();
     }
 
     public static EventUri of(int kind, String publicKeyHex) {
@@ -30,7 +25,7 @@ public final class EventUri {
     }
 
     public static EventUri of(Kind kind, @NonNull String publicKeyHex) {
-        return fromString("%d:%s".formatted(kind.getValue(), publicKeyHex));
+        return parse("%d:%s".formatted(kind.getValue(), publicKeyHex));
     }
 
     public static EventUri of(int kind, @NonNull String publicKeyHex, @NonNull String identifier) {
@@ -38,10 +33,10 @@ public final class EventUri {
     }
 
     public static EventUri of(Kind kind, @NonNull String publicKeyHex, @NonNull String identifier) {
-        return fromString("%d:%s:%s".formatted(kind.getValue(), publicKeyHex, identifier));
+        return parse("%d:%s:%s".formatted(kind.getValue(), publicKeyHex, identifier));
     }
 
-    public static EventUri fromString(String value) {
+    public static EventUri parse(String value) {
         try {
             String[] split = value.split(":", 3);
             if (split.length < 2) {
@@ -55,9 +50,17 @@ public final class EventUri {
             }
 
             String identifier = split.length != 3 ? null : split[2];
-            return new EventUri(Kind.fromString(kindString), supposedPublicKey, identifier);
+            return new EventUri(Kind.parse(kindString), supposedPublicKey, identifier);
         } catch (Exception e) {
             throw new IllegalArgumentException("Error while parsing event uri: " + e.getMessage());
+        }
+    }
+
+    public static Optional<EventUri> tryParse(String value) {
+        try {
+            return Optional.of(parse(value));
+        } catch (Exception e) {
+            return Optional.empty();
         }
     }
 

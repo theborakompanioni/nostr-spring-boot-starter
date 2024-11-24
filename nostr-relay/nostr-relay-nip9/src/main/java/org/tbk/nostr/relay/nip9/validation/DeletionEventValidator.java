@@ -38,7 +38,7 @@ public class DeletionEventValidator implements EventValidator {
 
             List<EventUri> referencedEvents = MoreTags.findByName(event, IndexedTag.a).stream()
                     .map(it -> it.getValues(0))
-                    .map(EventUri::fromString)
+                    .map(EventUri::parse)
                     .toList();
 
             String authorPublicKeyHex = HexFormat.of().formatHex(event.getPubkey().toByteArray());

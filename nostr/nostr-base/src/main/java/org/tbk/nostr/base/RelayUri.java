@@ -13,16 +13,16 @@ import static java.util.Objects.requireNonNull;
 public final class RelayUri {
 
     public static boolean isValidRelayUriString(String value) {
-        return tryFromString(value).isPresent();
+        return tryParse(value).isPresent();
     }
 
-    public static RelayUri fromString(String uri) {
+    public static RelayUri parse(String uri) {
         return of(URI.create(uri));
     }
 
-    public static Optional<RelayUri> tryFromString(String uri) {
+    public static Optional<RelayUri> tryParse(String uri) {
         try {
-            return Optional.of(fromString(uri));
+            return Optional.of(parse(uri));
         } catch (Exception e) {
             return Optional.empty();
         }

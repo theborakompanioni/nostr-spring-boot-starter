@@ -114,7 +114,7 @@ public class DefaultEventValidator implements EventValidator {
         } else {
             String supposedEventUri = tag.getValues(0);
             try {
-                EventUri eventUri = EventUri.fromString(supposedEventUri);
+                EventUri eventUri = EventUri.parse(supposedEventUri);
                 if (!MorePublicKeys.isValidPublicKey(eventUri.getPublicKey())) {
                     errors.rejectValue("valuesList", "event.a.tag.pubkey.value.invalid", "Invalid pubkey in tag 'a'.");
                 }

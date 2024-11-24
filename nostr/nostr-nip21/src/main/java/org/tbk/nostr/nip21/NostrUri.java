@@ -17,16 +17,16 @@ public final class NostrUri {
     private static final String SCHEME = "nostr";
 
     public static boolean isValidNostrUriString(String value) {
-        return tryFromString(value).isPresent();
+        return tryParse(value).isPresent();
     }
 
-    public static NostrUri fromString(String uri) {
+    public static NostrUri parse(String uri) {
         return of(URI.create(uri));
     }
 
-    public static Optional<NostrUri> tryFromString(String uri) {
+    public static Optional<NostrUri> tryParse(String uri) {
         try {
-            return Optional.of(fromString(uri));
+            return Optional.of(parse(uri));
         } catch (Exception e) {
             return Optional.empty();
         }

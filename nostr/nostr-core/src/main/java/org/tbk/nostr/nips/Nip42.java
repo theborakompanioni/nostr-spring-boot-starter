@@ -50,7 +50,7 @@ public final class Nip42 {
     public static Optional<RelayUri> getRelay(EventOrBuilder event) {
         return MoreTags.findByNameSingle(event, RELAY_TAG_NAME)
                 .filter(it -> it.getValuesCount() > 0)
-                .map(it -> RelayUri.fromString(it.getValues(0)));
+                .map(it -> RelayUri.parse(it.getValues(0)));
     }
 
     public static Event.Builder createAuthEvent(XonlyPublicKey publicKey,

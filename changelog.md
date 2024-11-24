@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - persona: add new module `nostr-persona`
 
 ### Breaking
-- RelayUri: change signature of method `of(String)` and rename to `fromString`
+- RelayUri: change signature of method `of(String)` and rename to `parse`
+- EventUri: change signature of method `fromString(String)` and rename to `parse`
 - nip19: move from `nostr-core` to module `nostr-nip19`
 - nip19: rename method from `from*` to `decode*`
 - nip19: rename methods from `to*` to `encode*`

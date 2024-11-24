@@ -113,8 +113,8 @@ class Nip19Test {
         assertThat(nprofile.getPublicKey(), is(MorePublicKeys.fromHex("3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")));
 
         assertThat(nprofile.getRelays(), hasSize(2));
-        assertThat(nprofile.getRelays().get(0), is(RelayUri.fromString("wss://r.x.com")));
-        assertThat(nprofile.getRelays().get(1), is(RelayUri.fromString("wss://djbas.sadkb.com")));
+        assertThat(nprofile.getRelays().get(0), is(RelayUri.parse("wss://r.x.com")));
+        assertThat(nprofile.getRelays().get(1), is(RelayUri.parse("wss://djbas.sadkb.com")));
 
         // encode
         assertThat(Nip19.encode(nprofile), is(nprofileEncoded));
@@ -154,11 +154,11 @@ class Nip19Test {
         assertThat(nevent.getPublicKey().orElseThrow(), is(MorePublicKeys.fromHex("f9dd6a762506260b38a2d3e5b464213c2e47fa3877429fe9ee60e071a31a07d7")));
 
         assertThat(nevent.getRelays(), hasSize(5));
-        assertThat(nevent.getRelays().get(0), is(RelayUri.fromString("wss://fiatjaf.nostr1.com/")));
-        assertThat(nevent.getRelays().get(1), is(RelayUri.fromString("wss://nostr.ono.re/")));
-        assertThat(nevent.getRelays().get(2), is(RelayUri.fromString("wss://nostr.massmux.com/")));
-        assertThat(nevent.getRelays().get(3), is(RelayUri.fromString("wss://auth.nostr1.com/")));
-        assertThat(nevent.getRelays().get(4), is(RelayUri.fromString("wss://nostr.radixrat.com/")));
+        assertThat(nevent.getRelays().get(0), is(RelayUri.parse("wss://fiatjaf.nostr1.com/")));
+        assertThat(nevent.getRelays().get(1), is(RelayUri.parse("wss://nostr.ono.re/")));
+        assertThat(nevent.getRelays().get(2), is(RelayUri.parse("wss://nostr.massmux.com/")));
+        assertThat(nevent.getRelays().get(3), is(RelayUri.parse("wss://auth.nostr1.com/")));
+        assertThat(nevent.getRelays().get(4), is(RelayUri.parse("wss://nostr.radixrat.com/")));
 
         assertThat(nevent.getKind().isPresent(), is(true));
         assertThat(nevent.getKind().orElseThrow(), is(Kind.of(1)));
@@ -193,7 +193,7 @@ class Nip19Test {
         assertThat(nevent.getPublicKey().isPresent(), is(false));
 
         assertThat(nevent.getRelays(), hasSize(1));
-        assertThat(nevent.getRelays().get(0), is(RelayUri.fromString("wss://relay.westernbtc.com/")));
+        assertThat(nevent.getRelays().get(0), is(RelayUri.parse("wss://relay.westernbtc.com/")));
 
         assertThat(nevent.getKind().isPresent(), is(false));
 
@@ -276,7 +276,7 @@ class Nip19Test {
         assertThat(naddr.getEventUri().toString(), is("1234:3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d:myprofile"));
 
         assertThat(naddr.getRelays(), hasSize(1));
-        assertThat(naddr.getRelays().get(0), is(RelayUri.fromString("wss://example.com")));
+        assertThat(naddr.getRelays().get(0), is(RelayUri.parse("wss://example.com")));
 
         // we are using a different order of the TLV values, so the encoded string does not match
         // let's only check for object equality
