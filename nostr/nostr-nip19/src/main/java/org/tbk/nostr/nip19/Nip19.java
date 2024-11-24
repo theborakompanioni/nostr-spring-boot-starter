@@ -77,6 +77,10 @@ public final class Nip19 {
         return encodeNprofile(publicKey, Collections.emptyList());
     }
 
+    public static String encodeNprofile(XonlyPublicKey publicKey, RelayUri relay) {
+        return encodeNprofile(publicKey, Collections.singletonList(relay));
+    }
+
     public static String encodeNprofile(XonlyPublicKey publicKey, Collection<RelayUri> relays) {
         return encode(Nprofile.builder()
                 .publicKey(publicKey)
@@ -86,6 +90,10 @@ public final class Nip19 {
 
     public static String encodeNprofile(Identity.Account account) {
         return encodeNprofile(account.getPublicKey());
+    }
+
+    public static String encodeNprofile(Identity.Account account, RelayUri relay) {
+        return encodeNprofile(account.getPublicKey(), Collections.singletonList(relay));
     }
 
     public static String encodeNprofile(Identity.Account account, Collection<RelayUri> relays) {
@@ -98,6 +106,10 @@ public final class Nip19 {
 
     public static String encodeNevent(Event event) {
         return encodeNevent(event, Collections.emptyList());
+    }
+
+    public static String encodeNevent(Event event, RelayUri relay) {
+        return encodeNevent(event, Collections.singletonList(relay));
     }
 
     public static String encodeNevent(Event event, Collection<RelayUri> relays) {
@@ -115,6 +127,10 @@ public final class Nip19 {
 
     public static String encodeNaddr(EventUri eventUri) {
         return encodeNaddr(eventUri, Collections.emptyList());
+    }
+
+    public static String encodeNaddr(EventUri eventUri, RelayUri relay) {
+        return encodeNaddr(eventUri, Collections.singletonList(relay));
     }
 
     public static String encodeNaddr(EventUri eventUri, Collection<RelayUri> relays) {

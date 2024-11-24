@@ -34,14 +34,14 @@ public final class NostrUri {
 
     public static NostrUri of(Nip19Entity entity) {
         return switch (entity.getEntityType()) {
-            case NSEC -> throw new IllegalArgumentException("Unexpected value: %s".formatted(entity.getEntityType()));
+            case NSEC -> throw new IllegalArgumentException("Unsupported value: %s".formatted(entity.getEntityType()));
             default -> new NostrUri(entity);
         };
     }
 
     public static NostrUri of(URI uri) {
         if (!SCHEME.equalsIgnoreCase(uri.getScheme())) {
-            throw new IllegalArgumentException("Unsupported scheme");
+            throw new IllegalArgumentException("Unsupported scheme. Expected '%s', got: %s.".formatted(SCHEME, uri.getScheme()));
         }
         return of(Nip19.decode(uri.getSchemeSpecificPart()));
     }

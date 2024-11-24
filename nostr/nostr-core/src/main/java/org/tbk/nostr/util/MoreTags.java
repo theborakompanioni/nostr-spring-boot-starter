@@ -168,6 +168,10 @@ public final class MoreTags {
         return named(IndexedTag.k.name(), String.valueOf(kind));
     }
 
+    public static TagValue q(EventId eventId, RelayUri recommendedRelay, XonlyPublicKey publicKey) {
+        return named(IndexedTag.q.name(), eventId.toHex(), recommendedRelay.getUri().toString(), publicKey.value.toHex());
+    }
+
     public static TagValue expiration(Duration duration) {
         return Nip40.expiration(duration);
     }

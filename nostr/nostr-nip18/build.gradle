@@ -6,6 +6,7 @@ description = 'nostr nip18 package'
 
 dependencies {
     api project(':nostr:nostr-core')
+    api project(':nostr:nostr-nip21')
     
     api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
 

@@ -2,6 +2,7 @@ package org.tbk.nostr.nip21;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nip19.*;
 
 import java.net.URI;
@@ -14,6 +15,26 @@ import static org.hamcrest.Matchers.is;
  * Test vectors taken from <a href="https://github.com/nostr-protocol/nips/blob/master/21.md#examples">NIP-21 examples</a>.
  */
 class NostrUriTest {
+
+    @Test
+    void testValiditySuccess() {
+        assertThat(NostrUri.isValidNostrUriString("nostr:npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9"), is(true));
+        assertThat(NostrUri.isValidNostrUriString("nostr:nprofile1qqsrhuxx8l9ex335q7he0f09aej04zpazpl0ne2cgukyawd24mayt8gpp4mhxue69uhhytnc9e3k7mgpz4mhxue69uhkg6nzv9ejuumpv34kytnrdaksjlyr9p"), is(true));
+        assertThat(NostrUri.isValidNostrUriString("nostr:note1fntxtkcy9pjwucqwa9mddn7v03wwwsu9j330jj350nvhpky2tuaspk6nqc"), is(true));
+        assertThat(NostrUri.isValidNostrUriString("nostr:nevent1qqstna2yrezu5wghjvswqqculvvwxsrcvu7uc0f78gan4xqhvz49d9spr3mhxue69uhkummnw3ez6un9d3shjtn4de6x2argwghx6egpr4mhxue69uhkummnw3ez6ur4vgh8wetvd3hhyer9wghxuet5nxnepm"), is(true));
+    }
+
+    @Test
+    void testValidityError() {
+        assertThat(NostrUri.isValidNostrUriString(""), is(false));
+        assertThat(NostrUri.isValidNostrUriString("nostr:"), is(false));
+        assertThat(NostrUri.isValidNostrUriString("nostr:randomstuff"), is(false));
+        assertThat(NostrUri.isValidNostrUriString("any:npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9"), is(false));
+        assertThat(NostrUri.isValidNostrUriString("nostr:npub1sn0wdenkukak0d9d"), is(false));
+
+        // nsecs are invalid as nostr uri
+        assertThat(NostrUri.isValidNostrUriString("nostr2:nsec1064t9a0fxkd6mdfcwghz8ehxtwcvsfj6wp7nzlkykyeve536adeqjksgqj"), is(false));
+    }
 
     @Test
     void testNpub() {
@@ -64,6 +85,14 @@ class NostrUriTest {
         URI uri = URI.create("nostr:nsec1064t9a0fxkd6mdfcwghz8ehxtwcvsfj6wp7nzlkykyeve536adeqjksgqj");
 
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () -> NostrUri.of(uri));
-        assertThat(e.getMessage(), is("Unexpected value: NSEC"));
+        assertThat(e.getMessage(), is("Unsupported value: NSEC"));
+    }
+
+    @Test
+    void testFromUriError() {
+        URI uri = URI.create("https:npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9");
+
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () -> NostrUri.of(uri));
+        assertThat(e.getMessage(), is("Unsupported scheme. Expected 'nostr', got: https."));
     }
 }
