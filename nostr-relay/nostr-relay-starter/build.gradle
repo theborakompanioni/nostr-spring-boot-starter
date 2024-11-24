@@ -16,6 +16,7 @@ dependencies {
 
     api project(':nostr-relay:nostr-relay-autoconfigure')
 
+    api project(':nostr:nostr-nip18')
     api project(':nostr:nostr-nip19')
 
     implementation 'org.springframework.boot:spring-boot-starter-websocket'

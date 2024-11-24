@@ -1,4 +1,4 @@
-package org.tbk.nostr.relay.nip9.validation;
+package org.tbk.nostr.relay.nip18.validation;
 
 import com.google.protobuf.ByteString;
 import lombok.NonNull;
@@ -7,7 +7,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.tbk.nostr.base.IndexedTag;
-import org.tbk.nostr.nips.Nip18;
+import org.tbk.nostr.nip18.Nip18;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.proto.json.JsonReader;

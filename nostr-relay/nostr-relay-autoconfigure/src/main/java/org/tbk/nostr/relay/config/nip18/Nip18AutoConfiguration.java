@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.tbk.nostr.relay.config.NostrRelayAutoConfiguration;
-import org.tbk.nostr.relay.nip9.validation.RepostEventValidator;
+import org.tbk.nostr.relay.nip18.validation.RepostEventValidator;
 import org.tbk.nostr.relay.validation.DefaultEventValidator;
 
 @AutoConfiguration

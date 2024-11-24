@@ -1,9 +1,10 @@
-package org.tbk.nostr.nips;
+package org.tbk.nostr.nip18;
 
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
+import org.tbk.nostr.nips.Nip10;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.util.MoreEvents;

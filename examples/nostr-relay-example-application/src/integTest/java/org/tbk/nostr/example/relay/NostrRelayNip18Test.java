@@ -9,8 +9,8 @@ import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nip18.Nip18;
 import org.tbk.nostr.nips.Nip1;
-import org.tbk.nostr.nips.Nip18;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.template.NostrTemplate;
@@ -37,7 +37,7 @@ class NostrRelayNip18Test {
         Signer signer = SimpleSigner.random();
 
         Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
-        Event repost = MoreEvents.createFinalizedRepost(signer, event, nostrTemplate.getRelayUri());
+        Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri()));
 
         assertThat(repost.getKind(), is(Nip18.kindRepost().getValue()));
 
@@ -57,7 +57,7 @@ class NostrRelayNip18Test {
                 .about("about")
                 .picture(URI.create("https://www.example.com/example.png"))
                 .build());
-        Event genericRepost = MoreEvents.createFinalizedRepost(signer, event, nostrTemplate.getRelayUri());
+        Event genericRepost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri()));
 
         assertThat(genericRepost.getKind(), is(Nip18.kindGenericRepost().getValue()));
 
@@ -78,7 +78,7 @@ class NostrRelayNip18Test {
 
         assertThat("sanity check", MoreEvents.hasValidSignature(invalidEvent), is(false));
 
-        Event repost = MoreEvents.createFinalizedRepost(signer, invalidEvent, nostrTemplate.getRelayUri());
+        Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), invalidEvent, nostrTemplate.getRelayUri()));
 
         OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))
@@ -98,7 +98,7 @@ class NostrRelayNip18Test {
 
         assertThat("sanity check", MoreEvents.hasValidSignature(invalidEvent), is(false));
 
-        Event repost = MoreEvents.createFinalizedRepost(signer, invalidEvent, nostrTemplate.getRelayUri());
+        Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), invalidEvent, nostrTemplate.getRelayUri()));
 
         OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))

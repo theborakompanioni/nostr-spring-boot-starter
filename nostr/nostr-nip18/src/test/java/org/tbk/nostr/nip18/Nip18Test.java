@@ -1,4 +1,4 @@
-package org.tbk.nostr.nips;
+package org.tbk.nostr.nip18;
 
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.base.IndexedTag;

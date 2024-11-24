@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-description = 'nostr nip19 package'
+description = 'nostr nip18 package'
 
 dependencies {
     implementation project(':nostr:nostr-core')

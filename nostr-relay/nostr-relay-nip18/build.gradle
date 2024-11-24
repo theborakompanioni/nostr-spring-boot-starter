@@ -6,6 +6,7 @@ description = 'nostr relay nip18 package'
 
 dependencies {
     api project(':nostr-relay:nostr-relay-base')
+    implementation project(':nostr:nostr-nip18')
 
     api 'io.projectreactor:reactor-core'
 }
