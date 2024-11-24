@@ -2,6 +2,7 @@ package org.tbk.nostr.identity;
 
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.*;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.proto.Event;
 
 import java.util.HexFormat;
@@ -46,6 +47,14 @@ public class SimpleSigner implements Signer {
 
     @Override
     public Event.Builder sign(Event.Builder builder) {
+        if (builder.getKind() == Kinds.kindDirectMessage.getValue()) {
+            throw new IllegalArgumentException("Cannot sign event with kind %d".formatted(Kinds.kindDirectMessage.getValue()));
+        }
+
+        return signUnsafe(builder);
+    }
+
+    public Event.Builder signUnsafe(Event.Builder builder) {
         if (builder.getId().isEmpty()) {
             throw new IllegalArgumentException("Missing id");
         }
@@ -54,12 +63,6 @@ public class SimpleSigner implements Signer {
             ByteVector32 data = ByteVector32.fromValidHex(HexFormat.of().formatHex(builder.getId().toByteArray()));
             ByteVector32 auxRand = ByteVector32.fromValidHex(HexFormat.of().formatHex(MoreRandom.randomByteArray(32)));
             ByteVector64 signature = Crypto.signSchnorr(data, this.privateKey, Crypto.SchnorrTweak.NoTweak.INSTANCE, auxRand);
-
-            // sanity check
-            boolean validSignature = Crypto.verifySignatureSchnorr(data, signature, privateKey.xOnlyPublicKey());
-            if (!validSignature) {
-                throw new IllegalStateException("Invalid signature");
-            }
 
             return builder.setSig(ByteString.copyFrom(signature.toByteArray()));
         } catch (Exception e) {
