@@ -2,6 +2,7 @@ package org.tbk.nostr.nips;
 
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.XonlyPublicKey;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
@@ -38,7 +39,7 @@ public final class Nip1 {
         return MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())
                 .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
-                .setKind(MoreKinds.kindUserMetadata().getValue())
+                .setKind(Kinds.kindProfileMetadata.getValue())
                 .setContent(JsonWriter.toJson(metadata)));
     }
 
@@ -46,7 +47,7 @@ public final class Nip1 {
         return MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())
                 .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
-                .setKind(MoreKinds.kindShortTextNote().getValue())
+                .setKind(Kinds.kindTextNote.getValue())
                 .setContent(content));
     }
 

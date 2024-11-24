@@ -11,10 +11,10 @@ import org.sqlite.SQLiteException;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.EventUri;
 import org.tbk.nostr.base.IndexedTag;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.example.relay.domain.event.EventEntity;
 import org.tbk.nostr.example.relay.domain.event.EventEntityService;
 import org.tbk.nostr.example.relay.domain.event.EventEntitySpecifications;
-import org.tbk.nostr.nips.Nip9;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.OkResponse;
@@ -154,7 +154,7 @@ public class NostrSupportService implements NostrSupport, Nip1Support, Nip9Suppo
         return Mono.fromCallable(() -> {
             EventId eventId = EventId.of(event.getId().toByteArray());
             return eventEntityService.exists(EventEntitySpecifications.hasPubkey(author)
-                    .and(EventEntitySpecifications.hasKind(Nip9.kind()))
+                    .and(EventEntitySpecifications.hasKind(Kinds.kindDeletion))
                     .and(EventEntitySpecifications.hasTagWithFirstValue(IndexedTag.e, eventId.toHex())));
         });
     }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.client.NostrClientService;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
@@ -132,7 +133,7 @@ class NostrRelayNip42Test {
         List<Response> responses = nostrTemplate.fetch(ReqRequest.newBuilder()
                         .setId(subscriptionId)
                         .addFilters(Filter.newBuilder()
-                                .addKinds(1)
+                                .addKinds(Kinds.kindTextNote.getValue())
                                 .build())
                         .build())
                 .bufferTimeout(2, Duration.ofSeconds(3))
@@ -306,7 +307,7 @@ class NostrRelayNip42Test {
         Event authEvent = MoreEvents.finalize(signer, Nip42.createAuthEvent(signer.getPublicKey(),
                         "challengestringhere",
                         nostrClient.getRelayUri())
-                .setKind(Nip42.kind().getValue() + 1));
+                .setKind(Kinds.kindClientAuthentication.getValue() + 1));
 
         List<Response> response = requireNonNull(nostrClient.attach()
                 .doOnSubscribe(foo -> {

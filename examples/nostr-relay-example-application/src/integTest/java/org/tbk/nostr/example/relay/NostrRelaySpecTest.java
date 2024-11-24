@@ -564,16 +564,17 @@ class NostrRelaySpecTest {
     void itShouldFetchEventsByKindSuccessfully0() {
         Signer signer = SimpleSigner.random();
 
-        int kind = 1337;
+        int kind0 = Kind.maxValue() - 1;
+        int kind1 = Kind.maxValue();
 
         Event eventMatching = MoreEvents.finalize(signer, MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())
                 .setPubkey(ByteString.fromHex(signer.getPublicKey().value.toHex()))
-                .setKind(kind)
+                .setKind(kind0)
                 .setContent("GM")));
 
         Event eventNonMatching = MoreEvents.finalize(signer, MoreEvents.withEventId(eventMatching.toBuilder()
-                .setKind(eventMatching.getKind() + 1)));
+                .setKind(kind1)));
 
         List<Event> events = List.of(eventMatching, eventNonMatching);
         List<OkResponse> oks = nostrTemplate.send(events)
@@ -588,7 +589,7 @@ class NostrRelaySpecTest {
                                 .addAllIds(events.stream()
                                         .map(Event::getId)
                                         .toList())
-                                .addKinds(kind)
+                                .addKinds(kind0)
                                 .build())
                         .build())
                 .collectList()

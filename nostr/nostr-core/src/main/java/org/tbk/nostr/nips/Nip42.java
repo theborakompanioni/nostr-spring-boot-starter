@@ -3,6 +3,7 @@ package org.tbk.nostr.nips;
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.Kind;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
@@ -17,7 +18,6 @@ import java.util.Optional;
  * See <a href="https://github.com/nostr-protocol/nips/blob/master/42.md">NIP-42</a>.
  */
 public final class Nip42 {
-    private static final Kind AUTH_EVENT_KIND = Kind.of(22_242);
     private static final String CHALLENGE_TAG_NAME = "challenge";
     private static final String RELAY_TAG_NAME = "relay";
 
@@ -25,12 +25,8 @@ public final class Nip42 {
         throw new UnsupportedOperationException();
     }
 
-    public static Kind kind() {
-        return AUTH_EVENT_KIND;
-    }
-
     public static boolean isAuthEvent(EventOrBuilder event) {
-        return event.getKind() == AUTH_EVENT_KIND.getValue();
+        return event.getKind() == Kinds.kindClientAuthentication.getValue();
     }
 
     public static TagValue challenge(String challenge) {
@@ -59,7 +55,7 @@ public final class Nip42 {
         return MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())
                 .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
-                .setKind(AUTH_EVENT_KIND.getValue())
+                .setKind(Kinds.kindClientAuthentication.getValue())
                 .addTags(challenge(challenge))
                 .addTags(relay(relayUri))
                 .setContent(""));

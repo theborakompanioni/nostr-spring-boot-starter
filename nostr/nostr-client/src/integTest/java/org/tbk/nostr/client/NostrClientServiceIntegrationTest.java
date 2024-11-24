@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.proto.Filter;
@@ -63,7 +64,7 @@ class NostrClientServiceIntegrationTest {
         Disposable subscriptionDisposable = sut.subscribe(ReqRequest.newBuilder()
                         .setId("test")
                         .addFilters(Filter.newBuilder()
-                                .addKinds(1)
+                                .addKinds(Kinds.kindTextNote.getValue())
                                 .build())
                         .build())
                 .doOnSubscribe(it -> latch.countDown())

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.client.NostrClientService;
 import org.tbk.nostr.nip19.Nip19;
@@ -36,7 +37,7 @@ class MainApplicationRunner implements ApplicationRunner, DisposableBean {
         ReqRequest reqRequest = ReqRequest.newBuilder()
                 .setId(subscriptionId.getId())
                 .addFilters(Filter.newBuilder()
-                        .addKinds(1)
+                        .addKinds(Kinds.kindTextNote.getValue())
                         .setSince(Instant.now().minusSeconds(21).getEpochSecond())
                         .build())
                 .build();

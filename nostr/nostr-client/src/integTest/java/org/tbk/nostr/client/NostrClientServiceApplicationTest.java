@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
@@ -60,7 +61,7 @@ class NostrClientServiceApplicationTest {
         ReqRequest reqRequest = ReqRequest.newBuilder()
                 .setId(subscriptionId.getId())
                 .addFilters(Filter.newBuilder()
-                        .addKinds(1)
+                        .addKinds(Kinds.kindTextNote.getValue())
                         .addAuthors(ByteString.fromHex(signer.getPublicKey().value.toHex()))
                         .build())
                 .build();

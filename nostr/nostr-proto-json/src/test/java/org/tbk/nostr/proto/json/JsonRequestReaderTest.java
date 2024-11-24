@@ -3,6 +3,7 @@ package org.tbk.nostr.proto.json;
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.base.IndexedTag;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip42;
@@ -369,7 +370,7 @@ class JsonRequestReaderTest {
                 .setEvent(MoreEvents.withEventId(Event.newBuilder()
                                 .setCreatedAt(1)
                                 .setPubkey(ByteString.fromHex(testSigner.getPublicKey().value.toHex()))
-                                .setKind(Nip42.kind().getValue())
+                                .setKind(Kinds.kindClientAuthentication.getValue())
                                 .addTags(MoreTags.named("relay", "wss://relay.example.com/"))
                                 .addTags(MoreTags.named("challenge", "challengestringhere"))
                         )

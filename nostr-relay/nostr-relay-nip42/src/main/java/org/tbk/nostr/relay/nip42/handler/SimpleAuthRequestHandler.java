@@ -8,6 +8,7 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.nips.Nip42;
 import org.tbk.nostr.proto.AuthRequest;
 import org.tbk.nostr.proto.Event;
@@ -67,8 +68,8 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
     }
 
     private static void checkAuthEvent(NostrRequestContext context, Event authEvent) throws AuthenticationException {
-        if (authEvent.getKind() != Nip42.kind().getValue()) {
-            throw new AuthenticationServiceException("invalid: Kind must be %d".formatted(Nip42.kind().getValue()));
+        if (!Nip42.isAuthEvent(authEvent)) {
+            throw new AuthenticationServiceException("invalid: Kind must be %d".formatted(Kinds.kindClientAuthentication.getValue()));
         }
 
         String expectedChallenge = context.getAuthenticationChallenge()

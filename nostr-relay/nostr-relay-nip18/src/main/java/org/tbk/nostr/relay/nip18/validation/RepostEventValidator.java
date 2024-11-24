@@ -7,6 +7,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.tbk.nostr.base.IndexedTag;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.nip18.Nip18;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
@@ -28,12 +29,12 @@ public class RepostEventValidator implements EventValidator {
             try {
                 Event repostedEvent = JsonReader.fromJson(event.getContent(), Event.newBuilder());
 
-                if (event.getKind() == Nip18.kindRepost().getValue()) {
+                if (event.getKind() == Kinds.kindRepost.getValue()) {
                     if (repostedEvent.getKind() != 1) {
                         errors.rejectValue("kind", "nip18.refs.invalid", "Reposted event must be a short text note.");
                         return;
                     }
-                } else if (event.getKind() == Nip18.kindGenericRepost().getValue()) {
+                } else if (event.getKind() == Kinds.kindGenericRepost.getValue()) {
                     if (repostedEvent.getKind() == 1) {
                         errors.rejectValue("kind", "nip18.refs.invalid", "Reposted event must not be a short text note.");
                         return;

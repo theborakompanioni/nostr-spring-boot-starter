@@ -4,6 +4,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.base.IndexedTag;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
@@ -278,7 +279,7 @@ class JsonRequestWriterTest {
                         .setEvent(MoreEvents.withEventId(Event.newBuilder()
                                         .setCreatedAt(1)
                                         .setPubkey(ByteString.fromHex(testSigner.getPublicKey().value.toHex()))
-                                        .setKind(Nip42.kind().getValue())
+                                        .setKind(Kinds.kindClientAuthentication.getValue())
                                         .addTags(MoreTags.named("relay", "wss://relay.example.com/"))
                                         .addTags(MoreTags.named("challenge", "challengestringhere"))
                                 )

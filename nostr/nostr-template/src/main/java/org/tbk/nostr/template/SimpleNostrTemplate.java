@@ -14,10 +14,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.base.Metadata;
-import org.tbk.nostr.base.RelayUri;
-import org.tbk.nostr.base.SubscriptionId;
+import org.tbk.nostr.base.*;
 import org.tbk.nostr.nip11.RelayInfoDocument;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.proto.json.JsonReader;
@@ -164,7 +161,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
         return fetchEvents(ReqRequest.newBuilder()
                 .setId(subscriptionId.getId())
                 .addFilters(Filter.newBuilder()
-                        .addKinds(0)
+                        .addKinds(Kinds.kindProfileMetadata.getValue())
                         .addAllAuthors(idsAsBytes)
                         .build())
                 .build())

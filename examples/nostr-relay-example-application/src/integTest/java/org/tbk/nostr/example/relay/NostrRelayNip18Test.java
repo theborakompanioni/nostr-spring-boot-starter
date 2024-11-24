@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.base.IndexedTag;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
@@ -39,7 +40,7 @@ class NostrRelayNip18Test {
         Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
         Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri()));
 
-        assertThat(repost.getKind(), is(Nip18.kindRepost().getValue()));
+        assertThat(repost.getKind(), is(Kinds.kindRepost.getValue()));
 
         OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))
@@ -59,7 +60,7 @@ class NostrRelayNip18Test {
                 .build());
         Event genericRepost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri()));
 
-        assertThat(genericRepost.getKind(), is(Nip18.kindGenericRepost().getValue()));
+        assertThat(genericRepost.getKind(), is(Kinds.kindGenericRepost.getValue()));
 
         OkResponse ok0 = nostrTemplate.send(genericRepost)
                 .blockOptional(Duration.ofSeconds(5))
@@ -130,7 +131,7 @@ class NostrRelayNip18Test {
 
         Event event = MoreEvents.finalize(signer, Nip1.createEphemeralEvent(signer.getPublicKey(), "GM"));
         Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri())
-                .setKind(Nip18.kindRepost().getValue()));
+                .setKind(Kinds.kindRepost.getValue()));
 
         OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))
@@ -146,7 +147,7 @@ class NostrRelayNip18Test {
 
         Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
         Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri())
-                .setKind(Nip18.kindGenericRepost().getValue()));
+                .setKind(Kinds.kindGenericRepost.getValue()));
 
         OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))

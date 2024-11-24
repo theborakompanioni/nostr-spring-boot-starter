@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Kind;
+import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
@@ -161,7 +162,7 @@ class Nip19Test {
         assertThat(nevent.getRelays().get(4), is(RelayUri.parse("wss://nostr.radixrat.com/")));
 
         assertThat(nevent.getKind().isPresent(), is(true));
-        assertThat(nevent.getKind().orElseThrow(), is(Kind.of(1)));
+        assertThat(nevent.getKind().orElseThrow(), is(Kinds.kindTextNote));
 
         // we are using a different order of the TLV values, so the encoded string does not match
         // let's only check for object equality
