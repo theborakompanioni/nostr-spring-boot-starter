@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr nip64 package'
+
+repositories {
+    maven { url 'https://raw.githubusercontent.com/lichess-org/lila-maven/master' }
+}
+
+dependencies {
+    api project(':nostr:nostr-core')
+    implementation 'org.lichess:scalachess_3:16.5.0'
+}
