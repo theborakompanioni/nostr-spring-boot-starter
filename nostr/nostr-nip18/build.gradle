@@ -5,7 +5,7 @@ plugins {
 description = 'nostr nip18 package'
 
 dependencies {
-    implementation project(':nostr:nostr-core')
+    api project(':nostr:nostr-core')
     
     api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
 

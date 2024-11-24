@@ -13,12 +13,7 @@ import static java.util.Objects.requireNonNull;
 public final class RelayUri {
 
     public static boolean isValidRelayUriString(String value) {
-        try {
-            fromString(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return tryFromString(value).isPresent();
     }
 
     public static RelayUri fromString(String uri) {

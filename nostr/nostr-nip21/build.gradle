@@ -2,12 +2,11 @@ plugins {
     id 'java'
 }
 
-description = 'nostr nip19 package'
+description = 'nostr nip21 package'
 
 dependencies {
     api project(':nostr:nostr-core')
-
-    api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
+    api project(':nostr:nostr-nip19')
 
     testImplementation project(':nostr:nostr-persona')
 }
