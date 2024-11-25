@@ -391,10 +391,12 @@ class NostrRelaySpecTest {
         Signer signer = SimpleSigner.random();
 
         Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
-                .addTags(MoreTags.named("")));
+                .addTags(TagValue.newBuilder().build()));
         Event invalidEvent1 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM1")
-                .addTags(MoreTags.named("", "test")));
+                .addTags(MoreTags.named("")));
         Event invalidEvent2 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM2")
+                .addTags(MoreTags.named("", "test")));
+        Event invalidEvent3 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM3")
                 .addTags(MoreTags.named("0".repeat(257))));
 
         List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2);
