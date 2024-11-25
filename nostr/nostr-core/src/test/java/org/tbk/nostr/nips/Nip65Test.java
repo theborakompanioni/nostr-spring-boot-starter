@@ -11,8 +11,6 @@ import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,8 +28,8 @@ class Nip65Test {
         List<TagValue> rTag = MoreTags.findByName(event0, IndexedTag.r);
         assertThat(rTag, hasSize(0));
 
-        assertThat(Nip65.findReadRelays(event0), hasSize(0));
-        assertThat(Nip65.findWriteRelays(event0), hasSize(0));
+        assertThat(Nip65.findRelays(event0).getWriteRelays(), hasSize(0));
+        assertThat(Nip65.findRelays(event0).getWriteRelays(), hasSize(0));
     }
 
     @Test
@@ -40,7 +38,10 @@ class Nip65Test {
 
         Set<RelayUri> readRelays = Set.of(RelayUri.parse("ws://localhost:8080"), RelayUri.parse("ws://localhost:8081"));
         Set<RelayUri> writeRelays = Set.of(RelayUri.parse("ws://localhost:8080"), RelayUri.parse("ws://localhost:8082"));
-        Event event0 = MoreEvents.finalize(signer, Nip65.createRelayListEvent(signer.getPublicKey(), readRelays, writeRelays));
+        Event event0 = MoreEvents.finalize(signer, Nip65.createRelayListEvent(signer.getPublicKey(), Nip65.ReadWriteRelays.builder()
+                .readRelays(readRelays)
+                .writeRelays(writeRelays)
+                .build()));
 
         List<TagValue> rTag = MoreTags.findByName(event0, IndexedTag.r);
         assertThat(rTag, hasSize(3));
@@ -56,8 +57,9 @@ class Nip65Test {
         assertThat(rTag.get(2).getValues(0), is("ws://localhost:8082"));
         assertThat(rTag.get(2).getValues(1), is("write"));
 
-        assertThat(Nip65.findReadRelays(event0), containsInRelativeOrder(RelayUri.parse("ws://localhost:8080"), RelayUri.parse("ws://localhost:8081")));
-        assertThat(Nip65.findWriteRelays(event0), containsInRelativeOrder(RelayUri.parse("ws://localhost:8080"), RelayUri.parse("ws://localhost:8082")));
+        Nip65.ReadWriteRelays relays = Nip65.findRelays(event0);
+        assertThat(relays.getReadRelays(), containsInRelativeOrder(RelayUri.parse("ws://localhost:8080"), RelayUri.parse("ws://localhost:8081")));
+        assertThat(relays.getWriteRelays(), containsInRelativeOrder(RelayUri.parse("ws://localhost:8080"), RelayUri.parse("ws://localhost:8082")));
     }
 
     @Test
@@ -76,7 +78,8 @@ class Nip65Test {
         assertThat(rTag.get(1).getValuesCount(), is(1));
         assertThat(rTag.get(1).getValues(0), is("ws://localhost:8081"));
 
-        assertThat(Nip65.findReadRelays(event0), containsInRelativeOrder(RelayUri.parse("ws://localhost:8080"), RelayUri.parse("ws://localhost:8081")));
-        assertThat(Nip65.findWriteRelays(event0), containsInRelativeOrder(RelayUri.parse("ws://localhost:8080"), RelayUri.parse("ws://localhost:8081")));
+        Nip65.ReadWriteRelays relays = Nip65.findRelays(event0);
+        assertThat(relays.getReadRelays(), containsInRelativeOrder(RelayUri.parse("ws://localhost:8080"), RelayUri.parse("ws://localhost:8081")));
+        assertThat(relays.getWriteRelays(), containsInRelativeOrder(RelayUri.parse("ws://localhost:8080"), RelayUri.parse("ws://localhost:8081")));
     }
 }

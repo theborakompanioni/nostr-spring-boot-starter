@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.tbk.nostr.base.*;
 import org.tbk.nostr.nip11.RelayInfoDocument;
+import org.tbk.nostr.nips.Nip65;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.proto.json.JsonReader;
 import org.tbk.nostr.util.MoreEvents;
@@ -25,6 +26,7 @@ import reactor.core.publisher.SynchronousSink;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLException;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -126,7 +128,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     @Override
-    public Flux<Event> fetchEventByAuthor(XonlyPublicKey publicKey) {
+    public Flux<Event> fetchEventsByAuthor(XonlyPublicKey publicKey) {
         return fetchEventsByAuthors(Collections.singletonList(publicKey));
     }
 
@@ -135,38 +137,47 @@ public class SimpleNostrTemplate implements NostrTemplate {
         if (publicKeys.isEmpty()) {
             return Flux.empty();
         }
-
-        Set<ByteString> idsAsBytes = publicKeys.stream()
-                .map(it -> ByteString.copyFrom(it.value.toByteArray()))
-                .collect(Collectors.toSet());
-
-        SubscriptionId subscriptionId = createUniqueSubscriptionId(idsAsBytes);
+        SubscriptionId subscriptionId = createUniqueSubscriptionId(publicKeys);
 
         return fetchEvents(ReqRequest.newBuilder()
                 .setId(subscriptionId.getId())
                 .addFilters(Filter.newBuilder()
-                        .addAllAuthors(idsAsBytes)
+                        .addAllAuthors(publicKeys.stream()
+                                .map(it -> ByteString.copyFrom(it.value.toByteArray()))
+                                .collect(Collectors.toSet()))
                         .build())
                 .build());
     }
 
     @Override
     public Mono<Metadata> fetchMetadataByAuthor(XonlyPublicKey publicKey) {
-        Set<ByteString> idsAsBytes = Set.of(publicKey).stream()
-                .map(it -> ByteString.fromHex(publicKey.value.toHex()))
-                .collect(Collectors.toSet());
-
-        SubscriptionId subscriptionId = createUniqueSubscriptionId(idsAsBytes);
+        SubscriptionId subscriptionId = createUniqueSubscriptionId(publicKey);
 
         return fetchEvents(ReqRequest.newBuilder()
                 .setId(subscriptionId.getId())
                 .addFilters(Filter.newBuilder()
                         .addKinds(Kinds.kindProfileMetadata.getValue())
-                        .addAllAuthors(idsAsBytes)
+                        .addAuthors(ByteString.fromHex(publicKey.value.toHex()))
                         .build())
                 .build())
                 .map(it -> JsonReader.fromJson(it.getContent(), Metadata.newBuilder()))
                 .next();
+    }
+
+    @Override
+    public Mono<Nip65.ReadWriteRelays> fetchRelayListByAuthor(XonlyPublicKey publicKey) {
+        SubscriptionId subscriptionId = createUniqueSubscriptionId(publicKey);
+
+        return fetchEvents(ReqRequest.newBuilder()
+                .setId(subscriptionId.getId())
+                .addFilters(Filter.newBuilder()
+                        .addKinds(Kinds.kindRelayListMetadata.getValue())
+                        .addAuthors(ByteString.fromHex(publicKey.value.toHex()))
+                        .build())
+                .build())
+                .filter(Nip65::isRelayListEvent)
+                .next()
+                .map(Nip65::findRelays);
     }
 
     @Override
@@ -277,6 +288,16 @@ public class SimpleNostrTemplate implements NostrTemplate {
         });
     }
 
+    private static SubscriptionId createUniqueSubscriptionId(XonlyPublicKey publicKey) {
+        return createUniqueSubscriptionId(Set.of(publicKey));
+    }
+
+    private static SubscriptionId createUniqueSubscriptionId(Collection<XonlyPublicKey> publicKeys) {
+        return createUniqueSubscriptionId(publicKeys.stream()
+                .map(it -> ByteString.copyFrom(it.value.toByteArray()))
+                .collect(Collectors.toSet()));
+    }
+
     private static SubscriptionId createUniqueSubscriptionId(Set<ByteString> list) {
         return createUniqueSubscriptionId(list.stream()
                 .map(ByteString::toByteArray)
@@ -284,11 +305,10 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     private static SubscriptionId createUniqueSubscriptionId(List<byte[]> list) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        list.forEach(outputStream::writeBytes);
         return SubscriptionId.of(
-                HexFormat.of().formatHex(Crypto.sha256(
-                        HexFormat.of().parseHex(list.stream()
-                                .map(it -> HexFormat.of().formatHex(it))
-                                .collect(Collectors.joining()))))
+                HexFormat.of().formatHex(Crypto.sha256(outputStream.toByteArray()))
         );
     }
 

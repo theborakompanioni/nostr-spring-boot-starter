@@ -5,6 +5,7 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nip11.RelayInfoDocument;
+import org.tbk.nostr.nips.Nip65;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.proto.json.JsonWriter;
 import reactor.core.publisher.Flux;
@@ -29,11 +30,13 @@ public interface NostrTemplate {
 
     Flux<Event> fetchEventsByIds(Collection<EventId> ids);
 
-    Flux<Event> fetchEventByAuthor(XonlyPublicKey publicKey);
+    Flux<Event> fetchEventsByAuthor(XonlyPublicKey publicKey);
 
     Flux<Event> fetchEventsByAuthors(Collection<XonlyPublicKey> publicKeys);
 
     Mono<Metadata> fetchMetadataByAuthor(XonlyPublicKey publicKey);
+
+    Mono<Nip65.ReadWriteRelays> fetchRelayListByAuthor(XonlyPublicKey publicKey);
 
     Flux<Response> count(CountRequest request);
 

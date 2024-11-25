@@ -518,7 +518,7 @@ class NostrRelaySpecTest {
                 .orElseThrow();
         assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
 
-        List<Event> fetchedEvents = nostrTemplate.fetchEventByAuthor(signer0.getPublicKey())
+        List<Event> fetchedEvents = nostrTemplate.fetchEventsByAuthor(signer0.getPublicKey())
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();

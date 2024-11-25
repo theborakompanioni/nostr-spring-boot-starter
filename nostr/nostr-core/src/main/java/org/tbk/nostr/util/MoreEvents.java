@@ -79,8 +79,15 @@ public final class MoreEvents {
         return finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata));
     }
 
-    public static Event finalizeRelayList(Signer signer, Collection<RelayUri> readWriteRelays) {
-        return finalize(signer, Nip65.createRelayListEvent(signer.getPublicKey(), new HashSet<>(readWriteRelays)));
+    public static Event createFinalizeRelayList(Signer signer, Collection<RelayUri> readWriteRelays) {
+        return createFinalizeRelayList(signer, Nip65.ReadWriteRelays.builder()
+                .readRelays(readWriteRelays)
+                .writeRelays(readWriteRelays)
+                .build());
+    }
+
+    public static Event createFinalizeRelayList(Signer signer, Nip65.ReadWriteRelays relays) {
+        return finalize(signer, Nip65.createRelayListEvent(signer.getPublicKey(), relays));
     }
 
     public static Optional<EventId> findLowestEventId(Collection<EventId> eventIds) {

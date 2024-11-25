@@ -23,21 +23,22 @@ need to write scalable and efficient solutions effortlessly.
 - [x] [NIP-9](https://github.com/nostr-protocol/nips/blob/master/09.md)
 - [x] [NIP-10](https://github.com/nostr-protocol/nips/blob/master/10.md)
 - [x] [NIP-13](https://github.com/nostr-protocol/nips/blob/master/13.md)
-- [ ] [NIP-18](https://github.com/nostr-protocol/nips/blob/master/18.md)
+- [x] [NIP-18](https://github.com/nostr-protocol/nips/blob/master/18.md)
 - [x] [NIP-19](https://github.com/nostr-protocol/nips/blob/master/19.md)
 - [x] [NIP-21](https://github.com/nostr-protocol/nips/blob/master/21.md)
 - [x] [NIP-24](https://github.com/nostr-protocol/nips/blob/master/24.md)
 - [x] [NIP-40](https://github.com/nostr-protocol/nips/blob/master/40.md)
 - [x] [NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md)
 - [x] [NIP-50](https://github.com/nostr-protocol/nips/blob/master/50.md)
+- [x] [NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md)
 
 Planned:
+- [ ] [NIP-02](https://github.com/nostr-protocol/nips/blob/master/02.md)
 - [ ] [NIP-11](https://github.com/nostr-protocol/nips/blob/master/11.md)
 - [ ] [NIP-25](https://github.com/nostr-protocol/nips/blob/master/25.md)
 - [ ] [NIP-38](https://github.com/nostr-protocol/nips/blob/master/38.md)
 - [ ] [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md)
 - [ ] [NIP-64](https://github.com/nostr-protocol/nips/blob/master/64.md)
-- [ ] [NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md)
 - [ ] [NIP-70](https://github.com/nostr-protocol/nips/blob/master/70.md)
 
 

@@ -67,7 +67,7 @@ class NostrTemplateApplicationTest {
         Event fetchedEvent0 = sut.fetchEventById(EventId.of(ok.getEventId().toByteArray())).block(Duration.ofSeconds(5));
         assertThat(fetchedEvent0, is(event));
 
-        Event fetchedEvent1 = sut.fetchEventByAuthor(signer.getPublicKey()).next().block(Duration.ofSeconds(5));
+        Event fetchedEvent1 = sut.fetchEventsByAuthor(signer.getPublicKey()).next().block(Duration.ofSeconds(5));
         assertThat(fetchedEvent1, is(event));
     }
 
