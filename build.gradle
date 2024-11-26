@@ -29,7 +29,8 @@ plugins {
     id 'idea'
     id 'nebula.release' version '17.2.2'
     id 'nebula.lint' version '18.1.0'
-    id 'com.netflix.nebula.project' version '10.1.5'
+    id 'com.netflix.nebula.project' version '11.0.0'
+    id 'com.netflix.nebula.facet' version '11.0.0'
     id 'com.github.spotbugs' version '5.2.1' apply false
     id 'net.bytebuddy.byte-buddy-gradle-plugin' version "$bytebuddyPluginVersion" apply false
     id 'org.springframework.boot' version "$springBootGradlePluginVersion" apply false
@@ -99,6 +100,7 @@ subprojects {
     apply plugin: 'com.github.spotbugs'
     apply plugin: 'com.netflix.nebula.project'
     apply plugin: 'com.netflix.nebula.info'
+    apply plugin: 'com.netflix.nebula.facet'
     apply plugin: 'com.netflix.nebula.integtest-standalone'
     apply plugin: 'io.franzbecker.gradle-lombok'
     apply plugin: 'io.spring.dependency-management'
@@ -202,6 +204,13 @@ subprojects {
         }
     }
 
+    facets {
+        e2eTest {
+            parentSourceSet = 'test'
+            includeInCheckLifecycle = false
+        }
+    }
+
     test {
         finalizedBy jacocoTestReport // report is always generated after tests run
 
@@ -209,6 +218,10 @@ subprojects {
     }
 
     integrationTest {
+        useJUnitPlatform()
+    }
+
+    e2eTest {
         useJUnitPlatform()
     }
 

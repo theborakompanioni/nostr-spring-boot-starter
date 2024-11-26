@@ -116,7 +116,7 @@ implementation "io.github.theborakompanioni:nostr-proto:${bitcoinSpringBootStart
 
 Run full test suite (including load tests):
 ```shell script
-CI=true ./gradlew test integrationTest --rerun-tasks --no-parallel
+CI=true ./gradlew test integrationTest e2eTest --rerun-tasks --no-parallel
 ```
 
 ## Contributing
