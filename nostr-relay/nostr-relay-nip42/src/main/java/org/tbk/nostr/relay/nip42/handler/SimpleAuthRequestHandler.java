@@ -6,7 +6,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.nips.Nip42;
@@ -34,7 +33,7 @@ public class SimpleAuthRequestHandler implements AuthRequestHandler {
         try {
             checkAuthEvent(context, authEvent);
 
-            Authentication authentication = nip42Support.attemptAuthentication(context, authEvent)
+            Nip42Support.NostrAuthentication authentication = nip42Support.attemptAuthentication(context, authEvent)
                     .blockOptional()
                     .orElseThrow(() -> new InternalAuthenticationServiceException("error: Provider error."));
 

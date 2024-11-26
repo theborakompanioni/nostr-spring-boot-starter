@@ -19,10 +19,9 @@ public class SimpleAuthenticationInterceptor implements AuthenticationIntercepto
         if (Boolean.FALSE.equals(nip42Support.requiresAuthentication(context, request).block())) {
             return true;
         }
+        context.add(createAuthenticationRequiredResponse(request));
 
-        onAuthenticationRequired(context, request);
-
-        String challenge =  context.getAuthenticationChallenge()
+        String challenge = context.getAuthenticationChallenge()
                 .orElseGet(() -> nip42Support.createNewChallenge(context.getSession()));
         context.setAuthenticationChallenge(challenge);
 
@@ -35,37 +34,37 @@ public class SimpleAuthenticationInterceptor implements AuthenticationIntercepto
         return false;
     }
 
-    private static void onAuthenticationRequired(NostrRequestContext context, Request request) {
+    private static Response createAuthenticationRequiredResponse(Request request) {
         String errorMessage = "auth-required: authentication required.";
-        switch (request.getKindCase()) {
+        return switch (request.getKindCase()) {
             case CLOSE, AUTH -> {
                 // authentication not needed for these events
                 throw new IllegalArgumentException("Cannot enforce authentication for events with kind %s".formatted(request.getKindCase()));
             }
-            case EVENT -> context.add(Response.newBuilder()
+            case EVENT -> Response.newBuilder()
                     .setOk(OkResponse.newBuilder()
                             .setEventId(request.getEvent().getEvent().getId())
                             .setSuccess(false)
                             .setMessage(errorMessage)
                             .build())
-                    .build());
-            case REQ -> context.add(Response.newBuilder()
+                    .build();
+            case REQ -> Response.newBuilder()
                     .setClosed(ClosedResponse.newBuilder()
                             .setSubscriptionId(request.getReq().getId())
                             .setMessage(errorMessage)
                             .build())
-                    .build());
-            case COUNT -> context.add(Response.newBuilder()
+                    .build();
+            case COUNT -> Response.newBuilder()
                     .setClosed(ClosedResponse.newBuilder()
                             .setSubscriptionId(request.getCount().getId())
                             .setMessage(errorMessage)
                             .build())
-                    .build());
-            case KIND_NOT_SET -> context.add(Response.newBuilder()
+                    .build();
+            case KIND_NOT_SET -> Response.newBuilder()
                     .setNotice(NoticeResponse.newBuilder()
                             .setMessage(errorMessage)
                             .build())
-                    .build());
-        }
+                    .build();
+        };
     }
 }

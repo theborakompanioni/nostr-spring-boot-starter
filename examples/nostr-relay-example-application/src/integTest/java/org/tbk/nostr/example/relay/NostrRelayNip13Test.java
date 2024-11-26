@@ -14,12 +14,15 @@ import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.relay.config.nip13.Nip13Properties;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
+import org.tbk.nostr.util.MoreSubscriptionIds;
+import reactor.core.publisher.Flux;
 
 import java.time.Duration;
+import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = NostrRelayTestConfig.class)
@@ -64,9 +67,14 @@ class NostrRelayNip13Test {
     void itShouldDeclineEventNotMeetingTargetDifficulty() {
         Signer signer = SimpleSigner.random();
 
-        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
+        assertThat("sanity check", nip13ExtensionProperties.getMinPowDifficulty(), is(greaterThan(0)));
+        
+        Event event = requireNonNull(Flux.fromStream(Stream.generate(() -> MoreEvents.createFinalizedTextNote(signer, MoreSubscriptionIds.random().getId()))
+                        .filter(it -> !Nip13.meetsTargetDifficulty(it, nip13ExtensionProperties.getMinPowDifficulty(), false)))
+                .blockFirst(Duration.ofSeconds(10)));
 
-        assertThat("sanity check", Nip13.meetsTargetDifficulty(event, nip13ExtensionProperties.getMinPowDifficulty()), is(false));
+        assertThat("sanity check", Nip13.meetsTargetDifficulty(event, nip13ExtensionProperties.getMinPowDifficulty(), false), is(false));
+        assertThat("sanity check", Nip13.meetsTargetDifficulty(event, nip13ExtensionProperties.getMinPowDifficulty(), true), is(false));
 
         OkResponse ok = nostrTemplate.send(event)
                 .blockOptional(Duration.ofSeconds(5))
@@ -106,6 +114,7 @@ class NostrRelayNip13Test {
 
         assertThat(ok.getMessage(), is("pow: Missing or invalid pow commitment."));
     }
+
     @Test
     void itShouldDeclineEventMeetingTargetButCommitsToWrongDifficulty() {
         Signer signer = SimpleSigner.random();

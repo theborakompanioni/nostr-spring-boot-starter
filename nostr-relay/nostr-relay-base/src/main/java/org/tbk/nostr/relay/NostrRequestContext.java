@@ -21,7 +21,11 @@ public interface NostrRequestContext {
 
     void setAuthenticationChallenge(String challenge);
 
-    boolean isAuthenticated();
+    default boolean isAuthenticated() {
+        return getAuthentication().isPresent();
+    }
+
+    Optional<Principal> getAuthentication();
 
     void setAuthentication(Principal principal);
 

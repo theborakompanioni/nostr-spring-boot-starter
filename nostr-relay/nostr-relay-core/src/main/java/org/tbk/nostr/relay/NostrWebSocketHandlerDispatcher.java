@@ -127,8 +127,8 @@ public class NostrWebSocketHandlerDispatcher extends TextWebSocketHandler {
         }
 
         @Override
-        public boolean isAuthenticated() {
-            return getSession().getAuthentication().isPresent();
+        public Optional<Principal> getAuthentication() {
+            return getSession().getAuthentication();
         }
 
         @Override

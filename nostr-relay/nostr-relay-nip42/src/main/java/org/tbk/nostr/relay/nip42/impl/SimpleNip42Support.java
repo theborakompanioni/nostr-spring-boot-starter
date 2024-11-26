@@ -1,7 +1,6 @@
 package org.tbk.nostr.relay.nip42.impl;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.tbk.nostr.nips.Nip70;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.relay.NostrRequestContext;
@@ -24,14 +23,17 @@ public class SimpleNip42Support implements Nip42Support {
 
     @Override
     public Mono<Boolean> requiresAuthentication(NostrRequestContext context, Request request) {
-        return Mono.just(true);
+        if (request.getKindCase() != Request.KindCase.EVENT) {
+            return Mono.just(false);
+        }
+        return Mono.just(Nip70.isProtectedEvent(request.getEvent().getEvent()));
     }
 
     @Override
-    public Mono<Authentication> attemptAuthentication(NostrRequestContext context, Event authEvent) {
-        return Mono.just(UsernamePasswordAuthenticationToken.authenticated(
+    public Mono<NostrAuthentication> attemptAuthentication(NostrRequestContext context, Event authEvent) {
+        return Mono.just(SimpleNostrAuthenticationToken.authenticated(
                 MorePublicKeys.fromEvent(authEvent),
-                "",
+                authEvent,
                 Collections.emptyList()
         ));
     }

@@ -7,3 +7,4 @@ org.tbk.nostr.relay.config.nip13.Nip13AutoConfiguration
 org.tbk.nostr.relay.config.nip18.Nip18AutoConfiguration
 org.tbk.nostr.relay.config.nip40.Nip40AutoConfiguration
 org.tbk.nostr.relay.config.nip42.Nip42AutoConfiguration
+org.tbk.nostr.relay.config.nip70.Nip70AutoConfiguration

@@ -1,6 +1,8 @@
 package org.tbk.nostr.example.relay;
 
+import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,7 +12,9 @@ import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.client.NostrClientService;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.nips.Nip42;
+import org.tbk.nostr.nips.Nip70;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
@@ -47,11 +51,16 @@ class NostrRelayNip42Test {
         });
     }
 
+    @NonNull
+    private static Event createProtectedEventDummy(Signer signer) {
+        return MoreEvents.finalize(signer, Nip70.protect(Nip1.createTextNote(signer.getPublicKey(), "GM")));
+    }
+
     @Test
     void itShouldReceiveAuthChallenge() {
         Signer signer = SimpleSigner.random();
 
-        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
+        Event event = createProtectedEventDummy(signer);
 
         List<Response> responses = nostrTemplate.publishEvent(event)
                 .bufferTimeout(2, Duration.ofSeconds(3))
@@ -82,7 +91,7 @@ class NostrRelayNip42Test {
     void itShouldShouldDeclineEventRequestForUnauthenticated0() {
         Signer signer = SimpleSigner.random();
 
-        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
+        Event event = createProtectedEventDummy(signer);
 
         OkResponse ok = nostrTemplate.send(event)
                 .blockOptional(Duration.ofSeconds(5))
@@ -97,7 +106,7 @@ class NostrRelayNip42Test {
     void itShouldShouldDeclineEventRequestForUnauthenticated1() {
         Signer signer = SimpleSigner.random();
 
-        Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM0");
+        Event event0 = createProtectedEventDummy(signer);
 
         List<Response> responses = requireNonNull(nostrClient.attach()
                 .doOnSubscribe(foo -> {
@@ -128,6 +137,7 @@ class NostrRelayNip42Test {
     }
 
     @Test
+    @Disabled("Must inject own Nip42Support that requires authentication for REQ requests")
     void itShouldShouldDeclineReqRequestForUnauthenticated() {
         String subscriptionId = MoreSubscriptionIds.random().getId();
         List<Response> responses = nostrTemplate.fetch(ReqRequest.newBuilder()
@@ -163,7 +173,7 @@ class NostrRelayNip42Test {
     void itShouldSendSameAuthChallengesMultipleTimes() {
         Signer signer = SimpleSigner.random();
 
-        Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM0");
+        Event event0 = createProtectedEventDummy(signer);
 
         List<Response> responses0 = requireNonNull(nostrClient.attach()
                 .doOnSubscribe(foo -> {
@@ -249,7 +259,7 @@ class NostrRelayNip42Test {
     void itShouldVerifyErrorOnInvalidAuthEvent1UnknownChallenge() {
         Signer signer = SimpleSigner.random();
 
-        Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM0");
+        Event event0 = createProtectedEventDummy(signer);
 
         List<Response> response0 = requireNonNull(nostrClient.attach()
                 .doOnSubscribe(foo -> {
@@ -403,7 +413,7 @@ class NostrRelayNip42Test {
     void itShouldAuthenticateSuccessfully0() {
         Signer signer = SimpleSigner.random();
 
-        Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM0");
+        Event event0 = createProtectedEventDummy(signer);
 
         List<Response> responses0 = requireNonNull(nostrClient.attach()
                 .doOnSubscribe(foo -> {
