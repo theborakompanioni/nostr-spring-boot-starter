@@ -20,4 +20,7 @@ dependencies {
 
     integTestImplementation 'org.springframework.boot:spring-boot-starter-web'
     integTestImplementation 'org.springframework.boot:spring-boot-docker-compose'
+
+    e2eTestImplementation project(':nostr:nostr-nip19')
+    e2eTestImplementation 'org.springframework.boot:spring-boot-starter-web'
 }
