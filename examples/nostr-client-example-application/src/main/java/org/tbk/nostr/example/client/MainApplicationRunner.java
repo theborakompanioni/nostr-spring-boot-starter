@@ -43,7 +43,7 @@ class MainApplicationRunner implements ApplicationRunner, DisposableBean {
                 .build();
 
         log.info("[ALL] Will subscribe (subscription_id = '{}')…", subscriptionId.getId());
-        this.subscription = nostrClientService.subscribe(reqRequest, NostrClientService.SubscribeOptions.defaultOptions().toBuilder()
+        this.subscription = nostrClientService.subscribeToEvents(reqRequest, NostrClientService.SubscribeOptions.defaultOptions().toBuilder()
                         .closeOnEndOfStream(false)
                         .build())
                 .doOnSubscribe(foo -> {

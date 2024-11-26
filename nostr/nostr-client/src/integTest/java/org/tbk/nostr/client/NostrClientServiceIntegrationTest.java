@@ -61,7 +61,7 @@ class NostrClientServiceIntegrationTest {
         assertThat(sut.getSubscriptions().isEmpty(), is(true));
 
         CountDownLatch latch = new CountDownLatch(1);
-        Disposable subscriptionDisposable = sut.subscribe(ReqRequest.newBuilder()
+        Disposable subscriptionDisposable = sut.subscribeToEvents(ReqRequest.newBuilder()
                         .setId("test")
                         .addFilters(Filter.newBuilder()
                                 .addKinds(Kinds.kindTextNote.getValue())

@@ -16,11 +16,17 @@ public interface NostrClientService {
 
     RelayUri getRelayUri();
 
-    default Flux<Event> subscribe(ReqRequest req) {
+    Flux<Response> subscribe(ReqRequest req, SubscribeOptions options);
+
+    default Flux<Response> subscribe(ReqRequest req) {
         return this.subscribe(req, SubscribeOptions.defaultOptions());
     }
 
-    Flux<Event> subscribe(ReqRequest req, SubscribeOptions options);
+    default Flux<Event> subscribeToEvents(ReqRequest req) {
+        return this.subscribeToEvents(req, SubscribeOptions.defaultOptions());
+    }
+
+    Flux<Event> subscribeToEvents(ReqRequest req, SubscribeOptions options);
 
     Flux<Response> attach();
 

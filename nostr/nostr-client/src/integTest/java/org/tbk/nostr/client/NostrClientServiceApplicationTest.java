@@ -66,7 +66,7 @@ class NostrClientServiceApplicationTest {
                         .build())
                 .build();
 
-        Event fetchedEvent = sut.subscribe(reqRequest)
+        Event fetchedEvent = sut.subscribeToEvents(reqRequest)
                 .blockFirst(Duration.ofSeconds(5));
 
         assertThat(fetchedEvent, is(notNullValue()));

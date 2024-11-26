@@ -44,7 +44,7 @@ class NostrRelaySpecEventStreamTest {
         CountDownLatch latch = new CountDownLatch(2);
 
         List<Event> receivedEvents = new ArrayList<>();
-        Disposable subscription = nostrClient.subscribe(ReqRequest.newBuilder()
+        Disposable subscription = nostrClient.subscribeToEvents(ReqRequest.newBuilder()
                         .setId(MoreSubscriptionIds.random().getId())
                         .addFilters(Filter.newBuilder()
                                 .addIds(event1.getId())
@@ -86,7 +86,7 @@ class NostrRelaySpecEventStreamTest {
         CountDownLatch latch = new CountDownLatch(3);
 
         List<Event> receivedEvents = new ArrayList<>();
-        Disposable subscription = nostrClient.subscribe(ReqRequest.newBuilder()
+        Disposable subscription = nostrClient.subscribeToEvents(ReqRequest.newBuilder()
                         .setId(MoreSubscriptionIds.random().getId())
                         .addFilters(Filter.newBuilder()
                                 .addAuthors(ByteString.copyFrom(signer.getPublicKey().value.toByteArray()))

@@ -11,7 +11,9 @@ import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.client.NostrClientService;
 import org.tbk.nostr.nip19.Nip19;
 import org.tbk.nostr.nip19.Npub;
-import org.tbk.nostr.proto.*;
+import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.Filter;
+import org.tbk.nostr.proto.ReqRequest;
 import org.tbk.nostr.proto.json.JsonReader;
 import org.tbk.nostr.util.MoreSubscriptionIds;
 
@@ -33,22 +35,13 @@ class NostrClientServiceIntegrationE2eTest {
     void itShouldFetchMetadataEventSuccessfully0() {
         SubscriptionId subscriptionId = MoreSubscriptionIds.random();
 
-        Event event = sut.attach()
-                .doOnSubscribe(foo -> {
-                    sut.subscribe(ReqRequest.newBuilder()
-                                    .setId(subscriptionId.getId())
-                                    .addFilters(Filter.newBuilder()
-                                            .addKinds(Kinds.kindProfileMetadata.getValue())
-                                            .addAuthors(ByteString.copyFrom(fiatjaf.getPublicKey().value.toByteArray()))
-                                            .build())
-                                    .build())
-                            .subscribe()
-                            .dispose();
-                })
-                .filter(it -> it.getKindCase() == Response.KindCase.EVENT)
-                .map(Response::getEvent)
-                .filter(it -> subscriptionId.getId().equals(it.getSubscriptionId()))
-                .map(EventResponse::getEvent)
+        Event event = sut.subscribeToEvents(ReqRequest.newBuilder()
+                        .setId(subscriptionId.getId())
+                        .addFilters(Filter.newBuilder()
+                                .addKinds(Kinds.kindProfileMetadata.getValue())
+                                .addAuthors(ByteString.copyFrom(fiatjaf.getPublicKey().value.toByteArray()))
+                                .build())
+                        .build())
                 .next()
                 .blockOptional(Duration.ofSeconds(10))
                 .orElseThrow();

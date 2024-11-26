@@ -109,12 +109,12 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
     }
 
     @Override
-    public Flux<Event> subscribe(ReqRequest req, SubscribeOptions options) {
+    public Flux<Response> subscribe(ReqRequest req, SubscribeOptions options) {
         checkOpenSession();
 
         SubscriptionId subscriptionId = SubscriptionId.of(req.getId());
 
-        return this.attachToEvents(subscriptionId).doOnSubscribe(s -> {
+        return this.attachTo(subscriptionId).doOnSubscribe(s -> {
             this.subscriptions.put(subscriptionId, SubscriptionContext.builder()
                     .reqRequest(req)
                     .options(options)
@@ -124,6 +124,17 @@ public class SimpleNostrClientService extends AbstractScheduledService implement
                     .setReq(req)
                     .build());
         });
+    }
+
+    @Override
+    public Flux<Event> subscribeToEvents(ReqRequest req, SubscribeOptions options) {
+        checkOpenSession();
+
+        return this.subscribe(req, options)
+                .filter(it -> Response.KindCase.EVENT.equals(it.getKindCase()))
+                .map(Response::getEvent)
+                .map(EventResponse::getEvent)
+                .filter(MoreEvents::hasValidSignature);
     }
 
     @Override
