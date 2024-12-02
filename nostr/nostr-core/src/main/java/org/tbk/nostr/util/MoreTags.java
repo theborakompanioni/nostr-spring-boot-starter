@@ -5,10 +5,7 @@ import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.RelayUri;
-import org.tbk.nostr.nips.Nip10;
-import org.tbk.nostr.nips.Nip13;
-import org.tbk.nostr.nips.Nip40;
-import org.tbk.nostr.nips.Nip65;
+import org.tbk.nostr.nips.*;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
 import org.tbk.nostr.proto.TagFilter;
@@ -129,6 +126,20 @@ public final class MoreTags {
      */
     public static TagValue p(String... values) {
         return named(IndexedTag.p.name(), values);
+    }
+
+    public static TagValue a(Event event) {
+        if (Nip1.isReplaceableEvent(event)) {
+            return a(event.getKind(), MorePublicKeys.fromEvent(event));
+        }
+        if (Nip1.isAddressableEvent(event)) {
+            TagValue dTag = MoreTags.findByNameSingle(event, IndexedTag.d)
+                    .filter(it -> it.getValuesCount() >= 1)
+                    .orElseThrow(() -> new IllegalArgumentException("Missing or conflicting '%s' tag.".formatted(IndexedTag.d)));
+            return a(event.getKind(), MorePublicKeys.fromEvent(event), dTag.getValues(0));
+        }
+
+        throw new IllegalArgumentException("Expected a replaceable or addressable event. Got kind: %d".formatted(event.getKind()));
     }
 
     public static TagValue a(int kind, XonlyPublicKey publicKey) {
