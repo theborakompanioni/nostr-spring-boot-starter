@@ -30,4 +30,11 @@ public final class Nip30 {
         }
         return MoreTags.named("emoji", shortcode, imageUrl.toString());
     }
+
+    public static String placeholder(String shortcode) {
+        if (!isValidShortcode(shortcode)) {
+            throw new IllegalArgumentException("Illegal characters in shortcode.");
+        }
+        return ":%s:".formatted(shortcode);
+    }
 }

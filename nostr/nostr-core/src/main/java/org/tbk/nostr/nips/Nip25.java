@@ -5,9 +5,11 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
+import java.net.URI;
 import java.time.Instant;
 
 /**
@@ -25,6 +27,12 @@ public final class Nip25 {
 
     public static Event.Builder dislike(XonlyPublicKey publicKey, Event event) {
         return reaction(publicKey, event, "-");
+    }
+
+    public static Event.Builder emoji(XonlyPublicKey publicKey, Event event, URI imageUrl) {
+        TagValue emoji = Nip30.emoji("emoji", imageUrl);
+        return reaction(publicKey, event, Nip30.placeholder(emoji.getValues(0)))
+                .addTags(emoji);
     }
 
     public static Event.Builder reaction(XonlyPublicKey publicKey, Event event, String content) {

@@ -9,6 +9,7 @@ import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
+import java.net.URI;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -69,6 +70,24 @@ class Nip25Test {
 
         List<TagValue> aTags = MoreTags.findByName(reactionEvent, IndexedTag.a);
         assertThat(aTags, hasSize(0));
+    }
+
+    @Test
+    void itShouldReactToEventWithEmoji() {
+        Signer signer = SimpleSigner.random();
+
+        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
+
+        Event reactionEvent = MoreEvents.finalize(signer,
+                Nip25.emoji(signer.getPublicKey(), event, URI.create("https://gleasonator.com/emoji/Gleasonator/soapbox.png"))
+        );
+
+        assertThat(reactionEvent.getKind(), is(Kinds.kindReaction.getValue()));
+
+        List<TagValue> emojiTags = MoreTags.findByName(reactionEvent, "emoji");
+        assertThat(emojiTags, hasSize(1));
+
+        assertThat(reactionEvent.getContent(), is(Nip30.placeholder(emojiTags.getFirst().getValues(0))));
     }
 
     @Test
