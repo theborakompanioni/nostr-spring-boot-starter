@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - nip25: Reactions
 - nip30: Custom Emoji
+- nip38: User Statuses
+
+### Breaking
+- nip40: rename method from `expiration` to `expirationTag`
 
 ## [0.0.4] - 2024-12-05
 ### Added

@@ -29,6 +29,7 @@ need to write scalable and efficient solutions effortlessly.
 - [x] [NIP-24](https://github.com/nostr-protocol/nips/blob/master/24.md)
 - [x] [NIP-25](https://github.com/nostr-protocol/nips/blob/master/25.md)
 - [x] [NIP-30](https://github.com/nostr-protocol/nips/blob/master/30.md)
+- [x] [NIP-38](https://github.com/nostr-protocol/nips/blob/master/38.md)
 - [x] [NIP-40](https://github.com/nostr-protocol/nips/blob/master/40.md)
 - [x] [NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md)
 - [x] [NIP-50](https://github.com/nostr-protocol/nips/blob/master/50.md)
@@ -37,7 +38,6 @@ need to write scalable and efficient solutions effortlessly.
 Planned:
 - [ ] [NIP-02](https://github.com/nostr-protocol/nips/blob/master/02.md)
 - [ ] [NIP-11](https://github.com/nostr-protocol/nips/blob/master/11.md)
-- [ ] [NIP-38](https://github.com/nostr-protocol/nips/blob/master/38.md)
 - [ ] [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md)
 - [ ] [NIP-64](https://github.com/nostr-protocol/nips/blob/master/64.md)
 - [ ] [NIP-70](https://github.com/nostr-protocol/nips/blob/master/70.md)
@@ -45,7 +45,7 @@ Planned:
 
 ### `nostr-proto`
 
-See [nostr-proto](./nostr/nostr-proto/src/main/proto/event.proto) for protobuf definitions of core nostr concepts used throughout most modules (e.g. events, filters, etc.).
+See [nostr-proto](./nostr/nostr-proto/src/main/proto/event.proto) for protobuf definitions of core nostr concepts used in all modules.
 
 ```protobuf
 message Event {

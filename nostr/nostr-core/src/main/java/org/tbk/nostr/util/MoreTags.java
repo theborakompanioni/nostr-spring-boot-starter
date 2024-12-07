@@ -198,11 +198,11 @@ public final class MoreTags {
     }
 
     public static TagValue expiration(Duration duration) {
-        return Nip40.expiration(duration);
+        return Nip40.expirationTag(duration);
     }
 
     public static TagValue expiration(Instant instant) {
-        return Nip40.expiration(instant);
+        return Nip40.expirationTag(instant);
     }
 
     public static TagValue nonce(String nonce, long targetDifficulty) {

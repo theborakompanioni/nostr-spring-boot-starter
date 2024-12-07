@@ -20,12 +20,20 @@ public final class Nip40 {
         throw new UnsupportedOperationException();
     }
 
-    public static TagValue expiration(Duration duration) {
-        return expiration(Instant.now().plusNanos(duration.toNanos()));
+    public static TagValue expirationTag(Duration duration) {
+        return expiration(duration).tag();
     }
 
-    public static TagValue expiration(Instant instant) {
-        return MoreTags.named(EXPIRATION_TAG_NAME, String.valueOf(instant.getEpochSecond()));
+    public static Expiration expiration(Duration duration) {
+        return Expiration.of(duration);
+    }
+
+    public static TagValue expirationTag(Instant instant) {
+        return expiration(instant).tag();
+    }
+
+    public static Expiration expiration(Instant instant) {
+        return Expiration.of(instant);
     }
 
     public static Optional<Instant> getExpiration(Event event) {
@@ -43,5 +51,25 @@ public final class Nip40 {
                 .filter(it -> it >= 0)
                 .min(Comparator.comparingLong(value -> value))
                 .map(Instant::ofEpochSecond);
+    }
+
+    public static final class Expiration {
+        public static Expiration of(Duration duration) {
+            return new Expiration(Instant.now().plusNanos(duration.toNanos()));
+        }
+
+        public static Expiration of(Instant instant) {
+            return new Expiration(instant);
+        }
+
+        private final TagValue tag;
+
+        private Expiration(Instant instant) {
+            this.tag = MoreTags.named(EXPIRATION_TAG_NAME, String.valueOf(instant.getEpochSecond()));
+        }
+
+        public TagValue tag() {
+            return tag;
+        }
     }
 }

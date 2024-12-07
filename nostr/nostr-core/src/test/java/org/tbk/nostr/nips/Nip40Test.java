@@ -22,7 +22,7 @@ class Nip40Test {
 
         Instant expiresAt = now.plusSeconds(21).plusMillis(21);
         Event event = Nip1.createTextNote(testPubkey, "GM")
-                .addTags(Nip40.expiration(expiresAt))
+                .addTags(Nip40.expirationTag(expiresAt))
                 .build();
 
         assertThat(Nip40.getExpiration(event), is(Optional.of(expiresAt.truncatedTo(ChronoUnit.SECONDS))));
@@ -34,11 +34,11 @@ class Nip40Test {
 
         Instant expiresAt = now.plusSeconds(21).plusMillis(21);
         Event event = Nip1.createTextNote(testPubkey, "GM")
-                .addTags(Nip40.expiration(expiresAt.plusSeconds(42)))
-                .addTags(Nip40.expiration(expiresAt.plusSeconds(21_000)))
-                .addTags(Nip40.expiration(expiresAt))
-                .addTags(Nip40.expiration(expiresAt.plusSeconds(42_00)))
-                .addTags(Nip40.expiration(expiresAt.plusSeconds(21)))
+                .addTags(Nip40.expirationTag(expiresAt.plusSeconds(42)))
+                .addTags(Nip40.expirationTag(expiresAt.plusSeconds(21_000)))
+                .addTags(Nip40.expirationTag(expiresAt))
+                .addTags(Nip40.expirationTag(expiresAt.plusSeconds(42_00)))
+                .addTags(Nip40.expirationTag(expiresAt.plusSeconds(21)))
                 .build();
 
         assertThat(Nip40.getExpiration(event), is(Optional.of(expiresAt.truncatedTo(ChronoUnit.SECONDS))));
