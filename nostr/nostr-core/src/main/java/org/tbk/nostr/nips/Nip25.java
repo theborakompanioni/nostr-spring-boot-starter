@@ -29,12 +29,6 @@ public final class Nip25 {
         return reaction(publicKey, event, "-");
     }
 
-    public static Event.Builder emoji(XonlyPublicKey publicKey, Event event, URI imageUrl) {
-        TagValue emoji = Nip30.emoji("emoji", imageUrl);
-        return reaction(publicKey, event, Nip30.placeholder(emoji.getValues(0)))
-                .addTags(emoji);
-    }
-
     public static Event.Builder website(XonlyPublicKey publicKey, URI websiteUrl, String content) {
         return MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())
@@ -42,6 +36,14 @@ public final class Nip25 {
                 .setKind(Kinds.kindReactionToWebsite.getValue())
                 .addTags(MoreTags.r(websiteUrl.normalize()))
                 .setContent(content));
+    }
+
+    public static Event.Builder emoji(XonlyPublicKey publicKey, Event event, URI imageUrl) {
+        return reaction(publicKey, event, Nip30.emoji("emoji", imageUrl));
+    }
+
+    public static Event.Builder reaction(XonlyPublicKey publicKey, Event event, Nip30.Emoji emoji) {
+        return reaction(publicKey, event, emoji.placeholder()).addTags(emoji.tag());
     }
 
     public static Event.Builder reaction(XonlyPublicKey publicKey, Event event, String content) {

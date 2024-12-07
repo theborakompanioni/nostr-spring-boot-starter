@@ -36,7 +36,7 @@ class Nip30Test {
 
     @Test
     void emojiSuccess() {
-        TagValue emoji = Nip30.emoji("soapbox", URI.create("https://gleasonator.com/emoji/Gleasonator/soapbox.png"));
+        TagValue emoji = Nip30.emojiTag("soapbox", URI.create("https://gleasonator.com/emoji/Gleasonator/soapbox.png"));
 
         assertThat(emoji.getName(), is("emoji"));
         assertThat(emoji.getValuesCount(), is(2));
@@ -47,7 +47,7 @@ class Nip30Test {
     @Test
     void emojiFail() {
         IllegalArgumentException error = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            Nip30.emoji("!", URI.create("https://example.org/!.png"));
+            Nip30.emojiTag("!", URI.create("https://example.org/!.png"));
         });
 
         assertThat(error.getMessage(), is("Illegal characters in shortcode."));

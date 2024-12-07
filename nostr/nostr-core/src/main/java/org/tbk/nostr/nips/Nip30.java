@@ -24,11 +24,12 @@ public final class Nip30 {
         return !shortcode.isEmpty() && shortcodeMatcher.matchesAllOf(shortcode);
     }
 
-    public static TagValue emoji(String shortcode, URI imageUrl) {
-        if (!isValidShortcode(shortcode)) {
-            throw new IllegalArgumentException("Illegal characters in shortcode.");
-        }
-        return MoreTags.named("emoji", shortcode, imageUrl.toString());
+    public static Emoji emoji(String shortcode, URI imageUrl) {
+        return Emoji.of(shortcode, imageUrl);
+    }
+
+    public static TagValue emojiTag(String shortcode, URI imageUrl) {
+        return emoji(shortcode, imageUrl).tag();
     }
 
     public static String placeholder(String shortcode) {
@@ -36,5 +37,28 @@ public final class Nip30 {
             throw new IllegalArgumentException("Illegal characters in shortcode.");
         }
         return ":%s:".formatted(shortcode);
+    }
+
+    public static final class Emoji {
+        public static Emoji of(String shortcode, URI imageUrl) {
+            return new Emoji(shortcode, imageUrl);
+        }
+
+        private final TagValue tag;
+
+        private Emoji(String shortcode, URI imageUrl) {
+            if (!isValidShortcode(shortcode)) {
+                throw new IllegalArgumentException("Illegal characters in shortcode.");
+            }
+            this.tag = MoreTags.named("emoji", shortcode, imageUrl.toString());
+        }
+
+        public TagValue tag() {
+            return tag;
+        }
+
+        public String placeholder() {
+            return Nip30.placeholder(tag.getValues(0));
+        }
     }
 }
