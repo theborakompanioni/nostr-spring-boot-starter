@@ -35,6 +35,15 @@ public final class Nip25 {
                 .addTags(emoji);
     }
 
+    public static Event.Builder website(XonlyPublicKey publicKey, URI websiteUrl, String content) {
+        return MoreEvents.withEventId(Event.newBuilder()
+                .setCreatedAt(Instant.now().getEpochSecond())
+                .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
+                .setKind(Kinds.kindReactionToWebsite.getValue())
+                .addTags(MoreTags.r(websiteUrl.normalize()))
+                .setContent(content));
+    }
+
     public static Event.Builder reaction(XonlyPublicKey publicKey, Event event, String content) {
         Event.Builder builder = MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())

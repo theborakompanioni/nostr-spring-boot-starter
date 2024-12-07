@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- nip25: Reactions
+- nip30: Custom Emoji
+
 ## [0.0.4] - 2024-12-05
 ### Added
 - nip18: repost events

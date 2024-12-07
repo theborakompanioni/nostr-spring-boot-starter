@@ -91,6 +91,22 @@ class Nip25Test {
     }
 
     @Test
+    void itShouldReactToWebsite() {
+        Signer signer = SimpleSigner.random();
+
+        Event reactionEvent = MoreEvents.finalize(signer,
+                Nip25.website(signer.getPublicKey(), URI.create("https://Example.com:443/%7EFoo%2a/baz/../bar/index.html?param1=value1#fragment"), "")
+        );
+
+        assertThat(reactionEvent.getKind(), is(Kinds.kindReactionToWebsite.getValue()));
+
+        List<TagValue> rTags = MoreTags.findByName(reactionEvent, IndexedTag.r);
+        assertThat(rTags, hasSize(1));
+
+        assertThat(rTags.getLast().getValues(0), is("https://Example.com:443/%7EFoo%2a/bar/index.html?param1=value1#fragment"));
+    }
+
+    @Test
     void itShouldReactToReplaceableEvent() {
         Signer signer = SimpleSigner.random();
 

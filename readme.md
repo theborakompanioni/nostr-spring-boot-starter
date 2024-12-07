@@ -27,6 +27,7 @@ need to write scalable and efficient solutions effortlessly.
 - [x] [NIP-19](https://github.com/nostr-protocol/nips/blob/master/19.md)
 - [x] [NIP-21](https://github.com/nostr-protocol/nips/blob/master/21.md)
 - [x] [NIP-24](https://github.com/nostr-protocol/nips/blob/master/24.md)
+- [x] [NIP-25](https://github.com/nostr-protocol/nips/blob/master/25.md)
 - [x] [NIP-30](https://github.com/nostr-protocol/nips/blob/master/30.md)
 - [x] [NIP-40](https://github.com/nostr-protocol/nips/blob/master/40.md)
 - [x] [NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md)
@@ -36,7 +37,6 @@ need to write scalable and efficient solutions effortlessly.
 Planned:
 - [ ] [NIP-02](https://github.com/nostr-protocol/nips/blob/master/02.md)
 - [ ] [NIP-11](https://github.com/nostr-protocol/nips/blob/master/11.md)
-- [ ] [NIP-25](https://github.com/nostr-protocol/nips/blob/master/25.md)
 - [ ] [NIP-38](https://github.com/nostr-protocol/nips/blob/master/38.md)
 - [ ] [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md)
 - [ ] [NIP-64](https://github.com/nostr-protocol/nips/blob/master/64.md)
