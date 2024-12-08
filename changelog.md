@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Breaking
 - nip40: rename method from `expiration` to `expirationTag`
 
+### Changed
+- upgrade: update spring-boot from v3.3.4 to v3.4.0
+
 ## [0.0.4] - 2024-12-05
 ### Added
 - nip18: repost events
