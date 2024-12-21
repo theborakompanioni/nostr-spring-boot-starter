@@ -35,3 +35,4 @@ include 'nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-start
 include 'examples:nostr-client-example-application'
 include 'examples:nostr-relay-example-application'
 include 'examples:nostr-shell-example-application'
+include 'examples:nostr-agentic-example-application'

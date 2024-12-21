@@ -1,0 +1,22 @@
+spring.application.name: 'tbk-nostr-agentic'
+
+spring.lifecycle.timeout-per-shutdown-phase: 30s
+spring.threads.virtual.enabled: true
+
+# LOGGING
+logging.file.path: ./var/log
+logging.file.name: application.log
+logging.config: classpath:logback.xml
+logging.level.org.springframework: INFO
+logging.level.org.tbk.nostr: INFO
+
+org.tbk.nostr.agentic.client:
+  #relay-uri: wss://nostr-pub.wellorder.net
+  #relay-uri: wss://relay.damus.io
+  relay-uri: wss://relay.primal.net
+
+spring.docker.compose:
+  enabled: true
+  file: docker-compose.yml
+  stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
+  skip.in-tests: false

@@ -1,0 +1,28 @@
+apply plugin: 'org.springframework.boot'
+
+description = 'nostr agentic example application package'
+
+dependencies {
+    implementation project(':nostr:nostr-core')
+    implementation project(':nostr:nostr-client')
+    implementation project(':nostr:nostr-nip19')
+
+    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
+    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
+
+    implementation 'io.projectreactor:reactor-core'
+
+    implementation('org.springframework.boot:spring-boot-starter-web') {
+        exclude group:'org.springframework.boot', module:'spring-boot-starter-tomcat'
+    }
+    implementation 'org.springframework.boot:spring-boot-starter-tomcat'
+    //implementation 'org.springframework.boot:spring-boot-starter-jetty'
+
+    implementation 'org.springframework.boot:spring-boot-docker-compose'
+
+    //implementation 'dev.langchain4j:langchain4j-local-ai-spring-boot-starter:0.36.2' <-- NOT WORKING
+    //implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2:0.36.2'
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+}
