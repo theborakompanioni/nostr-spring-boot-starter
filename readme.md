@@ -84,7 +84,7 @@ repositories {
 ```
 
 ```groovy
-implementation "io.github.theborakompanioni:nostr-proto:${bitcoinSpringBootStarterVersion}"
+implementation "io.github.theborakompanioni:nostr-proto:${nostrSpringBootStarterVersion}"
 ```
 
 

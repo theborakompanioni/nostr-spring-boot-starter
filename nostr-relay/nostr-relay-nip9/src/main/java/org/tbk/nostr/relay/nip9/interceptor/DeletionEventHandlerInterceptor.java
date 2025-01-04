@@ -93,7 +93,7 @@ public class DeletionEventHandlerInterceptor implements RequestHandlerIntercepto
                 .doOnNext(it -> {
                     log.debug("Found existing deletion event for incoming event {}", event.getId());
                 })
-                .flatMap(it -> support.deleteAllByEventIds(publicKey, List.of(EventId.of(event.getId().toByteArray()))))
+                .flatMap(it -> support.deleteAllByEventIds(publicKey, List.of(EventId.of(event))))
                 .subscribe(unused -> {
                     log.debug("Successfully marked event {} as deleted.", event.getId());
                 }, e -> {

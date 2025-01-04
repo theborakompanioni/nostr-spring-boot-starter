@@ -223,7 +223,7 @@ class NostrRelaySpecTest {
         Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
 
         Event invalidEvent0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM0")
-                .addTags(MoreTags.e(EventId.of(event.getId().toByteArray()).toHex(), "https://example.org")));
+                .addTags(MoreTags.e(EventId.of(event).toHex(), "https://example.org")));
 
         List<Event> events = List.of(invalidEvent0);
         List<OkResponse> oks = nostrTemplate.send(events)
@@ -469,7 +469,7 @@ class NostrRelaySpecTest {
                 .orElseThrow();
         assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
 
-        Event fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(eventMatching.getId().toByteArray()))
+        Event fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(eventMatching))
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(fetchedEvent0, is(eventMatching));
@@ -498,7 +498,7 @@ class NostrRelaySpecTest {
         assertThat(ok0.getEventId(), is(event0.getId()));
         assertThat(ok0.getSuccess(), is(true));
 
-        Event fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(event0.getId().toByteArray()))
+        Event fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(event0))
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(fetchedEvent0, is(event0));
@@ -808,7 +808,7 @@ class NostrRelaySpecTest {
         assertThat(ok0.getSuccess(), is(true));
         assertThat(ok0.getMessage(), is(""));
 
-        Optional<Event> fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(ephemeralEvent0.getId().toByteArray()))
+        Optional<Event> fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(ephemeralEvent0))
                 .blockOptional(Duration.ofSeconds(5));
 
         assertThat(fetchedEvent0.isPresent(), is(false));
@@ -922,7 +922,7 @@ class NostrRelaySpecTest {
 
         assertThat("sanity check", event1WithLowerId.getCreatedAt(), is(event0.getCreatedAt()));
         // this check might fail - unlikely, but can happen!
-        assertThat("sanity check", EventId.of(event1WithLowerId.getId().toByteArray()), is(lessThan(EventId.of(event0.getId().toByteArray()))));
+        assertThat("sanity check", EventId.of(event1WithLowerId), is(lessThan(EventId.of(event0))));
 
         OkResponse ok0 = nostrTemplate.send(event0)
                 .blockOptional(Duration.ofSeconds(5))
@@ -967,7 +967,7 @@ class NostrRelaySpecTest {
 
         assertThat("sanity check", event0WithLowerId.getCreatedAt(), is(event1.getCreatedAt()));
         // this check might fail - unlikely, but can happen!
-        assertThat("sanity check", EventId.of(event0WithLowerId.getId().toByteArray()), is(lessThan(EventId.of(event1.getId().toByteArray()))));
+        assertThat("sanity check", EventId.of(event0WithLowerId), is(lessThan(EventId.of(event1))));
 
         OkResponse ok0 = nostrTemplate.send(event0WithLowerId)
                 .blockOptional(Duration.ofSeconds(5))

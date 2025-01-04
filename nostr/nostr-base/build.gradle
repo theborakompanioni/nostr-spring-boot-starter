@@ -5,4 +5,5 @@ plugins {
 description = 'nostr base package'
 
 dependencies {
+    api project(':nostr:nostr-proto')
 }

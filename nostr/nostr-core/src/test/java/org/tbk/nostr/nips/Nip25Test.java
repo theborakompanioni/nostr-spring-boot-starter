@@ -31,7 +31,7 @@ class Nip25Test {
 
         List<TagValue> eTags = MoreTags.findByName(reactionEvent, IndexedTag.e);
         assertThat(eTags, hasSize(1));
-        assertThat(eTags.getLast().getValues(0), is(EventId.of(event.getId().toByteArray()).toHex()));
+        assertThat(eTags.getLast().getValues(0), is(EventId.of(event).toHex()));
 
         List<TagValue> pTags = MoreTags.findByName(reactionEvent, IndexedTag.p);
         assertThat(pTags, hasSize(1));
@@ -58,7 +58,7 @@ class Nip25Test {
 
         List<TagValue> eTags = MoreTags.findByName(reactionEvent, IndexedTag.e);
         assertThat(eTags, hasSize(1));
-        assertThat(eTags.getLast().getValues(0), is(EventId.of(event.getId().toByteArray()).toHex()));
+        assertThat(eTags.getLast().getValues(0), is(EventId.of(event).toHex()));
 
         List<TagValue> pTags = MoreTags.findByName(reactionEvent, IndexedTag.p);
         assertThat(pTags, hasSize(1));
@@ -121,7 +121,7 @@ class Nip25Test {
 
         List<TagValue> eTags = MoreTags.findByName(reactionEvent, IndexedTag.e);
         assertThat(eTags, hasSize(1));
-        assertThat(eTags.getLast().getValues(0), is(EventId.of(event.getId().toByteArray()).toHex()));
+        assertThat(eTags.getLast().getValues(0), is(EventId.of(event).toHex()));
 
         List<TagValue> pTags = MoreTags.findByName(reactionEvent, IndexedTag.p);
         assertThat(pTags, hasSize(1));
@@ -155,7 +155,7 @@ class Nip25Test {
 
         List<TagValue> eTags = MoreTags.findByName(reactionEvent, IndexedTag.e);
         assertThat(eTags, hasSize(3));
-        assertThat(eTags.getLast().getValues(0), is(EventId.of(event.getId().toByteArray()).toHex()));
+        assertThat(eTags.getLast().getValues(0), is(EventId.of(event).toHex()));
 
         List<TagValue> pTags = MoreTags.findByName(reactionEvent, IndexedTag.p);
         assertThat(pTags, hasSize(3));

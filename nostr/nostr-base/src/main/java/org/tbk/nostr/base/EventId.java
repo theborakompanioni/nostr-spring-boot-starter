@@ -1,7 +1,9 @@
 package org.tbk.nostr.base;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.protobuf.ByteString;
 import lombok.EqualsAndHashCode;
+import org.tbk.nostr.proto.EventOrBuilder;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -28,6 +30,14 @@ public final class EventId implements Comparable<EventId> {
 
     public static EventId fromHex(String id) {
         return of(HexFormat.of().parseHex(id));
+    }
+
+    public static EventId of(EventOrBuilder eventOrBuilder) {
+        return of(eventOrBuilder.getId());
+    }
+
+    public static EventId of(ByteString id) {
+        return of(id.toByteArray());
     }
 
     public static EventId of(byte[] id) {

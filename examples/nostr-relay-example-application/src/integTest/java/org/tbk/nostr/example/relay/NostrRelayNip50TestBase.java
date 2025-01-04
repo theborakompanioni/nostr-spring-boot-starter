@@ -33,7 +33,7 @@ class NostrRelayNip50TestBase {
                 .orElseThrow();
         assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
 
-        Event fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(eventMatching.getId().toByteArray()))
+        Event fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(eventMatching))
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat("sanity check - event is stored successfully", fetchedEvent0, is(eventMatching));

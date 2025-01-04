@@ -49,7 +49,7 @@ class NostrRelayNip40Test {
         assertThat(ok0.getEventId(), is(event0.getId()));
         assertThat(ok0.getSuccess(), is(true));
 
-        Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(event0.getId().toByteArray()))
+        Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(event0))
                 .blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
     }
@@ -73,7 +73,7 @@ class NostrRelayNip40Test {
         assertThat(ok0.getEventId(), is(event0.getId()));
         assertThat(ok0.getSuccess(), is(true));
 
-        EventId event0Id = EventId.of(event0.getId().toByteArray());
+        EventId event0Id = EventId.of(event0);
         Event fetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();

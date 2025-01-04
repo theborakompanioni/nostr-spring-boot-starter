@@ -37,7 +37,7 @@ public final class Nip18 {
 
     public static Event.Builder quote(XonlyPublicKey publicKey, Event event, RelayUri relayUri, String text) {
         return quote(publicKey, event, relayUri, text, Nevent.builder()
-                .eventId(EventId.of(event.getId().toByteArray()))
+                .eventId(EventId.of(event))
                 .relay(relayUri)
                 .build());
     }
@@ -54,7 +54,7 @@ public final class Nip18 {
                 .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
                 .setKind(Kinds.kindTextNote.getValue())
                 .setContent(content)
-                .addTags(MoreTags.q(EventId.of(event.getId().toByteArray()), relayUri, MorePublicKeys.fromEvent(event)))
+                .addTags(MoreTags.q(EventId.of(event), relayUri, MorePublicKeys.fromEvent(event)))
                 .addTags(MoreTags.e(event, relayUri, Nip10.Marker.ROOT, MorePublicKeys.fromEvent(event)))
                 .addTags(MoreTags.p(event)));
     }

@@ -138,10 +138,10 @@ public class ReplaceableEventInterceptor implements RequestHandlerInterceptor {
             // "In case of replaceable events with the same timestamp, the event with the lowest id
             // (first in lexical order) should be retained, and the other discarded."
             List<EventId> eventIds = existingEventsWithSameCreatedAt.stream()
-                    .map(it -> EventId.of(it.getId().toByteArray()))
+                    .map(EventId::of)
                     .toList();
 
-            EventId incomingEventId = EventId.of(event.getId().toByteArray());
+            EventId incomingEventId = EventId.of(event);
             Optional<EventId> lowestEventId = MoreEvents.findLowestEventId(Stream.concat(eventIds.stream(), Stream.of(incomingEventId)).toList());
             if (lowestEventId.isPresent() && !lowestEventId.get().equals(incomingEventId)) {
                 return Optional.of(ReplaceableError.LOWER_ID);

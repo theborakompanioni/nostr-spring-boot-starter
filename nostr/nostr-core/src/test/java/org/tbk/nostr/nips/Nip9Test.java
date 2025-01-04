@@ -1,6 +1,7 @@
 package org.tbk.nostr.nips;
 
 import org.junit.jupiter.api.Test;
+import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
@@ -27,7 +28,7 @@ class Nip9Test {
         TagValue eTag = MoreTags.findByNameSingle(deletionEvent0, IndexedTag.e)
                 .orElseThrow(() -> new IllegalStateException("Expected an `e` tag"));
 
-        assertThat(eTag.getValues(0), is(HexFormat.of().formatHex(event0.getId().toByteArray())));
+        assertThat(eTag.getValues(0), is(EventId.of(event0).toHex()));
     }
 
     @Test

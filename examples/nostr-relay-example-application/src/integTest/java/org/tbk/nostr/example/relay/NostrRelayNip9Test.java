@@ -45,7 +45,7 @@ class NostrRelayNip9Test {
         assertThat(ok0.getMessage(), is("invalid: Missing 'e' or 'a' tag."));
         assertThat(ok0.getSuccess(), is(false));
 
-        EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0.getId().toByteArray());
+        EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0);
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(invalidDeletionEvent0Id).blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
     }
@@ -68,7 +68,7 @@ class NostrRelayNip9Test {
         assertThat(ok0.getMessage(), is("invalid: Referencing events not signed by author is not permitted."));
         assertThat(ok0.getSuccess(), is(false));
 
-        EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0.getId().toByteArray());
+        EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0);
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(invalidDeletionEvent0Id)
                 .blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
@@ -88,7 +88,7 @@ class NostrRelayNip9Test {
         assertThat(ok0.getEventId(), is(deletionEvent0.getId()));
         assertThat(ok0.getSuccess(), is(true));
 
-        EventId deletionEventId0 = EventId.of(deletionEvent0.getId().toByteArray());
+        EventId deletionEventId0 = EventId.of(deletionEvent0);
         Event deletionEvent1 = MoreEvents.finalize(signer, Nip9.createDeletionEvent(signer.getPublicKey(), List.of(deletionEventId0)));
 
         OkResponse ok1 = nostrTemplate.send(deletionEvent1)
@@ -118,7 +118,7 @@ class NostrRelayNip9Test {
         assertThat(ok0.getMessage(), is("invalid: Invalid tag 'e'."));
         assertThat(ok0.getSuccess(), is(false));
 
-        EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0.getId().toByteArray());
+        EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0);
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(invalidDeletionEvent0Id).blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
     }
@@ -136,7 +136,7 @@ class NostrRelayNip9Test {
         assertThat(ok0.getMessage(), is("invalid: Invalid tag 'a'."));
         assertThat(ok0.getSuccess(), is(false));
 
-        EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0.getId().toByteArray());
+        EventId invalidDeletionEvent0Id = EventId.of(invalidDeletionEvent0);
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(invalidDeletionEvent0Id).blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
     }
@@ -171,7 +171,7 @@ class NostrRelayNip9Test {
         assertThat(oks, hasSize(events.size()));
         assertThat("events are ok", oks.stream().allMatch(OkResponse::getSuccess));
 
-        EventId event0Id = EventId.of(event0.getId().toByteArray());
+        EventId event0Id = EventId.of(event0);
         Event fetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
@@ -187,11 +187,11 @@ class NostrRelayNip9Test {
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(event0Id).blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
 
-        EventId event1Id = EventId.of(event1.getId().toByteArray());
+        EventId event1Id = EventId.of(event1);
         Optional<Event> refetchedEvent1 = nostrTemplate.fetchEventById(event1Id).blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent1.isPresent(), is(true));
 
-        EventId deletionEvent0Id = EventId.of(deletionEvent0.getId().toByteArray());
+        EventId deletionEvent0Id = EventId.of(deletionEvent0);
         Event refetchedDeletionEvent0 = nostrTemplate.fetchEventById(deletionEvent0Id)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
@@ -204,7 +204,7 @@ class NostrRelayNip9Test {
 
         Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM");
 
-        EventId event0Id = EventId.of(event0.getId().toByteArray());
+        EventId event0Id = EventId.of(event0);
         Optional<Event> fetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
                 .blockOptional(Duration.ofSeconds(5));
         assertThat(fetchedEvent0.isPresent(), is(false));
@@ -239,7 +239,7 @@ class NostrRelayNip9Test {
 
         Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
 
-        EventId event0Id = EventId.of(event0.getId().toByteArray());
+        EventId event0Id = EventId.of(event0);
         Optional<Event> fetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
                 .blockOptional(Duration.ofSeconds(5));
         assertThat(fetchedEvent0.isPresent(), is(false));
@@ -283,7 +283,7 @@ class NostrRelayNip9Test {
         assertThat(oks, hasSize(events.size()));
         assertThat("events are ok", oks.stream().allMatch(OkResponse::getSuccess));
 
-        EventId event0Id = EventId.of(event0.getId().toByteArray());
+        EventId event0Id = EventId.of(event0);
         Event fetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
@@ -300,7 +300,7 @@ class NostrRelayNip9Test {
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(event0Id).blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
 
-        EventId event1Id = EventId.of(event1.getId().toByteArray());
+        EventId event1Id = EventId.of(event1);
         Optional<Event> refetchedEvent1 = nostrTemplate.fetchEventById(event1Id).blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent1.isPresent(), is(true));
     }
@@ -321,7 +321,7 @@ class NostrRelayNip9Test {
         assertThat(oks, hasSize(events.size()));
         assertThat("events are ok", oks.stream().allMatch(OkResponse::getSuccess));
 
-        EventId event0Id = EventId.of(event0.getId().toByteArray());
+        EventId event0Id = EventId.of(event0);
         Event fetchedEvent0 = nostrTemplate.fetchEventById(event0Id)
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
@@ -338,7 +338,7 @@ class NostrRelayNip9Test {
         Optional<Event> refetchedEvent0 = nostrTemplate.fetchEventById(event0Id).blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent0.isPresent(), is(false));
 
-        EventId event1Id = EventId.of(event1.getId().toByteArray());
+        EventId event1Id = EventId.of(event1);
         Optional<Event> refetchedEvent1 = nostrTemplate.fetchEventById(event1Id).blockOptional(Duration.ofSeconds(5));
         assertThat(refetchedEvent1.isPresent(), is(true));
     }

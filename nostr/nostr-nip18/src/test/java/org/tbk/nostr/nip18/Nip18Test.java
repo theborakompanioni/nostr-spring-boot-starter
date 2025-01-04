@@ -35,7 +35,7 @@ class Nip18Test {
         assertThat(repost.getKind(), is(6));
 
         TagValue eTag = MoreTags.findByNameSingle(repost, IndexedTag.e).orElseThrow();
-        assertThat(eTag.getValues(0), is(HexFormat.of().formatHex(event.getId().toByteArray())));
+        assertThat(eTag.getValues(0), is(EventId.of(event).toHex()));
         assertThat(eTag.getValues(1), is(dummyRelayUri.getUri().toString()));
     }
 
@@ -62,12 +62,12 @@ class Nip18Test {
         assertThat(quote.getKind(), is(1));
 
         TagValue qTag = MoreTags.findByNameSingle(quote, IndexedTag.q).orElseThrow();
-        assertThat(qTag.getValues(0), is(HexFormat.of().formatHex(event.getId().toByteArray())));
+        assertThat(qTag.getValues(0), is(EventId.of(event).toHex()));
         assertThat(qTag.getValues(1), is(dummyRelayUri.getUri().toString()));
         assertThat(qTag.getValues(2), is(HexFormat.of().formatHex(event.getPubkey().toByteArray())));
 
         assertThat(quote.getContent(), containsString(NostrUri.of(Nevent.builder()
-                .eventId(EventId.of(event.getId().toByteArray()))
+                .eventId(EventId.of(event))
                 .relay(dummyRelayUri)
                 .build()).getUri().toString()));
     }

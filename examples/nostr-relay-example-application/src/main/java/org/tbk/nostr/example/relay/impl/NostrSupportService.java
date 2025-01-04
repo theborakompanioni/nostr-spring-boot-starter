@@ -151,12 +151,9 @@ public class NostrSupportService implements NostrSupport, Nip1Support, Nip9Suppo
 
     @Override
     public Mono<Boolean> hasDeletionEvent(XonlyPublicKey author, Event event) {
-        return Mono.fromCallable(() -> {
-            EventId eventId = EventId.of(event.getId().toByteArray());
-            return eventEntityService.exists(EventEntitySpecifications.hasPubkey(author)
-                    .and(EventEntitySpecifications.hasKind(Kinds.kindDeletion))
-                    .and(EventEntitySpecifications.hasTagWithFirstValue(IndexedTag.e, eventId.toHex())));
-        });
+        return Mono.fromCallable(() -> eventEntityService.exists(EventEntitySpecifications.hasPubkey(author)
+                .and(EventEntitySpecifications.hasKind(Kinds.kindDeletion))
+                .and(EventEntitySpecifications.hasTagWithFirstValue(IndexedTag.e, EventId.of(event).toHex()))));
     }
 
     @NonNull

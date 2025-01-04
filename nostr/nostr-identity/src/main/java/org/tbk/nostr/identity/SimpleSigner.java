@@ -2,6 +2,7 @@ package org.tbk.nostr.identity;
 
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.*;
+import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.proto.Event;
 
@@ -60,7 +61,7 @@ public class SimpleSigner implements Signer {
         }
 
         try {
-            ByteVector32 data = ByteVector32.fromValidHex(HexFormat.of().formatHex(builder.getId().toByteArray()));
+            ByteVector32 data = ByteVector32.fromValidHex(EventId.of(builder).toHex());
             ByteVector32 auxRand = ByteVector32.fromValidHex(HexFormat.of().formatHex(MoreRandom.randomByteArray(32)));
             ByteVector64 signature = Crypto.signSchnorr(data, this.privateKey, Crypto.SchnorrTweak.NoTweak.INSTANCE, auxRand);
 

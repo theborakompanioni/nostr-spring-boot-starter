@@ -227,7 +227,7 @@ class Nip19Test {
         assertThat(neventEncoded, is("nevent1qqsqmtm0ave40kvaw72e4a04ed0evcy6fnsc7latu9wtpl24r3c6avqzyre3jf56sat7sn5mdkkexfwtwjfn7e8ff97ycw50watnv8ncah6kgqcyqqqqqqgrnkc3n"));
 
         Nevent nevent = Nip19.decodeNevent(neventEncoded);
-        assertThat(nevent.getEventId(), is(EventId.of(event.getId().toByteArray())));
+        assertThat(nevent.getEventId(), is(EventId.of(event)));
         assertThat(nevent.getRelays(), hasSize(0));
         assertThat(nevent.getPublicKey().orElseThrow(), is(MorePublicKeys.fromBytes(event.getPubkey().toByteArray())));
         assertThat(nevent.getKind().orElseThrow(), is(Kind.of(event.getKind())));
@@ -245,7 +245,7 @@ class Nip19Test {
         assertThat(neventEncoded, is("nevent1qqs2malx2x2fmdevyk8t9axknszspq2erntvr3qsgnpe5needmhn2rczyre3jf56sat7sn5mdkkexfwtwjfn7e8ff97ycw50watnv8ncah6kgqcyqqqzwyqdqd6t6"));
 
         Nevent nevent = Nip19.decodeNevent(neventEncoded);
-        assertThat(nevent.getEventId(), is(EventId.of(event.getId().toByteArray())));
+        assertThat(nevent.getEventId(), is(EventId.of(event)));
         assertThat(nevent.getRelays(), hasSize(0));
         assertThat(nevent.getPublicKey().orElseThrow(), is(MorePublicKeys.fromBytes(event.getPubkey().toByteArray())));
         assertThat(nevent.getKind().orElseThrow(), is(Kind.of(event.getKind())));
@@ -263,7 +263,7 @@ class Nip19Test {
         assertThat(neventEncoded, is("nevent1qqs8quc49hrxy6pvhqceg7hqmcqw4e2hdewyp0377cacxlqrfmxxc9szyre3jf56sat7sn5mdkkexfwtwjfn7e8ff97ycw50watnv8ncah6kgqcyqqq82vq94w7ta"));
 
         Nevent nevent = Nip19.decodeNevent(neventEncoded);
-        assertThat(nevent.getEventId(), is(EventId.of(event.getId().toByteArray())));
+        assertThat(nevent.getEventId(), is(EventId.of(event)));
         assertThat(nevent.getRelays(), hasSize(0));
         assertThat(nevent.getPublicKey().orElseThrow(), is(MorePublicKeys.fromBytes(event.getPubkey().toByteArray())));
         assertThat(nevent.getKind().orElseThrow(), is(Kind.of(event.getKind())));

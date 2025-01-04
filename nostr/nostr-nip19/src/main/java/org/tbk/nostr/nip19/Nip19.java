@@ -114,7 +114,7 @@ public final class Nip19 {
 
     public static String encodeNevent(Event event, Collection<RelayUri> relays) {
         return encode(Nevent.builder()
-                .eventId(EventId.of(event.getId().toByteArray()))
+                .eventId(EventId.of(event))
                 .relays(relays)
                 .publicKey(MorePublicKeys.fromEvent(event))
                 .kind(Kind.of(event.getKind()))

@@ -67,7 +67,7 @@ public class NostrRelayExampleApplication {
 
             Supplier<Duration> startupDuration = () -> Duration.ofMillis(Instant.now().toEpochMilli() - now.toEpochMilli());
             Event bootedEvent = MoreEvents.finalize(serverSigner, Nip1.createTextNote(serverSigner.getPublicKey(), "Booted.")
-                    .addTags(MoreTags.e(EventId.of(bootingEvent.getId().toByteArray())))
+                    .addTags(MoreTags.e(EventId.of(bootingEvent)))
                     .addTags(MoreTags.named("alt", "Took %s".formatted(startupDuration.get())))
             );
             eventEntityService.createEvent(bootedEvent);

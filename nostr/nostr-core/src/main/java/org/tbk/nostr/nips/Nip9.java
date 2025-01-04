@@ -43,7 +43,7 @@ public final class Nip9 {
             return createDeletionEventForAddressableEvent(publicKey, event.getKind(), dTagValue);
         }
 
-        return createDeletionEvent(publicKey, null, Collections.singletonList(EventId.of(event.getId().toByteArray())));
+        return createDeletionEvent(publicKey, null, Collections.singletonList(EventId.of(event)));
     }
 
     public static Event.Builder createDeletionEventForEvent(EventUri eventUri) {

@@ -63,23 +63,23 @@ public final class MoreTags {
     }
 
     public static TagValue e(Event event) {
-        return e(EventId.of(event.getId().toByteArray()));
+        return e(EventId.of(event));
     }
 
     public static TagValue e(Event event, RelayUri recommendedRelay) {
-        return e(EventId.of(event.getId().toByteArray()), recommendedRelay);
+        return e(EventId.of(event), recommendedRelay);
     }
 
     public static TagValue e(Event event, Nip10.Marker marker) {
-        return e(EventId.of(event.getId().toByteArray()), null, marker);
+        return e(EventId.of(event), null, marker);
     }
 
     public static TagValue e(Event event, @Nullable RelayUri recommendedRelay, Nip10.Marker marker) {
-        return e(EventId.of(event.getId().toByteArray()), recommendedRelay, marker);
+        return e(EventId.of(event), recommendedRelay, marker);
     }
 
     public static TagValue e(Event event, @Nullable RelayUri recommendedRelay, Nip10.Marker marker, XonlyPublicKey publicKey) {
-        return Nip10.e(EventId.of(event.getId().toByteArray()), recommendedRelay, marker, publicKey);
+        return Nip10.e(EventId.of(event), recommendedRelay, marker, publicKey);
     }
 
     public static TagValue e(EventId eventId) {

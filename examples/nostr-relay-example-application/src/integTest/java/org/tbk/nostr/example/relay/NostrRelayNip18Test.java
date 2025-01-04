@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.base.Metadata;
@@ -20,7 +21,6 @@ import org.tbk.nostr.util.MoreTags;
 
 import java.net.URI;
 import java.time.Duration;
-import java.util.HexFormat;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -214,7 +214,7 @@ class NostrRelayNip18Test {
         Event event0 = MoreEvents.createFinalizedTextNote(signer, "GM0");
         Event repost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event0, nostrTemplate.getRelayUri())
                 .clearTags()
-                .addTags(MoreTags.named(IndexedTag.e.name(), HexFormat.of().formatHex(event0.getId().toByteArray()))));
+                .addTags(MoreTags.named(IndexedTag.e.name(), EventId.of(event0).toHex())));
 
         OkResponse ok0 = nostrTemplate.send(repost)
                 .blockOptional(Duration.ofSeconds(5))

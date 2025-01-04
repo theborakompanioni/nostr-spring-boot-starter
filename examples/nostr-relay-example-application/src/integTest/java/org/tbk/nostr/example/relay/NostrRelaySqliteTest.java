@@ -49,7 +49,7 @@ class NostrRelaySqliteTest {
                 .orElseThrow();
         assertThat(oks.stream().filter(OkResponse::getSuccess).count(), is((long) events.size()));
 
-        Event fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(eventMatching.getId().toByteArray()))
+        Event fetchedEvent0 = nostrTemplate.fetchEventById(EventId.of(eventMatching))
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(fetchedEvent0, is(eventMatching));

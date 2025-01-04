@@ -51,9 +51,9 @@ class MainApplicationRunner implements ApplicationRunner, DisposableBean {
                 })
                 .delaySubscription(Duration.ofSeconds(5))
                 .subscribe(it -> {
-                    String idHex = HexFormat.of().formatHex(it.getId().toByteArray());
-                    String noteId = Nip19.encodeNote(EventId.fromHex(idHex));
-                    String displayId = "%s (%s)".formatted(noteId, idHex);
+                    EventId eventId = EventId.of(it);
+                    String noteId = Nip19.encodeNote(eventId);
+                    String displayId = "%s (%s)".formatted(noteId, eventId.toHex());
 
                     String pubkeyHex = HexFormat.of().formatHex(it.getPubkey().toByteArray());
                     String npub = Nip19.encodeNpub(MorePublicKeys.fromHex(pubkeyHex));
