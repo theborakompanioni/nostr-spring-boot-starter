@@ -2,10 +2,6 @@ syntax = "proto3";
 
 package nostr;
 
-import "google/protobuf/any.proto";
-import "google/protobuf/struct.proto";
-import "google/protobuf/timestamp.proto";
-
 option java_package = "org.tbk.nostr.proto";
 option java_outer_classname = "NostrProtos";
 option java_multiple_files = true;
@@ -163,4 +159,43 @@ message CountResult {
 // `auth` from NIP-42: https://github.com/nostr-protocol/nips/blob/master/42.md
 message AuthResponse {
   string challenge = 1 [json_name = "challenge"];
+}
+
+
+/*
+ * As defined in <a href="https://github.com/nostr-protocol/nips/blob/4f33dbc2b86684f9bf26dd1b0fc9789e3cbf2165/01.md">NIP-1</a>,
+ * <a href="https://github.com/nostr-protocol/nips/blob/4f33dbc2b86684f9bf26dd1b0fc9789e3cbf2165/05.md">NIP-05</a> and
+ * <a href="https://github.com/nostr-protocol/nips/blob/4f33dbc2b86684f9bf26dd1b0fc9789e3cbf2165/24.md">NIP-24</a>.
+ */
+message Metadata {
+  string name = 1 [json_name = "name"];
+  string about = 2 [json_name = "about"];
+  string picture = 3 [json_name = "picture"];
+  /**
+   * An alternative, bigger name with richer characters than `name`.
+   * `name` should always be set regardless of the presence of `display_name` in the metadata.
+   */
+  string display_name = 4 [json_name = "display_name"];
+  /**
+   * A web URL related in any way to the event author.
+   */
+  string website = 5 [json_name = "website"];
+  /**
+   * A web URL to a wide (~1024x768) picture to be optionally displayed in the background of a profile screen.
+   */
+  string banner = 6 [json_name = "banner"];
+  /**
+   * A boolean to clarify that the content is entirely or partially the result of automation, such as with chatbots
+   * or newsfeeds.
+   */
+  bool bot = 7 [json_name = "bot"];
+  /**
+   * An <a href="https://datatracker.ietf.org/doc/html/rfc5322#section-3.4.1">internet identifier</a>
+   * (an email-like address) as the value. Although there is a link to a very liberal "internet identifier"
+   * specification above, NIP-05 assumes the <local-part> part will be restricted to the characters
+   * <code>a-z0-9-_.</code>, case-insensitive.
+   */
+  string nip05 = 8 [json_name = "nip05"];
+
+  string lud16 = 9 [json_name = "lud16"];
 }

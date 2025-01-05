@@ -2,7 +2,6 @@ package org.tbk.nostr.template;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.nip11.RelayInfoDocument;
 import org.tbk.nostr.nips.Nip65;

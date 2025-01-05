@@ -5,10 +5,8 @@ import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Kinds;
-import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
-import org.tbk.nostr.nips.Nip42;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
@@ -494,19 +492,16 @@ class JsonRequestWriterTest {
     @Test
     void itShouldWriteMetadata0() throws IOException {
         String json = JsonRequestWriter.toJson(Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/example.png"))
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/example.png").toString())
                 .build());
 
         assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""
                 {
                   "name": "name",
                   "about": "about",
-                  "picture": "https://www.example.com/example.png",
-                  "website": null,
-                  "banner": null,
-                  "display_name": null
+                  "picture": "https://www.example.com/example.png"
                 }
                 """)));
     }
@@ -514,15 +509,15 @@ class JsonRequestWriterTest {
     @Test
     void itShouldWriteMetadata1() throws IOException {
         String json = JsonRequestWriter.toJson(Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/picture.png"))
-                .displayName("display name")
-                .website(URI.create("https://www.example.com/"))
-                .banner(URI.create("https://www.example.com/banner.png"))
-                .bot(true)
-                .nip05("nip05@example.com")
-                .lud16("lud16@example.com")
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/picture.png").toString())
+                .setDisplayName("display name")
+                .setWebsite(URI.create("https://www.example.com/").toString())
+                .setBanner(URI.create("https://www.example.com/banner.png").toString())
+                .setBot(true)
+                .setNip05("nip05@example.com")
+                .setLud16("lud16@example.com")
                 .build());
 
         assertThat(JSON.std.anyFrom(json), is(JSON.std.anyFrom("""

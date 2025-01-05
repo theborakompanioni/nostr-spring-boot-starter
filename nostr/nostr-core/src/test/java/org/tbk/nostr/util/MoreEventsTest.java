@@ -3,11 +3,11 @@ package org.tbk.nostr.util;
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.Metadata;
 import org.tbk.nostr.proto.json.JsonReader;
 
 import java.net.URI;
@@ -296,9 +296,9 @@ class MoreEventsTest {
     @Test
     void itShouldVerifyGeneratedMetadata0() {
         Event event = MoreEvents.createFinalizedMetadata(testSigner, Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/example.png"))
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/example.png").toString())
                 .build());
         Event verifiedEvent = MoreEvents.verifySignature(event);
         assertThat(verifiedEvent, is(notNullValue()));

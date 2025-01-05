@@ -1,13 +1,12 @@
 package org.tbk.nostr.proto.json;
 
 import com.google.protobuf.ByteString;
-import org.tbk.nostr.base.Metadata;
+import com.google.protobuf.Descriptors;
 import org.tbk.nostr.proto.*;
 
 import java.io.IOException;
-import java.net.URI;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.tbk.nostr.proto.json.Json.json;
 
@@ -136,48 +135,23 @@ final class JsonResponseReader {
     }
 
     private static CountResult countFromMap(Map<String, Object> map, CountResult.Builder count) {
+        Descriptors.FieldDescriptor countField = CountResult.getDescriptor().findFieldByNumber(CountResult.COUNT_FIELD_NUMBER);
+        Descriptors.FieldDescriptor approximateField = CountResult.getDescriptor().findFieldByNumber(CountResult.APPROXIMATE_FIELD_NUMBER);
+
         return count
-                .setCount(Long.parseLong(String.valueOf(map.get("count"))))
-                .setApproximate(Boolean.parseBoolean(String.valueOf(map.getOrDefault("approximate", false))))
+                .setCount(Long.parseLong(String.valueOf(map.get(countField.getJsonName()))))
+                .setApproximate(Boolean.parseBoolean(String.valueOf(map.getOrDefault(approximateField.getJsonName(), false))))
                 .build();
     }
 
-    private static Metadata metadataFromMap(Map<String, Object> map, Metadata.Builder metadata) {
-        Metadata.Builder builder = metadata
-                .name(Optional.ofNullable(map.get("name"))
-                        .map(String::valueOf)
-                        .orElse(null))
-                .about(Optional.ofNullable(map.get("about"))
-                        .map(String::valueOf)
-                        .orElse(null))
-                .picture(Optional.ofNullable(map.get("picture"))
-                        .map(String::valueOf)
-                        .map(URI::create)
-                        .orElse(null))
-                .displayName(Optional.ofNullable(map.get("display_name"))
-                        .map(String::valueOf)
-                        .orElse(null))
-                .website(Optional.ofNullable(map.get("website"))
-                        .map(String::valueOf)
-                        .map(URI::create)
-                        .orElse(null))
-                .banner(Optional.ofNullable(map.get("banner"))
-                        .map(String::valueOf)
-                        .map(URI::create)
-                        .orElse(null));
+    private static Metadata metadataFromMap(Map<String, Object> map, Metadata.Builder builder) {
+        List<Descriptors.FieldDescriptor> fields = builder.getDescriptorForType().getFields();
 
-        Optional.ofNullable(map.get("bot"))
-                .map(String::valueOf)
-                .map(Boolean::parseBoolean)
-                .ifPresent(builder::bot);
-
-        Optional.ofNullable(map.get("nip05"))
-                .map(String::valueOf)
-                .ifPresent(builder::nip05);
-
-        Optional.ofNullable(map.get("lud16"))
-                .map(String::valueOf)
-                .ifPresent(builder::lud16);
+        fields.stream()
+                .filter(it -> map.containsKey(it.getJsonName()))
+                .forEach(it -> {
+                    builder.setField(it, map.get(it.getJsonName()));
+                });
 
         return builder.build();
     }

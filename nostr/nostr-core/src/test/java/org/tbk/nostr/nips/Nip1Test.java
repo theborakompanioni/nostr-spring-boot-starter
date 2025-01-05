@@ -4,9 +4,9 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.junit.jupiter.api.Test;
-import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.Metadata;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,9 +35,9 @@ class Nip1Test {
     void itShouldCreateMetadata() throws IOException {
         Instant now = Instant.now();
         Event event = Nip1.createMetadata(testPubkey, Metadata.newBuilder()
-                        .name("name")
-                        .about("about")
-                        .picture(URI.create("https://www.example.com/example.png"))
+                        .setName("name")
+                        .setAbout("about")
+                        .setPicture(URI.create("https://www.example.com/example.png").toString())
                         .build())
                 .build();
 
@@ -48,10 +48,7 @@ class Nip1Test {
                 {
                   "name": "name",
                   "about": "about",
-                  "picture": "https://www.example.com/example.png",
-                  "website": null,
-                  "banner": null,
-                  "display_name": null
+                  "picture": "https://www.example.com/example.png"
                 }
                 """)));
     }

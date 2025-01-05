@@ -8,12 +8,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Kinds;
-import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nip18.Nip18;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.Metadata;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
@@ -54,9 +54,9 @@ class NostrRelayNip18Test {
         Signer signer = SimpleSigner.random();
 
         Event event = MoreEvents.createFinalizedMetadata(signer, Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/example.png"))
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/example.png").toString())
                 .build());
         Event genericRepost = MoreEvents.finalize(signer, Nip18.repost(signer.getPublicKey(), event, nostrTemplate.getRelayUri()));
 

@@ -1,7 +1,7 @@
 package org.tbk.nostr.proto.json;
 
-import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.Metadata;
 import org.tbk.nostr.proto.Request;
 import org.tbk.nostr.proto.Response;
 

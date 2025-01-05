@@ -6,13 +6,13 @@ import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.nips.Nip65;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
+import org.tbk.nostr.proto.Metadata;
 import org.tbk.nostr.proto.json.JsonWriter;
 
 import java.nio.charset.StandardCharsets;

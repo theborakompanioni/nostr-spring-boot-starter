@@ -5,6 +5,7 @@ import org.tbk.nostr.base.*;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.Metadata;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
@@ -111,7 +112,7 @@ class Nip25Test {
         Signer signer = SimpleSigner.random();
 
         Event event = MoreEvents.createFinalizedMetadata(signer, Metadata.newBuilder()
-                .name("nostr-spring-boot-starter")
+                .setName("nostr-spring-boot-starter")
                 .build());
 
         Event reactionEvent = MoreEvents.finalize(signer, Nip25.like(signer.getPublicKey(), event));

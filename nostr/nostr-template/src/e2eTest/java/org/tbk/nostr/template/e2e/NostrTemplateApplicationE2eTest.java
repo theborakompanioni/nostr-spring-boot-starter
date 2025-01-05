@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.nip11.RelayInfoDocument;
 import org.tbk.nostr.nip19.Nip19;
 import org.tbk.nostr.nip19.Npub;
+import org.tbk.nostr.proto.Metadata;
 import org.tbk.nostr.template.NostrTemplate;
 
 import java.time.Duration;

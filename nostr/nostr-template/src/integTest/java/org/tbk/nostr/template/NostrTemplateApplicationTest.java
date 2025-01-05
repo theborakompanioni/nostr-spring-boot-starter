@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.base.EventId;
-import org.tbk.nostr.base.Metadata;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nip11.RelayInfoDocument;
@@ -291,12 +290,12 @@ class NostrTemplateApplicationTest {
         Signer signer = SimpleSigner.random();
 
         Metadata metadata = Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/picture.png"))
-                .displayName("display name")
-                .banner(URI.create("https://www.example.com/banner.png"))
-                .website(URI.create("https://www.example.com/"))
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/picture.png").toString())
+                .setDisplayName("display name")
+                .setBanner(URI.create("https://www.example.com/banner.png").toString())
+                .setWebsite(URI.create("https://www.example.com/").toString())
                 .build();
         Event event = MoreEvents.createFinalizedMetadata(signer, metadata);
 
@@ -316,15 +315,15 @@ class NostrTemplateApplicationTest {
         Signer signer = SimpleSigner.random();
 
         Metadata metadata0 = Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/example.png"))
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/example0.png").toString())
                 .build();
 
         Metadata metadata1 = Metadata.newBuilder()
-                .name("name1")
-                .about("about1")
-                .picture(URI.create("https://www.example.com/example1.png"))
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/example1.png").toString())
                 .build();
 
         assertThat("sanity check", metadata1, not(is(metadata0)));

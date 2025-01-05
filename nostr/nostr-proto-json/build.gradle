@@ -5,7 +5,6 @@ plugins {
 description = 'nostr proto json package'
 
 dependencies {
-    api project(':nostr:nostr-base')
     api project(':nostr:nostr-proto')
 
     implementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"

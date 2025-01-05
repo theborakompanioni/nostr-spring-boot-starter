@@ -4,14 +4,13 @@ import com.fasterxml.jackson.jr.ob.JSONComposer;
 import com.fasterxml.jackson.jr.ob.comp.ArrayComposer;
 import com.fasterxml.jackson.jr.ob.comp.ObjectComposer;
 import com.google.common.annotations.VisibleForTesting;
-import org.tbk.nostr.base.Metadata;
+import com.google.protobuf.Descriptors.FieldDescriptor;
 import org.tbk.nostr.proto.*;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.HexFormat;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import static org.tbk.nostr.proto.json.Json.json;
 import static org.tbk.nostr.proto.json.Json.jsonForSigning;
@@ -37,28 +36,11 @@ final class JsonRequestWriter {
         try {
             ObjectComposer<JSONComposer<String>> builder = json
                     .composeString()
-                    .startObject()
-                    .put("name", val.getName())
-                    .put("about", val.getAbout())
-                    .put("picture", Optional.ofNullable(val.getPicture())
-                            .map(URI::toString)
-                            .orElse(null))
-                    .put("display_name", val.getDisplayName())
-                    .put("website", Optional.ofNullable(val.getWebsite())
-                            .map(URI::toString)
-                            .orElse(null))
-                    .put("banner", Optional.ofNullable(val.getBanner())
-                            .map(URI::toString)
-                            .orElse(null));
+                    .startObject();
 
-            if (val.getBot() != null) {
-                builder.put("bot", Boolean.TRUE.equals(val.getBot()));
-            }
-            if (val.getNip05() != null) {
-                builder.put("nip05", val.getNip05());
-            }
-            if (val.getLud16() != null) {
-                builder.put("lud16", val.getLud16());
+            Map<FieldDescriptor, Object> allFields = val.getAllFields();
+            for (Map.Entry<FieldDescriptor, Object> entry : allFields.entrySet()) {
+                builder.putObject(entry.getKey().getJsonName(), entry.getValue());
             }
             return builder.end().finish();
         } catch (IOException e) {

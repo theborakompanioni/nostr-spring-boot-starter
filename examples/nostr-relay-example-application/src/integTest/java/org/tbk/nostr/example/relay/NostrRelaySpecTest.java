@@ -399,7 +399,7 @@ class NostrRelaySpecTest {
         Event invalidEvent3 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM3")
                 .addTags(MoreTags.named("0".repeat(257))));
 
-        List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2);
+        List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2, invalidEvent3);
         List<OkResponse> oks = nostrTemplate.send(events)
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
@@ -819,9 +819,9 @@ class NostrRelaySpecTest {
         Signer signer = SimpleSigner.random();
 
         Metadata metadata0 = Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/example.png"))
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/example.png").toString())
                 .build();
 
         Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata0);
@@ -864,9 +864,9 @@ class NostrRelaySpecTest {
         Signer signer = SimpleSigner.random();
 
         Metadata metadata = Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/example.png"))
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/example.png").toString())
                 .build();
 
         Event event0 = MoreEvents.createFinalizedMetadata(signer, metadata);
@@ -911,9 +911,9 @@ class NostrRelaySpecTest {
         Signer signer = SimpleSigner.random();
 
         Metadata metadata = Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/example.png"))
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/example.png").toString())
                 .build();
 
         Event event1WithLowerId = MoreEvents.finalize(signer, Nip13.mineEvent(Nip1.createMetadata(signer.getPublicKey(), metadata), 16));
@@ -956,9 +956,9 @@ class NostrRelaySpecTest {
         Signer signer = SimpleSigner.random();
 
         Metadata metadata = Metadata.newBuilder()
-                .name("name")
-                .about("about")
-                .picture(URI.create("https://www.example.com/example.png"))
+                .setName("name")
+                .setAbout("about")
+                .setPicture(URI.create("https://www.example.com/example.png").toString())
                 .build();
 
         Event event0WithLowerId = MoreEvents.finalize(signer, Nip13.mineEvent(Nip1.createMetadata(signer.getPublicKey(), metadata), 16));
