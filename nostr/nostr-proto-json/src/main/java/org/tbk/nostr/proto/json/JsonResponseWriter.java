@@ -1,5 +1,6 @@
 package org.tbk.nostr.proto.json;
 
+import com.google.protobuf.Descriptors;
 import org.tbk.nostr.proto.*;
 
 import java.io.IOException;
@@ -70,6 +71,10 @@ final class JsonResponseWriter {
     }
 
     private static String toJson(CountResponse val) {
+        Descriptors.Descriptor descriptor = CountResult.getDescriptor();
+        Descriptors.FieldDescriptor countField = descriptor.findFieldByNumber(CountResult.COUNT_FIELD_NUMBER);
+        Descriptors.FieldDescriptor approximateField = descriptor.findFieldByNumber(CountResult.APPROXIMATE_FIELD_NUMBER);
+
         try {
             return json
                     .composeString()
@@ -77,8 +82,8 @@ final class JsonResponseWriter {
                     .add("COUNT")
                     .add(val.getSubscriptionId())
                     .startObject()
-                    .put("count", val.getResult().getCount())
-                    .put("approximate", val.getResult().getApproximate())
+                    .put(countField.getJsonName(), val.getResult().getCount())
+                    .put(approximateField.getJsonName(), val.getResult().getApproximate())
                     .end()
                     .end()
                     .finish();

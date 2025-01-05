@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.FieldDescriptor;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.TagFilter;
@@ -34,9 +35,27 @@ final class Json {
     static final JSON jsonForSigning = json
             .without(JSON.Feature.PRETTY_PRINT_OUTPUT);
 
+    private static final Descriptors.Descriptor eventDescriptor = Event.getDescriptor();
+    private static final FieldDescriptor eventIdField = eventDescriptor.findFieldByNumber(Event.ID_FIELD_NUMBER);
+    private static final FieldDescriptor eventPubkeyField = eventDescriptor.findFieldByNumber(Event.PUBKEY_FIELD_NUMBER);
+    private static final FieldDescriptor eventCreatedAtField = eventDescriptor.findFieldByNumber(Event.CREATED_AT_FIELD_NUMBER);
+    private static final FieldDescriptor eventKindField = eventDescriptor.findFieldByNumber(Event.KIND_FIELD_NUMBER);
+    private static final FieldDescriptor eventTagsField = eventDescriptor.findFieldByNumber(Event.TAGS_FIELD_NUMBER);
+    private static final FieldDescriptor eventContentField = eventDescriptor.findFieldByNumber(Event.CONTENT_FIELD_NUMBER);
+    private static final FieldDescriptor eventSigField = eventDescriptor.findFieldByNumber(Event.SIG_FIELD_NUMBER);
+
+    private static final Descriptors.Descriptor filterDescriptor = Filter.getDescriptor();
+    private static final FieldDescriptor filterIdsField = filterDescriptor.findFieldByNumber(Filter.IDS_FIELD_NUMBER);
+    private static final FieldDescriptor filterAuthorsField = filterDescriptor.findFieldByNumber(Filter.AUTHORS_FIELD_NUMBER);
+    private static final FieldDescriptor filterKindsField = filterDescriptor.findFieldByNumber(Filter.KINDS_FIELD_NUMBER);
+    private static final FieldDescriptor filterSinceField = filterDescriptor.findFieldByNumber(Filter.SINCE_FIELD_NUMBER);
+    private static final FieldDescriptor filterUntilField = filterDescriptor.findFieldByNumber(Filter.UNTIL_FIELD_NUMBER);
+    private static final FieldDescriptor filterLimitField = filterDescriptor.findFieldByNumber(Filter.LIMIT_FIELD_NUMBER);
+    private static final FieldDescriptor filterSearchField = filterDescriptor.findFieldByNumber(Filter.SEARCH_FIELD_NUMBER);
+
     static Event fromMap(Map<String, Object> map, Event.Builder event) {
-        List<Descriptors.FieldDescriptor> fields = Event.getDescriptor().getFields();
-        for (Descriptors.FieldDescriptor field : fields) {
+        List<FieldDescriptor> fields = Event.getDescriptor().getFields();
+        for (FieldDescriptor field : fields) {
             Object value = map.get(field.getJsonName());
             if (value == null) {
                 throw new IllegalArgumentException("Missing property '%s'".formatted(field.getJsonName()));
@@ -44,25 +63,25 @@ final class Json {
         }
 
         @SuppressWarnings("unchecked")
-        List<List<String>> tags = Optional.ofNullable((List<Object>) map.get("tags"))
+        List<List<String>> tags = Optional.ofNullable((List<Object>) map.get(eventTagsField.getJsonName()))
                 .orElseGet(Collections::emptyList).stream()
                 .map(it -> (List<String>) it)
                 .toList();
 
         return event
-                .setId(ByteString.fromHex(String.valueOf(map.get("id"))))
-                .setPubkey(ByteString.fromHex(String.valueOf(map.get("pubkey"))))
-                .setCreatedAt(Long.parseLong(String.valueOf(map.get("created_at"))))
-                .setKind(Integer.parseInt(String.valueOf(map.get("kind"))))
+                .setId(ByteString.fromHex(String.valueOf(map.get(eventIdField.getJsonName()))))
+                .setPubkey(ByteString.fromHex(String.valueOf(map.get(eventPubkeyField.getJsonName()))))
+                .setCreatedAt(Long.parseLong(String.valueOf(map.get(eventCreatedAtField.getJsonName()))))
+                .setKind(Integer.parseInt(String.valueOf(map.get(eventKindField.getJsonName())), 10))
                 .addAllTags(tagsFromList(tags))
-                .setContent(String.valueOf(map.get("content")))
-                .setSig(ByteString.fromHex(String.valueOf(map.get("sig"))))
+                .setContent(String.valueOf(map.get(eventContentField.getJsonName())))
+                .setSig(ByteString.fromHex(String.valueOf(map.get(eventSigField.getJsonName()))))
                 .build();
     }
 
     static Event.Builder fromMapPartial(Map<String, Object> map, Event.Builder event) {
-        List<Descriptors.FieldDescriptor> fields = Event.getDescriptor().getFields();
-        for (Descriptors.FieldDescriptor field : fields) {
+        List<FieldDescriptor> fields = Event.getDescriptor().getFields();
+        for (FieldDescriptor field : fields) {
             Object value = map.get(field.getJsonName());
             if (value != null) {
                 switch (field.getJsonName()) {
@@ -73,7 +92,7 @@ final class Json {
                         event.setPubkey(ByteString.fromHex(String.valueOf(value)));
                         break;
                     case "kind":
-                        event.setKind(Integer.parseInt(String.valueOf(value)));
+                        event.setKind(Integer.parseInt(String.valueOf(value), 10));
                         break;
                     case "created_at":
                         event.setCreatedAt(Long.parseLong(String.valueOf(value)));
@@ -89,7 +108,7 @@ final class Json {
         }
 
         @SuppressWarnings("unchecked")
-        List<List<String>> tags = Optional.ofNullable((List<Object>) map.get("tags"))
+        List<List<String>> tags = Optional.ofNullable((List<Object>) map.get(eventTagsField.getJsonName()))
                 .orElseGet(Collections::emptyList).stream()
                 .map(it -> (List<String>) it)
                 .toList();
@@ -127,15 +146,15 @@ final class Json {
      * }
      * </code>
      */
-    static Map<String, Object> asMap(Event event) {
+    static Map<String, Object> asMap(Event val) {
         return ImmutableMap.<String, Object>builder()
-                .put("id", HexFormat.of().formatHex(event.getId().toByteArray()))
-                .put("pubkey", HexFormat.of().formatHex(event.getPubkey().toByteArray()))
-                .put("created_at", event.getCreatedAt())
-                .put("kind", event.getKind())
-                .put("tags", listFromTags(event.getTagsList()))
-                .put("content", event.getContent())
-                .put("sig", HexFormat.of().formatHex(event.getSig().toByteArray()))
+                .put(eventIdField.getJsonName(), HexFormat.of().formatHex(val.getId().toByteArray()))
+                .put(eventPubkeyField.getJsonName(), HexFormat.of().formatHex(val.getPubkey().toByteArray()))
+                .put(eventCreatedAtField.getJsonName(), val.getCreatedAt())
+                .put(eventKindField.getJsonName(), val.getKind())
+                .put(eventTagsField.getJsonName(), listFromTags(val.getTagsList()))
+                .put(eventContentField.getJsonName(), val.getContent())
+                .put(eventSigField.getJsonName(), HexFormat.of().formatHex(val.getSig().toByteArray()))
                 .build();
     }
 
@@ -145,9 +164,9 @@ final class Json {
                 .toList();
     }
 
-    static Filter fromMap(Map<String, Object> map, Filter.Builder filter) {
+    static Filter fromMap(Map<String, Object> map, Filter.Builder builder) {
         @SuppressWarnings("unchecked")
-        List<ByteString> ids = Optional.ofNullable((List<Object>) map.get("ids"))
+        List<ByteString> ids = Optional.ofNullable((List<Object>) map.get(filterIdsField.getJsonName()))
                 .orElseGet(Collections::emptyList).stream()
                 .map(String::valueOf)
                 .distinct()
@@ -155,7 +174,7 @@ final class Json {
                 .toList();
 
         @SuppressWarnings("unchecked")
-        List<ByteString> authors = Optional.ofNullable((List<Object>) map.get("authors"))
+        List<ByteString> authors = Optional.ofNullable((List<Object>) map.get(filterAuthorsField.getJsonName()))
                 .orElseGet(Collections::emptyList).stream()
                 .map(String::valueOf)
                 .distinct()
@@ -163,7 +182,7 @@ final class Json {
                 .toList();
 
         @SuppressWarnings("unchecked")
-        List<Integer> kinds = Optional.ofNullable((List<Object>) map.get("kinds"))
+        List<Integer> kinds = Optional.ofNullable((List<Object>) map.get(filterKindsField.getJsonName()))
                 .orElseGet(Collections::emptyList).stream()
                 .map(String::valueOf)
                 .map(Integer::parseInt)
@@ -187,22 +206,22 @@ final class Json {
                 }).distinct()
                 .toList();
 
-        Optional<Long> since = Optional.ofNullable(map.get("since"))
+        Optional<Long> since = Optional.ofNullable(map.get(filterSinceField.getJsonName()))
                 .map(String::valueOf)
                 .map(Long::parseLong);
 
-        Optional<Long> until = Optional.ofNullable(map.get("until"))
+        Optional<Long> until = Optional.ofNullable(map.get(filterUntilField.getJsonName()))
                 .map(String::valueOf)
                 .map(Long::parseLong);
 
-        Optional<Integer> limit = Optional.ofNullable(map.get("limit"))
+        Optional<Integer> limit = Optional.ofNullable(map.get(filterLimitField.getJsonName()))
                 .map(String::valueOf)
                 .map(Integer::parseInt);
 
-        Optional<String> search = Optional.ofNullable(map.get("search"))
+        Optional<String> search = Optional.ofNullable(map.get(filterSearchField.getJsonName()))
                 .map(String::valueOf);
 
-        Filter.Builder filterBuilder = filter
+        Filter.Builder filterBuilder = builder
                 .addAllIds(ids)
                 .addAllAuthors(authors)
                 .addAllKinds(kinds)
@@ -233,17 +252,17 @@ final class Json {
         ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
 
         if (!filter.getIdsList().isEmpty()) {
-            builder.put("ids", filter.getIdsList()
+            builder.put(filterIdsField.getJsonName(), filter.getIdsList()
                     .stream().map(it -> HexFormat.of().formatHex(it.toByteArray()))
                     .toList());
         }
         if (!filter.getAuthorsList().isEmpty()) {
-            builder.put("authors", filter.getAuthorsList().stream()
+            builder.put(filterAuthorsField.getJsonName(), filter.getAuthorsList().stream()
                     .map(it -> HexFormat.of().formatHex(it.toByteArray()))
                     .toList());
         }
         if (!filter.getKindsList().isEmpty()) {
-            builder.put("kinds", filter.getKindsList());
+            builder.put(filterKindsField.getJsonName(), filter.getKindsList());
         }
 
         Map<String, Set<String>> singleLetterTags = filter.getTagsList().stream()
@@ -256,16 +275,16 @@ final class Json {
         singleLetterTags.forEach((key, value) -> builder.put("#%s".formatted(key), value));
 
         if (filter.getSince() > 0L) {
-            builder.put("since", filter.getSince());
+            builder.put(filterSinceField.getJsonName(), filter.getSince());
         }
         if (filter.getUntil() > 0L) {
-            builder.put("until", filter.getUntil());
+            builder.put(filterUntilField.getJsonName(), filter.getUntil());
         }
         if (filter.getLimit() > 0L) {
-            builder.put("limit", filter.getLimit());
+            builder.put(filterLimitField.getJsonName(), filter.getLimit());
         }
         if (!filter.getSearch().isEmpty()) {
-            builder.put("search", filter.getSearch());
+            builder.put(filterSearchField.getJsonName(), filter.getSearch());
         }
 
         return builder.build();
@@ -282,8 +301,7 @@ final class Json {
                 arrayComposer.add(it);
             }
 
-            return arrayComposer.end()
-                    .finish();
+            return arrayComposer.end().finish();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -134,11 +134,12 @@ final class JsonResponseReader {
         }
     }
 
-    private static CountResult countFromMap(Map<String, Object> map, CountResult.Builder count) {
-        Descriptors.FieldDescriptor countField = CountResult.getDescriptor().findFieldByNumber(CountResult.COUNT_FIELD_NUMBER);
-        Descriptors.FieldDescriptor approximateField = CountResult.getDescriptor().findFieldByNumber(CountResult.APPROXIMATE_FIELD_NUMBER);
+    private static CountResult countFromMap(Map<String, Object> map, CountResult.Builder builder) {
+        Descriptors.Descriptor descriptor = builder.getDescriptorForType();
+        Descriptors.FieldDescriptor countField = descriptor.findFieldByNumber(CountResult.COUNT_FIELD_NUMBER);
+        Descriptors.FieldDescriptor approximateField = descriptor.findFieldByNumber(CountResult.APPROXIMATE_FIELD_NUMBER);
 
-        return count
+        return builder
                 .setCount(Long.parseLong(String.valueOf(map.get(countField.getJsonName()))))
                 .setApproximate(Boolean.parseBoolean(String.valueOf(map.getOrDefault(approximateField.getJsonName(), false))))
                 .build();
@@ -149,9 +150,7 @@ final class JsonResponseReader {
 
         fields.stream()
                 .filter(it -> map.containsKey(it.getJsonName()))
-                .forEach(it -> {
-                    builder.setField(it, map.get(it.getJsonName()));
-                });
+                .forEach(it -> builder.setField(it, map.get(it.getJsonName())));
 
         return builder.build();
     }
