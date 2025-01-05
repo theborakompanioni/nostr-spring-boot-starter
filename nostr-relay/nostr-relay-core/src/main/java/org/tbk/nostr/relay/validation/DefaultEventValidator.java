@@ -1,7 +1,10 @@
 package org.tbk.nostr.relay.validation;
 
 import org.springframework.validation.Errors;
-import org.tbk.nostr.base.*;
+import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.EventUri;
+import org.tbk.nostr.base.Kind;
+import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;

@@ -2,7 +2,6 @@ package org.tbk.nostr.nips;
 
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.XonlyPublicKey;
-import org.tbk.nostr.base.Kind;
 import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.proto.Event;

@@ -5,7 +5,6 @@ import org.tbk.nostr.proto.Response;
 
 import java.security.Principal;
 import java.util.Optional;
-import java.util.function.Function;
 
 public interface NostrRequestContext {
 

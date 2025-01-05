@@ -1,8 +1,6 @@
 package org.tbk.nostr.relay.nip42.impl;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.HexFormat;
 
 final class SimpleNip42ChallengeFactory {
     private static final SecureRandom RANDOM = new SecureRandom();

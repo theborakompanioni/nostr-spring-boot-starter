@@ -1,7 +1,10 @@
 package org.tbk.nostr.nips;
 
 import org.junit.jupiter.api.Test;
-import org.tbk.nostr.base.*;
+import org.tbk.nostr.base.EventId;
+import org.tbk.nostr.base.IndexedTag;
+import org.tbk.nostr.base.Kinds;
+import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;

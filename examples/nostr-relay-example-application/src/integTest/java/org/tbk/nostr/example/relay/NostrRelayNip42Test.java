@@ -19,7 +19,6 @@ import org.tbk.nostr.proto.*;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreSubscriptionIds;
-import org.tbk.nostr.util.MoreTags;
 
 import java.time.Duration;
 import java.util.Collections;

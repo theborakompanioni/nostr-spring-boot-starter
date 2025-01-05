@@ -6,7 +6,6 @@ import org.tbk.nostr.nip19.Nip19;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 
 class PersonaTest {
 

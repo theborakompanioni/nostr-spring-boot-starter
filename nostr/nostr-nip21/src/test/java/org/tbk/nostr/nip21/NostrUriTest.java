@@ -2,8 +2,10 @@ package org.tbk.nostr.nip21;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.tbk.nostr.base.RelayUri;
-import org.tbk.nostr.nip19.*;
+import org.tbk.nostr.nip19.Nevent;
+import org.tbk.nostr.nip19.Note;
+import org.tbk.nostr.nip19.Nprofile;
+import org.tbk.nostr.nip19.Npub;
 
 import java.net.URI;
 

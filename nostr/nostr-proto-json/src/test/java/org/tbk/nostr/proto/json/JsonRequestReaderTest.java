@@ -6,7 +6,6 @@ import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
-import org.tbk.nostr.nips.Nip42;
 import org.tbk.nostr.proto.*;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;

@@ -5,7 +5,6 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.IndexedTag;
 import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
 
