@@ -17,7 +17,7 @@ public class SimpleSigner implements Signer {
     }
 
     public static SimpleSigner fromPrivateKeyHex(String hex) {
-        return fromPrivateKey(MoreIdentities.fromHex(hex));
+        return fromPrivateKey(PrivateKey.fromHex(hex));
     }
 
     public static SimpleSigner fromPrivateKey(PrivateKey privateKey) {

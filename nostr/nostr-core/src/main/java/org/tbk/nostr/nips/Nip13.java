@@ -59,7 +59,7 @@ public final class Nip13 {
     }
 
     public static long calculateDifficulty(EventOrBuilder event) {
-        return calculateDifficulty(MoreEvents.eventId(event));
+        return calculateDifficulty(MoreEvents.calculateEventId(event));
     }
 
     public static long calculateDifficulty(EventId eventId) {
@@ -145,7 +145,7 @@ public final class Nip13 {
             // update "nonce" tag with current nonce value
             eventBuilder.setTags(prototypeTagCount, nonceTagBuilder.setValues(0, Long.toString(nonce)));
 
-            currentDifficulty = countLeadingZeroes(MoreEvents.eventId(eventBuilder));
+            currentDifficulty = countLeadingZeroes(MoreEvents.calculateEventId(eventBuilder));
             nonce++;
         }
 

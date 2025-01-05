@@ -17,14 +17,6 @@ public final class MoreIdentities {
         return fromSeed(MoreRandom.randomByteArray(256));
     }
 
-    public static PrivateKey fromHex(String hex) {
-        return PrivateKey.fromHex(hex);
-    }
-
-    public static PrivateKey of(byte[] data) {
-        return new PrivateKey(data);
-    }
-
     public static Identity fromSeedHex(String hex) {
         return fromSeed(HexFormat.of().parseHex(hex));
     }

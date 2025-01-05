@@ -27,7 +27,7 @@ class MoreEventsTest {
                 .setKind(1)
                 .setContent("GM");
 
-        byte[] id = MoreEvents.eventId(partialEvent);
+        byte[] id = MoreEvents.calculateEventId(partialEvent);
 
         assertThat(id, is(HexFormat.of().parseHex("40a1d1223bc059a54185c097b4f6f352cf24e27a483fd60d39e635883a09091e")));
     }
@@ -56,7 +56,7 @@ class MoreEventsTest {
                 .addTags(MoreTags.named("alt", "reply"))
                 .setContent("GM");
 
-        byte[] id = MoreEvents.eventId(partialEvent);
+        byte[] id = MoreEvents.calculateEventId(partialEvent);
 
         assertThat(id, is(HexFormat.of().parseHex("5367ab9adc5c62d3fdbf9dd1d00807c921531db9925f906bf73b33afdf7f28dd")));
     }
@@ -81,7 +81,7 @@ class MoreEventsTest {
                 """;
 
         Event event = JsonReader.fromJson(json, Event.newBuilder());
-        byte[] eventId = MoreEvents.eventId(event.toBuilder());
+        byte[] eventId = MoreEvents.calculateEventId(event.toBuilder());
 
         assertThat(eventId, is(HexFormat.of().parseHex("c8e47b51d77915ff4a00c0b00eec9563d2b588cdfa13b75a74751e7f4fec4d9f")));
 
@@ -113,7 +113,7 @@ class MoreEventsTest {
                 """;
 
         Event event = JsonReader.fromJson(json, Event.newBuilder());
-        byte[] eventId = MoreEvents.eventId(event.toBuilder());
+        byte[] eventId = MoreEvents.calculateEventId(event.toBuilder());
 
         assertThat(eventId, is(HexFormat.of().parseHex("7f0fdf9021cbde815007340d603b43e61ddecac58a337165974b74eb843ba4bc")));
 

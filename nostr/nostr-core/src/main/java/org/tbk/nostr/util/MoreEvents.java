@@ -26,10 +26,10 @@ public final class MoreEvents {
     }
 
     public static Event.Builder withEventId(Event.Builder event) {
-        return event.setId(ByteString.copyFrom(eventId(event)));
+        return event.setId(ByteString.copyFrom(calculateEventId(event)));
     }
 
-    public static byte[] eventId(EventOrBuilder event) {
+    public static byte[] calculateEventId(EventOrBuilder event) {
         return Crypto.sha256(JsonWriter.toJsonForSigning(event).getBytes(StandardCharsets.UTF_8));
     }
 
@@ -38,7 +38,7 @@ public final class MoreEvents {
             event.setCreatedAt(Instant.now().getEpochSecond());
         }
         event.setPubkey(ByteString.fromHex(signer.getPublicKey().value.toHex()));
-        event.setId(ByteString.copyFrom(eventId(event)));
+        event.setId(ByteString.copyFrom(calculateEventId(event)));
         return signer.sign(event).build();
     }
 
@@ -57,7 +57,7 @@ public final class MoreEvents {
             throw new IllegalArgumentException("Invalid public key.");
         }
 
-        byte[] calculatedEventId = eventId(event);
+        byte[] calculatedEventId = calculateEventId(event);
         if (!Arrays.equals(calculatedEventId, event.getId().toByteArray())) {
             throw new IllegalArgumentException("Invalid id.");
         }

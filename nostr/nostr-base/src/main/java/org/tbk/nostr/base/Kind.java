@@ -15,7 +15,7 @@ public final class Kind implements Comparable<Kind> {
 
     public static boolean isValidKindString(String kindString) {
         try {
-            return isValidKind(Integer.parseInt(kindString));
+            return isValidKind(Integer.parseInt(kindString, 10));
         } catch (Exception e) {
             return false;
         }
