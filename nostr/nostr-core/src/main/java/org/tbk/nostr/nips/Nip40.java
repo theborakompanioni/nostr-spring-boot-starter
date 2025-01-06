@@ -10,6 +10,8 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * See <a href="https://github.com/nostr-protocol/nips/blob/master/40.md">NIP-40</a>.
  */
@@ -18,6 +20,14 @@ public final class Nip40 {
 
     private Nip40() {
         throw new UnsupportedOperationException();
+    }
+
+    public static Event.Builder expire(Event.Builder event, Duration duration) {
+        return event.addTags(expiration(duration).tag());
+    }
+
+    public static Event.Builder expire(Event.Builder event, Instant instant) {
+        return event.addTags(expiration(instant).tag());
     }
 
     public static TagValue expirationTag(Duration duration) {
@@ -36,7 +46,7 @@ public final class Nip40 {
         return Expiration.of(instant);
     }
 
-    public static Optional<Instant> getExpiration(Event event) {
+    public static Optional<Expiration> findExpiration(Event event) {
         return event.getTagsList().stream()
                 .filter(it -> EXPIRATION_TAG_NAME.equals(it.getName()))
                 .filter(it -> it.getValuesCount() > 0)
@@ -50,7 +60,7 @@ public final class Nip40 {
                 })
                 .filter(it -> it >= 0)
                 .min(Comparator.comparingLong(value -> value))
-                .map(Instant::ofEpochSecond);
+                .map(Expiration::of);
     }
 
     public static final class Expiration {
@@ -58,14 +68,25 @@ public final class Nip40 {
             return new Expiration(Instant.now().plusNanos(duration.toNanos()));
         }
 
+        public static Expiration of(long epochSeconds) {
+            return new Expiration(Instant.ofEpochSecond(epochSeconds));
+        }
+
         public static Expiration of(Instant instant) {
             return new Expiration(instant);
         }
 
+        private final Instant instant;
+
         private final TagValue tag;
 
         private Expiration(Instant instant) {
+            this.instant = requireNonNull(instant);
             this.tag = MoreTags.named(EXPIRATION_TAG_NAME, String.valueOf(instant.getEpochSecond()));
+        }
+
+        public Instant instant() {
+            return instant;
         }
 
         public TagValue tag() {

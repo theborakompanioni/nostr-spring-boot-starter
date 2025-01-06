@@ -25,7 +25,7 @@ class Nip40Test {
                 .addTags(Nip40.expirationTag(expiresAt))
                 .build();
 
-        assertThat(Nip40.getExpiration(event), is(Optional.of(expiresAt.truncatedTo(ChronoUnit.SECONDS))));
+        assertThat(Nip40.findExpiration(event).orElseThrow().instant(), is(expiresAt.truncatedTo(ChronoUnit.SECONDS)));
     }
 
     @Test
@@ -41,7 +41,7 @@ class Nip40Test {
                 .addTags(Nip40.expirationTag(expiresAt.plusSeconds(21)))
                 .build();
 
-        assertThat(Nip40.getExpiration(event), is(Optional.of(expiresAt.truncatedTo(ChronoUnit.SECONDS))));
+        assertThat(Nip40.findExpiration(event).orElseThrow().instant(), is(expiresAt.truncatedTo(ChronoUnit.SECONDS)));
     }
 
     @Test
@@ -49,6 +49,6 @@ class Nip40Test {
         Event event = Nip1.createTextNote(testPubkey, "GM")
                 .addTags(MoreTags.named("alt", "test"))
                 .build();
-        assertThat(Nip40.getExpiration(event), is(Optional.empty()));
+        assertThat(Nip40.findExpiration(event), is(Optional.empty()));
     }
 }

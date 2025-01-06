@@ -11,6 +11,8 @@ import org.tbk.nostr.base.SubscriptionId;
 import org.tbk.nostr.client.NostrClientService;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nips.Nip1;
+import org.tbk.nostr.nips.Nip40;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
 import org.tbk.nostr.proto.ReqRequest;
@@ -18,6 +20,7 @@ import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreSubscriptionIds;
 
 import java.time.Duration;
+import java.time.Instant;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -41,19 +44,13 @@ class NostrClientServiceApplicationE2eTest {
     }
 
     @Test
-    void itShouldPublishNoteSuccessfully() {
-        Signer signer = SimpleSigner.random();
-
-        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
-
-        sut.send(event).block(Duration.ofSeconds(5));
-    }
-
-    @Test
     void itShouldPublishNoteAndRetrieveSuccessfully() {
         Signer signer = SimpleSigner.random();
 
-        Event event = MoreEvents.createFinalizedTextNote(signer, "GM");
+        Event event = MoreEvents.finalize(signer, Nip40.expire(
+                Nip1.createTextNote(signer.getPublicKey(), "GM"),
+                Instant.now().plusSeconds(60)
+        ));
 
         sut.send(event).block(Duration.ofSeconds(5));
 

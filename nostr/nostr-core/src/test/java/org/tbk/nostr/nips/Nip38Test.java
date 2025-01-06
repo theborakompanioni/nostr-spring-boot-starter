@@ -34,7 +34,7 @@ class Nip38Test {
         assertThat(dTags, hasSize(1));
         assertThat(dTags.getLast().getValues(0), is("status"));
 
-        assertThat(Nip40.getExpiration(event).isPresent(), is(false));
+        assertThat(Nip40.findExpiration(event).isPresent(), is(false));
     }
 
     @Test
@@ -50,7 +50,7 @@ class Nip38Test {
         assertThat(dTags, hasSize(1));
         assertThat(dTags.getLast().getValues(0), is("general"));
 
-        assertThat(Nip40.getExpiration(event).isPresent(), is(false));
+        assertThat(Nip40.findExpiration(event).isPresent(), is(false));
     }
 
     @Test
@@ -70,7 +70,7 @@ class Nip38Test {
         assertThat(dTags, hasSize(1));
         assertThat(dTags.getLast().getValues(0), is("general"));
 
-        assertThat(Nip40.getExpiration(event).isPresent(), is(true));
+        assertThat(Nip40.findExpiration(event).isPresent(), is(true));
     }
 
     @Test
@@ -95,6 +95,6 @@ class Nip38Test {
         assertThat(rTags, hasSize(1));
         assertThat(rTags.getLast().getValues(0), is("spotify:search:Intergalatic%20-%20Beastie%20Boys"));
 
-        assertThat(Nip40.getExpiration(event).isPresent(), is(true));
+        assertThat(Nip40.findExpiration(event).isPresent(), is(true));
     }
 }

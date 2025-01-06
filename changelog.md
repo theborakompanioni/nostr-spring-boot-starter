@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Breaking
 - MoreEvents: rename method `eventId` to `calculateEventId`
 - MoreIdentities: remove methods `fromHex` and `of`
+- Nip40: remove method `getExpiration` (use `findExpiration`)
 - externalize modules `nostr-proto` and `nostr-proto-json`
+
+### Added
+
+- Nip40: add methods `findExpiration` and `expire`
 
 ## [0.1.0] - 2024-12-21
 

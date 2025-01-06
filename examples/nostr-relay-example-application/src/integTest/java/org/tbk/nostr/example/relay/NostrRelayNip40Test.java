@@ -41,7 +41,7 @@ class NostrRelayNip40Test {
         Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
                 .addTags(MoreTags.expiration(expiresAt)));
 
-        assertThat("sanity check", Nip40.getExpiration(event0), is(Optional.of(expiresAt.truncatedTo(ChronoUnit.SECONDS))));
+        assertThat("sanity check", Nip40.findExpiration(event0).orElseThrow().instant(), is(expiresAt.truncatedTo(ChronoUnit.SECONDS)));
 
         OkResponse ok0 = nostrTemplate.send(event0)
                 .blockOptional(Duration.ofSeconds(5))
@@ -65,7 +65,7 @@ class NostrRelayNip40Test {
         Event event0 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM")
                 .addTags(MoreTags.expiration(expiresAt)));
 
-        assertThat("sanity check", Nip40.getExpiration(event0), is(Optional.of(expiresAt.truncatedTo(ChronoUnit.SECONDS))));
+        assertThat("sanity check", Nip40.findExpiration(event0).orElseThrow().instant(), is(expiresAt.truncatedTo(ChronoUnit.SECONDS)));
 
         OkResponse ok0 = nostrTemplate.send(event0)
                 .blockOptional(Duration.ofSeconds(5))
