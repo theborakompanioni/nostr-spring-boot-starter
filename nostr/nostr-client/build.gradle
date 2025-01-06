@@ -7,8 +7,8 @@ description = 'nostr core package'
 dependencies {
     api project(':nostr:nostr-base')
     implementation project(':nostr:nostr-core')
-    api project(':nostr:nostr-proto')
-    implementation project(':nostr:nostr-proto-json')
+
+    implementation "io.github.theborakompanioni:nostr-proto-json:${nostrProtoVersion}"
 
     api "io.projectreactor:reactor-core"
 

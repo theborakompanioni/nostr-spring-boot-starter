@@ -821,7 +821,7 @@ class NostrRelaySpecTest {
     void itShouldVerifyReplaceableEventBehaviour0() {
         Signer signer = SimpleSigner.random();
 
-        Metadata metadata0 = Metadata.newBuilder()
+        ProfileMetadata metadata0 = ProfileMetadata.newBuilder()
                 .setName("name")
                 .setAbout("about")
                 .setPicture(URI.create("https://www.example.com/example.png").toString())
@@ -866,7 +866,7 @@ class NostrRelaySpecTest {
     void itShouldVerifyReplaceableEventBehaviour1NewerEventsExist() {
         Signer signer = SimpleSigner.random();
 
-        Metadata metadata = Metadata.newBuilder()
+        ProfileMetadata metadata = ProfileMetadata.newBuilder()
                 .setName("name")
                 .setAbout("about")
                 .setPicture(URI.create("https://www.example.com/example.png").toString())
@@ -913,7 +913,7 @@ class NostrRelaySpecTest {
     void itShouldVerifyReplaceableEventBehaviour2LowerIdWithSameCreatedAtTimestampCanBeInserted() {
         Signer signer = SimpleSigner.random();
 
-        Metadata metadata = Metadata.newBuilder()
+        ProfileMetadata metadata = ProfileMetadata.newBuilder()
                 .setName("name")
                 .setAbout("about")
                 .setPicture(URI.create("https://www.example.com/example.png").toString())
@@ -958,7 +958,7 @@ class NostrRelaySpecTest {
     void itShouldVerifyReplaceableEventBehaviour3GreaterIdWithSameCreatedAtTimestampCanNotBeInserted() {
         Signer signer = SimpleSigner.random();
 
-        Metadata metadata = Metadata.newBuilder()
+        ProfileMetadata metadata = ProfileMetadata.newBuilder()
                 .setName("name")
                 .setAbout("about")
                 .setPicture(URI.create("https://www.example.com/example.png").toString())

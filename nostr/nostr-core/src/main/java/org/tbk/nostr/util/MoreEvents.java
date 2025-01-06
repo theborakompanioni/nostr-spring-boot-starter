@@ -12,7 +12,7 @@ import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.nips.Nip65;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
-import org.tbk.nostr.proto.Metadata;
+import org.tbk.nostr.proto.ProfileMetadata;
 import org.tbk.nostr.proto.json.JsonWriter;
 
 import java.nio.charset.StandardCharsets;
@@ -75,7 +75,7 @@ public final class MoreEvents {
         return finalize(signer, Nip1.createTextNote(signer.getPublicKey(), content));
     }
 
-    public static Event createFinalizedMetadata(Signer signer, Metadata metadata) {
+    public static Event createFinalizedMetadata(Signer signer, ProfileMetadata metadata) {
         return finalize(signer, Nip1.createMetadata(signer.getPublicKey(), metadata));
     }
 

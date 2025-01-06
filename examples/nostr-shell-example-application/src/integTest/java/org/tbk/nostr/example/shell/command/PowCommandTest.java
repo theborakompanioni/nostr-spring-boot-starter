@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import static org.awaitility.Awaitility.await;
 
 @Slf4j
-@ShellTest
+@ShellTest(terminalWidth = 240)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class PowCommandTest {
 
@@ -40,7 +40,7 @@ class PowCommandTest {
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
             ShellAssertions.assertThat(session.screen())
-                    .containsText("{\"id\":\"0")
+                    .containsText("\"id\":\"0")
                     .containsText("\"kind\":1")
                     .containsText("\"created_at\":1")
                     .containsText("\"content\":\"GM\"")

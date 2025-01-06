@@ -12,7 +12,7 @@ import org.tbk.nostr.nip19.Nip19;
 import org.tbk.nostr.nip19.Npub;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.Filter;
-import org.tbk.nostr.proto.Metadata;
+import org.tbk.nostr.proto.ProfileMetadata;
 import org.tbk.nostr.proto.ReqRequest;
 import org.tbk.nostr.proto.json.JsonReader;
 import org.tbk.nostr.util.MoreSubscriptionIds;
@@ -48,7 +48,7 @@ class NostrClientServiceIntegrationE2eTest {
 
         assertThat(event.getKind(), is(Kinds.kindProfileMetadata.getValue()));
 
-        Metadata metadata = JsonReader.fromJson(event.getContent(), Metadata.newBuilder());
+        ProfileMetadata metadata = JsonReader.fromJson(event.getContent(), ProfileMetadata.newBuilder());
         assertThat(metadata, is(notNullValue()));
     }
 }

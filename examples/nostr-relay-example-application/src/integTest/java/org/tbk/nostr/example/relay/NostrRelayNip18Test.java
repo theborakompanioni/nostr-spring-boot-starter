@@ -13,7 +13,7 @@ import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nip18.Nip18;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.Metadata;
+import org.tbk.nostr.proto.ProfileMetadata;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
@@ -53,7 +53,7 @@ class NostrRelayNip18Test {
     void itShouldAcceptGenericRepostEvent() {
         Signer signer = SimpleSigner.random();
 
-        Event event = MoreEvents.createFinalizedMetadata(signer, Metadata.newBuilder()
+        Event event = MoreEvents.createFinalizedMetadata(signer, ProfileMetadata.newBuilder()
                 .setName("name")
                 .setAbout("about")
                 .setPicture(URI.create("https://www.example.com/example.png").toString())

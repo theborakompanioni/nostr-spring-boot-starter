@@ -6,9 +6,9 @@ description = 'nostr core package'
 
 dependencies {
     api project(':nostr:nostr-base')
-    api project(':nostr:nostr-proto')
-    api project(':nostr:nostr-proto-json')
     api project(':nostr:nostr-identity')
+
+    api "io.github.theborakompanioni:nostr-proto-json:${nostrProtoVersion}"
 
     implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
     implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"

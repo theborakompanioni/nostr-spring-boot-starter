@@ -281,7 +281,7 @@ class NostrTemplateApplicationTest {
     void itShouldFetchMetadataEventSuccessfully0() {
         Signer signer = SimpleSigner.random();
 
-        Optional<Metadata> metadataOrEmpty = sut.fetchMetadataByAuthor(signer.getPublicKey()).blockOptional(Duration.ofSeconds(5));
+        Optional<ProfileMetadata> metadataOrEmpty = sut.fetchMetadataByAuthor(signer.getPublicKey()).blockOptional(Duration.ofSeconds(5));
         assertThat(metadataOrEmpty, is(Optional.empty()));
     }
 
@@ -289,7 +289,7 @@ class NostrTemplateApplicationTest {
     void itShouldFetchMetadataEventSuccessfully1() {
         Signer signer = SimpleSigner.random();
 
-        Metadata metadata = Metadata.newBuilder()
+        ProfileMetadata metadata = ProfileMetadata.newBuilder()
                 .setName("name")
                 .setAbout("about")
                 .setPicture(URI.create("https://www.example.com/picture.png").toString())
@@ -303,7 +303,7 @@ class NostrTemplateApplicationTest {
         assertThat(ok, is(notNullValue()));
         assertThat(ok.getSuccess(), is(true));
 
-        Metadata fetchedMetadata = sut.fetchMetadataByAuthor(signer.getPublicKey())
+        ProfileMetadata fetchedMetadata = sut.fetchMetadataByAuthor(signer.getPublicKey())
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 
@@ -314,13 +314,13 @@ class NostrTemplateApplicationTest {
     void itShouldFetchMetadataEventSuccessfully2OnlyLatestMetadata() {
         Signer signer = SimpleSigner.random();
 
-        Metadata metadata0 = Metadata.newBuilder()
+        ProfileMetadata metadata0 = ProfileMetadata.newBuilder()
                 .setName("name")
                 .setAbout("about")
                 .setPicture(URI.create("https://www.example.com/example0.png").toString())
                 .build();
 
-        Metadata metadata1 = Metadata.newBuilder()
+        ProfileMetadata metadata1 = ProfileMetadata.newBuilder()
                 .setName("name")
                 .setAbout("about")
                 .setPicture(URI.create("https://www.example.com/example1.png").toString())
@@ -346,7 +346,7 @@ class NostrTemplateApplicationTest {
             assertThat(ok.getSuccess(), is(true));
         }
 
-        Metadata fetchedMetadata = sut.fetchMetadataByAuthor(signer.getPublicKey())
+        ProfileMetadata fetchedMetadata = sut.fetchMetadataByAuthor(signer.getPublicKey())
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
 

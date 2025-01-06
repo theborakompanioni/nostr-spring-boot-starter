@@ -6,10 +6,11 @@ description = 'nostr template package'
 
 dependencies {
     api project(':nostr:nostr-base')
-    api project(':nostr:nostr-proto')
     api project(':nostr:nostr-nip11')
     implementation project(':nostr:nostr-core')
-    implementation project(':nostr:nostr-proto-json')
+
+    api "io.github.theborakompanioni:nostr-proto-json:${nostrProtoVersion}"
+    implementation "io.github.theborakompanioni:nostr-proto-json:${nostrProtoVersion}"
 
     api "io.projectreactor:reactor-core"
 

@@ -33,7 +33,7 @@ public interface NostrTemplate {
 
     Flux<Event> fetchEventsByAuthors(Collection<XonlyPublicKey> publicKeys);
 
-    Mono<Metadata> fetchMetadataByAuthor(XonlyPublicKey publicKey);
+    Mono<ProfileMetadata> fetchMetadataByAuthor(XonlyPublicKey publicKey);
 
     Mono<Nip65.ReadWriteRelays> fetchRelayListByAuthor(XonlyPublicKey publicKey);
 

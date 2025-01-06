@@ -8,7 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.tbk.nostr.nip11.RelayInfoDocument;
 import org.tbk.nostr.nip19.Nip19;
 import org.tbk.nostr.nip19.Npub;
-import org.tbk.nostr.proto.Metadata;
+import org.tbk.nostr.proto.ProfileMetadata;
 import org.tbk.nostr.template.NostrTemplate;
 
 import java.time.Duration;
@@ -44,7 +44,7 @@ class NostrTemplateApplicationE2eTest {
 
     @Test
     void itShouldFetchMetadataEventSuccessfully0() {
-        Metadata metadata = sut.fetchMetadataByAuthor(fiatjaf.getPublicKey())
+        ProfileMetadata metadata = sut.fetchMetadataByAuthor(fiatjaf.getPublicKey())
                 .blockOptional(Duration.ofSeconds(10))
                 .orElseThrow();
 

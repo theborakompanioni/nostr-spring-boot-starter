@@ -6,7 +6,7 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.Metadata;
+import org.tbk.nostr.proto.ProfileMetadata;
 
 import java.io.IOException;
 import java.net.URI;
@@ -34,7 +34,7 @@ class Nip1Test {
     @Test
     void itShouldCreateMetadata() throws IOException {
         Instant now = Instant.now();
-        Event event = Nip1.createMetadata(testPubkey, Metadata.newBuilder()
+        Event event = Nip1.createMetadata(testPubkey, ProfileMetadata.newBuilder()
                         .setName("name")
                         .setAbout("about")
                         .setPicture(URI.create("https://www.example.com/example.png").toString())

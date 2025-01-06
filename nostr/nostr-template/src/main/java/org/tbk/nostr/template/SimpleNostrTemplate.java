@@ -153,7 +153,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
     }
 
     @Override
-    public Mono<Metadata> fetchMetadataByAuthor(XonlyPublicKey publicKey) {
+    public Mono<ProfileMetadata> fetchMetadataByAuthor(XonlyPublicKey publicKey) {
         SubscriptionId subscriptionId = createUniqueSubscriptionId(publicKey);
 
         return fetchEvents(ReqRequest.newBuilder()
@@ -163,7 +163,7 @@ public class SimpleNostrTemplate implements NostrTemplate {
                         .addAuthors(ByteString.fromHex(publicKey.value.toHex()))
                         .build())
                 .build())
-                .map(it -> JsonReader.fromJson(it.getContent(), Metadata.newBuilder()))
+                .map(it -> JsonReader.fromJson(it.getContent(), ProfileMetadata.newBuilder()))
                 .next();
     }
 

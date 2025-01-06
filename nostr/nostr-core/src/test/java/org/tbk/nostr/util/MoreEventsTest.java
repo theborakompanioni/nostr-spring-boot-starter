@@ -7,7 +7,7 @@ import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.Metadata;
+import org.tbk.nostr.proto.ProfileMetadata;
 import org.tbk.nostr.proto.json.JsonReader;
 
 import java.net.URI;
@@ -295,7 +295,7 @@ class MoreEventsTest {
 
     @Test
     void itShouldVerifyGeneratedMetadata0() {
-        Event event = MoreEvents.createFinalizedMetadata(testSigner, Metadata.newBuilder()
+        Event event = MoreEvents.createFinalizedMetadata(testSigner, ProfileMetadata.newBuilder()
                 .setName("name")
                 .setAbout("about")
                 .setPicture(URI.create("https://www.example.com/example.png").toString())

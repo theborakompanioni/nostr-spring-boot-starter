@@ -5,7 +5,7 @@ import fr.acinq.bitcoin.XonlyPublicKey;
 import org.tbk.nostr.base.Kinds;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.EventOrBuilder;
-import org.tbk.nostr.proto.Metadata;
+import org.tbk.nostr.proto.ProfileMetadata;
 import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreKinds;
@@ -35,7 +35,7 @@ public final class Nip1 {
         return MoreKinds.isAddressable(event.getKind());
     }
 
-    public static Event.Builder createMetadata(XonlyPublicKey publicKey, Metadata metadata) {
+    public static Event.Builder createMetadata(XonlyPublicKey publicKey, ProfileMetadata metadata) {
         return MoreEvents.withEventId(Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())
                 .setPubkey(ByteString.fromHex(publicKey.value.toHex()))

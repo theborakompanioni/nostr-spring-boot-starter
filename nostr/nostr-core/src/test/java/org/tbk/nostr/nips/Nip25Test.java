@@ -8,7 +8,7 @@ import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.Metadata;
+import org.tbk.nostr.proto.ProfileMetadata;
 import org.tbk.nostr.proto.TagValue;
 import org.tbk.nostr.util.MoreEvents;
 import org.tbk.nostr.util.MoreTags;
@@ -114,7 +114,7 @@ class Nip25Test {
     void itShouldReactToReplaceableEvent() {
         Signer signer = SimpleSigner.random();
 
-        Event event = MoreEvents.createFinalizedMetadata(signer, Metadata.newBuilder()
+        Event event = MoreEvents.createFinalizedMetadata(signer, ProfileMetadata.newBuilder()
                 .setName("nostr-spring-boot-starter")
                 .build());
 
