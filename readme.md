@@ -42,10 +42,9 @@ Planned:
 - [ ] [NIP-64](https://github.com/nostr-protocol/nips/blob/master/64.md)
 - [ ] [NIP-70](https://github.com/nostr-protocol/nips/blob/master/70.md)
 
-
 ### `nostr-proto`
 
-See [nostr-proto](./nostr/nostr-proto/src/main/proto/event.proto) for protobuf definitions of core nostr concepts used in all modules.
+See [nostr-proto](https://github.com/theborakompanioni/nostr-proto) for protobuf definitions.
 
 ```protobuf
 message Event {
@@ -61,6 +60,21 @@ message Event {
 [...]
 ```
 
+### `nostr-template`
+
+Publish events easily.
+
+```java
+NostrTemplate template = new SimpleNostrTemplate(RelayUri.parse("wss://relay.damus.io"));
+Signer signer = SimpleSigner.random();
+
+Event event = MoreEvents.finalize(signer, Nip40.expire(
+    Nip1.createTextNote(signer.getPublicKey(), "GM"),
+    Instant.now().plusSeconds(60)
+));
+
+template.send(event).block(Duration.ofSeconds(5));
+```
 
 ## Table of Contents
 

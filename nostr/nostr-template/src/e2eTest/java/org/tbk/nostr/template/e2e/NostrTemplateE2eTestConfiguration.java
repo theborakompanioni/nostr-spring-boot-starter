@@ -15,7 +15,7 @@ class NostrTemplateE2eTestConfiguration {
 
     @Bean
     RelayUri relay() {
-        return RelayUri.of(URI.create("wss://relay.damus.io"));
+        return RelayUri.parse("wss://relay.damus.io");
     }
 
     @Bean

@@ -65,7 +65,7 @@ class NostrTemplateApplicationE2eTest {
     }
 
     @Test
-    void itShouldPublishNoteAndRetrieveSuccessfully() {
+    void itShouldPublishAndRetrieveNoteSuccessfully() {
         Signer signer = SimpleSigner.random();
 
         Event event = MoreEvents.finalize(signer, Nip40.expire(

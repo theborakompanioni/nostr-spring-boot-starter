@@ -13,7 +13,7 @@ class NostrTemplateTestConfiguration {
 
     @Bean
     RelayUri relay() {
-        return RelayUri.of(URI.create("ws://localhost:7000"));
+        return RelayUri.parse("ws://localhost:7000");
     }
 
     @Bean
