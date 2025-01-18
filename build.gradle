@@ -27,8 +27,8 @@ buildscript {
 
 plugins {
     id 'idea'
-    id 'nebula.release' version '17.2.2'
-    id 'nebula.lint' version '18.1.0'
+    id 'nebula.release' version '19.0.10'
+    id 'nebula.lint' version '20.5.5'
     id 'com.netflix.nebula.project' version '11.0.0'
     id 'com.netflix.nebula.facet' version '11.0.0'
     id 'com.github.spotbugs' version '5.2.1' apply false
@@ -105,10 +105,9 @@ subprojects {
     apply plugin: 'io.franzbecker.gradle-lombok'
     apply plugin: 'io.spring.dependency-management'
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-
     java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
         toolchain {
             languageVersion = JavaLanguageVersion.of(JavaVersion.VERSION_21.getMajorVersion())
         }
