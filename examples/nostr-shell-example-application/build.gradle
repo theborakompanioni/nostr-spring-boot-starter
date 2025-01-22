@@ -10,6 +10,7 @@ dependencyManagement {
 
 bootRun {
     args = [] // overwrite from global gradle build
+    standardInput = System.in // needed for interactive spring-shell mode
 }
 
 dependencies {
