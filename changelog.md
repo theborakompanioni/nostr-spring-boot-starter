@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-01-24
 ### Breaking
 - MoreEvents: rename method `eventId` to `calculateEventId`
 - MoreIdentities: remove methods `fromHex` and `of`
@@ -19,7 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - upgrade: update gradle from v8.7 to v8.12
 
 ## [0.1.0] - 2024-12-21
-
 ### Added
 - nip25: Reactions
 - nip30: Custom Emoji
@@ -55,7 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - nip10: remove `tag` method from markers
 
 ## [0.0.3] - 2024-11-12
-
 ### Breaking
 - NostrTemplate: change signature of method `sendPlain` and rename to `publishPlain`
 - NostrClientService: change return value of method `attachTo`
@@ -67,7 +66,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - nip42: authentication of clients to relays
 
 ## [0.0.2] - 2024-11-01
-
 ### Added
 - nip11: add icon field to relay document
 - nip6: wrap identity in own class
@@ -89,11 +87,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - upgrade: update jmolecules-bom from v2023.1.3 to v2023.1.6
 
 ## [0.0.1] - 2024-04-25
-
 ### Added
 - Initial release
 
-[Unreleased]: https://github.com/theborakompanioni/nostr-spring-boot-starter/compare/0.1.0...HEAD
+[Unreleased]: https://github.com/theborakompanioni/nostr-spring-boot-starter/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/theborakompanioni/nostr-spring-boot-starter/releases/tag/0.2.0...0.1.0
 [0.1.0]: https://github.com/theborakompanioni/nostr-spring-boot-starter/releases/tag/0.1.0...0.0.4
 [0.0.4]: https://github.com/theborakompanioni/nostr-spring-boot-starter/releases/tag/0.0.4...0.0.3
 [0.0.3]: https://github.com/theborakompanioni/nostr-spring-boot-starter/releases/tag/0.0.3...0.0.2
