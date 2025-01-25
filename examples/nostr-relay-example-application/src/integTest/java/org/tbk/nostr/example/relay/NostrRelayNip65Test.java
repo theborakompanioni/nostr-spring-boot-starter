@@ -102,5 +102,4 @@ class NostrRelayNip65Test {
 
         assertThat(Nip65.findRelays(event), is(readWriteRelays));
     }
-
 }

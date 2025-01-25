@@ -4,7 +4,7 @@ services:
   postgres:
     restart: always
     container_name: regtest_db
-    image: postgres:17.0-alpine3.20
+    image: postgres:17-alpine
     volumes:
       - postgres-data:/postgresql_data
       - ./data/pg/init:/docker-entrypoint-initdb.d/
