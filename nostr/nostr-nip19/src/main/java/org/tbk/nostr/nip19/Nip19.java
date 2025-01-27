@@ -11,6 +11,7 @@ import org.tbk.nostr.util.MoreTags;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 /**
  * See <a href="https://github.com/nostr-protocol/nips/blob/master/19.md">NIP-19</a>.
@@ -27,6 +28,14 @@ public final class Nip19 {
 
     public static Nip19Entity decode(String bech32) {
         return Codecs.decode(bech32);
+    }
+
+    public static Optional<Nip19Entity> tryDecode(String bech32) {
+        try {
+            return Optional.of(Codecs.decode(bech32));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     public static <T extends Nip19Entity> T decodeStrict(String bech32, Class<T> clazz) {

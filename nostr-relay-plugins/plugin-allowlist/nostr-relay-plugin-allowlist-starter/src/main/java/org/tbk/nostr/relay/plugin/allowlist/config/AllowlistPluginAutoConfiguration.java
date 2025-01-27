@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
@@ -16,12 +15,10 @@ import org.tbk.nostr.relay.plugin.allowlist.Allowlist;
 import org.tbk.nostr.relay.plugin.allowlist.EmptyAllowlist;
 import org.tbk.nostr.relay.plugin.allowlist.StaticAllowlist;
 import org.tbk.nostr.relay.plugin.allowlist.validation.AllowlistValidator;
-import org.tbk.nostr.util.MorePublicKeys;
 
 import java.util.List;
 
 
-@ConditionalOnWebApplication
 @AutoConfiguration
 //@AutoConfigureBefore(NostrRelayAutoConfiguration.class)
 @EnableConfigurationProperties(AllowlistPluginProperties.class)
@@ -37,7 +34,6 @@ public class AllowlistPluginAutoConfiguration {
     @ConditionalOnMissingBean
     Allowlist allowlist() {
         List<XonlyPublicKey> allowed = properties.getAllowed().stream()
-                .map(it -> MorePublicKeys.fromHex(it))
                 .toList();
 
         return allowed.isEmpty() ? new EmptyAllowlist() : new StaticAllowlist(allowed);

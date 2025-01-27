@@ -1,5 +1,6 @@
 package org.tbk.nostr.example.relay;
 
+import fr.acinq.bitcoin.XonlyPublicKey;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,9 +18,12 @@ import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = NostrRelayTestConfig.class)
@@ -38,7 +42,24 @@ class NostrRelayPluginAllowlistTest {
     @Test
     void contextLoads() {
         assertThat(allowlistPluginProperties, is(notNullValue()));
-        assertThat(allowlistPluginProperties.getAllowed(), is(not(empty())));
+        assertThat(allowlist, is(notNullValue()));
+    }
+
+    @Test
+    void itShouldVerifyAllowlistEntries() {
+        List<XonlyPublicKey> allowed = allowlistPluginProperties.getAllowed();
+
+        Stream.of(0, 1, 2)
+                .map(it -> Persona.alice().deriveAccount(it))
+                .forEach(it -> {
+                    assertThat("alice is allowed", allowed.contains(it.getPublicKey()), is(true));
+                });
+
+        Stream.of(0, 1, 2)
+                .map(it -> Persona.bob().deriveAccount(it))
+                .forEach(it -> {
+                    assertThat("bob is not allowed", allowed.contains(it.getPublicKey()), is(false));
+                });
     }
 
     @Test

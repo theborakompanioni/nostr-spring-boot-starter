@@ -4,4 +4,6 @@ logging.file.name: application-plugin-test.log
 
 org.tbk.nostr.plugin.allowlist:
   allowed:
-    - 'f319269a8757e84e9b6dad9325cb74933f64e9497c4c3a8f7757361e78edf564' # persona "alice" account #0
+    - 'npub17vvjdx582l5yaxmd4kfjtjm5jvlkf62f03xr4rmh2umpu78d74jqxhkuj6' # persona "alice" account #0 (npub)
+    - '66b981cf8a15c68671d195dfabcd259b20dddc79f62f06fe578fe08258e7e0f8' # persona "alice" account #1 (hex)
+    - 'npub1ttc0gv8qlq0ae75jkjuq44855k8a6sugwcuppmsea2hnxypdux6qlpta39' # persona "alice" account #2 (npub)
