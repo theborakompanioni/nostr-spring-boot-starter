@@ -1,0 +1,7 @@
+spring.application.name: 'tbk-nostr-relay-plugin-test'
+
+logging.file.name: application-plugin-test.log
+
+org.tbk.nostr.plugin.allowlist:
+  allowed:
+    - 'f319269a8757e84e9b6dad9325cb74933f64e9497c4c3a8f7757361e78edf564' # persona "alice" account #0

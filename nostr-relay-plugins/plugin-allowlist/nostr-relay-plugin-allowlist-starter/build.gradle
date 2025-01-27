@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr relay plugin allowlist starter package'
+
+dependencies {
+    api project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-core')
+
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    annotationProcessor 'org.springframework.boot:spring-boot-autoconfigure-processor'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+}
