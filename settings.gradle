@@ -10,8 +10,6 @@ include 'nostr:nostr-nip18'
 include 'nostr:nostr-nip19'
 include 'nostr:nostr-nip21'
 include 'nostr:nostr-persona'
-//include 'nostr:nostr-proto'
-//include 'nostr:nostr-proto-json'
 include 'nostr:nostr-template'
 
 include 'nostr-relay:nostr-relay-base'
