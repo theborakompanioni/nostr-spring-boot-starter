@@ -24,6 +24,9 @@ dependencies {
 
     implementation 'io.projectreactor:reactor-core'
 
+    // for importing "DurationStyle" class
+    implementation 'org.springframework.boot:spring-boot'
+
     implementation 'org.springframework.shell:spring-shell-starter'
     testImplementation 'org.springframework.shell:spring-shell-starter-test'
 }

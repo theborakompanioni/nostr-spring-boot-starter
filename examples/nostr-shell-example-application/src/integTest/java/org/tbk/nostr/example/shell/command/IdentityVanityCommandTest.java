@@ -27,8 +27,7 @@ class IdentityVanityCommandTest {
                 .run();
 
         await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
-            ShellAssertions.assertThat(session.screen())
-                    .containsText("nostr:>");
+            ShellAssertions.assertThat(session.screen()).containsText("nostr:>");
         });
 
         String npubPrefix = "z";
@@ -57,8 +56,7 @@ class IdentityVanityCommandTest {
                 .run();
 
         await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
-            ShellAssertions.assertThat(session.screen())
-                    .containsText("nostr:>");
+            ShellAssertions.assertThat(session.screen()).containsText("nostr:>");
         });
 
         String npubSuffix = "z";
@@ -87,8 +85,7 @@ class IdentityVanityCommandTest {
                 .run();
 
         await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
-            ShellAssertions.assertThat(session.screen())
-                    .containsText("nostr:>");
+            ShellAssertions.assertThat(session.screen()).containsText("nostr:>");
         });
 
         String prefixAndSuffix = "z";

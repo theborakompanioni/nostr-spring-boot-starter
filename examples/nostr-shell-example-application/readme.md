@@ -85,7 +85,6 @@ nostr:>pow --target 25 --json "{ \"kind\": 1, \"content\":\"GM!\", \"tags\": [[ 
 {"id":"00000009af73d28a49db7f6047229cca1da09a46180b46129f2ca5a0a1f43a07","pubkey":"","created_at":1710368995,"kind":1,"tags":[["expiration","1710378232"],["nonce","189309","25"]],"content":"GM!","sig":""}
 ```
 
-
 ### Non-interactive
 ```shell
 ./examples/nostr-shell-example-application/build/libs/nostr-shell-example-application-0.1.0-dev-boot.jar pow --target 25 --parallelism 8 --json '{ \"kind\": 1, \"content\":\"GM!\", \"tags\": [[ \"expiration\", \"1710378232\" ]] }'

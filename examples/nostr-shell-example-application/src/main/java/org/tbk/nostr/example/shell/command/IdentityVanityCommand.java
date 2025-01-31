@@ -3,6 +3,7 @@ package org.tbk.nostr.example.shell.command;
 import com.google.common.base.Stopwatch;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.convert.DurationStyle;
 import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -15,6 +16,9 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
@@ -30,11 +34,14 @@ class IdentityVanityCommand {
     public String run(
             @ShellOption(value = "npub-prefix", defaultValue = "", help = "npub prefix") String npubPrefixArg,
             @ShellOption(value = "npub-suffix", defaultValue = "", help = "npub suffix") String npubSuffixArg,
-            @ShellOption(value = "parallelism", defaultValue = "0", help = "parallelism level (default: # of processors / 2)") int parallelismArg
+            @ShellOption(value = "parallelism", defaultValue = "0", help = "parallelism level (default: # of processors / 2)") int parallelismArg,
+            @ShellOption(value = "timeout", defaultValue = "-1", help = "timeout (e.g. 2s, 2d, default: -1 [no timeout])") String timeoutArg
     ) throws IOException {
+
         int parallelism = parallelismArg > 0 ? parallelismArg : Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
         String npubPrefix = npubPrefixArg == null ? "" : npubPrefixArg;
         String npubSuffix = npubSuffixArg == null ? "" : npubSuffixArg;
+        Optional<Duration> timeout = parseTimeout(timeoutArg);
 
         if (!hasValidBech32Chars().test(npubPrefix)) {
             throw new IllegalArgumentException("npub-prefix contains invalid bech32 chars");
@@ -48,7 +55,7 @@ class IdentityVanityCommand {
         Stopwatch stopwatch = Stopwatch.createStarted();
 
         Mono<Identity.Account> accountMono = mineAccountMatching(parallelism, withNpubPrefixAndSuffix(npubPrefix, npubSuffix));
-        Identity.Account account = requireNonNull(accountMono.block());
+        Identity.Account account = requireNonNull(timeout.isEmpty() ? accountMono.block() : accountMono.block(timeout.get()));
 
         log.debug("identity-vanity with npub-prefix '{}' took {}", npubPrefix, stopwatch.stop());
 
@@ -60,6 +67,11 @@ class IdentityVanityCommand {
                 .put("npub", Nip19.encodeNpub(account.getPublicKey()))
                 .end()
                 .finish();
+    }
+
+    private static Optional<Duration> parseTimeout(String timeoutArg) {
+        Duration duration = DurationStyle.SIMPLE.parse(timeoutArg, ChronoUnit.SECONDS);
+        return duration.isNegative() ? Optional.empty() : Optional.of(duration);
     }
 
     private static Predicate<String> hasValidBech32Chars() {
