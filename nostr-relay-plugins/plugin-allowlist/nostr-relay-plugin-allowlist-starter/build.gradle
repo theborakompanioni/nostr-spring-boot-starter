@@ -5,6 +5,7 @@ plugins {
 description = 'nostr relay plugin allowlist starter package'
 
 dependencies {
+    implementation project(':nostr-relay:nostr-relay-autoconfigure')
     api project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-core')
 
     implementation project(':nostr:nostr-nip19')

@@ -75,8 +75,8 @@ class NostrRelayPluginAllowlistTest {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(event.getId()));
-        assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), is("blocked: pubkey is not allowed."));
+        assertThat(ok.getSuccess(), is(false));
     }
 
     @Test
@@ -93,7 +93,7 @@ class NostrRelayPluginAllowlistTest {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(event.getId()));
-        assertThat(ok.getSuccess(), is(true));
         assertThat(ok.getMessage(), is(""));
+        assertThat(ok.getSuccess(), is(true));
     }
 }
