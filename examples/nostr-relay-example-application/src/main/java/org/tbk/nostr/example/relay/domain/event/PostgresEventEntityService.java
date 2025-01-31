@@ -21,5 +21,4 @@ class PostgresEventEntityService extends AbstractEventEntityService {
                 .map(EventEntitySpecifications::searchPostgres)
                 .orElse(Specification.where(null));
     }
-
 }

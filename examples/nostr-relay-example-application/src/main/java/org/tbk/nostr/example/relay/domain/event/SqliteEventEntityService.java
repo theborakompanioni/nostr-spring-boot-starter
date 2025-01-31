@@ -21,5 +21,4 @@ class SqliteEventEntityService extends AbstractEventEntityService {
                 .map(EventEntitySpecifications::searchSqlite)
                 .orElse(Specification.where(null));
     }
-
 }
