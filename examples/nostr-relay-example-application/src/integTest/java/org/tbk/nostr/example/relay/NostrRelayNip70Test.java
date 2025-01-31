@@ -58,8 +58,8 @@ class NostrRelayNip70Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(event.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("auth-required: authentication required."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test
@@ -98,7 +98,7 @@ class NostrRelayNip70Test {
                 .blockFirst(Duration.ofSeconds(5)));
 
         assertThat(ok2.getEventId(), is(event0.getId()));
-        assertThat(ok2.getSuccess(), is(true));
         assertThat(ok2.getMessage(), is(""));
+        assertThat(ok2.getSuccess(), is(true));
     }
 }

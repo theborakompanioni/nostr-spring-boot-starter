@@ -59,8 +59,8 @@ class NostrRelayNip13Test {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(event.getId()));
-        assertThat(ok.getSuccess(), is(true));
         assertThat(ok.getMessage(), is(""));
+        assertThat(ok.getSuccess(), is(true));
     }
 
     @Test
@@ -68,7 +68,7 @@ class NostrRelayNip13Test {
         Signer signer = SimpleSigner.random();
 
         assertThat("sanity check", nip13ExtensionProperties.getMinPowDifficulty(), is(greaterThan(0)));
-        
+
         Event event = requireNonNull(Flux.fromStream(Stream.generate(() -> MoreEvents.createFinalizedTextNote(signer, MoreSubscriptionIds.random().getId()))
                         .filter(it -> !Nip13.meetsTargetDifficulty(it, nip13ExtensionProperties.getMinPowDifficulty(), false)))
                 .blockFirst(Duration.ofSeconds(10)));
@@ -110,9 +110,8 @@ class NostrRelayNip13Test {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(event.getId()));
-        assertThat(ok.getSuccess(), is(false));
-
         assertThat(ok.getMessage(), is("pow: Missing or invalid pow commitment."));
+        assertThat(ok.getSuccess(), is(false));
     }
 
     @Test
@@ -135,8 +134,7 @@ class NostrRelayNip13Test {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(event.getId()));
-        assertThat(ok.getSuccess(), is(false));
-
         assertThat(ok.getMessage(), is("pow: Missing or invalid pow commitment."));
+        assertThat(ok.getSuccess(), is(false));
     }
 }

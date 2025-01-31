@@ -85,8 +85,8 @@ class NostrRelayNip18Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(repost.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("invalid: Invalid id."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test
@@ -105,8 +105,8 @@ class NostrRelayNip18Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(repost.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("invalid: Invalid signature."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test
@@ -121,8 +121,8 @@ class NostrRelayNip18Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(repost.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("invalid: Invalid tag 'e'."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test
@@ -137,8 +137,8 @@ class NostrRelayNip18Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(repost.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("invalid: Reposted event must be a short text note."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test
@@ -153,8 +153,8 @@ class NostrRelayNip18Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(repost.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("invalid: Reposted event must not be a short text note."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test
@@ -169,8 +169,8 @@ class NostrRelayNip18Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(repost.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("invalid: Invalid tag 'e'."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test
@@ -185,8 +185,8 @@ class NostrRelayNip18Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(repost.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("invalid: Invalid 'e' tag. Must include reposted event id."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test
@@ -203,8 +203,8 @@ class NostrRelayNip18Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(repost.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("invalid: Invalid 'e' tag. Must include reposted event id."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test

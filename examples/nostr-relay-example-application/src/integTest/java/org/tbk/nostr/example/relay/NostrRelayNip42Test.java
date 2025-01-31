@@ -250,8 +250,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(authEvent.getId()));
-        assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), is("error: Unknown auth challenge."));
+        assertThat(ok.getSuccess(), is(false));
     }
 
     @Test
@@ -305,8 +305,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok1.getEventId(), is(authEvent.getId()));
-        assertThat(ok1.getSuccess(), is(false));
         assertThat(ok1.getMessage(), is("error: Unknown auth challenge."));
+        assertThat(ok1.getSuccess(), is(false));
     }
 
     @Test
@@ -333,8 +333,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(authEvent.getId()));
-        assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), is("invalid: Kind must be 22242"));
+        assertThat(ok.getSuccess(), is(false));
     }
 
     @Test
@@ -361,8 +361,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(authEvent.getId()));
-        assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), is("invalid: Missing 'challenge' tag."));
+        assertThat(ok.getSuccess(), is(false));
     }
 
     @Test
@@ -404,8 +404,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(invalidEvent.getId()));
-        assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), is("invalid: Invalid signature."));
+        assertThat(ok.getSuccess(), is(false));
     }
 
     @Test
@@ -460,8 +460,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok1.getEventId(), is(authEvent.getId()));
-        assertThat(ok1.getSuccess(), is(true));
         assertThat(ok1.getMessage(), is(""));
+        assertThat(ok1.getSuccess(), is(true));
 
         List<Response> response2 = requireNonNull(nostrClient.attach()
                 .doOnSubscribe(foo -> {
@@ -478,7 +478,7 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok2.getEventId(), is(event0.getId()));
-        assertThat(ok2.getSuccess(), is(true));
         assertThat(ok2.getMessage(), is(""));
+        assertThat(ok2.getSuccess(), is(true));
     }
 }
