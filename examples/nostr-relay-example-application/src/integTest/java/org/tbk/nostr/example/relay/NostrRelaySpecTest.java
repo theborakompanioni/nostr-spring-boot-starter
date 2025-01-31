@@ -373,7 +373,6 @@ class NostrRelaySpecTest {
                 .addTags(MoreTags.named(IndexedTag.k.name(), "")));
         Event invalidEvent3 = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), "GM3")
                 .addTags(MoreTags.named(IndexedTag.k.name(), "invalid")));
-        ;
 
         List<Event> events = List.of(invalidEvent0, invalidEvent1, invalidEvent2, invalidEvent3);
         List<OkResponse> oks = nostrTemplate.send(events)

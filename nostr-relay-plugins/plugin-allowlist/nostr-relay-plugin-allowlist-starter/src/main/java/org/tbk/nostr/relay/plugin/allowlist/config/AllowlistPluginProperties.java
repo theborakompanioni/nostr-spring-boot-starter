@@ -7,7 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import org.tbk.nostr.nip19.Codecs;
 import org.tbk.nostr.nip19.Nip19;
 import org.tbk.nostr.nip19.Nip19Type;
 import org.tbk.nostr.nip19.Npub;
@@ -16,7 +15,6 @@ import org.tbk.nostr.util.MorePublicKeys;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 @ConfigurationProperties(
         prefix = "org.tbk.nostr.plugin.allowlist",

@@ -25,5 +25,4 @@ class EventEntityConfiguration {
             case SQLITE -> new SqliteEventEntityService(events, properties);
         };
     }
-
 }
