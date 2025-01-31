@@ -26,6 +26,9 @@ include 'nostr-relay:nostr-relay-autoconfigure'
 include 'nostr-relay:nostr-relay-starter'
 include 'nostr-relay:nostr-relay-utils'
 
+include 'nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-core'
+include 'nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-starter'
+
 include 'examples:nostr-client-example-application'
 include 'examples:nostr-relay-example-application'
 include 'examples:nostr-shell-example-application'

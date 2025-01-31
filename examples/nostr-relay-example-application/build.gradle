@@ -11,6 +11,7 @@ byteBuddy {
 
 dependencies {
     implementation project(':nostr-relay:nostr-relay-starter')
+    implementation project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-starter')
 
     implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
     implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
@@ -62,6 +63,7 @@ dependencies {
 
     testImplementation project(':nostr:nostr-template')
     testImplementation project(':nostr:nostr-client')
+    testImplementation project(':nostr:nostr-persona')
     integTestImplementation "org.postgresql:postgresql:${postgresqlVersion}"
     integTestImplementation 'org.springframework.boot:spring-boot-docker-compose'
 }

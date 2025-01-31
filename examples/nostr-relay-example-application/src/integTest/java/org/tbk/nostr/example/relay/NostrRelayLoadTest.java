@@ -52,8 +52,8 @@ class NostrRelayLoadTest {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(event.getId()));
-        assertThat(ok.getSuccess(), is(true));
         assertThat(ok.getMessage(), is(""));
+        assertThat(ok.getSuccess(), is(true));
 
         log.info("Inserting 1 event took {}", started.stop());
     }
@@ -75,8 +75,8 @@ class NostrRelayLoadTest {
                 .doFinally(foo -> {
                     latch.countDown();
                 }).subscribe(ok -> {
-                    assertThat(ok.getSuccess(), is(true));
                     assertThat(ok.getMessage(), is(""));
+                    assertThat(ok.getSuccess(), is(true));
                 });
 
         assertThat(latch.await(TIMEOUT.toMillis(), TimeUnit.MILLISECONDS), is(true));
@@ -101,8 +101,8 @@ class NostrRelayLoadTest {
                 .doFinally(foo -> {
                     latch.countDown();
                 }).subscribe(ok -> {
-                    assertThat(ok.getSuccess(), is(true));
                     assertThat(ok.getMessage(), is(""));
+                    assertThat(ok.getSuccess(), is(true));
                 });
 
         assertThat(latch.await(TIMEOUT.toMillis(), TimeUnit.MILLISECONDS), is(true));

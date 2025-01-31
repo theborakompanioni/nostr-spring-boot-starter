@@ -12,7 +12,7 @@ dependencies {
     api "io.github.theborakompanioni:nostr-proto-json:${nostrProtoVersion}"
     implementation "io.github.theborakompanioni:nostr-proto-json:${nostrProtoVersion}"
 
-    api "io.projectreactor:reactor-core"
+    api 'io.projectreactor:reactor-core'
 
     implementation "com.google.guava:guava:${guavaVersion}"
 

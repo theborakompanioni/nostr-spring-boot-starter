@@ -1,0 +1,9 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr relay plugin allowlist core package'
+
+dependencies {
+    api project(':nostr-relay:nostr-relay-base')
+}
