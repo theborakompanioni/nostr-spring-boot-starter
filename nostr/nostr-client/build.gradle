@@ -10,7 +10,7 @@ dependencies {
 
     implementation "io.github.theborakompanioni:nostr-proto-json:${nostrProtoVersion}"
 
-    api "io.projectreactor:reactor-core"
+    api 'io.projectreactor:reactor-core'
 
     implementation 'org.springframework:spring-websocket'
 

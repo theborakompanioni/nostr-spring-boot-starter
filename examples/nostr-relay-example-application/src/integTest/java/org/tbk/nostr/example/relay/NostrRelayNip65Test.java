@@ -49,8 +49,8 @@ class NostrRelayNip65Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(event.getId()));
-        assertThat(ok0.getSuccess(), is(true));
         assertThat(ok0.getMessage(), is(""));
+        assertThat(ok0.getSuccess(), is(true));
 
         assertThat(Nip65.findRelays(event).getReadRelays(), hasSize(0));
         assertThat(Nip65.findRelays(event).getWriteRelays(), hasSize(0));
@@ -68,8 +68,8 @@ class NostrRelayNip65Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(event.getId()));
-        assertThat(ok0.getSuccess(), is(true));
         assertThat(ok0.getMessage(), is(""));
+        assertThat(ok0.getSuccess(), is(true));
 
         assertThat(Nip65.findRelays(event).getReadRelays(), containsInRelativeOrder(nostrTemplate.getRelayUri()));
         assertThat(Nip65.findRelays(event).getWriteRelays(), containsInRelativeOrder(nostrTemplate.getRelayUri()));

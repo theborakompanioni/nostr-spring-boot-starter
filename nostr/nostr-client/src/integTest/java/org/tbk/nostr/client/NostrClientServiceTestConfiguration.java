@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tbk.nostr.base.RelayUri;
 
-import java.net.URI;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 

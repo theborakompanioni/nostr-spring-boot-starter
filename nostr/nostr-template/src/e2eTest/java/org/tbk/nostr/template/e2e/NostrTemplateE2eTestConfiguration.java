@@ -7,8 +7,6 @@ import org.tbk.nostr.base.RelayUri;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.template.SimpleNostrTemplate;
 
-import java.net.URI;
-
 @Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
 class NostrTemplateE2eTestConfiguration {

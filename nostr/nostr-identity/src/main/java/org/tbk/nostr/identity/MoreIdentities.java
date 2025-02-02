@@ -2,7 +2,6 @@ package org.tbk.nostr.identity;
 
 import fr.acinq.bitcoin.DeterministicWallet;
 import fr.acinq.bitcoin.MnemonicCode;
-import fr.acinq.bitcoin.PrivateKey;
 
 import java.util.HexFormat;
 import java.util.List;
