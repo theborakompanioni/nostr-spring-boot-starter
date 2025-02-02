@@ -1,0 +1,22 @@
+apply plugin: 'net.bytebuddy.byte-buddy-gradle-plugin'
+
+description = 'nostr relay plugin allowlist db package'
+
+byteBuddy {
+    transformation {
+        plugin = org.jmolecules.bytebuddy.JMoleculesPlugin.class
+    }
+}
+
+dependencies {
+    api project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-core')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    implementation 'org.jmolecules:jmolecules-ddd'
+    implementation 'org.jmolecules:jmolecules-events'
+    implementation 'org.jmolecules.integrations:jmolecules-jpa'
+    implementation 'org.jmolecules.integrations:jmolecules-ddd-integration'
+    implementation 'org.jmolecules.integrations:jmolecules-spring'
+    implementation 'org.jmolecules.integrations:jmolecules-jackson'
+}

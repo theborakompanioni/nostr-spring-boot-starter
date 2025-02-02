@@ -5,10 +5,12 @@ plugins {
 description = 'nostr relay plugin allowlist starter package'
 
 dependencies {
-    implementation project(':nostr-relay:nostr-relay-autoconfigure')
     api project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-core')
-
+    api project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-db')
+    api project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-db-autoconfigure')
     implementation project(':nostr:nostr-nip19')
+
+    implementation project(':nostr-relay:nostr-relay-autoconfigure')
 
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
     implementation 'org.springframework.boot:spring-boot-starter'
