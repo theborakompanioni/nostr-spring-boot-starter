@@ -21,7 +21,7 @@ class EventEntityConfiguration {
                                           NostrRelayExampleApplicationProperties properties,
                                           SupportedDatabaseType supportedDatabaseType) {
         return switch (supportedDatabaseType) {
-            case POSTGRES -> new PostgresEventEntityService(events, properties);
+            case POSTGRESQL -> new PostgresEventEntityService(events, properties);
             case SQLITE -> new SqliteEventEntityService(events, properties);
         };
     }

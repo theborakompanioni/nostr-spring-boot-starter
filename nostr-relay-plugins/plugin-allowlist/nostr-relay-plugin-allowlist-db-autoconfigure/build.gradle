@@ -1,12 +1,8 @@
-apply plugin: 'net.bytebuddy.byte-buddy-gradle-plugin'
+plugins {
+    id 'java'
+}
 
 description = 'nostr relay plugin allowlist db autoconfigure package'
-
-byteBuddy {
-    transformation {
-        plugin = org.jmolecules.bytebuddy.JMoleculesPlugin
-    }
-}
 
 dependencies {
     compileOnly project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-db')

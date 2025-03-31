@@ -1,10 +1,10 @@
 package org.tbk.nostr.relay.plugin.allowlist.db.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.MigrationVersion;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -21,6 +21,7 @@ import org.tbk.nostr.relay.plugin.allowlist.validation.AllowlistValidator;
 
 import javax.sql.DataSource;
 
+@Slf4j
 @AutoConfiguration
 @ConditionalOnClass(AllowlistValidator.class)
 @ConditionalOnProperty(value = "org.tbk.nostr.plugin.allowlist.enabled", matchIfMissing = true)
@@ -47,8 +48,9 @@ public class DatabaseAllowlistAutoConfiguration {
                     .dataSource(dataSource)
                     .javaMigrations(new V1__init())
                     .target(MigrationVersion.LATEST)
-                    .baselineOnMigrate(true)
                     .table("plugin_allowlist_flyway_schema_history")
+                    .baselineVersion(MigrationVersion.fromVersion("0"))
+                    .baselineOnMigrate(true)
                     .load();
 
             flyway.migrate();

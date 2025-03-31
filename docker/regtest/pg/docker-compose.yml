@@ -1,9 +1,10 @@
 
 services:
   postgres:
-    restart: always
-    container_name: "${COMPOSE_PROJECT_NAME}-db"
     image: postgres:17-alpine
+    restart: unless-stopped
+    labels:
+      org.springframework.boot.ignore: true
     volumes:
       - postgres-data:/postgresql_data
       - ./data/pg/init:/docker-entrypoint-initdb.d/
@@ -21,5 +22,20 @@ services:
       timeout: 5s
       retries: 5
 
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: postgres@example.org
+      PGADMIN_DEFAULT_PASSWORD: postgres
+    ports:
+      - "15532:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres-data:
+  pgadmin-data:
