@@ -1,6 +1,8 @@
 package org.tbk.nostr.example.relay;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +16,7 @@ import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.OkResponse;
 import org.tbk.nostr.relay.plugin.allowlist.Allowlist;
 import org.tbk.nostr.relay.plugin.allowlist.config.AllowlistPluginProperties;
+import org.tbk.nostr.relay.plugin.allowlist.db.domain.AllowlistEntryService;
 import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 
@@ -37,7 +40,22 @@ class NostrRelayPluginAllowlistTest {
     private Allowlist allowlist;
 
     @Autowired
+    private AllowlistEntryService allowlistEntryService;
+
+    @Autowired
     private NostrTemplate nostrTemplate;
+
+    @BeforeEach
+    public void beforeEach() {
+        allowlistPluginProperties.getAllowed()
+                .forEach(it -> allowlistEntryService.create(it));
+    }
+
+    @AfterEach
+    public void afterEach() {
+        allowlistPluginProperties.getAllowed()
+                .forEach(it -> allowlistEntryService.remove(it));
+    }
 
     @Test
     void contextLoads() {
@@ -46,7 +64,7 @@ class NostrRelayPluginAllowlistTest {
     }
 
     @Test
-    void itShouldVerifyAllowlistEntries() {
+    void itShouldVerifyAllowlistPropertyEntries() {
         List<XonlyPublicKey> allowed = allowlistPluginProperties.getAllowed();
 
         Stream.of(0, 1, 2)

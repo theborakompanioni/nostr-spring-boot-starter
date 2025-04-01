@@ -27,6 +27,7 @@ include 'nostr-relay:nostr-relay-starter'
 include 'nostr-relay:nostr-relay-utils'
 
 include 'nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-core'
+include 'nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-autoconfigure'
 include 'nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-db'
 include 'nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-db-autoconfigure'
 include 'nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-starter'

@@ -16,5 +16,4 @@ public interface AllowlistEntries extends JpaRepository<AllowlistEntry, Allowlis
     default Page<AllowlistEntry> findByPubkey(XonlyPublicKey publicKey, Pageable pageable) {
         return findAll(AllowlistEntrySpecifications.hasPubkey(publicKey), pageable);
     }
-
 }

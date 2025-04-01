@@ -20,7 +20,6 @@ import org.tbk.nostr.relay.plugin.allowlist.validation.AllowlistValidator;
 
 import java.util.List;
 
-
 @AutoConfiguration
 @AutoConfigureBefore(NostrRelayAutoConfiguration.class)
 @EnableConfigurationProperties(AllowlistPluginProperties.class)
@@ -47,4 +46,5 @@ public class AllowlistPluginAutoConfiguration {
     AllowlistValidator allowlistValidator(Allowlist allowlist) {
         return new AllowlistValidator(allowlist);
     }
+
 }

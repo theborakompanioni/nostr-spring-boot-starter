@@ -20,6 +20,11 @@ public class AllowlistEntryService {
     private final AllowlistEntries entries;
 
     @Transactional
+    public boolean hasEntries() {
+        return entries.count() != 0L;
+    }
+
+    @Transactional
     public void create(XonlyPublicKey publicKey) {
         AllowlistEntry entry = new AllowlistEntry(publicKey);
         entries.save(entry);
@@ -33,5 +38,10 @@ public class AllowlistEntryService {
     @Transactional
     public Optional<AllowlistEntry> findFirstByPubkey(XonlyPublicKey publicKey) {
         return findByPubkey(publicKey).stream().findFirst();
+    }
+
+    @Transactional
+    public void remove(XonlyPublicKey publicKey) {
+        entries.delete(AllowlistEntrySpecifications.hasPubkey(publicKey));
     }
 }

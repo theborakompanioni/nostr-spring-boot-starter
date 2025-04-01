@@ -62,9 +62,9 @@ class MainApplicationRunner implements ApplicationRunner, DisposableBean {
                             [ALL] New event:
                             id: {}
                             pubkey: {}
-                            content: """
+                            content: ```
                             {}
-                            """
+                            ```
                             """, displayId, displayPubkey, it.getContent());
                 }, e -> {
                     log.error("[ALL] Error during event stream.", e);

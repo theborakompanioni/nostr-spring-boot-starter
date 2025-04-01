@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @ConfigurationProperties(
         prefix = "org.tbk.nostr.plugin.allowlist",
-        ignoreUnknownFields = false
+        ignoreUnknownFields = true
 )
 @Getter
 @AllArgsConstructor(onConstructor = @__(@ConstructorBinding))

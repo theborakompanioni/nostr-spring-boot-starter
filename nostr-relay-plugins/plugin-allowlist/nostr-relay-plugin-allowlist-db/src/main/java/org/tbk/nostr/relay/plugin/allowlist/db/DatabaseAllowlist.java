@@ -17,6 +17,13 @@ public class DatabaseAllowlist implements Allowlist {
     @Override
     public boolean isAllowed(XonlyPublicKey pubkey) {
         Optional<AllowlistEntry> allowlistEntry = allowlistEntryService.findFirstByPubkey(pubkey);
+
+        if (allowlistEntry.isEmpty()) {
+            // TODO: caching
+            if (!allowlistEntryService.hasEntries()) {
+                return true;
+            }
+        }
         return allowlistEntry
                 .filter(it -> !it.isExpired(Instant.now()))
                 .isPresent();

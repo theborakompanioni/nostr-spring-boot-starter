@@ -6,6 +6,7 @@ description = 'nostr relay plugin allowlist db autoconfigure package'
 
 dependencies {
     compileOnly project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-db')
+    compileOnly project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-autoconfigure')
 
     implementation 'org.flywaydb:flyway-core'
 
