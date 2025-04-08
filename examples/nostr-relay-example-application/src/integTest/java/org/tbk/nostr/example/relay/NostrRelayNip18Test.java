@@ -220,7 +220,7 @@ class NostrRelayNip18Test {
                 .blockOptional(Duration.ofSeconds(5))
                 .orElseThrow();
         assertThat(ok0.getEventId(), is(repost.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is("invalid: Invalid 'e' tag. Missing relay URL."));
+        assertThat(ok0.getSuccess(), is(false));
     }
 }

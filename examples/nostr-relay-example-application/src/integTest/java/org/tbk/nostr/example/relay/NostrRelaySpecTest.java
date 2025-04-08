@@ -432,8 +432,8 @@ class NostrRelaySpecTest {
                 invalidEvent0.getCreatedAt(),
                 relayProperties.getCreatedAtLowerLimit()
         );
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is(expectedMessage));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test
@@ -453,8 +453,8 @@ class NostrRelaySpecTest {
                 invalidEvent0.getCreatedAt(),
                 relayProperties.getCreatedAtUpperLimit()
         );
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), is(expectedMessage));
+        assertThat(ok0.getSuccess(), is(false));
     }
 
     @Test
@@ -841,8 +841,8 @@ class NostrRelaySpecTest {
         OkResponse ok1 = oks.stream()
                 .filter(it -> event1Newer.getId().equals(it.getEventId()))
                 .findFirst().orElseThrow();
-        assertThat(ok1.getSuccess(), is(true));
         assertThat(ok1.getMessage(), is(""));
+        assertThat(ok1.getSuccess(), is(true));
 
         assertThat(oks.stream().anyMatch(OkResponse::getSuccess), is(true));
 

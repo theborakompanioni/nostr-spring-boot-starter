@@ -7,6 +7,7 @@ spring.docker.compose:
   enabled: true
   file: ../../docker/regtest/nostr-rs-relay/docker-compose.yml
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
+  stop.arguments: --volumes
   skip.in-tests: false
 
 org.tbk.nostr.example.client:

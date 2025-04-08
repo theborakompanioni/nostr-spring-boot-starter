@@ -82,8 +82,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(event.getId()));
-        assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), startsWith("auth-required:"));
+        assertThat(ok.getSuccess(), is(false));
     }
 
     @Test
@@ -97,8 +97,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(event.getId()));
-        assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), startsWith("auth-required:"));
+        assertThat(ok.getSuccess(), is(false));
     }
 
     @Test
@@ -123,8 +123,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok.getEventId(), is(event0.getId()));
-        assertThat(ok.getSuccess(), is(false));
         assertThat(ok.getMessage(), startsWith("auth-required:"));
+        assertThat(ok.getSuccess(), is(false));
 
         AuthResponse auth0 = responses.stream()
                 .filter(it -> it.getKindCase() == Response.KindCase.AUTH)
@@ -190,8 +190,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok0.getEventId(), is(event0.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), startsWith("auth-required:"));
+        assertThat(ok0.getSuccess(), is(false));
 
         AuthResponse auth0 = responses0.stream()
                 .filter(it -> it.getKindCase() == Response.KindCase.AUTH)
@@ -275,8 +275,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok0.getEventId(), is(event0.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), startsWith("auth-required:"));
+        assertThat(ok0.getSuccess(), is(false));
 
         AuthResponse auth0 = response0.stream()
                 .filter(it -> it.getKindCase() == Response.KindCase.AUTH)
@@ -430,8 +430,8 @@ class NostrRelayNip42Test {
                 .orElseThrow();
 
         assertThat(ok0.getEventId(), is(event0.getId()));
-        assertThat(ok0.getSuccess(), is(false));
         assertThat(ok0.getMessage(), startsWith("auth-required:"));
+        assertThat(ok0.getSuccess(), is(false));
 
         AuthResponse auth0 = responses0.stream()
                 .filter(it -> it.getKindCase() == Response.KindCase.AUTH)

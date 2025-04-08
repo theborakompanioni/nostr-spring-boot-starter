@@ -4,7 +4,6 @@ services:
   # https://github.com/scsibug/nostr-rs-relay
   relay:
     image: scsibug/nostr-rs-relay:latest
-    container_name: "${COMPOSE_PROJECT_NAME}-nostr-rs-relay"
     restart: unless-stopped
     ports:
       - "7000:8080"

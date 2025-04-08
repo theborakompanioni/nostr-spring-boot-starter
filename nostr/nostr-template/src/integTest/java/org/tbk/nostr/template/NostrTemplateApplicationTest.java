@@ -61,6 +61,7 @@ class NostrTemplateApplicationTest {
         OkResponse ok = sut.send(event).block(Duration.ofSeconds(5));
         assertThat(ok, is(notNullValue()));
         assertThat(ok.getEventId(), is(event.getId()));
+        assertThat(ok.getMessage(), is(""));
         assertThat(ok.getSuccess(), is(true));
 
         Event fetchedEvent0 = sut.fetchEventById(EventId.of(ok.getEventId().toByteArray())).block(Duration.ofSeconds(5));
@@ -91,6 +92,7 @@ class NostrTemplateApplicationTest {
         OkResponse ok = sut.send(event).block(Duration.ofSeconds(5));
         assertThat(ok, is(notNullValue()));
         assertThat(ok.getEventId(), is(event.getId()));
+        assertThat(ok.getMessage(), is(""));
         assertThat(ok.getSuccess(), is(true));
 
         Event fetchedEvent = sut.fetchEventById(EventId.of(ok.getEventId().toByteArray())).block(Duration.ofSeconds(5));
@@ -114,6 +116,7 @@ class NostrTemplateApplicationTest {
         OkResponse ok = sut.send(event).block(Duration.ofSeconds(5));
         assertThat(ok, is(notNullValue()));
         assertThat(ok.getEventId(), is(event.getId()));
+        assertThat(ok.getMessage(), is(""));
         assertThat(ok.getSuccess(), is(true));
 
         Event fetchedEvent = sut.fetchEventById(EventId.of(ok.getEventId().toByteArray())).block(Duration.ofSeconds(5));
@@ -141,6 +144,7 @@ class NostrTemplateApplicationTest {
         OkResponse ok = sut.send(event).block(Duration.ofSeconds(5));
         assertThat(ok, is(notNullValue()));
         assertThat(ok.getEventId(), is(partialEvent.getId()));
+        assertThat(ok.getMessage(), startsWith("invalid:"));
         assertThat(ok.getSuccess(), is(false));
     }
 
@@ -160,6 +164,7 @@ class NostrTemplateApplicationTest {
 
         assertThat(oks, hasSize(events.size()));
         for (OkResponse ok : oks) {
+            assertThat(ok.getMessage(), is(""));
             assertThat(ok.getSuccess(), is(true));
             assertThat(ok.getEventId(), either(is(event0.getId())).or(is(event1.getId())));
         }
@@ -181,6 +186,7 @@ class NostrTemplateApplicationTest {
 
         assertThat(oks, hasSize(events.size()));
         for (OkResponse ok : oks) {
+            assertThat(ok.getMessage(), is(""));
             assertThat(ok.getSuccess(), is(true));
         }
 
@@ -215,6 +221,7 @@ class NostrTemplateApplicationTest {
 
         assertThat(oks, hasSize(events.size()));
         for (OkResponse ok : oks) {
+            assertThat(ok.getMessage(), is(""));
             assertThat(ok.getSuccess(), is(true));
         }
 
@@ -257,10 +264,12 @@ class NostrTemplateApplicationTest {
 
         OkResponse ok0 = sut.send(event0).block(Duration.ofSeconds(5));
         assertThat(ok0, is(notNullValue()));
+        assertThat(ok0.getMessage(), is(""));
         assertThat(ok0.getSuccess(), is(true));
 
         OkResponse ok1 = sut.send(event1).block(Duration.ofSeconds(5));
         assertThat(ok1, is(notNullValue()));
+        assertThat(ok1.getMessage(), is(""));
         assertThat(ok1.getSuccess(), is(true));
 
         CountResult countAfter = sut.countEvents(CountRequest.newBuilder()
@@ -301,6 +310,7 @@ class NostrTemplateApplicationTest {
 
         OkResponse ok = sut.send(event).block(Duration.ofSeconds(5));
         assertThat(ok, is(notNullValue()));
+        assertThat(ok.getMessage(), is(""));
         assertThat(ok.getSuccess(), is(true));
 
         ProfileMetadata fetchedMetadata = sut.fetchMetadataByAuthor(signer.getPublicKey())
