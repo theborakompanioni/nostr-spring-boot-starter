@@ -13,34 +13,30 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AllowlistEntryService {
 
     @NonNull
     private final AllowlistEntries entries;
 
-    @Transactional
     public boolean hasEntries() {
-        return entries.count() != 0L;
+        return !entries.isEmpty();
     }
 
-    @Transactional
     public void create(XonlyPublicKey publicKey) {
         AllowlistEntry entry = new AllowlistEntry(publicKey);
         entries.save(entry);
     }
 
-    @Transactional
     public Page<AllowlistEntry> findByPubkey(XonlyPublicKey publicKey) {
         return entries.findByPubkey(publicKey, PageRequest.ofSize(1));
     }
 
-    @Transactional
     public Optional<AllowlistEntry> findFirstByPubkey(XonlyPublicKey publicKey) {
         return findByPubkey(publicKey).stream().findFirst();
     }
 
-    @Transactional
     public void remove(XonlyPublicKey publicKey) {
         entries.delete(AllowlistEntrySpecifications.hasPubkey(publicKey));
     }
