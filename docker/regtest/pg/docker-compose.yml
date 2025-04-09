@@ -1,7 +1,7 @@
 
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:17.3-alpine3.21@sha256:80d3d7d6bb3ddb1e44b79612330f7bfc6c451f093f6dd14a1317e777a260b602
     restart: unless-stopped
     labels:
       org.springframework.boot.ignore: true
@@ -23,7 +23,7 @@ services:
       retries: 5
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:9.0.0@sha256:1b2f1ecb93ed2c20530703f77acdfa0da8c2470a4e17044504057cea2d6b4fac
     restart: unless-stopped
     volumes:
       - pgadmin-data:/var/lib/pgadmin
