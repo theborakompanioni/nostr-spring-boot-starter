@@ -6,10 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-04-09
 ### Added
 - plugin: allowlist from properties
 - plugin: allowlist from database
-- 
+
 ### Changed
 - upgrade: update spring-boot from v3.4.0 to v3.4.4
 - upgrade: update spring-shell from v3.3.3 to v3.4.0
@@ -98,7 +99,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release
 
-[Unreleased]: https://github.com/theborakompanioni/nostr-spring-boot-starter/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/theborakompanioni/nostr-spring-boot-starter/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/theborakompanioni/nostr-spring-boot-starter/releases/tag/0.3.0...0.2.0
 [0.2.0]: https://github.com/theborakompanioni/nostr-spring-boot-starter/releases/tag/0.2.0...0.1.0
 [0.1.0]: https://github.com/theborakompanioni/nostr-spring-boot-starter/releases/tag/0.1.0...0.0.4
 [0.0.4]: https://github.com/theborakompanioni/nostr-spring-boot-starter/releases/tag/0.0.4...0.0.3
