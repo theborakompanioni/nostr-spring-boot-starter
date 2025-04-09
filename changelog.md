@@ -6,8 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- plugin: allowlist from properties
+- plugin: allowlist from database
+- 
 ### Changed
-- upgrade: update spring-boot from v3.4.0 to v3.4.2
+- upgrade: update spring-boot from v3.4.0 to v3.4.4
 - upgrade: update spring-shell from v3.3.3 to v3.4.0
 
 ## [0.2.0] - 2025-01-24
