@@ -87,7 +87,7 @@ class NostrRelayNip42Test {
     }
 
     @Test
-    void itShouldShouldDeclineEventRequestForUnauthenticated0() {
+    void itShouldDeclineEventRequestForUnauthenticated0() {
         Signer signer = SimpleSigner.random();
 
         Event event = createProtectedEventDummy(signer);
@@ -102,7 +102,7 @@ class NostrRelayNip42Test {
     }
 
     @Test
-    void itShouldShouldDeclineEventRequestForUnauthenticated1() {
+    void itShouldDeclineEventRequestForUnauthenticated1() {
         Signer signer = SimpleSigner.random();
 
         Event event0 = createProtectedEventDummy(signer);
@@ -137,7 +137,7 @@ class NostrRelayNip42Test {
 
     @Test
     @Disabled("Must inject own Nip42Support that requires authentication for REQ requests")
-    void itShouldShouldDeclineReqRequestForUnauthenticated() {
+    void itShouldDeclineReqRequestForUnauthenticated() {
         String subscriptionId = MoreSubscriptionIds.random().getId();
         List<Response> responses = nostrTemplate.fetch(ReqRequest.newBuilder()
                         .setId(subscriptionId)
