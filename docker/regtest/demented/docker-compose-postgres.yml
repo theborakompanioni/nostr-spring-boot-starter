@@ -1,0 +1,49 @@
+
+services:
+  # https://github.com/theborakompanioni/demente
+  relay:
+    #image: ghcr.io/theborakompanioni/demented:0.1.0@sha256:8929caf949d590509b68bc0ce8411da315740d05c7afa9cbd25e0ff23633a6df
+    image: ghcr.io/theborakompanioni/demented:devel
+    restart: no
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "7000:8080"
+      - "9001:9001"
+    command: >
+      --spring.profiles.active=development
+      --spring.datasource.url=jdbc:postgresql://postgres:5432/regtest_nostr_relay0
+      --spring.datasource.username=regtest_nostr_relay0
+      --spring.datasource.password=regtest_nostr_relay0
+      --spring.datasource.driver-class-name=org.postgresql.Driver
+      --spring.datasource.hikari.pool-name=PostgresPool
+      --spring.datasource.hikari.maximum-pool-size=10
+      --spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+      --spring.http.log-request-details=false
+      --logging.level.web=INFO
+
+  postgres:
+    image: postgres:17.3-alpine3.21@sha256:80d3d7d6bb3ddb1e44b79612330f7bfc6c451f093f6dd14a1317e777a260b602
+    restart: no
+    labels:
+      org.springframework.boot.ignore: true
+    volumes:
+      - postgres-data:/postgresql_data
+      - ./../pg/data/pg/init:/docker-entrypoint-initdb.d/
+    environment:
+      POSTGRES_ADDITIONAL_DATABASES: regtest_nostr_relay0
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      PGDATA: /postgresql_data
+    ports:
+      - "15432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready --dbname=postgres --username=postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

@@ -1,9 +1,8 @@
 
 services:
-
   # https://github.com/scsibug/nostr-rs-relay
   relay:
     image: scsibug/nostr-rs-relay:latest
-    restart: unless-stopped
+    restart: no
     ports:
       - "7000:8080"
