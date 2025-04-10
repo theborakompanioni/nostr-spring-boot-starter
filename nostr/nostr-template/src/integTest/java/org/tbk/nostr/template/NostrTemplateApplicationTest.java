@@ -2,6 +2,7 @@ package org.tbk.nostr.template;
 
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +23,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -156,7 +156,7 @@ class NostrTemplateApplicationTest {
         Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
         Event event1 = MoreEvents.createFinalizedTextNote(signer1, "GN");
 
-        Set<Event> events = Set.of(event0, event1);
+        List<Event> events = List.of(event0, event1);
         List<OkResponse> oks = sut.send(events)
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
@@ -178,7 +178,7 @@ class NostrTemplateApplicationTest {
         Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
         Event event1 = MoreEvents.createFinalizedTextNote(signer1, "GN");
 
-        Set<Event> events = Set.of(event0, event1);
+        List<Event> events = List.of(event0, event1);
         List<OkResponse> oks = sut.send(events)
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
@@ -213,7 +213,7 @@ class NostrTemplateApplicationTest {
         Event event0 = MoreEvents.createFinalizedTextNote(signer0, "GM");
         Event event1 = MoreEvents.createFinalizedTextNote(signer1, "GN");
 
-        Set<Event> events = Set.of(event0, event1);
+        List<Event> events = List.of(event0, event1);
         List<OkResponse> oks = sut.send(events)
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
@@ -320,7 +320,7 @@ class NostrTemplateApplicationTest {
         assertThat(fetchedMetadata, is(metadata));
     }
 
-    @Test
+    @RepeatedTest(5)
     void itShouldFetchMetadataEventSuccessfully2OnlyLatestMetadata() {
         Signer signer = SimpleSigner.random();
 
@@ -345,7 +345,7 @@ class NostrTemplateApplicationTest {
                 .setCreatedAt(event0.getCreatedAt() + 1)
         );
 
-        Set<Event> events = Set.of(event0, event1);
+        List<Event> events = List.of(event0, event1);
         List<OkResponse> oks = sut.send(events)
                 .collectList()
                 .blockOptional(Duration.ofSeconds(5))
