@@ -1,12 +1,10 @@
 package org.tbk.nostr.template;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tbk.nostr.base.RelayUri;
 
 @Configuration(proxyBeanMethods = false)
-@RequiredArgsConstructor
 class NostrTemplateTestConfiguration {
 
     @Bean

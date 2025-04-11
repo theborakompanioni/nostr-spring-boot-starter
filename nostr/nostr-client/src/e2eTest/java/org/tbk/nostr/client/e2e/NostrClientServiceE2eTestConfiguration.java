@@ -1,6 +1,5 @@
 package org.tbk.nostr.client.e2e;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tbk.nostr.base.RelayUri;
@@ -11,7 +10,6 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 @Configuration(proxyBeanMethods = false)
-@RequiredArgsConstructor
 class NostrClientServiceE2eTestConfiguration {
 
     @Bean
