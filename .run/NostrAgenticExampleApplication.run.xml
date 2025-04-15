@@ -3,7 +3,7 @@
     <option name="MAIN_CLASS_NAME" value="org.tbk.nostr.example.soul.NostrSoulExampleApplication" />
     <module name="nostr-spring-boot-starter.examples.nostr-soul-example-application.main" />
     <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=development" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples/nostr-soul-example-application" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples/nostr-agentic-example-application" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="org.tbk.nostr.example.soul.*" />

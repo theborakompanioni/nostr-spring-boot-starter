@@ -10,6 +10,27 @@ logging.config: classpath:logback.xml
 logging.level.org.springframework: INFO
 logging.level.org.tbk.nostr: INFO
 
+spring.ai:
+  ollama:
+    base-url: http://localhost:11434
+    init:
+      pull-model-strategy: when-missing
+      timeout: 60s
+      max-retries: 1
+      chat:
+        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+        additional-models:
+          #- moondream
+          - gemma3:1b
+          #- llama3.2
+          #- qwen2.5
+    chat:
+      options:
+        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+        model: gemma3:1b #moondream #gemma3:1b
+        #format: json
+        keep_alive: 24h
+
 org.tbk.nostr.agentic.client:
   #relay-uri: wss://nostr-pub.wellorder.net
   #relay-uri: wss://relay.damus.io
@@ -17,6 +38,5 @@ org.tbk.nostr.agentic.client:
 
 spring.docker.compose:
   enabled: true
-  file: docker-compose.yml
+  file: ./docker-compose.yml
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
-  skip.in-tests: false

@@ -106,11 +106,12 @@ implementation "io.github.theborakompanioni:nostr-proto:${nostrSpringBootStarter
 
 [This project contains various examples](examples/) that are stand-alone applications showing basic usage of the functionality provided.
 
-| Application                                                | Description                                                                      |
-|------------------------------------------------------------|----------------------------------------------------------------------------------|
-| [nostr-client](nostr-client-example-application/readme.md) | A simple Nostr client example application that subscribes to all kind `1` notes. |
-| [nostr-relay](nostr-relay-example-application/readme.md)   | A simple Nostr relay example application.                                        |
-| [nostr-shell](nostr-shell-example-application/readme.md)   | A simple Nostr shell example application, e.g. to "mine" notes (NIP-13).         |
+| Application                                                  | Description                                                                      |
+|--------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [nostr-agentic](nostr-agentic-example-application/readme.md) | A simple Nostr example application with AI capabilities.                         |
+| [nostr-client](nostr-client-example-application/readme.md)   | A simple Nostr client example application that subscribes to all kind `1` notes. |
+| [nostr-relay](nostr-relay-example-application/readme.md)     | A simple Nostr relay example application.                                        |
+| [nostr-shell](nostr-shell-example-application/readme.md)     | A simple Nostr shell example application, e.g. to "mine" notes (NIP-13).         |
 
 
 ## Development

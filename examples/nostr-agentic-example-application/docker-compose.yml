@@ -1,32 +1,17 @@
 version: "3"
 
 services:
-  localai:
-    image: localai/localai:latest-aio-cpu
-    # For a specific version:
-    # image: localai/localai:v2.24.2-aio-cpu
-    # For Nvidia GPUs decomment one of the following (cuda11 or cuda12):
-    # image: localai/localai:v2.24.2-aio-gpu-nvidia-cuda-11
-    # image: localai/localai:v2.24.2-aio-gpu-nvidia-cuda-12
-    # image: localai/localai:latest-aio-gpu-nvidia-cuda-11
-    # image: localai/localai:latest-aio-gpu-nvidia-cuda-12
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/readyz"]
-      interval: 1m
-      timeout: 20m
-      retries: 5
+  ollama:
+    image: ollama/ollama:0.6.5@sha256:96b7667cb536ab69bfd5cc0c2bd1e29602218e076fe6d34f402b786f17b4fde0
+    restart: no
     ports:
-      - 8080:8080
-    environment:
-      - DEBUG=true
-      # ...
+      - "11434:11434"
     volumes:
-      - ./models:/build/models:cached
-    # decomment the following piece if running with Nvidia GPUs
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
+      - ollama-data:/root/.ollama
+    environment:
+      # https://github.com/ollama/ollama/blob/0fe487e7325cd72b8b06e758c2a03842c557dbda/envconfig/config.go#L239
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0:11434
+
+volumes:
+  ollama-data:

@@ -20,9 +20,13 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-docker-compose'
 
+    implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
     //implementation 'dev.langchain4j:langchain4j-local-ai-spring-boot-starter:0.36.2' <-- NOT WORKING
     //implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2:0.36.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocOpenApiVersion}"
 }

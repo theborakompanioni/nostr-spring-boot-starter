@@ -115,12 +115,15 @@ subprojects {
 
     repositories {
         mavenCentral()
+        // needed for "spring-ai"
+        maven { url 'https://repo.spring.io/milestone' }
     }
 
     dependencyManagement {
         imports {
             mavenBom SpringBootPlugin.BOM_COORDINATES
             mavenBom "org.jmolecules:jmolecules-bom:${jmoleculesBomVersion}"
+            mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
         }
     }
 

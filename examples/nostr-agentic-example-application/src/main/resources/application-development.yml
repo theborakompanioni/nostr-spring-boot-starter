@@ -6,3 +6,7 @@ logging.file.name: application-dev.log
 logging.config: classpath:logback-development.xml
 logging.level.org.springframework: INFO
 logging.level.org.tbk.nostr: DEBUG
+
+spring.docker.compose:
+  stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
+  #stop.arguments: --volumes
