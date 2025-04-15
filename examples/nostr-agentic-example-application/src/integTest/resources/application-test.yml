@@ -5,16 +5,14 @@ logging.level.org.tbk.nostr: TRACE
 
 spring.docker.compose:
   enabled: true
-  #file: ../../docker/regtest/nostr-rs-relay/docker-compose.yml
-  file: ../../docker/regtest/demented/docker-compose.yml
+  #file: ../../docker/regtest/demented/docker-compose.yml
+  file: ./docker-compose.yml
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
   stop.arguments: --volumes
   skip.in-tests: false
 
-
 spring.ai:
   ollama:
-    base-url: http://localhost:11434
     init:
       pull-model-strategy: never
 

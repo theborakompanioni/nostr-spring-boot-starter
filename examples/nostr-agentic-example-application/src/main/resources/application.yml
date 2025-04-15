@@ -10,32 +10,39 @@ logging.config: classpath:logback.xml
 logging.level.org.springframework: INFO
 logging.level.org.tbk.nostr: INFO
 
+spring.docker.compose:
+  enabled: true
+  file: ./docker-compose.yml
+  stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
+  stop.arguments:
+    - '--remove-orphans'
+
 spring.ai:
   ollama:
-    base-url: http://localhost:11434
+    base-url: http://localhost:19434
     init:
       pull-model-strategy: when-missing
       timeout: 60s
       max-retries: 1
+      embedding:
+        include: false
       chat:
         # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
         additional-models:
-          - gemma3:1b
+          - hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
+          #- gemma3:1b
           #- moondream
     chat:
       options:
         # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
-        model: gemma3:1b #moondream
+        model: hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
+        #model: gemma3:1b
         #model: moondream
-        #format: json
         keep_alive: 24h
+        #format: json
+        temperature: 0.7
 
 org.tbk.nostr.agentic.client:
   #relay-uri: wss://nostr-pub.wellorder.net
   #relay-uri: wss://relay.damus.io
   relay-uri: wss://relay.primal.net
-
-spring.docker.compose:
-  enabled: true
-  file: ./docker-compose.yml
-  stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks

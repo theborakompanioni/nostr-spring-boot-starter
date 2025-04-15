@@ -1,11 +1,10 @@
-version: "3"
 
 services:
   ollama:
     image: ollama/ollama:0.6.5@sha256:96b7667cb536ab69bfd5cc0c2bd1e29602218e076fe6d34f402b786f17b4fde0
     restart: no
     ports:
-      - "11434:11434"
+      - "19434:11434"
     volumes:
       - ollama-data:/root/.ollama
     environment:
