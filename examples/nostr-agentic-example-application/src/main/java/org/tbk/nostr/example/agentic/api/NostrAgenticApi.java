@@ -3,14 +3,26 @@ package org.tbk.nostr.example.agentic.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
+import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.nips.Nip1;
+import org.tbk.nostr.persona.Persona;
+import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.json.JsonWriter;
+import org.tbk.nostr.util.MoreEvents;
 
 import javax.validation.constraints.NotNull;
 
@@ -26,6 +38,9 @@ public class NostrAgenticApi {
     @NotNull
     private final OllamaApi ollamaApi;
 
+    @NotNull
+    private final OllamaChatModel ollamaChatModel;
+
     @Operation(
             summary = "List models that are available locally on the machine where Ollama is running."
     )
@@ -33,5 +48,67 @@ public class NostrAgenticApi {
     public ResponseEntity<OllamaApi.ListModelResponse> listModels() {
         OllamaApi.ListModelResponse listModelResponse = ollamaApi.listModels();
         return ResponseEntity.ok(listModelResponse);
+    }
+
+    @Value
+    @Builder
+    @Jacksonized
+    public static class EventPlainApiRequestDto {
+        String contents;
+    }
+
+    @Operation(
+            summary = "Generate a nostr event."
+    )
+    @PostMapping(value = "/nostr/event/plain")
+    public ResponseEntity<String> eventPlain(@Validated @RequestBody EventPlainApiRequestDto body) {
+        OllamaOptions options = OllamaOptions.builder()
+                .temperature(0.33)
+                .build();
+        Prompt prompt = new Prompt(body.getContents(), options);
+        ChatResponse response = ollamaChatModel.call(prompt);
+
+        String text = response.getResult().getOutput().getText();
+
+        SimpleSigner signer = SimpleSigner.fromAccount(Persona.alice().deriveAccount(0));
+        Event event = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), text));
+
+        return ResponseEntity.ok(JsonWriter.toJson(event));
+    }
+
+    @Value
+    @Builder
+    @Jacksonized
+    public static class EventApiRequestDto {
+        String contents;
+
+        @Builder.Default
+        OllamaOptions options = OllamaOptions.builder()
+                .temperature(0.33)
+                .build();
+    }
+
+    @Value
+    @Builder
+    public static class EventApiResponseDto {
+        String json;
+    }
+
+    @Operation(
+            summary = "Generate a nostr event."
+    )
+    @PostMapping(value = "/nostr/event")
+    public ResponseEntity<EventApiResponseDto> event(@Validated @RequestBody EventApiRequestDto body) {
+        Prompt prompt = new Prompt(body.getContents(), body.getOptions());
+        ChatResponse response = ollamaChatModel.call(prompt);
+
+        String text = response.getResult().getOutput().getText();
+
+        SimpleSigner signer = SimpleSigner.fromAccount(Persona.alice().deriveAccount(0));
+        Event event = MoreEvents.finalize(signer, Nip1.createTextNote(signer.getPublicKey(), text));
+
+        return ResponseEntity.ok(EventApiResponseDto.builder()
+                .json(JsonWriter.toJson(event))
+                .build());
     }
 }

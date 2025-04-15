@@ -6,6 +6,7 @@ dependencies {
     implementation project(':nostr:nostr-core')
     implementation project(':nostr:nostr-client')
     implementation project(':nostr:nostr-nip19')
+    implementation project(':nostr:nostr-persona')
 
     implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
     implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
