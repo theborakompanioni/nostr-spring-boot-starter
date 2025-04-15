@@ -20,14 +20,13 @@ spring.ai:
       chat:
         # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
         additional-models:
-          #- moondream
           - gemma3:1b
-          #- llama3.2
-          #- qwen2.5
+          #- moondream
     chat:
       options:
         # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
-        model: gemma3:1b #moondream #gemma3:1b
+        model: gemma3:1b #moondream
+        #model: moondream
         #format: json
         keep_alive: 24h
 

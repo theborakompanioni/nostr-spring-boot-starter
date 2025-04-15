@@ -13,6 +13,7 @@ import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.boot.web.context.WebServerPortFileWriter;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.tbk.nostr.client.NostrClientService;
 
 import java.util.Locale;
@@ -48,6 +49,7 @@ public class NostrAgenticExampleApplication {
     }
 
     @Bean
+    @Profile("!test")
     ApplicationRunner testRunner(OllamaChatModel ollamaChatModel) {
         return args -> {
             String contents = """
