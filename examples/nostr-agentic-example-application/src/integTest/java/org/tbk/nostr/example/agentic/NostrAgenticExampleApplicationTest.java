@@ -1,6 +1,7 @@
 package org.tbk.nostr.example.agentic;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -19,11 +20,15 @@ class NostrAgenticExampleApplicationTest {
     private ApplicationContext applicationContext;
 
     @Autowired(required = false)
-    private NostrClientService sut;
+    private NostrClientService nostrClientService;
+
+    @Autowired(required = false)
+    private OllamaApi ollamaApi;
 
     @Test
     void contextLoads() {
         assertThat(applicationContext, is(notNullValue()));
-        assertThat(sut, is(notNullValue()));
+        assertThat(nostrClientService, is(notNullValue()));
+        assertThat(ollamaApi, is(notNullValue()));
     }
 }

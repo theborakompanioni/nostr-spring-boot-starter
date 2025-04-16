@@ -22,8 +22,8 @@ spring.ai:
     base-url: http://localhost:19434
     init:
       pull-model-strategy: when-missing
-      timeout: 60s
-      max-retries: 1
+      timeout: 120s
+      max-retries: 3
       embedding:
         include: false
       chat:

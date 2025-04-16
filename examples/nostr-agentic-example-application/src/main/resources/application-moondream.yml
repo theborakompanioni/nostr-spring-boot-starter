@@ -1,0 +1,11 @@
+spring.ai:
+  ollama:
+    init:
+      chat:
+        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+        additional-models:
+          - moondream
+    chat:
+      options:
+        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+        model: moondream

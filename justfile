@@ -67,7 +67,7 @@ update-verification:
 # run "nostr-agentic" example application
 [group("example")]
 run-example-nostr-agentic:
-    @./gradlew -p examples/nostr-agentic-example-application bootRun
+    @just --justfile examples/nostr-agentic-example-application/justfile run
 
 # run "nostr-shell" example application
 [group("example")]

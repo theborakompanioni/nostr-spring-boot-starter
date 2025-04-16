@@ -2,6 +2,11 @@ apply plugin: 'org.springframework.boot'
 
 description = 'nostr agentic example application package'
 
+
+bootRun {
+    args = [] // overwrite from global gradle build
+}
+
 dependencies {
     implementation project(':nostr:nostr-core')
     implementation project(':nostr:nostr-client')

@@ -1,0 +1,11 @@
+spring.ai:
+  ollama:
+    init:
+      chat:
+        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+        additional-models:
+          - gemma3:1b
+    chat:
+      options:
+        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+        model: gemma3:1b

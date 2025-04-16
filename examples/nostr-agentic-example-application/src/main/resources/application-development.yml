@@ -1,5 +1,7 @@
 spring.application.name: 'tbk-nostr-agentic-dev'
 
+debug: false
+
 # LOGGING
 logging.file.path: ./var/log
 logging.file.name: application-dev.log
