@@ -40,7 +40,11 @@ spring.ai:
         #format: json
         temperature: 0.7
 
-org.tbk.nostr.agentic.client:
-  #relay-uri: wss://nostr-pub.wellorder.net
-  #relay-uri: wss://relay.damus.io
-  relay-uri: wss://relay.primal.net
+org.tbk.nostr.example.agentic:
+  identity:
+    mnemonics: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+    passphrase: ''
+  client:
+    #relay-uri: wss://nostr-pub.wellorder.net
+    #relay-uri: wss://relay.damus.io
+    relay-uri: wss://relay.primal.net

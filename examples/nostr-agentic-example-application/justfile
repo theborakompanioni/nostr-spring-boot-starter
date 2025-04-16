@@ -29,7 +29,7 @@ system-info:
 clean:
     @{{justfile_directory()}}/../../gradlew -p {{justfile_directory()}} clean
 
-# clean (remove) the build artifacts
+# clean docker containers and volumes
 [group("development")]
 docker-clean:
     @docker compose down --volumes --remove-orphans
@@ -40,17 +40,26 @@ run profiles='development':
     @SPRING_PROFILES_ACTIVE={{profiles}} \
     {{justfile_directory()}}/../../gradlew -P {{justfile_directory()}} bootRun
 
+# run "nostr-agentic" with model smollm2
 [group("development")]
 run-smollm2 profiles='development,smollm2':
     @just run {{profiles}}
 
+# run "nostr-agentic" with model gemma3
 [group("development")]
 run-gemma3 profiles='development,gemma3':
     @just run {{profiles}}
 
+# run "nostr-agentic" with model moondream
 [group("development")]
 run-moondream profiles='development,moondream':
     @just run {{profiles}}
+
+# List available nostr identities.
+[group("api")]
+get-listidentities:
+    @curl --silent --request 'GET' \
+         http://localhost:"${SERVER_PORT}"/api/v1/agentic/listidentities | jq
 
 # List models that are available locally on the machine where Ollama is running.
 [group("api")]

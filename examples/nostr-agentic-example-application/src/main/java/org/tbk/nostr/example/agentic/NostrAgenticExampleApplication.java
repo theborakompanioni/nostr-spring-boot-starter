@@ -1,6 +1,7 @@
 package org.tbk.nostr.example.agentic;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.autoconfigure.ollama.OllamaChatProperties;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -15,6 +16,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.tbk.nostr.client.NostrClientService;
+import org.tbk.nostr.identity.Identity;
 
 import java.util.Locale;
 import java.util.TimeZone;
@@ -46,6 +48,15 @@ public class NostrAgenticExampleApplication {
     //@Bean
     MainApplicationRunner mainApplicationRunner(NostrClientService nostrClientService) {
         return new MainApplicationRunner(nostrClientService);
+    }
+
+    @Bean
+    ApplicationRunner appInfoLogger(Identity nostrIdentity,
+                                    OllamaChatProperties ollamaChatProperties) {
+        return args -> {
+            log.info("Identity Public Key (#0): {}", nostrIdentity.deriveAccount(0).getPublicKey().value.toHex());
+            log.info("Default Chat Model: {}", ollamaChatProperties.getModel());
+        };
     }
 
     @Bean

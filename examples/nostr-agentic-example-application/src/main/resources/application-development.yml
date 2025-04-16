@@ -14,5 +14,6 @@ spring.docker.compose:
     - ./docker-compose.yml
     - ../../docker/regtest/demented/docker-compose.yml
 
-org.tbk.nostr.agentic.client:
-  relay-uri: 'ws://localhost:7000'
+org.tbk.nostr.example.agentic:
+  client:
+    relay-uri: 'ws://localhost:7000'

@@ -5,7 +5,11 @@ nostr-agentic-example-application
 ## Run
 
 ```shell
-./gradlew -p examples/nostr-agentic-example-application bootRun
+just run-example-nostr-agentic
+```
+or
+```shell
+SPRING_PROFILES_ACTIVE=development ./gradlew -p examples/nostr-agentic-example-application bootRun
 ```
 
 ## API
