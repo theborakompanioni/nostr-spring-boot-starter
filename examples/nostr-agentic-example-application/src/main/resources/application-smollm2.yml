@@ -1,0 +1,11 @@
+spring.ai:
+  ollama:
+    init:
+      chat:
+        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+        additional-models:
+          - hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
+    chat:
+      options:
+        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+        model: hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K

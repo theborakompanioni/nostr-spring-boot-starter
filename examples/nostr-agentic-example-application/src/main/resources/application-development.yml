@@ -8,3 +8,11 @@ logging.file.name: application-dev.log
 logging.config: classpath:logback-development.xml
 logging.level.org.springframework: INFO
 logging.level.org.tbk.nostr: DEBUG
+
+spring.docker.compose:
+  file:
+    - ./docker-compose.yml
+    - ../../docker/regtest/demented/docker-compose.yml
+
+org.tbk.nostr.agentic.client:
+  relay-uri: 'ws://localhost:7000'
