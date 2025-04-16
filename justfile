@@ -72,4 +72,4 @@ run-example-nostr-agentic:
 # run "nostr-shell" example application
 [group("example")]
 run-example-nostr-shell:
-    @./gradlew -p examples/nostr-shell-example-application bootRun
+    @./gradlew --console=plain -p examples/nostr-shell-example-application bootRun
