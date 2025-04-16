@@ -13,13 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.tbk.nostr.example.agentic.api.NostrAgenticApi.ListIdentitiesApiResponseDto.IdentityEntry;
+import org.tbk.nostr.example.agentic.api.AgenticNostrApi.ListIdentitiesApiResponseDto.IdentityEntry;
 import org.tbk.nostr.identity.Identity;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nip19.Nip19;
@@ -34,15 +33,12 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/v1/agentic", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/nostr", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Tags({
-        @Tag(name = "agentic")
+        @Tag(name = "nostr")
 })
-public class NostrAgenticApi {
-
-    @NotNull
-    private final OllamaApi ollamaApi;
+public class AgenticNostrApi {
 
     @NotNull
     private final OllamaChatModel ollamaChatModel;
@@ -85,15 +81,6 @@ public class NostrAgenticApi {
         }
     }
 
-    @Operation(
-            summary = "List models that are available locally on the machine where Ollama is running."
-    )
-    @GetMapping(value = "/listmodels")
-    public ResponseEntity<OllamaApi.ListModelResponse> listModels() {
-        OllamaApi.ListModelResponse listModelResponse = ollamaApi.listModels();
-        return ResponseEntity.ok(listModelResponse);
-    }
-
     @Value
     @Builder
     @Jacksonized
@@ -104,7 +91,7 @@ public class NostrAgenticApi {
     @Operation(
             summary = "Generate a nostr event."
     )
-    @PostMapping(value = "/nostr/event/plain")
+    @PostMapping(value = "/event-plain")
     public ResponseEntity<String> eventPlain(@Validated @RequestBody EventPlainApiRequestDto body) {
         OllamaOptions options = OllamaOptions.builder()
                 .temperature(0.33)
@@ -140,7 +127,7 @@ public class NostrAgenticApi {
     @Operation(
             summary = "Generate a nostr event."
     )
-    @PostMapping(value = "/nostr/event")
+    @PostMapping(value = "/event")
     public ResponseEntity<EventApiResponseDto> event(@Validated @RequestBody EventApiRequestDto body) {
         Prompt prompt = new Prompt(body.getContents(), body.getOptions());
         ChatResponse response = ollamaChatModel.call(prompt);

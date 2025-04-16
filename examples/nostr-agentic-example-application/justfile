@@ -57,20 +57,20 @@ run-moondream profiles='development,moondream':
 
 # List available nostr identities.
 [group("api")]
-get-listidentities:
+listidentities:
     @curl --silent --request 'GET' \
-         http://localhost:"${SERVER_PORT}"/api/v1/agentic/listidentities | jq
+         http://localhost:"${SERVER_PORT}"/api/v1/nostr/listidentities | jq
 
 # List models that are available locally on the machine where Ollama is running.
 [group("api")]
-get-listmodels:
+listmodels:
     @curl --silent --request 'GET' \
-         http://localhost:"${SERVER_PORT}"/api/v1/agentic/listmodels | jq
+         http://localhost:"${SERVER_PORT}"/api/v1/model/listmodels | jq
 
 # Generate a nostr event.
 [group("api")]
-post-event text='What day is today?':
+event text='What day is today?':
     @curl --silent --request 'POST' \
-         http://localhost:"${SERVER_PORT}"/api/v1/agentic/nostr/event/plain \
+         http://localhost:"${SERVER_PORT}"/api/v1/nostr/event-plain \
          --header 'Content-Type: application/json' \
          --data '{ "contents": "{{text}}" }' | jq
