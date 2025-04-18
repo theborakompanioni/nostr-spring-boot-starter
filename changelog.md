@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- fix: correctly handle events without tags in tag filter
+
 ## [0.3.0] - 2025-04-09
 ### Added
 - plugin: allowlist from properties

@@ -6,6 +6,7 @@ import com.google.protobuf.Descriptors;
 import fr.acinq.bitcoin.ByteVector32;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 import org.tbk.nostr.base.EventId;
 import org.tbk.nostr.base.EventUri;
@@ -109,7 +110,7 @@ public final class EventEntitySpecifications {
 
     public static Specification<EventEntity> hasTagWithFirstValue(IndexedTag tagName, @Nullable String firstTagValue) {
         return (root, query, criteriaBuilder) -> {
-            Join<TagEntity, EventEntity> eventTags = root.join("tags");
+            Join<TagEntity, EventEntity> eventTags = root.join("tags", JoinType.LEFT);
             return criteriaBuilder.and(
                     criteriaBuilder.equal(eventTags.get("name"), tagName.name()),
                     firstTagValue == null ? criteriaBuilder.isNull(eventTags.get("value0")) : criteriaBuilder.equal(eventTags.get("value0"), firstTagValue)
