@@ -44,7 +44,7 @@ class NostrClientServiceApplicationE2eTest {
     }
 
     @Test
-    void itShouldPublishNoteAndRetrieveSuccessfully() {
+    void itShouldPublishAndRetrieveNoteSuccessfully() {
         Signer signer = SimpleSigner.random();
 
         Event event = MoreEvents.finalize(signer, Nip40.expire(
@@ -61,6 +61,8 @@ class NostrClientServiceApplicationE2eTest {
                 .blockFirst(Duration.ofSeconds(10)));
 
         assertThat(ok.getEventId(), is(event.getId()));
+        assertThat(ok.getMessage(), is(""));
+        assertThat(ok.getSuccess(), is(true));
 
         SubscriptionId subscriptionId = MoreSubscriptionIds.random();
 
