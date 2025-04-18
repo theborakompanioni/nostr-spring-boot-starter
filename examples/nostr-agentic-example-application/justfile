@@ -71,6 +71,14 @@ listmodels:
 [group("api")]
 event text='What day is today?':
     @curl --silent --request 'POST' \
-         http://localhost:"${SERVER_PORT}"/api/v1/nostr/event-plain \
+         http://localhost:"${SERVER_PORT}"/api/v1/nostr/event \
          --header 'Content-Type: application/json' \
          --data '{ "contents": "{{text}}" }' | jq
+
+# Generate a nostr event.
+[group("api")]
+event-with-meta text='What day is today?':
+    @curl --silent --request 'POST' \
+         http://localhost:"${SERVER_PORT}"/api/v1/nostr/event-with-meta \
+         --header 'Content-Type: application/json' \
+         --data '{ "contents": "{{text}}", "options": { "temperature": 0.21 } }' | jq

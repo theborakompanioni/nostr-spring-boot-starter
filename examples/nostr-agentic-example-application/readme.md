@@ -47,7 +47,7 @@ curl --silent http://localhost:8080/api/v1/model/listmodels | jq
 ### `nostr/event/plain`
 ```shell
 curl --silent --request 'POST' \
-    http://localhost:8080/api/v1/nostr/event-plain \
+    http://localhost:8080/api/v1/nostr/event \
     --header 'Content-Type: application/json' \
     --data '{
       "contents": "What day is today?"

@@ -24,7 +24,6 @@ import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nip19.Nip19;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
-import org.tbk.nostr.proto.json.JsonWriter;
 import org.tbk.nostr.util.MoreEvents;
 
 import javax.validation.constraints.NotNull;
@@ -84,31 +83,6 @@ public class AgenticNostrApi {
     @Value
     @Builder
     @Jacksonized
-    public static class EventPlainApiRequestDto {
-        String contents;
-    }
-
-    @Operation(
-            summary = "Generate a nostr event."
-    )
-    @PostMapping(value = "/event-plain")
-    public ResponseEntity<String> eventPlain(@Validated @RequestBody EventPlainApiRequestDto body) {
-        OllamaOptions options = OllamaOptions.builder()
-                .temperature(0.33)
-                .build();
-        Prompt prompt = new Prompt(body.getContents(), options);
-        ChatResponse response = ollamaChatModel.call(prompt);
-
-        String text = response.getResult().getOutput().getText();
-
-        Event event = MoreEvents.finalize(nostrSigner, Nip1.createTextNote(nostrSigner.getPublicKey(), text));
-
-        return ResponseEntity.ok(JsonWriter.toJson(event));
-    }
-
-    @Value
-    @Builder
-    @Jacksonized
     public static class EventApiRequestDto {
         String contents;
 
@@ -118,17 +92,11 @@ public class AgenticNostrApi {
                 .build();
     }
 
-    @Value
-    @Builder
-    public static class EventApiResponseDto {
-        String json;
-    }
-
     @Operation(
             summary = "Generate a nostr event."
     )
     @PostMapping(value = "/event")
-    public ResponseEntity<EventApiResponseDto> event(@Validated @RequestBody EventApiRequestDto body) {
+    public ResponseEntity<Event> event(@Validated @RequestBody EventApiRequestDto body) {
         Prompt prompt = new Prompt(body.getContents(), body.getOptions());
         ChatResponse response = ollamaChatModel.call(prompt);
 
@@ -136,8 +104,36 @@ public class AgenticNostrApi {
 
         Event event = MoreEvents.finalize(nostrSigner, Nip1.createTextNote(nostrSigner.getPublicKey(), text));
 
-        return ResponseEntity.ok(EventApiResponseDto.builder()
-                .json(JsonWriter.toJson(event))
+        return ResponseEntity.ok(event);
+    }
+
+    @Value
+    @Builder
+    public static class EventWithMetaApiResponseDto {
+        Event event;
+
+        Prompt prompt;
+
+        @JsonProperty("chat_response")
+        ChatResponse chatResponse;
+    }
+
+    @Operation(
+            summary = "Generate a nostr event."
+    )
+    @PostMapping(value = "/event-with-meta")
+    public ResponseEntity<EventWithMetaApiResponseDto> eventWithMeta(@Validated @RequestBody EventApiRequestDto body) {
+        Prompt prompt = new Prompt(body.getContents(), body.getOptions());
+        ChatResponse response = ollamaChatModel.call(prompt);
+
+        String text = response.getResult().getOutput().getText();
+
+        Event event = MoreEvents.finalize(nostrSigner, Nip1.createTextNote(nostrSigner.getPublicKey(), text));
+
+        return ResponseEntity.ok(EventWithMetaApiResponseDto.builder()
+                .event(event)
+                .prompt(prompt)
+                .chatResponse(response)
                 .build());
     }
 }
