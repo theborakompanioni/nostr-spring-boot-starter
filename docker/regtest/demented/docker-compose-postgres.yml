@@ -2,7 +2,7 @@
 services:
   # https://github.com/theborakompanioni/demente
   relay:
-    image: ghcr.io/theborakompanioni/demented:0.1.0@sha256:8929caf949d590509b68bc0ce8411da315740d05c7afa9cbd25e0ff23633a6df
+    image: ghcr.io/theborakompanioni/demented:0.1.1@sha256:4b973e28006a579476276790fcd19a4a287d92f4b12fcc1d099ed2a3f46a1052
     restart: no
     depends_on:
       postgres:
