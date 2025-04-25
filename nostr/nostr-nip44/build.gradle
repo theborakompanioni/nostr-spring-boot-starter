@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr nip44 package'
+
+dependencies {
+    api project(':nostr:nostr-core')
+
+    api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
+
+    testImplementation project(':nostr:nostr-persona')
+    testImplementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
+}

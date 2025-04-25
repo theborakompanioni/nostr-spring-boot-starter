@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- nip44: Encrypted messages
+
 ### Fixed
 - fix: correctly handle events without tags in tag filter
 

@@ -36,19 +36,15 @@ public final class Nip1 {
     }
 
     public static Event.Builder createMetadata(XonlyPublicKey publicKey, ProfileMetadata metadata) {
-        return MoreEvents.withEventId(Event.newBuilder()
-                .setCreatedAt(Instant.now().getEpochSecond())
-                .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
-                .setKind(Kinds.kindProfileMetadata.getValue())
-                .setContent(JsonWriter.toJson(metadata)));
+        return createEvent(publicKey, JsonWriter.toJson(metadata), Kinds.kindProfileMetadata.getValue());
     }
 
     public static Event.Builder createTextNote(XonlyPublicKey publicKey, String content) {
-        return MoreEvents.withEventId(Event.newBuilder()
-                .setCreatedAt(Instant.now().getEpochSecond())
-                .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
-                .setKind(Kinds.kindTextNote.getValue())
-                .setContent(content));
+        return createEvent(publicKey, content, Kinds.kindTextNote.getValue());
+    }
+
+    public static Event.Builder createEvent(XonlyPublicKey publicKey, String content, int kind) {
+        return MoreEvents.withEventId(createEventWithoutId(publicKey, content, kind));
     }
 
     public static Event.Builder createReplaceableEvent(XonlyPublicKey publicKey, String content) {
@@ -57,12 +53,7 @@ public final class Nip1 {
 
     public static Event.Builder createReplaceableEvent(XonlyPublicKey publicKey, String content, int kind) {
         MoreKinds.checkReplaceable(kind);
-
-        return MoreEvents.withEventId(Event.newBuilder()
-                .setCreatedAt(Instant.now().getEpochSecond())
-                .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
-                .setKind(kind)
-                .setContent(content));
+        return createEvent(publicKey, content, kind);
     }
 
     public static Event.Builder createEphemeralEvent(XonlyPublicKey publicKey, String content) {
@@ -71,14 +62,8 @@ public final class Nip1 {
 
     public static Event.Builder createEphemeralEvent(XonlyPublicKey publicKey, String content, int kind) {
         MoreKinds.checkEphemeral(kind);
-
-        return MoreEvents.withEventId(Event.newBuilder()
-                .setCreatedAt(Instant.now().getEpochSecond())
-                .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
-                .setKind(kind)
-                .setContent(content));
+        return createEvent(publicKey, content, kind);
     }
-
 
     public static Event.Builder createAddressableEvent(XonlyPublicKey publicKey, String content, @Nullable String dTagValue) {
         return createAddressableEvent(publicKey, content, MoreKinds.kindAddressableRange().lowerEndpoint().getValue(), dTagValue);
@@ -87,11 +72,15 @@ public final class Nip1 {
     public static Event.Builder createAddressableEvent(XonlyPublicKey publicKey, String content, int kind, @Nullable String dTagValue) {
         MoreKinds.checkAddressable(kind);
 
-        return MoreEvents.withEventId(Event.newBuilder()
+        return MoreEvents.withEventId(createEventWithoutId(publicKey, content, kind)
+                .addTags(dTagValue == null ? MoreTags.d() : MoreTags.d(dTagValue)));
+    }
+
+    private static Event.Builder createEventWithoutId(XonlyPublicKey publicKey, String content, int kind) {
+        return Event.newBuilder()
                 .setCreatedAt(Instant.now().getEpochSecond())
                 .setPubkey(ByteString.fromHex(publicKey.value.toHex()))
                 .setKind(kind)
-                .addTags(dTagValue == null ? MoreTags.d() : MoreTags.d(dTagValue))
-                .setContent(content));
+                .setContent(content);
     }
 }
