@@ -12,5 +12,25 @@ services:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0:11434
 
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: no
+    depends_on:
+      ollama:
+        condition: service_started
+    ports:
+      - "19480:8080"
+    volumes:
+      - open-webui-data:/app/backend/data
+    environment:
+      # https://docs.openwebui.com/getting-started/env-configuration
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - ENABLE_SIGNUP=true
+      - USER_AGENT=nostr-agentic
+      - WEBUI_NAME=nostr-agentic
+      - HF_HUB_OFFLINE=1
+      - OFFLINE_MODE=1
+
 volumes:
+  open-webui-data:
   ollama-data:
