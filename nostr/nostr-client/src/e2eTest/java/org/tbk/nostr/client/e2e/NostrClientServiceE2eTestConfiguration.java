@@ -14,7 +14,7 @@ class NostrClientServiceE2eTestConfiguration {
 
     @Bean
     RelayUri relay() {
-        return RelayUri.parse("wss://relay.damus.io");
+        return RelayUri.parse("wss://relay.primal.net");
     }
 
     @Bean(destroyMethod = "shutDown")
