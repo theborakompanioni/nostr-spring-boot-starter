@@ -197,6 +197,10 @@ public final class MoreTags {
         return Nip65.r(relay, marker);
     }
 
+    public static TagValue u(URI uri) {
+        return named(IndexedTag.u.name(), uri.toString());
+    }
+
     public static TagValue expiration(Duration duration) {
         return Nip40.expirationTag(duration);
     }
