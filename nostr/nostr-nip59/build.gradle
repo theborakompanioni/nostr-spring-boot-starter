@@ -1,0 +1,12 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr nip59 package'
+
+dependencies {
+    api project(':nostr:nostr-nip44')
+
+    testImplementation project(':nostr:nostr-persona')
+    testImplementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
+}

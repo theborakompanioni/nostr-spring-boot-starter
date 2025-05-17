@@ -35,6 +35,7 @@ need to write scalable and efficient solutions effortlessly.
 - [x] [NIP-44](https://github.com/nostr-protocol/nips/blob/master/44.md)
 - [x] [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md)
 - [x] [NIP-50](https://github.com/nostr-protocol/nips/blob/master/50.md)
+- [x] [NIP-59](https://github.com/nostr-protocol/nips/blob/master/59.md)
 - [x] [NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md)
 
 Planned:
