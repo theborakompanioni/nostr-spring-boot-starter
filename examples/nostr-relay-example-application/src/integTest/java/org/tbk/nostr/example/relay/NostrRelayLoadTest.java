@@ -21,10 +21,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -44,7 +42,7 @@ class NostrRelayLoadTest {
     void itShouldSendEventLoadTestSingleEvent() {
         Signer signer = SimpleSigner.random();
 
-        Event event = createTestEvents(signer, 1).getFirst();
+        Event event = createTestEvents(signer, 1).blockFirst();
 
         Stopwatch started = Stopwatch.createStarted();
         OkResponse ok = nostrTemplate.send(event)
@@ -64,14 +62,14 @@ class NostrRelayLoadTest {
 
         int eventCount = 1_000;
 
-        List<Event> events = createTestEvents(signer, eventCount);
+        Flux<Event> events = createTestEvents(signer, eventCount);
 
         CountDownLatch latch = new CountDownLatch(1);
 
         Stopwatch started = Stopwatch.createStarted();
-        Flux.just(events)
+        events.collectList()
                 .subscribeOn(Schedulers.single())
-                .flatMap(it -> nostrTemplate.send(it).timeout(TIMEOUT))
+                .flatMapMany(it -> nostrTemplate.send(it).timeout(TIMEOUT))
                 .doFinally(foo -> {
                     latch.countDown();
                 }).subscribe(ok -> {
@@ -90,12 +88,12 @@ class NostrRelayLoadTest {
 
         int eventCount = 1_000;
 
-        List<Event> events = createTestEvents(signer, eventCount);
+        Flux<Event> events = createTestEvents(signer, eventCount);
 
         CountDownLatch latch = new CountDownLatch(1);
 
         Stopwatch started = Stopwatch.createStarted();
-        Flux.fromIterable(events)
+        events
                 .subscribeOn(Schedulers.newParallel("load-test"))
                 .flatMap(it -> nostrTemplate.send(it).timeout(TIMEOUT))
                 .doFinally(foo -> {
@@ -110,7 +108,7 @@ class NostrRelayLoadTest {
         log.info("Inserting {} events on multiple threads took {}", eventCount, started.stop());
     }
 
-    private static List<Event> createTestEvents(Signer signer, int eventCount) {
+    private static Flux<Event> createTestEvents(Signer signer, int eventCount) {
         Event prototype = Nip1.createTextNote(signer.getPublicKey(), "")
                 .addTags(MoreTags.named("e", "00".repeat(32)))
                 .addTags(MoreTags.named("e", "00".repeat(32)))
@@ -124,9 +122,8 @@ class NostrRelayLoadTest {
                 .addTags(MoreTags.named("s"))
                 .buildPartial();
 
-        return IntStream.range(0, eventCount)
-                .mapToObj(i -> Event.newBuilder(prototype).setContent("GM" + i))
-                .map(event -> MoreEvents.finalize(signer, event))
-                .toList();
+        return Flux.range(0, eventCount)
+                .map(i -> Event.newBuilder(prototype).setContent("GM" + i))
+                .map(event -> MoreEvents.finalize(signer, event));
     }
 }

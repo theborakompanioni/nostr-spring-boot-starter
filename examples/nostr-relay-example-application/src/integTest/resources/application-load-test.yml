@@ -2,5 +2,10 @@ spring.application.name: 'tbk-nostr-relay-load-test'
 
 logging.file.name: application-load-test.log
 
+logging.level.org.tbk.nostr: INFO
+
+spring.jpa.properties.hibernate.format_sql: false
+spring.jpa.properties.hibernate.show_sql: false
+
 #spring.datasource.hikari.maximum-pool-size: 20
 org.tbk.nostr.example.relay.async-executor.max-pool-size: 10
