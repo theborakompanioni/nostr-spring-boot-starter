@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - upgrade: update spring-boot from v3.4.4 to v3.5.0
 - upgrade: update sqlite from v3.48.0.0 to v3.49.1.0
+- upgrade: update jmolecules from v2023.2.1 to v2023.3.1
 
 ## [0.4.0] - 2025-05-19
 ### Added

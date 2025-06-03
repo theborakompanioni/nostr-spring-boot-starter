@@ -5,8 +5,8 @@ ext {
     protobufVersion = '4.29.2'
     protocVersion = protobufVersion
     postgresqlVersion = '42.7.5'
-    jmoleculesBomVersion = '2023.2.1'
-    bytebuddyPluginVersion = '1.15.10' // keep in sync with `jmoleculesBomVersion`
+    jmoleculesBomVersion = '2023.3.1'
+    bytebuddyPluginVersion = '1.17.5' // keep in sync with `jmoleculesBomVersion`
     acinqSecp256k1KmpVersion = '0.15.0'
     acinqBitcoinKmpVersion = '0.20.0' // keep in sync with `acinqSecp256k1KmpVersion`
     acinqLightningKmpVersion = '1.8.4' // keep in sync with `acinqBitcoinKmpVersion`
