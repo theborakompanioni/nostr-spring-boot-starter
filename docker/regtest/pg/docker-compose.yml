@@ -23,7 +23,7 @@ services:
       retries: 5
 
   pgadmin:
-    image: dpage/pgadmin4:9.0.0@sha256:1b2f1ecb93ed2c20530703f77acdfa0da8c2470a4e17044504057cea2d6b4fac
+    image: dpage/pgadmin4:9.3.0@sha256:bd71932cb1ef94719e783f0eed42c227bc67877a7c7e076c7092738711e5f4d4
     restart: no
     volumes:
       - pgadmin-data:/var/lib/pgadmin
