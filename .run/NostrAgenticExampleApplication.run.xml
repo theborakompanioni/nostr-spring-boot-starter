@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="NostrSoulExampleApplication" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="org.tbk.nostr.example.soul.NostrSoulExampleApplication" />
-    <module name="nostr-spring-boot-starter.examples.nostr-soul-example-application.main" />
+  <configuration default="false" name="NostrAgenticExampleApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="org.tbk.nostr.example.agentic.NostrAgenticExampleApplication" />
+    <module name="nostr-spring-boot-starter.examples.nostr-agentic-example-application.main" />
     <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=development" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples/nostr-agentic-example-application" />
     <extension name="coverage">
