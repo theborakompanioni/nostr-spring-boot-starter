@@ -19,6 +19,6 @@ class PostgresEventEntityService extends AbstractEventEntityService {
     protected Specification<EventEntity> search(Filter filter) {
         return Nip50SearchTerm.from(filter)
                 .map(EventEntitySpecifications::searchPostgres)
-                .orElse(Specification.where(null));
+                .orElseGet(EventEntitySpecifications::empty);
     }
 }
