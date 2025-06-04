@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-database-postgresql'
 
     implementation "org.xerial:sqlite-jdbc:${sqliteVersion}"
-    implementation "org.hibernate.orm:hibernate-community-dialects:${hibernateCommunityDialectsVersion}"
+    implementation 'org.hibernate.orm:hibernate-community-dialects'
 
     implementation 'org.jmolecules:jmolecules-ddd'
     implementation 'org.jmolecules:jmolecules-events'

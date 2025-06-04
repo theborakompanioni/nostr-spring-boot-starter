@@ -19,6 +19,6 @@ class SqliteEventEntityService extends AbstractEventEntityService {
     protected Specification<EventEntity> search(Filter filter) {
         return Nip50SearchTerm.from(filter)
                 .map(EventEntitySpecifications::searchSqlite)
-                .orElse(Specification.where(null));
+                .orElseGet(EventEntitySpecifications::empty);
     }
 }

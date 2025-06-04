@@ -16,9 +16,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.tbk.nostr.relay.config.NostrRelayProperties;
-
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Slf4j
 @EnableWebSecurity
@@ -49,11 +48,11 @@ class NostrRelayExampleSecurityConfig implements WebSecurityCustomizer {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                antMatcher(nostrRelayProperties.getWebsocketPath())
+                                PathPatternRequestMatcher.withDefaults().matcher(nostrRelayProperties.getWebsocketPath())
                         ).permitAll()
                         .requestMatchers(
                                 PathRequest.toStaticResources().atCommonLocations(),
-                                antMatcher("/index.html"))
+                                PathPatternRequestMatcher.withDefaults().matcher("/index.html"))
                         .permitAll()
                         .anyRequest().authenticated()
                 );
