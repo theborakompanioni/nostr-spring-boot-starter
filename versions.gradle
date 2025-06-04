@@ -7,9 +7,9 @@ ext {
     postgresqlVersion = '42.7.5'
     jmoleculesBomVersion = '2023.3.1'
     bytebuddyPluginVersion = '1.17.5' // keep in sync with `jmoleculesBomVersion`
-    acinqSecp256k1KmpVersion = '0.15.0'
-    acinqBitcoinKmpVersion = '0.20.0' // keep in sync with `acinqSecp256k1KmpVersion`
-    acinqLightningKmpVersion = '1.8.4' // keep in sync with `acinqBitcoinKmpVersion`
+    acinqSecp256k1KmpVersion = '0.17.1'
+    acinqBitcoinKmpVersion = '0.22.1' // keep in sync with `acinqSecp256k1KmpVersion`
+    acinqLightningKmpVersion = '1.9.0' // keep in sync with `acinqBitcoinKmpVersion`
     linguaVersion = '1.2.2'
     sqliteVersion = '3.49.1.0'
     lombokVersion = '1.18.30'
