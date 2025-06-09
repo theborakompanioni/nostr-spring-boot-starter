@@ -115,8 +115,6 @@ subprojects {
 
     repositories {
         mavenCentral()
-        // needed for "spring-ai"
-        maven { url 'https://repo.spring.io/milestone' }
     }
 
     dependencyManagement {

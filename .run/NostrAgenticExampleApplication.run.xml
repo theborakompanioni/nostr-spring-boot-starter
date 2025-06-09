@@ -6,7 +6,7 @@
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples/nostr-agentic-example-application" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.tbk.nostr.example.soul.*" />
+        <option name="PATTERN" value="org.tbk.nostr.example.agentic.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
