@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Singular;
@@ -84,20 +86,28 @@ public class AgenticNostrApi {
     @Builder
     @Jacksonized
     public static class EventApiRequestDto {
+        @NotNull
+        @NotBlank
+        @Size(max = 1024)
         String contents;
 
         @Builder.Default
-        OllamaOptions options = OllamaOptions.builder()
-                .temperature(0.33)
-                .build();
+        Double temperature = Double.valueOf("0.33");
+
+        private OllamaOptions toOllamaOptions() {
+            return OllamaOptions.builder()
+                    .temperature(temperature)
+                    .build();
+        }
     }
 
     @Operation(
             summary = "Generate a nostr event."
     )
     @PostMapping(value = "/event")
-    public ResponseEntity<Event> event(@Validated @RequestBody EventApiRequestDto body) {
-        Prompt prompt = new Prompt(body.getContents(), body.getOptions());
+    // Note: ResponseEntity<?> is used as workaround for swagger-ui loading issues with protobuf classes
+    public ResponseEntity<?> event(@Validated @RequestBody EventApiRequestDto body) {
+        Prompt prompt = new Prompt(body.getContents(), body.toOllamaOptions());
         ChatResponse response = ollamaChatModel.call(prompt);
 
         String text = response.getResult().getOutput().getText();
@@ -110,7 +120,7 @@ public class AgenticNostrApi {
     @Value
     @Builder
     public static class EventWithMetaApiResponseDto {
-        Event event;
+        Object event; // Note: Object is used as workaround for swagger-ui loading issues with protobuf classes
 
         Prompt prompt;
 
@@ -123,7 +133,7 @@ public class AgenticNostrApi {
     )
     @PostMapping(value = "/event-with-meta")
     public ResponseEntity<EventWithMetaApiResponseDto> eventWithMeta(@Validated @RequestBody EventApiRequestDto body) {
-        Prompt prompt = new Prompt(body.getContents(), body.getOptions());
+        Prompt prompt = new Prompt(body.getContents(), body.toOllamaOptions());
         ChatResponse response = ollamaChatModel.call(prompt);
 
         String text = response.getResult().getOutput().getText();
