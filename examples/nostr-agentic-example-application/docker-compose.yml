@@ -1,7 +1,7 @@
 
 services:
   ollama:
-    image: ollama/ollama:0.6.5@sha256:96b7667cb536ab69bfd5cc0c2bd1e29602218e076fe6d34f402b786f17b4fde0
+    image: ollama/ollama:0.11.10@sha256:a5409cb903d30f9cd67e9f430dd336ddc9274e16fd78f75b675c42065991b4fd
     restart: no
     ports:
       - "19434:11434"
