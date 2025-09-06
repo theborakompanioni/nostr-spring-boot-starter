@@ -1,9 +1,9 @@
 package org.tbk.nostr.example.agentic;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.autoconfigure.ollama.OllamaChatProperties;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.ollama.autoconfigure.OllamaChatProperties;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.boot.ApplicationRunner;

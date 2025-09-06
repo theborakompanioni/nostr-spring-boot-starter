@@ -25,7 +25,7 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-docker-compose'
 
-    implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
+    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
     //implementation 'dev.langchain4j:langchain4j-local-ai-spring-boot-starter:0.36.2' <-- NOT WORKING
     //implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2:0.36.2'
 
