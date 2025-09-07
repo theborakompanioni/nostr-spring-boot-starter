@@ -12,7 +12,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.*;
-import org.tbk.nostr.example.agentic.lib.jackson.datatype.nostr.NostrModule;
+import org.tbk.jackson.datatype.nostr.NostrModule;
 
 import java.io.IOException;
 import java.math.BigDecimal;
