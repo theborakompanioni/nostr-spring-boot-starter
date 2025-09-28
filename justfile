@@ -1,5 +1,8 @@
 # This justfile requires https://github.com/casey/just
 
+# run example applications
+import 'examples.just'
+
 # Load environment variables from `.env` file.
 set dotenv-load
 # Fail the script if the env file is not found.
@@ -63,13 +66,3 @@ test-all:
 [group("development")]
 update-verification:
     @./gradlew dependencies --write-verification-metadata pgp,sha256 --export-keys --write-locks
-
-# run "nostr-agentic" example application
-[group("example")]
-run-example-nostr-agentic:
-    @just --justfile examples/nostr-agentic-example-application/justfile run
-
-# run "nostr-shell" example application
-[group("example")]
-run-example-nostr-shell:
-    @./gradlew --console=plain -p examples/nostr-shell-example-application bootRun
