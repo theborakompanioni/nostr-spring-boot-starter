@@ -7,7 +7,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +20,9 @@ import org.tbk.nostr.identity.Identity;
 import org.tbk.nostr.identity.MoreIdentities;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.identity.SimpleSigner;
+import org.tbk.nostr.proto.ProfileMetadata;
+import org.tbk.nostr.template.NostrTemplate;
+import org.tbk.nostr.template.SimpleNostrTemplate;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -40,6 +42,13 @@ class NostrAgenticExampleApplicationConfig {
                 .map(IdentityProperties::getSeed)
                 .map(MoreIdentities::fromSeed)
                 .orElseThrow(() -> new IllegalStateException("Could not create nostr identity from mnemonic."));
+    }
+
+    @Bean
+    ProfileMetadata nostrProfileMetadata() {
+        return properties.getProfileMetadata()
+                .map(NostrAgenticExampleApplicationProperties.ProfileMetadataProperties::toProfileMetadata)
+                .orElseThrow(() -> new IllegalStateException("Could not create nostr profile-metadata from properties."));
     }
 
     @Bean
@@ -70,11 +79,24 @@ class NostrAgenticExampleApplicationConfig {
         return webSocketClient;
     }
 
-    @Bean(destroyMethod = "shutDown")
+    @Bean(destroyMethod = "stopAsync")
     NostrClientService nostrClientService(RelayUri relayUri, WebSocketClient webSocketClient) throws TimeoutException {
         SimpleNostrClientService simpleReactiveNostrClient = new SimpleNostrClientService(relayUri, webSocketClient);
         simpleReactiveNostrClient.startAsync();
         simpleReactiveNostrClient.awaitRunning(Duration.ofSeconds(60));
         return simpleReactiveNostrClient;
+    }
+
+    @Bean
+    NostrTemplate nostrTemplate(RelayUri relayUri) {
+        return new SimpleNostrTemplate(relayUri);
+    }
+
+    @Bean
+    @ConditionalOnBean({NostrTemplate.class, Signer.class, ProfileMetadata.class})
+    NostrProfileMetadataUpdateRunner profileMetadataUpdateRunner(NostrTemplate nostrTemplate,
+                                                                 Signer signer,
+                                                                 ProfileMetadata profileMetadata) {
+        return new NostrProfileMetadataUpdateRunner(nostrTemplate, signer, profileMetadata);
     }
 }

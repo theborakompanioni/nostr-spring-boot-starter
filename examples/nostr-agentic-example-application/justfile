@@ -36,9 +36,9 @@ docker-clean:
 
 # run "nostr-agentic" example application
 [group("development")]
-run profiles='development':
+run profiles='development' *args='':
     @SPRING_PROFILES_ACTIVE={{profiles}} \
-    {{justfile_directory()}}/../../gradlew -P {{justfile_directory()}} bootRun
+    {{justfile_directory()}}/../../gradlew -P {{justfile_directory()}} bootRun {{args}}
 
 # run "nostr-agentic" with model smollm2
 [group("development")]
@@ -54,6 +54,18 @@ run-gemma3 profiles='development,gemma3':
 [group("development")]
 run-moondream profiles='development,moondream':
     @just run {{profiles}}
+
+# Get currently active identity
+[group("api")]
+whoami:
+    @curl --silent --request 'GET' \
+         http://localhost:"${SERVER_PORT}"/api/v1/nostr/whoami | jq
+
+# Get currently active identity
+[group("api")]
+whoami-profile:
+    @curl --silent --request 'GET' \
+         http://localhost:"${SERVER_PORT}"/api/v1/nostr/whoami/profile | jq
 
 # List available nostr identities.
 [group("api")]
