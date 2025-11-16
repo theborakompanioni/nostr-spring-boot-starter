@@ -22,14 +22,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.tbk.nostr.example.agentic.api.AgenticNostrApi.ListIdentitiesApiResponseDto.IdentityEntry;
 import org.tbk.nostr.identity.Identity;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nip19.Nip19;
 import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
+import org.tbk.nostr.proto.ProfileMetadata;
+import org.tbk.nostr.template.NostrTemplate;
 import org.tbk.nostr.util.MoreEvents;
 
+import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,14 +45,50 @@ import java.util.Optional;
 })
 public class AgenticNostrApi {
 
-    @NonNull
+    @NotNull
     private final OllamaChatModel ollamaChatModel;
 
-    @NonNull
+    @NotNull
     private final Identity nostrIdentity;
 
-    @NonNull
+    @NotNull
     private final Signer nostrSigner;
+
+    @NotNull
+    private final NostrTemplate nostrTemplate;
+
+    @Operation(
+            summary = "Currently active identity"
+    )
+    @GetMapping(value = "/whoami")
+    public ResponseEntity<WhoAmIResponse> whoami() {
+        return ResponseEntity.ok(WhoAmIResponse.builder()
+                .identity(toIdentityEntry(nostrIdentity))
+                .build());
+    }
+
+    @Operation(
+            summary = "Profile of currently active identity"
+    )
+    @GetMapping(value = "/whoami/profile")
+    public ResponseEntity<Event> whoamiProfile() {
+        ProfileMetadata profileMetadata = nostrTemplate.fetchMetadataByAuthor(nostrSigner.getPublicKey())
+                .blockOptional(Duration.ofSeconds(10))
+                .orElse(null);
+
+        // TODO: after nostr-proto supports serializing ProfileMetadata: don't wrap in an event
+        return ResponseEntity.ok(Nip1.createMetadata(nostrSigner.getPublicKey(), profileMetadata).build());
+    }
+    private static IdentityEntry toIdentityEntry(Identity nostrIdentity) {
+        return Optional.of(nostrIdentity)
+                .map(it -> it.deriveAccount(0))
+                .map(it -> IdentityEntry.builder()
+                        .path(it.getPath().toString())
+                        .publicKey(it.getPublicKey().value.toHex())
+                        .npub(Nip19.encodeNpub(it))
+                        .build())
+                .orElseThrow();
+    }
 
     @Operation(
             summary = "List available nostr identities."
@@ -57,14 +96,26 @@ public class AgenticNostrApi {
     @GetMapping(value = "/listidentities")
     public ResponseEntity<ListIdentitiesApiResponseDto> listIdentities() {
         return ResponseEntity.ok(ListIdentitiesApiResponseDto.builder()
-                .addIdentity(Optional.of(nostrIdentity)
-                        .map(it -> it.deriveAccount(0))
-                        .map(it -> IdentityEntry.builder()
-                                .path(it.getPath().toString())
-                                .publicKey(it.getPublicKey().value.toHex())
-                                .npub(Nip19.encodeNpub(it))
-                                .build()).orElseThrow())
+                .addIdentity(toIdentityEntry(nostrIdentity))
                 .build());
+    }
+
+    @Value
+    @Builder
+    public static class WhoAmIResponse {
+        @NonNull
+        IdentityEntry identity;
+        @Nullable
+        ProfileMetadata profileMetadata;
+    }
+
+    @Value
+    @Builder
+    public static class IdentityEntry {
+        String path;
+        @JsonProperty("public_key")
+        String publicKey;
+        String npub;
     }
 
     @Value
@@ -72,15 +123,6 @@ public class AgenticNostrApi {
     public static class ListIdentitiesApiResponseDto {
         @Singular("addIdentity")
         List<IdentityEntry> identities;
-
-        @Value
-        @Builder
-        public static class IdentityEntry {
-            String path;
-            @JsonProperty("public_key")
-            String publicKey;
-            String npub;
-        }
     }
 
     @Value

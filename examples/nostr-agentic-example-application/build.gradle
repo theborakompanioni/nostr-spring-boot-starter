@@ -9,6 +9,7 @@ bootRun {
 dependencies {
     implementation project(':nostr:nostr-core')
     implementation project(':nostr:nostr-client')
+    implementation project(':nostr:nostr-template')
     implementation project(':nostr:nostr-nip19')
     implementation project(':nostr:nostr-persona')
 
