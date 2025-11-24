@@ -5,7 +5,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.ollama.autoconfigure.OllamaChatProperties;
 import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -67,7 +67,7 @@ public class NostrAgenticExampleApplication {
                     What day is today?
                     """;
 
-            OllamaOptions build = OllamaOptions.builder()
+            OllamaChatOptions build = OllamaChatOptions.builder()
                     .temperature(0.33)
                     .build();
 

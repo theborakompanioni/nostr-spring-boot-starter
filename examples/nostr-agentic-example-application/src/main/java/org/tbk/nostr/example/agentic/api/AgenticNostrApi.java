@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -94,8 +94,8 @@ public class AgenticNostrApi {
         @Builder.Default
         Double temperature = Double.valueOf("0.33");
 
-        private OllamaOptions toOllamaOptions() {
-            return OllamaOptions.builder()
+        private OllamaChatOptions toOllamaChatOptions() {
+            return OllamaChatOptions.builder()
                     .temperature(temperature)
                     .build();
         }
@@ -107,7 +107,7 @@ public class AgenticNostrApi {
     @PostMapping(value = "/event")
     // Note: ResponseEntity<?> is used as workaround for swagger-ui loading issues with protobuf classes
     public ResponseEntity<?> event(@Validated @RequestBody EventApiRequestDto body) {
-        Prompt prompt = new Prompt(body.getContents(), body.toOllamaOptions());
+        Prompt prompt = new Prompt(body.getContents(), body.toOllamaChatOptions());
         ChatResponse response = ollamaChatModel.call(prompt);
 
         String text = response.getResult().getOutput().getText();
@@ -133,7 +133,7 @@ public class AgenticNostrApi {
     )
     @PostMapping(value = "/event-with-meta")
     public ResponseEntity<EventWithMetaApiResponseDto> eventWithMeta(@Validated @RequestBody EventApiRequestDto body) {
-        Prompt prompt = new Prompt(body.getContents(), body.toOllamaOptions());
+        Prompt prompt = new Prompt(body.getContents(), body.toOllamaChatOptions());
         ChatResponse response = ollamaChatModel.call(prompt);
 
         String text = response.getResult().getOutput().getText();
