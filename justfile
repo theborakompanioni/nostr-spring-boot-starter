@@ -66,3 +66,19 @@ test-all:
 [group("development")]
 update-verification:
     @./gradlew dependencies --write-verification-metadata pgp,sha256 --export-keys --write-locks
+
+# check style
+[group("development")]
+checkstyle:
+    @./gradlew checkstyleMain checkstyleTest checkstyleIntegTest checkstyleE2eTest
+
+# spot bugs
+[group("development")]
+spotbugs:
+    @./gradlew spotbugsMain spotbugsTest spotbugsIntegTest spotbugsE2eTest
+
+# lint files
+[group("development")]
+lint:
+    @./gradlew autoLintGradle
+
