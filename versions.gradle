@@ -14,7 +14,7 @@ ext {
     sqliteVersion = '3.49.1.0'
     lombokVersion = '1.18.42'
     springdocOpenApiVersion = '2.8.12'
-    checkstyleVersion = '10.26.1'
+    checkstyleVersion = '12.3.0'
     findsecbugsPluginVersion = '1.14.0'
     nostrProtoVersion = '0.3.0'
     springBootGradlePluginVersion = '3.5.8'
