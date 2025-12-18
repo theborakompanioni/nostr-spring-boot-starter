@@ -28,7 +28,7 @@ services:
     labels:
       org.springframework.boot.ignore: true
     volumes:
-      - postgres-data:/postgresql_data
+      - nsbs-demente-postgres-data:/postgresql_data
       - ./../pg/data/pg/init:/docker-entrypoint-initdb.d/
     environment:
       POSTGRES_ADDITIONAL_DATABASES: regtest_nostr_relay0
@@ -45,4 +45,4 @@ services:
       retries: 10
 
 volumes:
-  postgres-data:
+  nsbs-demente-postgres-data:

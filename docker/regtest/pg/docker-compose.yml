@@ -6,7 +6,7 @@ services:
     labels:
       org.springframework.boot.ignore: true
     volumes:
-      - postgres-data:/postgresql_data
+      - nsbs-postgres-data:/postgresql_data
       - ./data/pg/init:/docker-entrypoint-initdb.d/
     environment:
       POSTGRES_ADDITIONAL_DATABASES: regtest_nostr_relay0
@@ -26,7 +26,7 @@ services:
     image: dpage/pgadmin4:9.11.0@sha256:50700ac17936d0227f9e3e4bb086a91efb67064debc4b4737c35545bf1564088
     restart: no
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - nsbs-pgadmin-data:/var/lib/pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: postgres@example.org
       PGADMIN_DEFAULT_PASSWORD: postgres
@@ -37,5 +37,5 @@ services:
         condition: service_healthy
 
 volumes:
-  postgres-data:
-  pgadmin-data:
+  nsbs-postgres-data:
+  nsbs-pgadmin-data:
