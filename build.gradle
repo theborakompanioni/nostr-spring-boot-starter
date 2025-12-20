@@ -149,13 +149,13 @@ subprojects {
         exclude('**/mainnet/**')
         exclude('**/*.proto')
 
-        includeEmptyDirs false
+        includeEmptyDirs = false
     }
 
     sourcesJar {
         // needed till duplicate bug in protobuf gradle plugin is resolved.
         // see https://github.com/google/protobuf-gradle-plugin/issues/522 (last checked 2023-01-18)
-        duplicatesStrategy DuplicatesStrategy.EXCLUDE
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
         archiveClassifier.set('sources')
         from sourceSets.main.java
@@ -184,8 +184,8 @@ subprojects {
             exclude('*-local.yml')
             exclude('**/*.proto')
 
-            includeEmptyDirs false
-            duplicatesStrategy DuplicatesStrategy.FAIL
+            includeEmptyDirs = false
+            duplicatesStrategy = DuplicatesStrategy.FAIL
         }
 
         bootRun {
@@ -248,10 +248,10 @@ subprojects {
         testLogging {
             // set options for log level LIFECYCLE
             events TestLogEvent.STARTED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED
-            showExceptions true
-            exceptionFormat TestExceptionFormat.FULL
-            showCauses true
-            showStackTraces true
+            showExceptions = true
+            exceptionFormat = TestExceptionFormat.FULL
+            showCauses = true
+            showStackTraces = true
 
             afterSuite { desc, result ->
                 if (!desc.parent) { // will match the outermost suite
