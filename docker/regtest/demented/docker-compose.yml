@@ -2,7 +2,7 @@
 services:
   # https://github.com/theborakompanioni/demente
   relay:
-    image: ghcr.io/theborakompanioni/demented:0.1.1@sha256:4b973e28006a579476276790fcd19a4a287d92f4b12fcc1d099ed2a3f46a1052
+    image: ghcr.io/theborakompanioni/demented:0.2.0@sha256:c8e7b0f2dc1c8c8f7d5708d85a28909632a4161d94244a3806ed5b2dd177fe7a
     restart: no
     ports:
       - "7000:8080"
