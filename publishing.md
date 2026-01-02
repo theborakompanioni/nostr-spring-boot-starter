@@ -13,6 +13,14 @@ signing.keyId=ABCDEF01
 signing.secretKeyRingFile=/home/user/.gnupg/secring.gpg
 ```
 
+### Local Staging Deploy Repository
+e.g. to publish to your local staging deploy repository (in your build directory):
+```sh
+./gradlew publishNebulaPublicationToStagingDeployRepository -Prelease.version=1.0.0-SNAPSHOT
+```
+```sh
+./gradlew publishNebulaPublicationToStagingDeployRepository -Prelease.useLastTag=true
+```
 
 ### Local Maven Repository
 e.g. to publish to your local maven repository:
@@ -24,38 +32,7 @@ e.g. to publish to your local maven repository:
 ```
 
 
-### Maven Central
-```sh
-./gradlew --no-parallel -Prelease.useLastTag=true \
-    clean assemble -PjavadocEnabled \
-    sign -Psigning.password=secret \
-    publishAllPublicationsToMavenRepository -PossrhPassword=secret
-```
-
-e.g. publishing an individual module to Maven Central (notice params `signing.password` and `ossrhPassword`):
-```sh
-./gradlew -p nostr/nostr-base \
-    --no-parallel -Prelease.useLastTag=true \
-    clean assemble -PjavadocEnabled \
-    sign -Psigning.password=secret \
-    publishAllPublicationsToMavenRepository -PossrhPassword=secret
-```
-
-In your local `~/.gradle/gradle.properties` you need
-```
-ossrhUsername=your-jira-user
-#ossrhPassword=your-jira-password - must be provided via command line
-```
-
-### Jitpack
-Publishing on JitPack is done by creating a GitHub Release.
-
-
 ## Resources
 - Signing Plugin: https://docs.gradle.org/current/userguide/signing_plugin.html#signing_plugin
 - Nebula Publishing Plugin: https://github.com/nebula-plugins/nebula-publishing-plugin
-- Maven Central Publish Guide: https://central.sonatype.org/publish/publish-guide/
-- Maven Central Release Guide: https://central.sonatype.org/publish/release/
-- Central OSSRH Nexus Repository: https://s01.oss.sonatype.org/
-- Jitpack: https://jitpack.io/docs/#publishing-on-jitpack
 - https://discuss.gradle.org/t/how-to-publish-artifacts-signatures-asc-files-using-maven-publish-plugin/7422/24
