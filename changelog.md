@@ -5,11 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.5.0] - 2026-01-02
 ### Changed
 - upgrade: update spring-boot from v3.4.4 to v3.5.8
 - upgrade: update spring-shell from v3.4.0 to v3.4.1
 - upgrade: update sqlite from v3.48.0.0 to v3.49.1.0
-- upgrade: update jmolecules from v2023.2.1 to v2023.3.1
+- upgrade: update jmolecules from v2023.2.1 to v2025.0.2
 - upgrade: update lightning-kmp from v1.8.4 to v1.11.2
 - upgrade: update bitcoin-kmp from v0.20.0 to v0.28.0
 - upgrade: update secp256k1-kmp from v0.15.0 to v0.21.0
@@ -118,7 +120,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release
 
-[Unreleased]: https://github.com/theborakompanioni/nostr-spring-boot-starter/compare/0.4.0...HEAD
+[Unreleased]: https://github.com/theborakompanioni/nostr-spring-boot-starter/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/theborakompanioni/nostr-spring-boot-starter/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/theborakompanioni/nostr-spring-boot-starter/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/theborakompanioni/nostr-spring-boot-starter/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/theborakompanioni/nostr-spring-boot-starter/compare/0.1.0...0.2.0
