@@ -50,7 +50,7 @@ class NostrTemplateApplicationE2eTest {
     @Test
     void itShouldFetchRelayInfoDocumentSuccessfully0() {
         RelayInfoDocument relayInfo = sut.fetchRelayInfoDocument()
-                .blockOptional(Duration.ofSeconds(10))
+                .blockOptional(Duration.ofSeconds(30))
                 .orElseThrow();
         assertThat(relayInfo, is(notNullValue()));
     }
@@ -58,7 +58,7 @@ class NostrTemplateApplicationE2eTest {
     @Test
     void itShouldFetchMetadataEventSuccessfully0() {
         ProfileMetadata metadata = sut.fetchMetadataByAuthor(fiatjaf.getPublicKey())
-                .blockOptional(Duration.ofSeconds(10))
+                .blockOptional(Duration.ofSeconds(30))
                 .orElseThrow();
 
         assertThat(metadata, is(notNullValue()));
@@ -73,7 +73,7 @@ class NostrTemplateApplicationE2eTest {
                 Instant.now().plusSeconds(60)
         ));
 
-        sut.send(event).block(Duration.ofSeconds(5));
+        sut.send(event).block(Duration.ofSeconds(30));
 
         SubscriptionId subscriptionId = MoreSubscriptionIds.random();
 
@@ -86,7 +86,7 @@ class NostrTemplateApplicationE2eTest {
                 .build();
 
         Event fetchedEvent = sut.fetchEvents(reqRequest)
-                .blockFirst(Duration.ofSeconds(5));
+                .blockFirst(Duration.ofSeconds(30));
 
         assertThat(fetchedEvent, is(notNullValue()));
         assertThat(fetchedEvent.getId(), is(event.getId()));

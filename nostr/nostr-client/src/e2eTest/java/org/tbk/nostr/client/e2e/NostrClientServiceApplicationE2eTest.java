@@ -58,7 +58,7 @@ class NostrClientServiceApplicationE2eTest {
                 })
                 .filter(it -> it.getKindCase() == Response.KindCase.OK)
                 .map(Response::getOk)
-                .blockFirst(Duration.ofSeconds(10)));
+                .blockFirst(Duration.ofSeconds(30)));
 
         assertThat(ok.getEventId(), is(event.getId()));
         assertThat(ok.getMessage(), is(""));
@@ -75,7 +75,7 @@ class NostrClientServiceApplicationE2eTest {
                 .build();
 
         Event fetchedEvent = sut.subscribeToEvents(reqRequest)
-                .blockFirst(Duration.ofSeconds(5));
+                .blockFirst(Duration.ofSeconds(30));
 
         assertThat(fetchedEvent, is(notNullValue()));
         assertThat(fetchedEvent.getId(), is(event.getId()));

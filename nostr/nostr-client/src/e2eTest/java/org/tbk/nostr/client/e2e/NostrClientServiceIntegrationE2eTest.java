@@ -43,7 +43,7 @@ class NostrClientServiceIntegrationE2eTest {
                                 .build())
                         .build())
                 .next()
-                .blockOptional(Duration.ofSeconds(10))
+                .blockOptional(Duration.ofSeconds(30))
                 .orElseThrow();
 
         assertThat(event.getKind(), is(Kinds.kindProfileMetadata.getValue()));
