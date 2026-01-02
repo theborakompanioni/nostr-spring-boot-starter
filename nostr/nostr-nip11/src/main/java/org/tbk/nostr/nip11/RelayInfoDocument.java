@@ -19,20 +19,19 @@ import java.util.Map;
 /**
  * Primary fields
  * {
- * "name": <string identifying relay>,
- * "description": <string with detailed information>,
- * "pubkey": <administrative contact pubkey>,
- * "contact": <administrative alternate contact>,
- * "supported_nips": <a list of NIP numbers supported by the relay>,
- * "software": <string identifying relay software URL>,
- * "version": <string version identifier>
+ * "name": ${string identifying relay},
+ * "description": ${string with detailed information},
+ * "pubkey": ${administrative contact pubkey},
+ * "contact": ${administrative alternate contact},
+ * "supported_nips": ${a list of NIP numbers supported by the relay},
+ * "software": ${string identifying relay software URL},
+ * "version": ${string version identifier}
  * }
  */
 @Value
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class RelayInfoDocument {
-    private static final JSON json = JSON.std
-            .without(JSON.Feature.WRITE_NULL_PROPERTIES);
+    private static final JSON json = JSON.std.without(JSON.Feature.WRITE_NULL_PROPERTIES);
 
     /**
      * A relay may select a name for use in client software.
