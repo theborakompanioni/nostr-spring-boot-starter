@@ -62,6 +62,11 @@ test-e2e:
 test-all:
     @./gradlew test integrationTest e2eTest --rerun-tasks --no-parallel
 
+# build javadocs
+[group("development")]
+javadoc:
+    @./gradlew javadoc -PjavadocEnabled
+
 # update metadata for dependency verification
 [group("development")]
 update-verification:
