@@ -85,5 +85,4 @@ spotbugs:
 # lint files
 [group("development")]
 lint:
-    @./gradlew autoLintGradle
-
+    @./gradlew autoLintGradle --no-parallel
