@@ -1,11 +1,10 @@
 spring.ai:
   ollama:
-    init:
-      chat:
-        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
-        additional-models:
-          - gemma3:1b
     chat:
       options:
-        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+        # https://ollama.com/library/gemma3
         model: gemma3:1b
+    init:
+      chat:
+        additional-models:
+          - ${spring.ai.ollama.chat.options.model}

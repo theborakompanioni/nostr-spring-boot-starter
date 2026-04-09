@@ -14,6 +14,13 @@ spring.docker.compose:
     - ./docker-compose.yml
     - ../../docker/regtest/demented/docker-compose.yml
 
+spring.ai:
+  retry:
+    maxAttempts: 21
+  init:
+    maxRetries: 5
+
+
 org.tbk.nostr.example.agentic:
   client:
     relay-uri: 'ws://localhost:7000'

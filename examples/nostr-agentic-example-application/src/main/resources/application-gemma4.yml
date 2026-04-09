@@ -1,0 +1,17 @@
+spring.ai:
+  ollama:
+    chat:
+      options:
+        # https://ollama.com/library/gemma4
+        model: gemma4
+        #model: gemma4:e4b
+        #model: gemma4:e2b-it-q8_0
+        #model: hf.co/ggml-org/gemma-4-E4B-it-GGUF:Q8_0 # Q4_K_M | Q8_0 | F16
+        # https://ai.google.dev/gemma/docs/core/model_card_4#best_practices
+        temperature: 1.0
+        topP: 0.95
+        topK: 64
+    init:
+      chat:
+        additional-models:
+          - ${spring.ai.ollama.chat.options.model}

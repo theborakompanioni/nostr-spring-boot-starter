@@ -1,7 +1,7 @@
 
 services:
   ollama:
-    image: ollama/ollama:0.11.10@sha256:a5409cb903d30f9cd67e9f430dd336ddc9274e16fd78f75b675c42065991b4fd
+    image: ollama/ollama:0.21.2@sha256:2038a264392af4d21f7f14e1568e8dd9aa0f2bd0f31d7d9a59a8cca1e9829663
     restart: no
     ports:
       - "19434:11434"
@@ -11,13 +11,19 @@ services:
       # https://github.com/ollama/ollama/blob/0fe487e7325cd72b8b06e758c2a03842c557dbda/envconfig/config.go#L239
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0:11434
+    healthcheck:
+      test: "ollama --version && ollama ps || exit 1"
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     restart: no
     depends_on:
       ollama:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "19480:8080"
     volumes:
