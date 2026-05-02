@@ -4,7 +4,7 @@ ext {
     grpcVersion = '1.80.0'
     protobufVersion = '4.34.1'
     protocVersion = protobufVersion
-    postgresqlVersion = '42.7.5'
+    postgresqlVersion = '42.7.11'
     jmoleculesBomVersion = '2025.0.2'
     bytebuddyPluginVersion = '1.18.8' // keep in sync with `jmoleculesBomVersion`
     acinqSecp256k1KmpVersion = '0.21.0'

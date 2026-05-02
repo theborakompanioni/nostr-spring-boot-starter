@@ -72,7 +72,7 @@ class NostrAgenticExampleApplicationWebMvcConfigurer implements WebMvcConfigurer
         objectMapper
                 .registerModule(internalModule)
                 .registerModule(new NostrModule())
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
                 .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
                 .enable(SerializationFeature.INDENT_OUTPUT)
                 .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
