@@ -2,6 +2,7 @@ package org.tbk.nostr.example.relay.impl;
 
 import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.NonNull;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.UncategorizedDataAccessException;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +33,7 @@ import java.util.Collection;
 
 import static java.util.Objects.requireNonNull;
 
-public class NostrSupportService implements NostrSupport, Nip1Support, Nip9Support, Nip40Support {
+public class NostrSupportService implements NostrSupport, Nip1Support, Nip9Support, Nip40Support, DisposableBean {
 
     private final EventEntityService eventEntityService;
 
@@ -171,5 +172,12 @@ public class NostrSupportService implements NostrSupport, Nip1Support, Nip9Suppo
                 .and(EventEntitySpecifications.hasKind(kind))
                 .and(EventEntitySpecifications.isCreatedBeforeInclusive(createdAt))
                 .and(EventEntitySpecifications.isNotDeleted());
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if (asyncScheduler != null) {
+            asyncScheduler.dispose();
+        }
     }
 }
