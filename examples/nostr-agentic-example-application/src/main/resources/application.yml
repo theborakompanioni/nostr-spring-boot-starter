@@ -44,6 +44,16 @@ org.tbk.nostr.example.agentic:
   identity:
     mnemonics: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
     passphrase: ''
+  profile-metadata:
+    name: 'Alice'
+    about: "Hey, I'm Alice"
+    #picture: ''
+    display-name: 'alice'
+    #website: 'https://www.example.org'
+    #banner: ''
+    bot: true
+    #nip05: ''
+    #lud16: ''
   client:
     #relay-uri: wss://nostr-pub.wellorder.net
     #relay-uri: wss://relay.damus.io

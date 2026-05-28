@@ -2,8 +2,8 @@
 
 # run "nostr-agentic" example application
 [group("example")]
-run-example-nostr-agentic:
-    @just --justfile examples/nostr-agentic-example-application/justfile run
+run-example-nostr-agentic profiles='development,gemma3' *args='':
+    @just --justfile examples/nostr-agentic-example-application/justfile run {{profiles}} {{args}}
 
 # run "nostr-shell" example application
 [group("example")]
