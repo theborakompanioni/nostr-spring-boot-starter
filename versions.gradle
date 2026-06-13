@@ -20,7 +20,7 @@ ext {
     springBootGradlePluginVersion = '3.5.14'
     springBootVersion = springBootGradlePluginVersion
     springShellVersion = '3.4.1'
-    springAiVersion = '1.1.7'
+    springAiVersion = '1.1.8'
     protobufGradleVersion = '0.10.0'
 }
 
