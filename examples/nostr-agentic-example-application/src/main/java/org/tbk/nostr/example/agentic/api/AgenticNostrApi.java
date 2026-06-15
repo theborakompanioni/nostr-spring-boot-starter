@@ -5,11 +5,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import lombok.Singular;
-import lombok.Value;
+import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -28,7 +26,6 @@ import org.tbk.nostr.nips.Nip1;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.util.MoreEvents;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,13 +38,13 @@ import java.util.Optional;
 })
 public class AgenticNostrApi {
 
-    @NotNull
+    @NonNull
     private final OllamaChatModel ollamaChatModel;
 
-    @NotNull
+    @NonNull
     private final Identity nostrIdentity;
 
-    @NotNull
+    @NonNull
     private final Signer nostrSigner;
 
     @Operation(
