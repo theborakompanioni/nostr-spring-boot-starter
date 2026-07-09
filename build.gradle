@@ -234,9 +234,9 @@ subprojects {
             csv.enabled = false
         }*/
     }
-
-    artifacts {
-        archives testJar
+    
+    tasks.named("assemble") {
+        dependsOn(testJar)
     }
 
     lombok {
