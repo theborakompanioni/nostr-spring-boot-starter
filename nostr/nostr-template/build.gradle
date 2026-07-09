@@ -9,12 +9,12 @@ dependencies {
     api project(':nostr:nostr-nip11')
     implementation project(':nostr:nostr-core')
 
-    api "io.github.theborakompanioni:nostr-proto-json:${nostrProtoVersion}"
-    implementation "io.github.theborakompanioni:nostr-proto-json:${nostrProtoVersion}"
+    api "io.github.theborakompanioni:nostr-proto-json:${rootProject.ext.nostrProtoVersion}"
+    implementation "io.github.theborakompanioni:nostr-proto-json:${rootProject.ext.nostrProtoVersion}"
 
     api 'io.projectreactor:reactor-core'
 
-    implementation "com.google.guava:guava:${guavaVersion}"
+    implementation "com.google.guava:guava:${rootProject.ext.guavaVersion}"
 
     implementation 'org.springframework:spring-websocket'
 

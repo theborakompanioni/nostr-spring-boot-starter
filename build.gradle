@@ -120,18 +120,18 @@ subprojects {
     dependencyManagement {
         imports {
             mavenBom SpringBootPlugin.BOM_COORDINATES
-            mavenBom "org.jmolecules:jmolecules-bom:${jmoleculesBomVersion}"
-            mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+            mavenBom "org.jmolecules:jmolecules-bom:${rootProject.ext.jmoleculesBomVersion}"
+            mavenBom "org.springframework.ai:spring-ai-bom:${rootProject.ext.springAiVersion}"
         }
     }
 
     dependencies {
         compileOnly "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}"
         testCompileOnly "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}"
-        spotbugsPlugins "com.h3xstream.findsecbugs:findsecbugs-plugin:${findsecbugsPluginVersion}"
+        spotbugsPlugins "com.h3xstream.findsecbugs:findsecbugs-plugin:${rootProject.ext.findsecbugsPluginVersion}"
 
         implementation 'org.slf4j:slf4j-api'
-        implementation "com.google.guava:guava:${guavaVersion}"
+        implementation "com.google.guava:guava:${rootProject.ext.guavaVersion}"
 
         testImplementation 'org.junit.jupiter:junit-jupiter-api'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -240,7 +240,7 @@ subprojects {
     }
 
     lombok {
-        version = "${lombokVersion}"
+        version = "${rootProject.ext.lombokVersion}"
     }
 
     tasks.withType(Test).configureEach {
@@ -294,7 +294,7 @@ subprojects {
     }
 
     checkstyle {
-        toolVersion = "${checkstyleVersion}"
+        toolVersion = "${rootProject.ext.checkstyleVersion}"
         configFile = rootProject.file('./checkstyle.xml')
         maxErrors = 0
         ignoreFailures = false

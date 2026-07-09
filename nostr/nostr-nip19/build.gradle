@@ -7,7 +7,7 @@ description = 'nostr nip19 package'
 dependencies {
     api project(':nostr:nostr-core')
 
-    api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
+    api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${rootProject.ext.acinqBitcoinKmpVersion}"
 
     testImplementation project(':nostr:nostr-persona')
 }

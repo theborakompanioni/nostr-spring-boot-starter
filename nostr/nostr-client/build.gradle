@@ -8,13 +8,13 @@ dependencies {
     api project(':nostr:nostr-base')
     implementation project(':nostr:nostr-core')
 
-    implementation "io.github.theborakompanioni:nostr-proto-json:${nostrProtoVersion}"
+    implementation "io.github.theborakompanioni:nostr-proto-json:${rootProject.ext.nostrProtoVersion}"
 
     api 'io.projectreactor:reactor-core'
 
     implementation 'org.springframework:spring-websocket'
 
-    implementation "com.google.guava:guava:${guavaVersion}"
+    implementation "com.google.guava:guava:${rootProject.ext.guavaVersion}"
 
     testImplementation project(':nostr:nostr-identity')
 

@@ -7,8 +7,8 @@ description = 'nostr nip44 package'
 dependencies {
     api project(':nostr:nostr-core')
 
-    api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
+    api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${rootProject.ext.acinqBitcoinKmpVersion}"
 
     testImplementation project(':nostr:nostr-persona')
-    testImplementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
+    testImplementation "com.fasterxml.jackson.jr:jackson-jr-all:${rootProject.ext.jacksonJrVersion}"
 }

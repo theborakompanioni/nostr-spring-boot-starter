@@ -13,20 +13,20 @@ dependencies {
     implementation project(':nostr-relay:nostr-relay-starter')
     implementation project(':nostr-relay-plugins:plugin-allowlist:nostr-relay-plugin-allowlist-starter')
 
-    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
-    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
+    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${rootProject.ext.acinqBitcoinKmpVersion}"
+    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${rootProject.ext.acinqSecp256k1KmpVersion}"
 
-    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
+    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${rootProject.ext.jacksonJrVersion}"
 
     // lingua: language detection for NIP-50 support
-    implementation "com.github.pemistahl:lingua:${linguaVersion}"
+    implementation "com.github.pemistahl:lingua:${rootProject.ext.linguaVersion}"
 
     implementation 'io.projectreactor:reactor-core'
 
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
 
-    implementation "org.xerial:sqlite-jdbc:${sqliteVersion}"
+    implementation "org.xerial:sqlite-jdbc:${rootProject.ext.sqliteVersion}"
     implementation 'org.hibernate.orm:hibernate-community-dialects'
 
     implementation 'org.jmolecules:jmolecules-ddd'
@@ -64,6 +64,6 @@ dependencies {
     testImplementation project(':nostr:nostr-template')
     testImplementation project(':nostr:nostr-client')
     testImplementation project(':nostr:nostr-persona')
-    integTestImplementation "org.postgresql:postgresql:${postgresqlVersion}"
+    integTestImplementation "org.postgresql:postgresql:${rootProject.ext.postgresqlVersion}"
     integTestImplementation 'org.springframework.boot:spring-boot-docker-compose'
 }
