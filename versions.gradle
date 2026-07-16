@@ -17,7 +17,7 @@ ext {
     checkstyleVersion = '13.8.0'
     findsecbugsPluginVersion = '1.14.0'
     nostrProtoVersion = '0.4.0'
-    springBootGradlePluginVersion = '3.5.16'
+    springBootGradlePluginVersion = '4.1.0'
     springBootVersion = springBootGradlePluginVersion
     springShellVersion = '3.4.1'
     springAiVersion = '1.1.8'
