@@ -49,18 +49,33 @@ test:
 
 # run integration tests
 [group("development")]
-test-integration:
-    @./gradlew integrationTest --rerun-tasks --no-parallel
+test-integration *args='':
+    @./gradlew integrationTest --no-parallel {{args}}
+
+# run integration tests  (with `--rerun-tasks`)
+[group("development")]
+test-integration-force *args='':
+    @just test-e2e --rerun-tasks {{args}}
 
 # run end-to-end tests
 [group("development")]
-test-e2e:
-    @./gradlew e2eTest --rerun-tasks --no-parallel
+test-e2e *args='':
+    @./gradlew e2eTest --no-parallel
+
+# run end-to-end tests (with `--rerun-tasks`)
+[group("development")]
+test-e2e-force *args='':
+    @just test-e2e --rerun-tasks {{args}}
 
 # run all tests
 [group("development")]
-test-all:
-    @./gradlew test integrationTest e2eTest --rerun-tasks --no-parallel
+test-all *args='':
+    @./gradlew test integrationTest e2eTest --no-parallel {{args}}
+
+# run all tests (with `--rerun-tasks`)
+[group("development")]
+test-all-force *args='':
+    @just test-all --rerun-tasks {{args}}
 
 # build javadocs
 [group("development")]

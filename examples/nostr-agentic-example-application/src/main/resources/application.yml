@@ -10,6 +10,10 @@ logging.config: classpath:logback.xml
 logging.level.org.springframework: INFO
 logging.level.org.tbk.nostr: INFO
 
+# todo: remove after upgrading jackson-datatype-nostr to jackson3
+spring.http.converters:
+  preferred-json-mapper: jackson2
+
 spring.docker.compose:
   enabled: true
   file: ./docker-compose.yml
@@ -46,5 +50,4 @@ org.tbk.nostr.example.agentic:
     passphrase: ''
   client:
     #relay-uri: wss://nostr-pub.wellorder.net
-    #relay-uri: wss://relay.damus.io
     relay-uri: wss://relay.primal.net

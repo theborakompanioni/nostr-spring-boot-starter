@@ -4,10 +4,10 @@ import fr.acinq.bitcoin.Crypto;
 import fr.acinq.bitcoin.MnemonicCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.shell.standard.ShellCommandGroup;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.core.command.annotation.Command;
+import org.springframework.shell.core.command.annotation.CommandGroup;
+import org.springframework.shell.core.command.annotation.Option;
+import org.springframework.stereotype.Component;
 import org.tbk.nostr.example.shell.util.Json;
 import org.tbk.nostr.identity.Identity;
 import org.tbk.nostr.identity.MoreIdentities;
@@ -20,15 +20,15 @@ import java.util.HexFormat;
 import java.util.List;
 
 @Slf4j
-@ShellComponent
-@ShellCommandGroup("Commands")
+@Component
+@CommandGroup(name = "Commands")
 @RequiredArgsConstructor
 class PersonaCommand {
 
-    @ShellMethod(key = "persona", value = "Generate nostr personas")
+    @Command(name = "persona", description = "Generate nostr personas")
     public String run(
-            @ShellOption(value = "name", help = "persona name (used to derive master key)") String name,
-            @ShellOption(value = "account", defaultValue = "0", help = "identity account index (default: 0)") long accountIndexArg
+            @Option(shortName = 'n', longName = "name", description = "persona name (used to derive master key)", required = true) String name,
+            @Option(shortName = 'a', longName = "account", defaultValue = "0", description = "identity account index (default: 0)") long accountIndexArg
     ) throws IOException {
         long accountIndex = accountIndexArg >= 0 ? accountIndexArg : 0;
 

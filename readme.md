@@ -68,7 +68,7 @@ message Event {
 Publish events easily.
 
 ```java
-NostrTemplate template = new SimpleNostrTemplate(RelayUri.parse("wss://relay.damus.io"));
+NostrTemplate template = new SimpleNostrTemplate(RelayUri.parse("wss://relay.example.org"));
 Signer signer = SimpleSigner.random();
 
 Event event = MoreEvents.finalize(signer, Nip40.expire(

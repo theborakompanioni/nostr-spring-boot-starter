@@ -2,7 +2,7 @@ package org.tbk.nostr.example.shell.util;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 
-public class Json {
+public final class Json {
 
     public static final JSON json = JSON.std
             .with(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS)
@@ -14,4 +14,8 @@ public class Json {
 
     public static final JSON jsonPretty = json
             .with(JSON.Feature.PRETTY_PRINT_OUTPUT);
+
+    private Json() {
+        throw new UnsupportedOperationException();
+    }
 }

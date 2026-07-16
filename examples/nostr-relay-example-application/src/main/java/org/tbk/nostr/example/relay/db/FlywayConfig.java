@@ -1,11 +1,8 @@
 package org.tbk.nostr.example.relay.db;
 
-import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.migration.JavaMigration;
-import org.flywaydb.core.internal.database.DatabaseType;
-import org.flywaydb.database.postgresql.PostgreSQLDatabaseType;
-import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.flyway.autoconfigure.FlywayConfigurationCustomizer;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +14,7 @@ class FlywayConfig {
 
     @Bean
     SupportedDatabaseType supportedDatabaseType(DataSourceProperties dataSourceProperties) {
-        return SupportedDatabaseType.fromUrl(dataSourceProperties.getUrl());
+        return SupportedDatabaseType.fromUrl(dataSourceProperties.determineUrl());
     }
 
     @Bean

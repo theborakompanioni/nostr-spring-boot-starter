@@ -3,108 +3,72 @@ package org.tbk.nostr.example.shell.command;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.shell.test.ShellAssertions;
+import org.springframework.shell.test.ShellScreen;
 import org.springframework.shell.test.ShellTestClient;
 import org.springframework.shell.test.autoconfigure.ShellTest;
-import org.springframework.test.annotation.DirtiesContext;
-
-import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.await;
+import org.tbk.nostr.example.shell.NostrShellExampleApplication;
 
 @Slf4j
 @ShellTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest(classes = NostrShellExampleApplication.class)
 class IdentityVanityCommandTest {
 
     @Autowired
     private ShellTestClient client;
 
     @Test
-    void testIdentityVanityPrefix() {
-        ShellTestClient.InteractiveShellSession session = client
-                .interactive()
-                .run();
-
-        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
-            ShellAssertions.assertThat(session.screen()).containsText("nostr:>");
-        });
-
+    void testIdentityVanityPrefix() throws Exception {
         String npubPrefix = "z";
+        String command = """
+                identity-vanity --npub-prefix %s
+                """.formatted(npubPrefix);
 
-        session.write(session.writeSequence()
-                .text("identity-vanity").space()
-                .text("--npub-prefix").space().text(npubPrefix).space()
-                .carriageReturn()
-                .build());
+        ShellScreen screen = client.sendCommand(command);
 
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            ShellAssertions.assertThat(session.screen())
-                    .containsText("{")
-                    .containsText("\"npub\" : \"npub1" + npubPrefix)
-                    .containsText("\"nsec\" : \"nsec1")
-                    .containsText("\"privateKey\" : \"")
-                    .containsText("\"publicKey\" : \"")
-                    .containsText("}");
-        });
+        ShellAssertions.assertThat(screen)
+                .containsText("{")
+                .containsText("\"npub\" : \"npub1" + npubPrefix)
+                .containsText("\"nsec\" : \"nsec1")
+                .containsText("\"privateKey\" : \"")
+                .containsText("\"publicKey\" : \"")
+                .containsText("}");
     }
 
     @Test
-    void testIdentityVanitySuffix() {
-        ShellTestClient.InteractiveShellSession session = client
-                .interactive()
-                .run();
-
-        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
-            ShellAssertions.assertThat(session.screen()).containsText("nostr:>");
-        });
-
+    void testIdentityVanitySuffix() throws Exception {
         String npubSuffix = "z";
+        String command = """
+                identity-vanity --npub-suffix %s
+                """.formatted(npubSuffix);
 
-        session.write(session.writeSequence()
-                .text("identity-vanity").space()
-                .text("--npub-suffix").space().text(npubSuffix).space()
-                .carriageReturn()
-                .build());
+        ShellScreen screen = client.sendCommand(command);
 
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            ShellAssertions.assertThat(session.screen())
-                    .containsText("{")
-                    .containsText("\"npub\" : \"npub1").containsText(npubSuffix + "\"")
-                    .containsText("\"nsec\" : \"nsec1")
-                    .containsText("\"privateKey\" : \"")
-                    .containsText("\"publicKey\" : \"")
-                    .containsText("}");
-        });
+        ShellAssertions.assertThat(screen)
+                .containsText("{")
+                .containsText("\"npub\" : \"npub1").containsText(npubSuffix + "\"")
+                .containsText("\"nsec\" : \"nsec1")
+                .containsText("\"privateKey\" : \"")
+                .containsText("\"publicKey\" : \"")
+                .containsText("}");
     }
 
     @Test
-    void testIdentityVanityPrefixAndSuffix() {
-        ShellTestClient.InteractiveShellSession session = client
-                .interactive()
-                .run();
-
-        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
-            ShellAssertions.assertThat(session.screen()).containsText("nostr:>");
-        });
-
+    void testIdentityVanityPrefixAndSuffix() throws Exception {
         String prefixAndSuffix = "z";
+        String command = """
+                identity-vanity --npub-prefix %s --npub-suffix %s
+                """.formatted(prefixAndSuffix, prefixAndSuffix);
 
-        session.write(session.writeSequence()
-                .text("identity-vanity").space()
-                .text("--npub-prefix").space().text(prefixAndSuffix).space()
-                .text("--npub-suffix").space().text(prefixAndSuffix).space()
-                .carriageReturn()
-                .build());
+        ShellScreen screen = client.sendCommand(command);
 
-        await().atMost(10 * 2, TimeUnit.SECONDS).untilAsserted(() -> {
-            ShellAssertions.assertThat(session.screen())
-                    .containsText("{")
-                    .containsText("\"npub\" : \"npub1" + prefixAndSuffix).containsText(prefixAndSuffix + "\"")
-                    .containsText("\"nsec\" : \"nsec1")
-                    .containsText("\"privateKey\" : \"")
-                    .containsText("\"publicKey\" : \"")
-                    .containsText("}");
-        });
+        ShellAssertions.assertThat(screen)
+                .containsText("{")
+                .containsText("\"npub\" : \"npub1" + prefixAndSuffix).containsText(prefixAndSuffix + "\"")
+                .containsText("\"nsec\" : \"nsec1")
+                .containsText("\"privateKey\" : \"")
+                .containsText("\"publicKey\" : \"")
+                .containsText("}");
     }
 }

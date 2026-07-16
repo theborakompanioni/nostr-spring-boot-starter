@@ -23,14 +23,14 @@ public class SimpleNostrAuthenticationToken extends AbstractAuthenticationToken 
     }
 
     @Serial
-    private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
+    private static final long serialVersionUID = 2027_08_01_00L;
 
     private final Nip42Support.PublicKeyPrincipal principal;
 
     private Object credentials;
 
     public SimpleNostrAuthenticationToken(XonlyPublicKey principal, Object credentials) {
-        super(null);
+        super((Collection<? extends GrantedAuthority>) null);
         this.principal = new SimplePublicKeyPrincipal(principal);
         this.credentials = credentials;
         setAuthenticated(false);
