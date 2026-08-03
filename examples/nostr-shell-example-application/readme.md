@@ -10,7 +10,7 @@ A simple Nostr shell example application, e.g. to "mine" notes (NIP-13).
 
 ## Run
 ```shell
-./examples/nostr-shell-example-application/build/libs/nostr-shell-example-application-<$version>-boot.jar
+java -jar ./examples/nostr-shell-example-application/build/libs/nostr-shell-example-application-${version}-boot.jar
 ```
 
 ## Example
@@ -18,7 +18,7 @@ A simple Nostr shell example application, e.g. to "mine" notes (NIP-13).
 ### Interactive
 
 ```shell
-./examples/nostr-shell-example-application/build/libs/nostr-shell-example-application-0.1.0-dev-boot.jar 
+java -jar ./examples/nostr-shell-example-application/build/libs/nostr-shell-example-application-${version}-boot.jar
 $>help
 AVAILABLE COMMANDS
 
@@ -87,6 +87,9 @@ $>pow --target 25 --json "{ \"kind\": 1, \"content\":\"GM!\", \"tags\": [[ \"exp
 
 ### Non-interactive
 ```shell
-./examples/nostr-shell-example-application/build/libs/nostr-shell-example-application-0.1.0-dev-boot.jar pow --target 25 --parallelism 8 --json '{ \"kind\": 1, \"content\":\"GM!\", \"tags\": [[ \"expiration\", \"1710378232\" ]] }'
+java -D"spring.shell.interactive.enabled=false" \
+  -jar ./examples/nostr-shell-example-application/build/libs/nostr-shell-example-application-${version}-boot.jar \
+  pow --target 25 --parallelism 8 \
+  --json '{"kind":1,"content":"GM!","tags":[["expiration","1710378232"]]}'
 {"id":"000000469cab0be2c76b8585c081ce3ad84897cdd50e9348b2b0b75a82f4d7aa","pubkey":"","created_at":1710441044,"kind":1,"tags":[["expiration","1710378232"],["nonce","163290","25","2"]],"content":"GM!","sig":""}
 ```

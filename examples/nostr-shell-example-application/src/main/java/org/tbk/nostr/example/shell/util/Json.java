@@ -9,8 +9,7 @@ public final class Json {
             .with(JSON.Feature.READ_ONLY)
             .with(JSON.Feature.PRESERVE_FIELD_ORDERING)
             .with(JSON.Feature.USE_DEFERRED_MAPS)
-            .without(JSON.Feature.FORCE_REFLECTION_ACCESS)
-            .without(JSON.Feature.PRETTY_PRINT_OUTPUT);
+            .without(JSON.Feature.FORCE_REFLECTION_ACCESS);
 
     public static final JSON jsonPretty = json
             .with(JSON.Feature.PRETTY_PRINT_OUTPUT);
