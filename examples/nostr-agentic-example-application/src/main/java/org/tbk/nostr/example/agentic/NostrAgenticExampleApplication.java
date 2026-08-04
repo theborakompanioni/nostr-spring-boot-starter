@@ -15,6 +15,7 @@ import org.springframework.boot.web.server.context.WebServerPortFileWriter;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.util.StopWatch;
 import org.tbk.nostr.client.NostrClientService;
 import org.tbk.nostr.identity.Identity;
 
@@ -67,13 +68,18 @@ public class NostrAgenticExampleApplication {
                     What day is today?
                     """;
 
-            OllamaChatOptions build = OllamaChatOptions.builder()
+            OllamaChatOptions options = ollamaChatModel.getOptions().mutate()
                     .temperature(0.33)
                     .build();
 
-            ChatResponse response = ollamaChatModel.call(new Prompt(contents, build));
+            StopWatch stopWatch = new StopWatch("chatModel.call");
 
-            log.debug("ChatResponse: {}", response);
+            log.debug("chatModel.call: '{}' ({})", contents, options.toMap());
+            stopWatch.start();
+            ChatResponse response = ollamaChatModel.call(new Prompt(contents, options));
+            stopWatch.stop();
+            log.debug("{}", stopWatch.shortSummary());
+
             log.info("Model: {}", response.getMetadata().getModel());
             log.info("Text: {}", response.getResult().getOutput().getText());
         };

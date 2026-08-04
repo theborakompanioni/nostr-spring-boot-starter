@@ -10,10 +10,11 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -91,10 +92,15 @@ public class AgenticNostrApi {
         @Builder.Default
         Double temperature = Double.valueOf("0.33");
 
-        private OllamaChatOptions toOllamaChatOptions() {
-            return OllamaChatOptions.builder()
-                    .temperature(temperature)
+        private ChatOptions toChatOptions(ChatModel model) {
+            return model.getOptions().mutate()
+                    .combineWith(toChatOptions())
                     .build();
+        }
+
+        private ChatOptions.Builder<?> toChatOptions() {
+            return ChatOptions.builder()
+                    .temperature(temperature);
         }
     }
 
@@ -104,7 +110,8 @@ public class AgenticNostrApi {
     @PostMapping(value = "/event")
     // Note: ResponseEntity<?> is used as workaround for swagger-ui loading issues with protobuf classes
     public ResponseEntity<?> event(@Validated @RequestBody EventApiRequestDto body) {
-        Prompt prompt = new Prompt(body.getContents(), body.toOllamaChatOptions());
+        ChatOptions options = body.toChatOptions(ollamaChatModel);
+        Prompt prompt = new Prompt(body.getContents(), options);
         ChatResponse response = ollamaChatModel.call(prompt);
 
         String text = response.getResult().getOutput().getText();
@@ -130,7 +137,8 @@ public class AgenticNostrApi {
     )
     @PostMapping(value = "/event-with-meta")
     public ResponseEntity<EventWithMetaApiResponseDto> eventWithMeta(@Validated @RequestBody EventApiRequestDto body) {
-        Prompt prompt = new Prompt(body.getContents(), body.toOllamaChatOptions());
+        ChatOptions options = body.toChatOptions(ollamaChatModel);
+        Prompt prompt = new Prompt(body.getContents(), options);
         ChatResponse response = ollamaChatModel.call(prompt);
 
         String text = response.getResult().getOutput().getText();

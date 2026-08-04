@@ -31,18 +31,17 @@ spring.ai:
       chat:
         # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
         additional-models:
-          - hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
+          - ${spring.ai.ollama.chat.model}
           #- gemma3:1b
           #- moondream
     chat:
-      options:
-        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
-        model: hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
-        #model: gemma3:1b
-        #model: moondream
-        keep_alive: 24h
-        #format: json
-        temperature: 0.7
+      # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+      model: hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
+      #model: gemma3:1b
+      #model: moondream
+      keep_alive: 24h
+      #format: json
+      temperature: 0.7
 
 org.tbk.nostr.example.agentic:
   identity:

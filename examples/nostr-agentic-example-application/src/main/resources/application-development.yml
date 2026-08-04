@@ -20,7 +20,6 @@ spring.ai:
   init:
     maxRetries: 5
 
-
 org.tbk.nostr.example.agentic:
   client:
     relay-uri: 'ws://localhost:7000'
