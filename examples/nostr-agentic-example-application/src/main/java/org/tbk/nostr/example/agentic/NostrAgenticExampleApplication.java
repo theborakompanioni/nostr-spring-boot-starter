@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.util.StopWatch;
 import org.tbk.nostr.client.NostrClientService;
+import org.tbk.nostr.example.agentic.utils.MostMinimalPrompt;
 import org.tbk.nostr.identity.Identity;
 
 import java.util.Locale;
@@ -64,9 +65,7 @@ public class NostrAgenticExampleApplication {
     @Profile("!test")
     ApplicationRunner testRunner(OllamaChatModel ollamaChatModel) {
         return args -> {
-            String contents = """
-                    What day is today?
-                    """;
+            String contents = MostMinimalPrompt.prompt();
 
             OllamaChatOptions options = ollamaChatModel.getOptions().mutate()
                     .temperature(0.33)
