@@ -23,10 +23,10 @@ class NostrAgenticExampleApplicationE2eTest {
 
     @Test
     void itShouldVerifyMinimalPrompt() {
-        String contents = MostMinimalPrompt.prompt();
+        MostMinimalPrompt prompt = MostMinimalPrompt.create();
 
         OllamaChatOptions options = ollamaChatModel.getOptions();
-        ChatResponse response = ollamaChatModel.call(new Prompt(contents, options));
+        ChatResponse response = ollamaChatModel.call(new Prompt(prompt.getPrompt(), options));
 
         assertThat(response.getResult(), is(notNullValue()));
 

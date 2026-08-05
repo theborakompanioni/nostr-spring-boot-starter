@@ -10,6 +10,8 @@ spring.docker.compose:
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
   #stop.arguments: --volumes
   skip.in-tests: false
+  profiles.active:
+    - 'test' # override the default profile
 
 org.tbk.nostr.example.agentic:
   client:
@@ -19,6 +21,10 @@ spring.ai:
   ollama:
     init:
       pull-model-strategy: never
+    # https://docs.spring.io/spring-ai/reference/api/chat/prompt-engineering-patterns.html
     chat:
       think: false
-      temperature: 0.1 # very deterministic output
+      temperature: 0.01 # very deterministic output
+      max-tokens: 5
+      top-k: 1
+      top-p: 1

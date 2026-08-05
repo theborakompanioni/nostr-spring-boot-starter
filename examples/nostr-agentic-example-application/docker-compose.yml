@@ -13,17 +13,23 @@ services:
       OLLAMA_HOST: 0.0.0.0:11434
     healthcheck:
       test: "ollama --version && ollama ps || exit 1"
-      start_period: 20s
+      start_period: 30s
+      start_interval: 5s
       interval: 30s
       retries: 5
       timeout: 5s
 
   open-webui:
+    profiles: ["open-webui"]
     image: ghcr.io/open-webui/open-webui:0.11.0-slim@sha256:88da9f0e08b8ada8e40bc6d6291494e2c6775a62d24b67b0cefb74ffee4ce621
     restart: no
     depends_on:
       ollama:
-        condition: service_healthy
+        condition: service_started # don't wait, ui is for humans and should not block the application from starting
+    # don't wait for health checks, ui is for humans and should not block the application from starting
+    healthcheck:
+      disable: true
+      test: ["CMD", "exit", "0"]
     ports:
       - "19480:8080"
     volumes:

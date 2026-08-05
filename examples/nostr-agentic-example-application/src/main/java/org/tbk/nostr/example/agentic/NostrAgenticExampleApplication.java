@@ -65,22 +65,34 @@ public class NostrAgenticExampleApplication {
     @Profile("!test")
     ApplicationRunner testRunner(OllamaChatModel ollamaChatModel) {
         return args -> {
-            String contents = MostMinimalPrompt.prompt();
+            MostMinimalPrompt prompt = MostMinimalPrompt.create();
 
             OllamaChatOptions options = ollamaChatModel.getOptions().mutate()
-                    .temperature(0.1)
+                    .combineWith(prompt.getOptions().mutate())
+                    .disableThinking()
                     .build();
 
             StopWatch stopWatch = new StopWatch("chatModel.call");
 
-            log.debug("chatModel.call: '{}' ({})", contents, options.toMap());
             stopWatch.start();
-            ChatResponse response = ollamaChatModel.call(new Prompt(contents, options));
+            ChatResponse response = ollamaChatModel.call(new Prompt(prompt.getPrompt(), options));
             stopWatch.stop();
-            log.debug("{}", stopWatch.shortSummary());
 
-            log.info("Model: {}", response.getMetadata().getModel());
-            log.info("Text: {}", response.getResult().getOutput().getText());
+            log.info("""
+                    \n***** TEST PROMPT *****
+                    * prompt: "{}"
+                    * response: "{}"
+                    * =====================
+                    * model: {}
+                    * options: {}
+                    * stopwatch: {}
+                    ***********************
+                    """,
+                    prompt.getPrompt(),
+                    response.getResult().getOutput().getText(),
+                    response.getMetadata().getModel(),
+                    options.toMap(),
+                    stopWatch.shortSummary());
         };
     }
 }
