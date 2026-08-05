@@ -12,7 +12,6 @@ spring.ai:
       topP: 0.95
       topK: 64
       think: true
-    init:
-      chat:
-        additional-models:
-          - ${spring.ai.ollama.chat.model}
+    embedding:
+      # https://ollama.com/library/embeddinggemma
+      model: 'embeddinggemma' # needed for 'QuestionAnswerAdvisor'

@@ -29,6 +29,6 @@ spring.ai:
     chat:
       think: false
       temperature: 0.01 # very deterministic output
-      num-predict: 3
+      num-predict: 5
       top-k: 1
       top-p: 1

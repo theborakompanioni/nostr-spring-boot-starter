@@ -3,7 +3,3 @@ spring.ai:
     chat:
       # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
       model: hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
-    init:
-      chat:
-        additional-models:
-          - ${spring.ai.ollama.chat.model}

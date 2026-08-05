@@ -3,7 +3,3 @@ spring.ai:
     chat:
       # https://ollama.com/library/moondream
       model: moondream
-    init:
-      chat:
-        additional-models:
-          - ${spring.ai.ollama.chat.model}

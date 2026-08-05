@@ -19,9 +19,9 @@ public class MostMinimalPrompt {
     // see https://docs.spring.io/spring-ai/reference/api/chat/prompt-engineering-patterns.html#_temperature
     private static final double DEFAULT_TEMPERATURE = 0.01d;
 
-    // Low values (1-25): For single words, short phrases, or classification labels.
+    // Low values (5-25): For single words, short phrases, or classification labels.
     // see https://docs.spring.io/spring-ai/reference/api/chat/prompt-engineering-patterns.html#_output_length_maxtokens
-    private static final int DEFAULT_MAX_TOKENS = 3;
+    private static final int DEFAULT_MAX_TOKENS = 5;
 
     public static MostMinimalPrompt create() {
         return MostMinimalPrompt.builder()

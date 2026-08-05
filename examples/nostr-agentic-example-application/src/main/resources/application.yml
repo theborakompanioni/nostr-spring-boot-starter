@@ -43,7 +43,8 @@ spring.ai:
       timeout: 120s
       max-retries: 3
       embedding:
-        include: false
+        additional-models:
+          - ${spring.ai.ollama.embedding.model}
       chat:
         # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
         additional-models:
@@ -60,6 +61,10 @@ spring.ai:
       #format: json
       #think: true
       temperature: 0.7
+    # https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html
+    embedding:
+      model: 'mxbai-embed-large' # needed for 'QuestionAnswerAdvisor'
+
   vectorstore:
     # https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html#pgvector-properties
     pgvector:
