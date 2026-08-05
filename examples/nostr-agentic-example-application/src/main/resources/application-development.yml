@@ -12,7 +12,10 @@ logging.level.org.tbk.nostr: DEBUG
 spring.docker.compose:
   file:
     - ./docker-compose.yml
+    - ../../docker/regtest/pgvector/docker-compose.yml
     - ../../docker/regtest/demented/docker-compose.yml
+  arguments[0]: --project-name=nostr-agentic-example-dev
+  arguments[1]: --progress=auto
   profiles.active:
     - 'development'
 

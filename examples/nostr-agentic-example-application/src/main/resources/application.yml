@@ -16,8 +16,24 @@ spring.http.converters:
 
 spring.docker.compose:
   enabled: true
-  file: ./docker-compose.yml
+  file:
+    - ./docker-compose.yml
+    - ../../docker/regtest/pgvector/docker-compose.yml
+  arguments[0]: --project-name=nostr-agentic-example
+  arguments[1]: --progress=auto
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
+
+spring.jpa.properties.hibernate.format_sql: true
+spring.jpa.properties.hibernate.show_sql: true
+
+spring.datasource.url: 'jdbc:postgresql://localhost:16432/postgres'
+spring.datasource.username: postgres
+spring.datasource.password: postgres
+spring.datasource.driver-class-name: org.postgresql.Driver
+spring.datasource.hikari.pool-name: PostgresPool
+spring.datasource.hikari.maximum-pool-size: 10
+
+#spring.jpa.properties.hibernate.dialect: org.tbk.nostr.example.relay.db.dialect.CustomPostgresDialect
 
 spring.ai:
   ollama:
@@ -44,6 +60,17 @@ spring.ai:
       #format: json
       #think: true
       temperature: 0.7
+  vectorstore:
+    # https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html#pgvector-properties
+    pgvector:
+      initialize-schema: true
+      schema-validation: false # enable on demand, e.g. when flyway migration for schema exists
+      remove-existing-vector-store-table: false
+      table-name: spring_ai_vector_store
+      index-type: HNSW
+      distance-type: COSINE_DISTANCE
+      dimensions: 1536
+      max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
 
 org.tbk.nostr.example.agentic:
   identity:
