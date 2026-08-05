@@ -68,7 +68,7 @@ public class NostrAgenticExampleApplication {
             String contents = MostMinimalPrompt.prompt();
 
             OllamaChatOptions options = ollamaChatModel.getOptions().mutate()
-                    .temperature(0.33)
+                    .temperature(0.1)
                     .build();
 
             StopWatch stopWatch = new StopWatch("chatModel.call");

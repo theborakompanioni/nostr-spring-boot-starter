@@ -9,8 +9,8 @@ services:
       - ollama-data:/root/.ollama
     environment:
       # https://github.com/ollama/ollama/blob/0fe487e7325cd72b8b06e758c2a03842c557dbda/envconfig/config.go#L239
-      - OLLAMA_KEEP_ALIVE=24h
-      - OLLAMA_HOST=0.0.0.0:11434
+      OLLAMA_KEEP_ALIVE: 24h
+      OLLAMA_HOST: 0.0.0.0:11434
     healthcheck:
       test: "ollama --version && ollama ps || exit 1"
       start_period: 20s
@@ -30,12 +30,19 @@ services:
       - open-webui-data:/app/backend/data
     environment:
       # https://docs.openwebui.com/getting-started/env-configuration
-      - OLLAMA_BASE_URL=http://ollama:11434
-      - ENABLE_SIGNUP=true
-      - USER_AGENT=nostr-agentic
-      - WEBUI_NAME=nostr-agentic
-      - HF_HUB_OFFLINE=1
-      - OFFLINE_MODE=1
+      OLLAMA_BASE_URL: http://ollama:11434
+      USER_AGENT: nostr-agentic
+      WEBUI_NAME: nostr-agentic
+      WEBUI_ADMIN_EMAIL: 'open-webui@example.org'
+      WEBUI_ADMIN_PASSWORD: 'open-webui'
+      ENABLE_SIGNUP: false
+      ENABLE_PUBLIC_ACTIVE_USERS_COUNT: false
+      # DO NOT TRACK
+      OFFLINE_MODE: true
+      HF_HUB_OFFLINE: 1
+      SCARF_NO_ANALYTICS: true
+      DO_NOT_TRACK: true
+      ANONYMIZED_TELEMETRY: false
 
 volumes:
   open-webui-data:
