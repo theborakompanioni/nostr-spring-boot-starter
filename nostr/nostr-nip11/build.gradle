@@ -7,7 +7,7 @@ description = 'nostr nip11 package'
 dependencies {
     implementation project(':nostr:nostr-core')
     
-    api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
+    api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${rootProject.ext.acinqBitcoinKmpVersion}"
 
-    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
+    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${rootProject.ext.jacksonJrVersion}"
 }

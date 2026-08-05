@@ -5,5 +5,5 @@ plugins {
 description = 'nostr base package'
 
 dependencies {
-    api "io.github.theborakompanioni:nostr-proto:${nostrProtoVersion}"
+    api "io.github.theborakompanioni:nostr-proto:${rootProject.ext.nostrProtoVersion}"
 }

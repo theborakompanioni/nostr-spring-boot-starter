@@ -4,10 +4,10 @@ import com.google.common.base.Stopwatch;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.convert.DurationStyle;
-import org.springframework.shell.standard.ShellCommandGroup;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.core.command.annotation.Command;
+import org.springframework.shell.core.command.annotation.CommandGroup;
+import org.springframework.shell.core.command.annotation.Option;
+import org.springframework.stereotype.Component;
 import org.tbk.nostr.example.shell.util.Json;
 import org.tbk.nostr.identity.Identity;
 import org.tbk.nostr.identity.MoreIdentities;
@@ -25,17 +25,17 @@ import java.util.stream.IntStream;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
-@ShellComponent
-@ShellCommandGroup("Commands")
+@Component
+@CommandGroup(name = "Commands")
 @RequiredArgsConstructor
 class IdentityVanityCommand {
 
-    @ShellMethod(key = "identity-vanity", value = "Generate a vanity nostr key pair")
+    @Command(name = "identity-vanity", description = "Generate a vanity nostr key pair")
     public String run(
-            @ShellOption(value = "npub-prefix", defaultValue = "", help = "npub prefix") String npubPrefixArg,
-            @ShellOption(value = "npub-suffix", defaultValue = "", help = "npub suffix") String npubSuffixArg,
-            @ShellOption(value = "parallelism", defaultValue = "0", help = "parallelism level (default: # of processors / 2)") int parallelismArg,
-            @ShellOption(value = "timeout", defaultValue = "-1", help = "timeout (e.g. 2s, 2d, default: -1 [no timeout])") String timeoutArg
+            @Option(longName = "npub-prefix", defaultValue = "", description = "npub prefix") String npubPrefixArg,
+            @Option(longName = "npub-suffix", defaultValue = "", description = "npub suffix") String npubSuffixArg,
+            @Option(shortName = 'p', longName = "parallelism", defaultValue = "0", description = "parallelism level (default: # of processors / 2)") int parallelismArg,
+            @Option(longName = "timeout", defaultValue = "-1", description = "timeout (e.g. 2s, 2d, default: -1 [no timeout])") String timeoutArg
     ) throws IOException {
 
         int parallelism = parallelismArg > 0 ? parallelismArg : Math.max(1, Runtime.getRuntime().availableProcessors() / 2);

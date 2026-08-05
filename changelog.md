@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- upgrade: update spring-boot from v3.5.8 to v4.1.0
+- upgrade: update spring-shell from v3.4.1 to v4.0.3
+- upgrade: update spring-shell from v1.1.8 to v2.0.0
 
 ## [0.5.0] - 2026-01-02
 ### Changed

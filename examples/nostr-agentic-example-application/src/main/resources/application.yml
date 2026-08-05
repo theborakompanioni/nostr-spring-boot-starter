@@ -10,10 +10,16 @@ logging.config: classpath:logback.xml
 logging.level.org.springframework: INFO
 logging.level.org.tbk.nostr: INFO
 
+# todo: remove after upgrading jackson-datatype-nostr to jackson3
+spring.http.converters:
+  preferred-json-mapper: jackson2
+
 spring.docker.compose:
   enabled: true
   file: ./docker-compose.yml
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
+  profiles.active:
+    - 'open-webui'
 
 spring.ai:
   ollama:
@@ -27,18 +33,19 @@ spring.ai:
       chat:
         # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
         additional-models:
-          - hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
+          - ${spring.ai.ollama.chat.model}
           #- gemma3:1b
           #- moondream
+    # https://docs.spring.io/spring-ai/reference/api/chat/ollama-chat.html#_chat_properties
     chat:
-      options:
-        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
-        model: hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
-        #model: gemma3:1b
-        #model: moondream
-        keep_alive: 24h
-        #format: json
-        temperature: 0.7
+      # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
+      model: hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
+      #model: gemma3:1b
+      #model: moondream
+      keep_alive: 24h
+      #format: json
+      #think: true
+      temperature: 0.7
 
 org.tbk.nostr.example.agentic:
   identity:
@@ -46,5 +53,4 @@ org.tbk.nostr.example.agentic:
     passphrase: ''
   client:
     #relay-uri: wss://nostr-pub.wellorder.net
-    #relay-uri: wss://relay.damus.io
     relay-uri: wss://relay.primal.net

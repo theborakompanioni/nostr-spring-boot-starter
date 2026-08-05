@@ -12,10 +12,10 @@ dependencies {
     implementation project(':nostr:nostr-nip19')
     implementation project(':nostr:nostr-persona')
 
-    implementation "io.github.theborakompanioni:jackson-datatype-nostr:${nostrProtoVersion}"
+    implementation "io.github.theborakompanioni:jackson-datatype-nostr:${rootProject.ext.nostrProtoVersion}"
 
-    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
-    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
+    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${rootProject.ext.acinqBitcoinKmpVersion}"
+    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${rootProject.ext.acinqSecp256k1KmpVersion}"
 
     implementation 'io.projectreactor:reactor-core'
 
@@ -33,5 +33,5 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocOpenApiVersion}"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${rootProject.ext.springdocOpenApiVersion}"
 }

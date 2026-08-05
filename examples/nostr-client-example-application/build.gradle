@@ -7,8 +7,8 @@ dependencies {
     implementation project(':nostr:nostr-client')
     implementation project(':nostr:nostr-nip19')
 
-    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
-    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
+    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${rootProject.ext.acinqBitcoinKmpVersion}"
+    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${rootProject.ext.acinqSecp256k1KmpVersion}"
 
     implementation 'io.projectreactor:reactor-core'
 

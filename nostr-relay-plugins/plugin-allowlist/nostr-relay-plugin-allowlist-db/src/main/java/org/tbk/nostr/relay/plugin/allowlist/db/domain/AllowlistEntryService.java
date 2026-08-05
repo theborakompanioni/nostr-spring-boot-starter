@@ -38,6 +38,6 @@ public class AllowlistEntryService {
     }
 
     public void remove(XonlyPublicKey publicKey) {
-        entries.delete(AllowlistEntrySpecifications.hasPubkey(publicKey));
+        entries.delete(AllowlistEntrySpecifications.deleteByPubkey(publicKey));
     }
 }

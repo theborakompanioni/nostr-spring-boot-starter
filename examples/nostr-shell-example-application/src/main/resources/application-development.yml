@@ -2,6 +2,8 @@ spring.application.name: 'tbk-nostr-shell'
 
 spring.main.banner-mode: CONSOLE
 
+spring.shell.debug.enabled: true
+
 # LOGGING
 logging.file.path: ./var/log
 logging.file.name: application-dev.log

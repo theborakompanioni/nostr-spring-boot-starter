@@ -17,7 +17,7 @@ public final class RelayUri {
     }
 
     public static RelayUri parse(String uri) {
-        return of(URI.create(uri));
+        return of(URI.create(uri.trim()));
     }
 
     public static Optional<RelayUri> tryParse(String uri) {

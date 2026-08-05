@@ -1,6 +1,7 @@
 package org.tbk.nostr.example.agentic;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +29,9 @@ class NostrAgenticExampleApplicationTest {
     private OllamaApi ollamaApi;
 
     @Autowired(required = false)
+    private OllamaChatModel ollamaChatModel;
+
+    @Autowired(required = false)
     private Identity nostrIdentity;
 
     @Autowired(required = false)
@@ -38,6 +42,7 @@ class NostrAgenticExampleApplicationTest {
         assertThat(applicationContext, is(notNullValue()));
         assertThat(nostrClientService, is(notNullValue()));
         assertThat(ollamaApi, is(notNullValue()));
+        assertThat(ollamaChatModel, is(notNullValue()));
         assertThat(nostrIdentity, is(notNullValue()));
         assertThat(nostrSigner, is(notNullValue()));
     }

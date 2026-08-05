@@ -11,11 +11,13 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.ApplicationPidFileWriter;
-import org.springframework.boot.web.context.WebServerPortFileWriter;
+import org.springframework.boot.web.server.context.WebServerPortFileWriter;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.util.StopWatch;
 import org.tbk.nostr.client.NostrClientService;
+import org.tbk.nostr.example.agentic.utils.MostMinimalPrompt;
 import org.tbk.nostr.identity.Identity;
 
 import java.util.Locale;
@@ -63,19 +65,34 @@ public class NostrAgenticExampleApplication {
     @Profile("!test")
     ApplicationRunner testRunner(OllamaChatModel ollamaChatModel) {
         return args -> {
-            String contents = """
-                    What day is today?
-                    """;
+            MostMinimalPrompt prompt = MostMinimalPrompt.create();
 
-            OllamaChatOptions build = OllamaChatOptions.builder()
-                    .temperature(0.33)
+            OllamaChatOptions options = ollamaChatModel.getOptions().mutate()
+                    .combineWith(prompt.getOptions().mutate())
+                    .disableThinking()
                     .build();
 
-            ChatResponse response = ollamaChatModel.call(new Prompt(contents, build));
+            StopWatch stopWatch = new StopWatch("chatModel.call");
 
-            log.debug("ChatResponse: {}", response);
-            log.info("Model: {}", response.getMetadata().getModel());
-            log.info("Text: {}", response.getResult().getOutput().getText());
+            stopWatch.start();
+            ChatResponse response = ollamaChatModel.call(new Prompt(prompt.getPrompt(), options));
+            stopWatch.stop();
+
+            log.info("""
+                    \n***** TEST PROMPT *****
+                    * prompt: "{}"
+                    * response: "{}"
+                    * =====================
+                    * model: {}
+                    * options: {}
+                    * stopwatch: {}
+                    ***********************
+                    """,
+                    prompt.getPrompt(),
+                    response.getResult().getOutput().getText(),
+                    response.getMetadata().getModel(),
+                    options.toMap(),
+                    stopWatch.shortSummary());
         };
     }
 }

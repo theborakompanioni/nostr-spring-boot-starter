@@ -3,10 +3,10 @@ package org.tbk.nostr.example.shell.command;
 import com.google.common.base.Stopwatch;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.shell.standard.ShellCommandGroup;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.core.command.annotation.Command;
+import org.springframework.shell.core.command.annotation.CommandGroup;
+import org.springframework.shell.core.command.annotation.Option;
+import org.springframework.stereotype.Component;
 import org.tbk.nostr.nips.Nip13;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.json.JsonReader;
@@ -19,16 +19,16 @@ import java.util.stream.IntStream;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
-@ShellComponent
-@ShellCommandGroup("Commands")
+@Component
+@CommandGroup(name = "Commands")
 @RequiredArgsConstructor
 class PowCommand {
 
-    @ShellMethod(key = "pow", value = "Generate NIP-13 Proof of Work Notes")
+    @Command(name = "pow", description = "Generate NIP-13 Proof of Work Notes")
     public String run(
-            @ShellOption(value = "json", help = "note body") String json,
-            @ShellOption(value = "target", defaultValue = "8", help = "target difficulty (default: 8)") int targetDifficultyArg,
-            @ShellOption(value = "parallelism", defaultValue = "0", help = "parallelism level (default: # of processors / 2)") int parallelismArg
+            @Option(longName = "json", description = "note body", required = true) String json,
+            @Option(shortName = 't', longName = "target", defaultValue = "8", description = "target difficulty (default: 8)") int targetDifficultyArg,
+            @Option(shortName = 'p', longName = "parallelism", defaultValue = "0", description = "parallelism level (default: # of processors / 2)") int parallelismArg
     ) {
         int parallelism = parallelismArg > 0 ? parallelismArg : Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
         int difficultyTarget = targetDifficultyArg > 0 ? targetDifficultyArg : 8;
@@ -51,8 +51,8 @@ class PowCommand {
                         .doOnCancel(() -> {
                             log.debug("Cancelled thread for group {}", groupLabel);
                         }))
-                .toList()))
-                .block();
+                .toList())
+                .block());
 
         log.debug("pow with difficulty target {} took {}", difficultyTarget, stopwatch.stop());
 

@@ -1,8 +1,8 @@
 ext {
-    jacksonJrVersion = '2.22.0'
+    jacksonJrVersion = '2.22.1'
     guavaVersion = '33.6.0-jre'
-    grpcVersion = '1.81.0'
-    protobufVersion = '4.35.0'
+    grpcVersion = '1.83.1'
+    protobufVersion = '4.35.1'
     protocVersion = protobufVersion
     postgresqlVersion = '42.7.11'
     jmoleculesBomVersion = '2025.0.2'
@@ -14,12 +14,12 @@ ext {
     sqliteVersion = '3.49.1.0'
     lombokVersion = '1.18.46'
     springdocOpenApiVersion = '2.8.12'
-    checkstyleVersion = '13.5.0'
+    checkstyleVersion = '13.9.0'
     findsecbugsPluginVersion = '1.14.0'
     nostrProtoVersion = '0.4.0'
-    springBootGradlePluginVersion = '3.5.15'
+    springBootGradlePluginVersion = '4.1.0'
     springBootVersion = springBootGradlePluginVersion
-    springShellVersion = '3.4.1'
+    springShellVersion = '4.0.3'
     springAiVersion = '2.0.0'
     protobufGradleVersion = '0.10.0'
 }

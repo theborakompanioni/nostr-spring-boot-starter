@@ -4,7 +4,7 @@ description = 'nostr shell example application package'
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.shell:spring-shell-dependencies:${springShellVersion}"
+        mavenBom "org.springframework.shell:spring-shell-dependencies:${rootProject.ext.springShellVersion}"
     }
 }
 
@@ -17,10 +17,10 @@ dependencies {
     implementation project(':nostr:nostr-core')
     implementation project(':nostr:nostr-nip19')
 
-    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${acinqBitcoinKmpVersion}"
-    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${acinqSecp256k1KmpVersion}"
+    implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${rootProject.ext.acinqBitcoinKmpVersion}"
+    implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${rootProject.ext.acinqSecp256k1KmpVersion}"
 
-    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${jacksonJrVersion}"
+    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${rootProject.ext.jacksonJrVersion}"
 
     implementation 'io.projectreactor:reactor-core'
 

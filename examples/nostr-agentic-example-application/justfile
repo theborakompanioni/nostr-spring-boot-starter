@@ -27,7 +27,7 @@ system-info:
 # clean (remove) the build artifacts
 [group("development")]
 clean:
-    @{{justfile_directory()}}/../../gradlew -p {{justfile_directory()}} clean
+    @{{project_dir}}/../../gradlew -p {{project_dir}} clean
 
 # clean docker containers and volumes
 [group("development")]
@@ -38,7 +38,7 @@ docker-clean:
 [group("development")]
 run profiles='development':
     @SPRING_PROFILES_ACTIVE={{profiles}} \
-    {{justfile_directory()}}/../../gradlew -P {{justfile_directory()}} bootRun
+    {{project_dir}}/../../gradlew -P {{project_dir}} bootRun
 
 # run "nostr-agentic" with model smollm2
 [group("development")]
@@ -87,3 +87,8 @@ event-with-meta text='What day is today?':
          http://localhost:"${SERVER_PORT}"/api/v1/nostr/event-with-meta \
          --header 'Content-Type: application/json' \
          --data '{ "contents": "{{text}}", "options": { "temperature": 0.21 } }' | jq
+
+# run end-to-end tests
+[group("development")]
+test-e2e *args='':
+    @{{project_dir}}/../../gradlew -p {{project_dir}} e2eTest --no-parallel

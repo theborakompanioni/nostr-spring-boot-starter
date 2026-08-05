@@ -4,11 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.*;
@@ -16,7 +15,6 @@ import org.tbk.jackson.datatype.nostr.NostrModule;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.List;
 
 @EnableWebMvc
 @Configuration(proxyBeanMethods = false)
@@ -41,9 +39,9 @@ class NostrAgenticExampleApplicationWebMvcConfigurer implements WebMvcConfigurer
     }
 
     @Override
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(new BufferedImageHttpMessageConverter());
-        customizeJacksonMessageConverter(converters);
+    public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
+        builder.addCustomConverter(new BufferedImageHttpMessageConverter());
+        builder.withJsonConverter(new MappingJackson2HttpMessageConverter(configureObjectMapper()));
     }
 
     @Override
@@ -51,25 +49,13 @@ class NostrAgenticExampleApplicationWebMvcConfigurer implements WebMvcConfigurer
         configurer.defaultContentType(MediaType.APPLICATION_JSON);
     }
 
-    /**
-     * This is the only way that worked making jackson pretty print json responses.
-     *
-     * <p>No, beans of {@link Jackson2ObjectMapperBuilder}, {@link MappingJackson2HttpMessageConverter} or
-     * {@link Jackson2ObjectMapperBuilderCustomizer} did the job properly (which is very odd).
-     * Maybe try again at a later point in time. But this is good for now (2020-10-24).
-     */
-    private static void customizeJacksonMessageConverter(List<HttpMessageConverter<?>> converters) {
-        converters.stream()
-                .filter(any -> any instanceof MappingJackson2HttpMessageConverter)
-                .map(any -> (MappingJackson2HttpMessageConverter) any)
-                .forEach(converter -> configureObjectMapper(converter.getObjectMapper()));
-    }
+    private static ObjectMapper configureObjectMapper() {
+        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
 
-    private static void configureObjectMapper(ObjectMapper objectMapper) {
         SimpleModule internalModule = new SimpleModule("AppInternal")
                 .addSerializer(new BigDecimalToStringSerializer());
 
-        objectMapper
+        return objectMapper
                 .registerModule(internalModule)
                 .registerModule(new NostrModule())
                 .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
