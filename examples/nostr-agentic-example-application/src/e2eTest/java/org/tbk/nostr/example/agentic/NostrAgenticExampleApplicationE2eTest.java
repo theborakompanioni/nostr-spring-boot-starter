@@ -1,10 +1,10 @@
 package org.tbk.nostr.example.agentic;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,18 +19,21 @@ import static org.hamcrest.Matchers.notNullValue;
 class NostrAgenticExampleApplicationE2eTest {
 
     @Autowired
-    private OllamaChatModel ollamaChatModel;
+    private ChatClient chatClient;
 
     @Test
     void itShouldVerifyMinimalPrompt() {
-        MostMinimalPrompt prompt = MostMinimalPrompt.create();
+        Prompt minimalPrompt = MostMinimalPrompt.create().toPrompt();
 
-        OllamaChatOptions options = ollamaChatModel.getOptions();
-        ChatResponse response = ollamaChatModel.call(new Prompt(prompt.getPrompt(), options));
+        ChatClientResponse response = chatClient.prompt(minimalPrompt)
+                .call()
+                .chatClientResponse();
 
-        assertThat(response.getResult(), is(notNullValue()));
+        ChatResponse chatResponse = response.chatResponse();
+        assertThat(chatResponse, is(notNullValue()));
+        assertThat(chatResponse.getResult(), is(notNullValue()));
 
-        String text = response.getResult().getOutput().getText();
+        String text = chatResponse.getResult().getOutput().getText();
         assertThat(text, is(notNullValue()));
     }
 }
