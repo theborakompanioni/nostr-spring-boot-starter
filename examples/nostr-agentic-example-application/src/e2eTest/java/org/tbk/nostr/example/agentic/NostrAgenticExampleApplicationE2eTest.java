@@ -25,10 +25,7 @@ class NostrAgenticExampleApplicationE2eTest {
     void itShouldVerifyMinimalPrompt() {
         String contents = MostMinimalPrompt.prompt();
 
-        OllamaChatOptions options = ollamaChatModel.getOptions().mutate()
-                .temperature(0.33)
-                .build();
-
+        OllamaChatOptions options = ollamaChatModel.getOptions();
         ChatResponse response = ollamaChatModel.call(new Prompt(contents, options));
 
         assertThat(response.getResult(), is(notNullValue()));

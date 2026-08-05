@@ -34,6 +34,7 @@ spring.ai:
           - ${spring.ai.ollama.chat.model}
           #- gemma3:1b
           #- moondream
+    # https://docs.spring.io/spring-ai/reference/api/chat/ollama-chat.html#_chat_properties
     chat:
       # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
       model: hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
@@ -41,6 +42,7 @@ spring.ai:
       #model: moondream
       keep_alive: 24h
       #format: json
+      #think: true
       temperature: 0.7
 
 org.tbk.nostr.example.agentic:

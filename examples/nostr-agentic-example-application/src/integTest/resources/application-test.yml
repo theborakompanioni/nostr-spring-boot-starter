@@ -19,3 +19,6 @@ spring.ai:
   ollama:
     init:
       pull-model-strategy: never
+    chat:
+      think: false
+      temperature: 0.1 # very deterministic output
