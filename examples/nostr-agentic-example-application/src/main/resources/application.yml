@@ -18,8 +18,6 @@ spring.docker.compose:
   enabled: true
   file: ./docker-compose.yml
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
-  profiles.active:
-    - 'open-webui'
 
 spring.ai:
   ollama:

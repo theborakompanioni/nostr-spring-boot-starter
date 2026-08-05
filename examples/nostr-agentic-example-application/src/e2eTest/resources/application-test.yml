@@ -11,7 +11,7 @@ spring.docker.compose:
   #stop.arguments: --volumes
   skip.in-tests: false
   profiles.active:
-    - 'test' # override the default profile
+    - 'test'
 
 org.tbk.nostr.example.agentic:
   client:

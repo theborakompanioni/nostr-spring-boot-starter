@@ -13,6 +13,8 @@ spring.docker.compose:
   file:
     - ./docker-compose.yml
     - ../../docker/regtest/demented/docker-compose.yml
+  profiles.active:
+    - 'development'
 
 spring.ai:
   retry:

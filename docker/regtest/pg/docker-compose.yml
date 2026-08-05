@@ -23,8 +23,13 @@ services:
       retries: 5
 
   pgadmin:
+    profiles: ["development"]
     image: dpage/pgadmin4:9.15.0@sha256:cefc4cc6b7d9d71a9e81e76fb9d7e14038ab5661b539a190eea1b63fa612589a
     restart: no
+    # don't wait for health checks, ui is for humans and should not block the application from starting
+    healthcheck:
+      disable: true
+      test: [ "NONE" ]
     volumes:
       - nsbs-pgadmin-data:/var/lib/pgadmin
     environment:

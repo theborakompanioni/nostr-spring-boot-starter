@@ -20,12 +20,12 @@ services:
       timeout: 5s
 
   open-webui:
-    profiles: ["open-webui"]
+    profiles: ["development"]
     image: ghcr.io/open-webui/open-webui:0.11.0-slim@sha256:88da9f0e08b8ada8e40bc6d6291494e2c6775a62d24b67b0cefb74ffee4ce621
     restart: no
     depends_on:
       ollama:
-        condition: service_started # don't wait, ui is for humans and should not block the application from starting
+        condition: service_healthy
     # don't wait for health checks, ui is for humans and should not block the application from starting
     healthcheck:
       disable: true

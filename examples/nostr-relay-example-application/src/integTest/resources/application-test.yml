@@ -24,6 +24,8 @@ spring.docker.compose:
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
   stop.arguments: --volumes
   skip.in-tests: false
+  profiles.active:
+    - 'test'
 
 org.tbk.nostr.example.relay:
   async-executor:
