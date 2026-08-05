@@ -29,7 +29,7 @@ services:
     # don't wait for health checks, ui is for humans and should not block the application from starting
     healthcheck:
       disable: true
-      test: ["CMD", "exit", "0"]
+      test: ["NONE"]
     ports:
       - "19480:8080"
     volumes:

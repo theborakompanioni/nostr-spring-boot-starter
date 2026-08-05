@@ -79,5 +79,7 @@ curl --silent --request 'POST' \
 ## Resources
 
 - Ollama: https://github.com/ollama/ollama
-- Spring AI: https://docs.spring.io/spring-ai/reference/1.0/index.html
-- Spring Ollama Chat: https://docs.spring.io/spring-ai/reference/1.0/api/chat/ollama-chat.html
+- Spring AI: https://docs.spring.io/spring-ai/reference/index.html
+- Spring Ollama Chat: https://docs.spring.io/spring-ai/reference/api/chat/ollama-chat.html
+- Open WebUI (GitHub): https://github.com/open-webui/open-webui
+- Open WebUI Docs: https://docs.openwebui.com/reference/env-configuration

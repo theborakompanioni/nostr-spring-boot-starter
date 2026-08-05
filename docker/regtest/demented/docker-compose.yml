@@ -6,3 +6,11 @@ services:
     restart: no
     ports:
       - "7000:8080"
+    # custom health check as the default one is slow for dev envs (last checked: 2026-08-04)
+    healthcheck:
+      test: ["CMD", "java", "/home/app/HealthCheck.java", "http://localhost:9001/actuator/health"]
+      start_period: 30s
+      start_interval: 1s
+      interval: 30s
+      retries: 5
+      timeout: 5s
