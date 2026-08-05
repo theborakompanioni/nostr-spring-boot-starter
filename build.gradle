@@ -170,8 +170,7 @@ subprojects {
 
         dependencies {
             developmentOnly 'org.springframework.boot:spring-boot-devtools'
-            // TODO: Once done with the migration to spring-boot v4, remove properties-migrator dependency
-            runtimeOnly 'org.springframework.boot:spring-boot-properties-migrator'
+            developmentOnly 'org.springframework.boot:spring-boot-properties-migrator'
         }
 
         jar {
