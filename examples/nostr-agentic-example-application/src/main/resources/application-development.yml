@@ -7,6 +7,7 @@ logging.file.path: ./var/log
 logging.file.name: application-dev.log
 logging.config: classpath:logback-development.xml
 logging.level.org.springframework: INFO
+logging.level.org.springframework.ai: DEBUG
 logging.level.org.tbk.nostr: DEBUG
 
 # Risk of exposing sensitive or private information. Be careful!

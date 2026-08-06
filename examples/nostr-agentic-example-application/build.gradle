@@ -30,6 +30,8 @@ dependencies {
     implementation 'org.springframework.ai:spring-ai-vector-store-advisor'
     // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html
     implementation 'org.springframework.ai:spring-ai-rag'
+    // https://docs.spring.io/spring-ai/reference/api/chat-memory.html
+    implementation 'org.springframework.ai:spring-ai-starter-model-chat-memory-repository-jdbc'
 
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

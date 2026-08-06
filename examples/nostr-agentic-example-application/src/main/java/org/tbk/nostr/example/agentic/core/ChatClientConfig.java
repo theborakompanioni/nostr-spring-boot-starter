@@ -1,8 +1,13 @@
 package org.tbk.nostr.example.agentic.core;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
@@ -20,7 +25,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import java.security.SecureRandom;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 @Configuration
 class ChatClientConfig {
@@ -110,12 +118,42 @@ class ChatClientConfig {
     }
 
     @Bean
+    MessageWindowChatMemory messageWindowChatMemory(ChatMemoryRepository chatMemoryRepository) {
+        return MessageWindowChatMemory.builder()
+                .chatMemoryRepository(chatMemoryRepository)
+                .maxMessages(10)
+                .build();
+    }
+
+    @Bean
+    MessageChatMemoryAdvisor messageChatMemoryAdvisor(ChatMemory chatMemory) {
+        return MessageChatMemoryAdvisor.builder(chatMemory).build();
+    }
+
+    @Bean
+    Consumer<ChatClient.AdvisorSpec> randomConversationIdAdvisor() {
+        return advisorSpec -> {
+            advisorSpec.param(ChatMemory.CONVERSATION_ID, UUID.randomUUID().toString());
+        };
+    }
+
+
+    @Bean
+    @Primary
+    Consumer<ChatClient.AdvisorSpec> compositeAdvisorSpecConsumer(List<Consumer<ChatClient.AdvisorSpec>> advisorSpecConsumers) {
+        return advisorSpec -> advisorSpecConsumers.forEach(it -> it.accept(advisorSpec));
+    }
+
+
+    @Bean
     @Primary
     ChatClient defaultChatClient(ChatClient.Builder builder,
-                                 List<Advisor> defaultAdvisors) {
+                                 List<Advisor> defaultAdvisors,
+                                 Consumer<ChatClient.AdvisorSpec> defaultAdvisorSpecConsumer) {
         return builder
                 .defaultSystem("You are a helpful assistant.")
                 .defaultAdvisors(defaultAdvisors)
+                .defaultAdvisors(defaultAdvisorSpecConsumer)
                 .build();
     }
 

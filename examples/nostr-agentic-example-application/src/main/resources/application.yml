@@ -46,6 +46,9 @@ spring.datasource.hikari.maximum-pool-size: 10
 #spring.jpa.properties.hibernate.dialect: org.tbk.nostr.example.relay.db.dialect.CustomPostgresDialect
 
 spring.ai:
+  chat:
+    memory.repository.jdbc:
+      initialize-schema: never # done via flyway migration
   ollama:
     base-url: http://localhost:19434
     init:
@@ -73,7 +76,7 @@ spring.ai:
   vectorstore:
     # https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html#pgvector-properties
     pgvector:
-      initialize-schema: false
+      initialize-schema: false # done via flyway migration
       schema-validation: true
       remove-existing-vector-store-table: false
       table-name: spring_ai_vector_store
