@@ -30,9 +30,6 @@ class NostrAgenticExampleApplicationTest {
     private VectorStore vectorStore;
 
     @Autowired(required = false)
-    private VectorStoreRetriever vectorStoreRetriever;
-
-    @Autowired(required = false)
     private QuestionAnswerAdvisor questionAnswerAdvisor;
 
     @Autowired(required = false)
@@ -58,7 +55,6 @@ class NostrAgenticExampleApplicationTest {
         assertThat(applicationContext, is(notNullValue()));
 
         assertThat(vectorStore, is(notNullValue()));
-        assertThat(vectorStoreRetriever, is(notNullValue()));
         assertThat(questionAnswerAdvisor, is(notNullValue()));
         assertThat(chatClient, is(notNullValue()));
 

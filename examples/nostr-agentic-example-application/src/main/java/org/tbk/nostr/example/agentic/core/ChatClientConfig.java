@@ -1,39 +1,52 @@
 package org.tbk.nostr.example.agentic.core;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
+import org.springframework.ai.rag.generation.augmentation.QueryAugmenter;
+import org.springframework.ai.rag.preretrieval.query.expansion.MultiQueryExpander;
+import org.springframework.ai.rag.preretrieval.query.transformation.CompressionQueryTransformer;
+import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
+import org.springframework.ai.rag.preretrieval.query.transformation.RewriteQueryTransformer;
+import org.springframework.ai.rag.preretrieval.query.transformation.TranslationQueryTransformer;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import java.util.List;
+
 @Configuration
 class ChatClientConfig {
 
-    private static final PromptTemplate DEFAULT_PROMPT_TEMPLATE = new PromptTemplate("""
-			{query}
+    private static final PromptTemplate questionAnswerAdvisorPromptTemplate = new PromptTemplate("""
+            {query}
+            
+            Context information is below, surrounded by ---------------------
+            
+            ---------------------
+            {question_answer_context}
+            ---------------------
+            
+            Given the context and provided history information and not prior knowledge,
+            reply to the user comment. If the answer is not in the context, inform
+            the user that you can't answer the question.
+            """);
 
-			Context information is below, surrounded by ---------------------
-
-			---------------------
-			{question_answer_context}
-			---------------------
-
-			Given the context and provided history information and not prior knowledge,
-			reply to the user comment. If the answer is not in the context, inform
-			the user that you can't answer the question.
-			""");
-
-    @Bean
-    PromptTemplate defaultPromptTemplate() {
-        return DEFAULT_PROMPT_TEMPLATE;
+    @Bean("questionAnswerAdvisorPromptTemplate")
+    PromptTemplate questionAnswerAdvisorPromptTemplate() {
+        return questionAnswerAdvisorPromptTemplate;
     }
 
     @Bean
     QuestionAnswerAdvisor questionAnswerAdvisor(VectorStore vectorStore,
-                                                PromptTemplate promptTemplate) {
+                                                @Qualifier("questionAnswerAdvisorPromptTemplate") PromptTemplate promptTemplate) {
         return QuestionAnswerAdvisor.builder(vectorStore)
                 .promptTemplate(promptTemplate)
                 .searchRequest(SearchRequest.builder().build())
@@ -41,15 +54,76 @@ class ChatClientConfig {
     }
 
     @Bean
-    @Primary
-    ChatClient defaultChatClient(ChatClient.Builder builder, QuestionAnswerAdvisor questionAnswerAdvisor) {
-        return builder
-                .defaultAdvisors(questionAnswerAdvisor)
+    VectorStoreDocumentRetriever documentRetriever(VectorStore vectorStore) {
+        return VectorStoreDocumentRetriever.builder()
+                .similarityThreshold(0.50)
+                .vectorStore(vectorStore)
                 .build();
     }
 
     @Bean
-    ChatClient customChatClient(ChatClient.Builder builder) {
-        return builder.defaultSystem("You are a helpful assistant.").build();
+    ContextualQueryAugmenter contextualQueryAugmenter(VectorStore vectorStore) {
+        return ContextualQueryAugmenter.builder()
+                .allowEmptyContext(true)
+                .build();
+    }
+
+    @Bean
+    RewriteQueryTransformer rewriteQueryTransformer(ChatClient.Builder builder) {
+        return RewriteQueryTransformer.builder()
+                .chatClientBuilder(builder)
+                .build();
+    }
+
+    @Bean
+    TranslationQueryTransformer translationQueryTransformer(ChatClient.Builder builder) {
+        return TranslationQueryTransformer.builder()
+                .chatClientBuilder(builder)
+                .targetLanguage("english")
+                .build();
+    }
+
+    @Bean
+    MultiQueryExpander multiQueryExpander(ChatClient.Builder builder) {
+        return MultiQueryExpander.builder()
+                .chatClientBuilder(builder)
+                .numberOfQueries(3)
+                .build();
+    }
+
+    @Bean
+    CompressionQueryTransformer compressionQueryTransformer(ChatClient.Builder builder) {
+        return CompressionQueryTransformer.builder()
+                .chatClientBuilder(builder)
+                .build();
+    }
+
+    @Bean
+    RetrievalAugmentationAdvisor retrievalAugmentationAdvisor(VectorStoreDocumentRetriever documentRetriever,
+                                                              QueryAugmenter queryAugmenter,
+                                                              List<QueryTransformer> queryTransformers) {
+        return RetrievalAugmentationAdvisor.builder()
+                .documentRetriever(documentRetriever)
+                .queryAugmenter(queryAugmenter)
+                .queryTransformers(queryTransformers)
+                .build();
+    }
+
+    @Bean
+    @Primary
+    ChatClient defaultChatClient(ChatClient.Builder builder,
+                                 List<Advisor> defaultAdvisors) {
+        return builder
+                .defaultSystem("You are a helpful assistant.")
+                .defaultAdvisors(defaultAdvisors)
+                .build();
+    }
+
+    @Bean
+    ChatClient unhelpfulChatClient(ChatClient.Builder builder,
+                                   List<Advisor> defaultAdvisors) {
+        return builder
+                .defaultSystem("You are an unhelpful assistant.")
+                .build();
     }
 }

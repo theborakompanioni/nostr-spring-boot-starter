@@ -10,6 +10,16 @@ logging.config: classpath:logback.xml
 logging.level.org.springframework: INFO
 logging.level.org.tbk.nostr: INFO
 
+# Risk of exposing sensitive or private information. Be careful!
+spring.ai.chat.observations.log-prompt: false
+spring.ai.chat.observations.log-completion: false
+spring.ai.chat.observations.include-error-logging: false
+spring.ai.tools.observations.include-content: false
+spring.ai.image.observations.log-prompt: false
+spring.ai.vectorstore.observations.log-query-response: false
+spring.ai.chat.client.observations.log-prompt: false
+spring.ai.chat.client.observations.log-completion: false
+
 # todo: remove after upgrading jackson-datatype-nostr to jackson3
 spring.http.converters:
   preferred-json-mapper: jackson2

@@ -9,6 +9,16 @@ logging.config: classpath:logback-development.xml
 logging.level.org.springframework: INFO
 logging.level.org.tbk.nostr: DEBUG
 
+# Risk of exposing sensitive or private information. Be careful!
+spring.ai.chat.observations.log-prompt: true
+spring.ai.chat.observations.log-completion: true
+spring.ai.chat.observations.include-error-logging: true
+spring.ai.tools.observations.include-content: true
+spring.ai.image.observations.log-prompt: true
+spring.ai.vectorstore.observations.log-query-response: true
+spring.ai.chat.client.observations.log-prompt: true
+spring.ai.chat.client.observations.log-completion: true
+
 spring.docker.compose:
   file:
     - ./docker-compose.yml
