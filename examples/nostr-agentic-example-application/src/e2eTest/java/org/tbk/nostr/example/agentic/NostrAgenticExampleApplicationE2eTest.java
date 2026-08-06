@@ -32,7 +32,6 @@ class NostrAgenticExampleApplicationE2eTest {
     @Autowired
     private ChatClient chatClient;
 
-
     @Autowired
     private OllamaChatModel ollamaChatModel;
 

@@ -73,8 +73,8 @@ spring.ai:
   vectorstore:
     # https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html#pgvector-properties
     pgvector:
-      initialize-schema: true
-      schema-validation: false # enable on demand, e.g. when flyway migration for schema exists
+      initialize-schema: false
+      schema-validation: true
       remove-existing-vector-store-table: false
       table-name: spring_ai_vector_store
       index-type: HNSW
