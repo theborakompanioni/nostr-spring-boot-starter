@@ -35,6 +35,8 @@ spring.ai:
   ollama:
     init:
       pull-model-strategy: when-missing
+      timeout: 120s # short timeouts in e2e tests, you should only load small models
+      max-retries: 3
     # https://docs.spring.io/spring-ai/reference/api/chat/prompt-engineering-patterns.html
     chat:
       think: false

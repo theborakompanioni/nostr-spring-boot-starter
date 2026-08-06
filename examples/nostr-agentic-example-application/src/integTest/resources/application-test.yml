@@ -25,6 +25,8 @@ spring.ai:
   ollama:
     init:
       pull-model-strategy: never
+      timeout: 1s # effectively disable
+      max-retries: 0
     # https://docs.spring.io/spring-ai/reference/api/chat/prompt-engineering-patterns.html
     chat:
       think: false

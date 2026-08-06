@@ -1,5 +1,8 @@
 spring.ai:
   ollama:
+    init:
+      timeout: 30m # default is 5m, sometimes takes longer for larger models
+      max-retries: 1
     chat:
       # https://ollama.com/library/gemma3
       model: gemma3:1b
