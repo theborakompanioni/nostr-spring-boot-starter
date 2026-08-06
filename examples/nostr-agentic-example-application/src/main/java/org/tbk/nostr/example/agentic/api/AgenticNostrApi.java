@@ -4,22 +4,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.tbk.nostr.example.agentic.api.AgenticNostrApi.ListIdentitiesApiResponseDto.IdentityEntry;
+import org.tbk.nostr.example.agentic.core.AddConversationId;
 import org.tbk.nostr.identity.Identity;
 import org.tbk.nostr.identity.Signer;
 import org.tbk.nostr.nip19.Nip19;
@@ -40,7 +42,7 @@ import java.util.Optional;
 public class AgenticNostrApi {
 
     @NonNull
-    private final OllamaChatModel ollamaChatModel;
+    private final ChatClient chatClient;
 
     @NonNull
     private final Identity nostrIdentity;
@@ -92,6 +94,9 @@ public class AgenticNostrApi {
         @Builder.Default
         Double temperature = Double.valueOf("0.33");
 
+        @Nullable
+        String conversationId;
+
         private ChatOptions toChatOptions(ChatModel model) {
             return model.getOptions().mutate()
                     .combineWith(toChatOptions())
@@ -110,9 +115,13 @@ public class AgenticNostrApi {
     @PostMapping(value = "/event")
     // Note: ResponseEntity<?> is used as workaround for swagger-ui loading issues with protobuf classes
     public ResponseEntity<?> event(@Validated @RequestBody EventApiRequestDto body) {
-        ChatOptions options = body.toChatOptions(ollamaChatModel);
+        ChatOptions options = body.toChatOptions().build();
         Prompt prompt = new Prompt(body.getContents(), options);
-        ChatResponse response = ollamaChatModel.call(prompt);
+
+        ChatResponse response = chatClient.prompt(prompt)
+                .advisors(new AddConversationId(body::getConversationId))
+                .call()
+                .chatResponse();
 
         String text = response.getResult().getOutput().getText();
 
@@ -137,9 +146,13 @@ public class AgenticNostrApi {
     )
     @PostMapping(value = "/event-with-meta")
     public ResponseEntity<EventWithMetaApiResponseDto> eventWithMeta(@Validated @RequestBody EventApiRequestDto body) {
-        ChatOptions options = body.toChatOptions(ollamaChatModel);
+        ChatOptions options = body.toChatOptions().build();
         Prompt prompt = new Prompt(body.getContents(), options);
-        ChatResponse response = ollamaChatModel.call(prompt);
+
+        ChatResponse response = chatClient.prompt(prompt)
+                .advisors(new AddConversationId(body::getConversationId))
+                .call()
+                .chatResponse();
 
         String text = response.getResult().getOutput().getText();
 

@@ -17,7 +17,7 @@ spring.ai:
       temperature: 1.0
       topP: 0.95
       topK: 64
-      think: true
+      #think: true <- some models dont support thinking, e.g. gemma-4-E2B-it-GGUF:Q4_0
     embedding:
       # https://ollama.com/library/embeddinggemma
       model: 'embeddinggemma' # needed for 'QuestionAnswerAdvisor'

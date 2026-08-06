@@ -1,6 +1,5 @@
 package org.tbk.nostr.example.agentic.core;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -25,7 +24,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -132,9 +130,7 @@ class ChatClientConfig {
 
     @Bean
     Consumer<ChatClient.AdvisorSpec> randomConversationIdAdvisor() {
-        return advisorSpec -> {
-            advisorSpec.param(ChatMemory.CONVERSATION_ID, UUID.randomUUID().toString());
-        };
+        return new AddConversationId(() -> UUID.randomUUID().toString());
     }
 
 
@@ -164,4 +160,5 @@ class ChatClientConfig {
                 .defaultSystem("You are an unhelpful assistant.")
                 .build();
     }
+
 }
