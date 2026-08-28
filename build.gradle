@@ -125,10 +125,6 @@ subprojects {
         }
     }
 
-    repositories {
-        mavenCentral()
-    }
-
     dependencyManagement {
         imports {
             mavenBom SpringBootPlugin.BOM_COORDINATES
