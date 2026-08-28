@@ -44,8 +44,8 @@ dependencies:
 
 # run unit tests
 [group("development")]
-test:
-    @./gradlew test
+test *args='':
+    @./gradlew test {{args}}
 
 # run integration tests
 [group("development")]
@@ -79,25 +79,42 @@ test-all-force *args='':
 
 # build javadocs
 [group("development")]
-javadoc:
-    @./gradlew javadoc -PjavadocEnabled
+javadoc *args='':
+    @./gradlew javadoc -PjavadocEnabled {{args}}
 
 # update metadata for dependency verification
 [group("development")]
-update-verification:
-    @./gradlew dependencies --write-verification-metadata pgp,sha256 --export-keys --write-locks
+update-verification *args='':
+   @./gradlew \
+     -Dorg.gradle.caching=false \
+     -Dorg.gradle.configureondemand=false \
+     -Dorg.gradle.parallel=false \
+     dependencies dependencyTree \
+     --write-verification-metadata pgp,sha256 --export-keys --write-locks \
+     {{args}}
+
+# update dependency lockfiles
+[group("development")]
+update-lockfiles *args='':
+    @./gradlew \
+     -Dorg.gradle.caching=false \
+     -Dorg.gradle.configureondemand=false \
+     -Dorg.gradle.parallel=false \
+     dependencies dependencyTree \
+     --write-locks \
+     {{args}}
 
 # check style
 [group("development")]
-checkstyle:
-    @./gradlew checkstyleMain checkstyleTest checkstyleIntegTest checkstyleE2eTest
+checkstyle *args='':
+    @./gradlew checkstyleMain checkstyleTest checkstyleIntegTest checkstyleE2eTest {{args}}
 
 # spot bugs
 [group("development")]
-spotbugs:
-    @./gradlew spotbugsMain spotbugsTest spotbugsIntegTest spotbugsE2eTest
+spotbugs *args='':
+    @./gradlew spotbugsMain spotbugsTest spotbugsIntegTest spotbugsE2eTest {{args}}
 
 # lint files
 [group("development")]
-lint:
-    @./gradlew autoLintGradle --no-parallel
+lint *args='':
+    @./gradlew autoLintGradle --no-parallel {{args}}
