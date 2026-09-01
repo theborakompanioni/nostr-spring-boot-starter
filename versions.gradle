@@ -1,7 +1,7 @@
 ext {
     jacksonJrVersion = '2.22.2'
     guavaVersion = '33.7.1-jre'
-    grpcVersion = '1.83.1'
+    grpcVersion = '1.84.0'
     protobufVersion = '4.36.0'
     protocVersion = protobufVersion
     postgresqlVersion = '42.7.13'
