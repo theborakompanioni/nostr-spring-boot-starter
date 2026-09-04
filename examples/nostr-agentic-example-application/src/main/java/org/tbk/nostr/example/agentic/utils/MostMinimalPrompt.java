@@ -2,6 +2,7 @@ package org.tbk.nostr.example.agentic.utils;
 
 import lombok.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
 
 @Value
 @Builder(access = AccessLevel.PRIVATE)
@@ -40,4 +41,8 @@ public class MostMinimalPrompt {
     @NonNull
     @ToString.Exclude
     ChatOptions options;
+
+    public Prompt toPrompt() {
+        return new Prompt(this.prompt, this.options);
+    }
 }

@@ -1,9 +1,12 @@
 spring.ai:
   ollama:
+    init:
+      timeout: 30m # default is 5m, sometimes takes longer for larger models
+      max-retries: 1
     chat:
       # https://ollama.com/library/gemma3
       model: gemma3:1b
-    init:
-      chat:
-        additional-models:
-          - ${spring.ai.ollama.chat.model}
+    # https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html
+    embedding:
+      # https://ollama.com/library/embeddinggemma
+      model: 'embeddinggemma' # needed for 'QuestionAnswerAdvisor'

@@ -10,42 +10,80 @@ logging.config: classpath:logback.xml
 logging.level.org.springframework: INFO
 logging.level.org.tbk.nostr: INFO
 
+# Risk of exposing sensitive or private information. Be careful!
+spring.ai.chat.observations.log-prompt: false
+spring.ai.chat.observations.log-completion: false
+spring.ai.chat.observations.include-error-logging: false
+spring.ai.tools.observations.include-content: false
+spring.ai.image.observations.log-prompt: false
+spring.ai.vectorstore.observations.log-query-response: false
+spring.ai.chat.client.observations.log-prompt: false
+spring.ai.chat.client.observations.log-completion: false
+
 # todo: remove after upgrading jackson-datatype-nostr to jackson3
 spring.http.converters:
   preferred-json-mapper: jackson2
 
 spring.docker.compose:
   enabled: true
-  file: ./docker-compose.yml
+  file:
+    - ./docker-compose.yml
+    - ../../docker/regtest/pgvector/docker-compose.yml
+  arguments[0]: --project-name=nostr-agentic-example
+  arguments[1]: --progress=auto
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
-  profiles.active:
-    - 'open-webui'
+
+spring.jpa.properties.hibernate.format_sql: true
+spring.jpa.properties.hibernate.show_sql: true
+
+spring.datasource.url: 'jdbc:postgresql://localhost:16432/postgres'
+spring.datasource.username: postgres
+spring.datasource.password: postgres
+spring.datasource.driver-class-name: org.postgresql.Driver
+spring.datasource.hikari.pool-name: PostgresPool
+spring.datasource.hikari.maximum-pool-size: 10
+
+#spring.jpa.properties.hibernate.dialect: org.tbk.nostr.example.relay.db.dialect.CustomPostgresDialect
 
 spring.ai:
+  chat:
+    memory.repository.jdbc:
+      initialize-schema: never # done via flyway migration
   ollama:
     base-url: http://localhost:19434
     init:
       pull-model-strategy: when-missing
-      timeout: 120s
-      max-retries: 3
+      timeout: 15m # default is 5m, sometimes takes longer for larger models
+      max-retries: 0
       embedding:
-        include: false
+        additional-models:
+          - ${spring.ai.ollama.embedding.model}
       chat:
-        # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
         additional-models:
           - ${spring.ai.ollama.chat.model}
-          #- gemma3:1b
-          #- moondream
     # https://docs.spring.io/spring-ai/reference/api/chat/ollama-chat.html#_chat_properties
     chat:
       # https://github.com/ollama/ollama?tab=readme-ov-file#model-library
       model: hf.co/unsloth/SmolLM2-135M-Instruct-GGUF:Q2_K
-      #model: gemma3:1b
-      #model: moondream
       keep_alive: 24h
       #format: json
       #think: true
       temperature: 0.7
+    # https://docs.spring.io/spring-ai/reference/api/embeddings/ollama-embeddings.html
+    embedding:
+      model: 'all-minilm:22m' # needed for 'QuestionAnswerAdvisor'
+
+  vectorstore:
+    # https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html#pgvector-properties
+    pgvector:
+      initialize-schema: false # done via flyway migration
+      schema-validation: true
+      remove-existing-vector-store-table: false
+      table-name: spring_ai_vector_store
+      index-type: HNSW
+      distance-type: COSINE_DISTANCE
+      dimensions: 1536
+      max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
 
 org.tbk.nostr.example.agentic:
   identity:

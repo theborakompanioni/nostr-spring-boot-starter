@@ -11,10 +11,14 @@ or
 ```shell
 SPRING_PROFILES_ACTIVE=development ./gradlew -p examples/nostr-agentic-example-application bootRun
 ```
+## Open Web UI
+
+Open Web UI at http://localhost:19480
 
 ## API
 
-API docs at http://localhost:8080/swagger-ui/.
+API docs at http://localhost:8080/swagger-ui/index.html
+
 
 ### `listmodels`
 ```shell

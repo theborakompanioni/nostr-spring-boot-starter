@@ -3,15 +3,29 @@ spring.application.name: 'tbk-nostr-agentic-test'
 logging.file.name: application-e2e.log
 logging.level.org.tbk.nostr: TRACE
 
+# Risk of exposing sensitive or private information. Be careful!
+spring.ai.chat.observations.log-prompt: true
+spring.ai.chat.observations.log-completion: true
+spring.ai.chat.observations.include-error-logging: true
+spring.ai.tools.observations.include-content: true
+spring.ai.image.observations.log-prompt: true
+spring.ai.vectorstore.observations.log-query-response: true
+spring.ai.chat.client.observations.log-prompt: true
+spring.ai.chat.client.observations.log-completion: true
+
 spring.docker.compose:
   file:
     - ./docker-compose.yml
+    - ../../docker/regtest/pgvector/docker-compose.yml
     - ../../docker/regtest/demented/docker-compose.yml
+  arguments[0]: --project-name=nostr-agentic-example-e2e
+  arguments[1]: --progress=auto
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
-  #stop.arguments: --volumes
+  #stop.arguments[0]: --volumes
+  #stop.arguments[1]: --remove-orphans
   skip.in-tests: false
   profiles.active:
-    - 'test' # override the default profile
+    - 'test'
 
 org.tbk.nostr.example.agentic:
   client:
@@ -21,10 +35,12 @@ spring.ai:
   ollama:
     init:
       pull-model-strategy: when-missing
+      timeout: 120s # short timeouts in e2e tests, you should only load small models
+      max-retries: 3
     # https://docs.spring.io/spring-ai/reference/api/chat/prompt-engineering-patterns.html
     chat:
       think: false
       temperature: 0.01 # very deterministic output
-      max-tokens: 5
+      num-predict: 1
       top-k: 1
       top-p: 1

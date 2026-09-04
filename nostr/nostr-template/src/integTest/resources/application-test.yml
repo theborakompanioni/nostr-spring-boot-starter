@@ -4,6 +4,9 @@ spring.docker.compose:
   enabled: true
   file: ../../docker/regtest/nostr-rs-relay/docker-compose.yml
   #file: ../../docker/regtest/demented/docker-compose.yml
+  arguments[0]: --project-name=nostr-template-test
+  arguments[1]: --progress=auto
   stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
-  stop.arguments: --volumes
+  stop.arguments[0]: --volumes
+  stop.arguments[1]: --remove-orphans
   skip.in-tests: false

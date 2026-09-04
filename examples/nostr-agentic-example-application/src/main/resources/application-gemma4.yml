@@ -1,18 +1,23 @@
 spring.ai:
   ollama:
+    init:
+      timeout: 30m # default is 5m, sometimes takes longer for larger models
+      max-retries: 1
     chat:
       # https://ollama.com/library/gemma4
-      model: gemma4
+      model: hf.co/ggml-org/gemma-4-E2B-it-GGUF:Q4_0
+      #model: gemma4
+      #model: gemma4:e2b
       #model: gemma4:e4b
       #model: gemma4:e2b-it-q8_0
       #model: gemma4:e4b-it-q4_K_M
+      #model: hf.co/ggml-org/gemma-4-E2B-it-GGUF:Q4_0
       #model: hf.co/ggml-org/gemma-4-E4B-it-GGUF:Q8_0 # Q4_K_M | Q8_0 | F16
       # https://ai.google.dev/gemma/docs/core/model_card_4#best_practices
       temperature: 1.0
       topP: 0.95
       topK: 64
-      think: true
-    init:
-      chat:
-        additional-models:
-          - ${spring.ai.ollama.chat.model}
+      #think: true <- some models dont support thinking, e.g. gemma-4-E2B-it-GGUF:Q4_0
+    embedding:
+      # https://ollama.com/library/embeddinggemma
+      model: 'embeddinggemma' # needed for 'QuestionAnswerAdvisor'

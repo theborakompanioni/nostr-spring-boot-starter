@@ -1,20 +1,20 @@
 services:
-  postgres:
-    image: postgres:18.1-alpine3.21@sha256:44d837eb4c2ed263474a95f0cc24745413c50924df60dd73ed6c4c3e36b84259
+  pgvector:
+    image: pgvector/pgvector:0.8.6-pg18-trixie@sha256:1963bc48febf543433baa1ce3edcc6cc08154de722e22495f86681cc9a849026
     restart: no
     labels:
       org.springframework.boot.ignore: true
     volumes:
-      - nsbs-postgres-data:/postgresql_data
-      - ./data/pg/init:/docker-entrypoint-initdb.d/
+      - nsbs-pgvector-data:/postgresql_data
+      - ./data/pgvector/init:/docker-entrypoint-initdb.d/
     environment:
-      POSTGRES_ADDITIONAL_DATABASES: regtest_nostr_relay0
+      #POSTGRES_ADDITIONAL_DATABASES: regtest <- does not work
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       PGDATA: /postgresql_data
     ports:
-      - "${POSTGRES_PORT:-15432}:5432"
+      - "${POSTGRES_PORT:-16432}:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready --username=$$POSTGRES_USER --dbname=$$POSTGRES_DB" ]
       interval: 10s
@@ -30,17 +30,17 @@ services:
       disable: true
       test: [ "NONE" ]
     volumes:
-      - nsbs-pgadmin-data:/var/lib/pgadmin
+      - nsbs-pgvector-pgadmin-data:/var/lib/pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-postgres@example.org}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-postgres}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgvector@example.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-pgvector}
       PGADMIN_CONFIG_SERVER_MODE: 'False' # Single-user environment with automatic login
     ports:
-      - "${PGADMIN_PORT:-15532}:80"
+      - "${PGADMIN_PORT:-16532}:80"
     depends_on:
-      postgres:
+      pgvector:
         condition: service_healthy
 
 volumes:
-  nsbs-postgres-data:
-  nsbs-pgadmin-data:
+  nsbs-pgvector-data:
+  nsbs-pgvector-pgadmin-data:
