@@ -4,7 +4,6 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONComposer;
 import com.fasterxml.jackson.jr.ob.comp.ObjectComposer;
 import fr.acinq.bitcoin.XonlyPublicKey;
-import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
 import org.tbk.nostr.util.MorePublicKeys;
@@ -29,7 +28,8 @@ import java.util.Map;
  * }
  */
 @Value
-@Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
+// must use @lombok.Builder instead of @Builder because of https://github.com/projectlombok/lombok/issues/3857
+@lombok.Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class RelayInfoDocument {
     private static final JSON json = JSON.std.without(JSON.Feature.WRITE_NULL_PROPERTIES);
 
