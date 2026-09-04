@@ -82,7 +82,7 @@ spring.ai:
       table-name: spring_ai_vector_store
       index-type: HNSW
       distance-type: COSINE_DISTANCE
-      dimensions: 1536
+      dimensions: 768 # 1536 # 384
       max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
 
 org.tbk.nostr.example.agentic:
@@ -92,3 +92,4 @@ org.tbk.nostr.example.agentic:
   client:
     #relay-uri: wss://nostr-pub.wellorder.net
     relay-uri: wss://relay.primal.net
+  document: classpath:/data/documents/bitcoin.pdf
