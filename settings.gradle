@@ -38,6 +38,8 @@ include 'nostr:nostr-nip44'
 include 'nostr:nostr-nip59'
 include 'nostr:nostr-persona'
 include 'nostr:nostr-template'
+include 'nostr:nostr-autoconfigure'
+include 'nostr:nostr-starter'
 
 include 'nostr-relay:nostr-relay-base'
 include 'nostr-relay:nostr-relay-core'
