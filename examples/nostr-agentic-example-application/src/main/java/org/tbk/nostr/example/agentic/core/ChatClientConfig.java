@@ -59,29 +59,29 @@ class ChatClientConfig {
                 .build();
     }
 
-    @Bean
+    // @Bean
     VectorStoreDocumentRetriever documentRetriever(VectorStore vectorStore) {
         return VectorStoreDocumentRetriever.builder()
-                .similarityThreshold(0.50)
                 .vectorStore(vectorStore)
+                .similarityThreshold(0.70)
                 .build();
     }
 
-    @Bean
-    ContextualQueryAugmenter contextualQueryAugmenter(VectorStore vectorStore) {
+    //@Bean
+    ContextualQueryAugmenter contextualQueryAugmenter() {
         return ContextualQueryAugmenter.builder()
                 .allowEmptyContext(true)
                 .build();
     }
 
-    @Bean
+    //@Bean
     RewriteQueryTransformer rewriteQueryTransformer(ChatClient.Builder builder) {
         return RewriteQueryTransformer.builder()
                 .chatClientBuilder(builder)
                 .build();
     }
 
-    @Bean
+    //@Bean
     TranslationQueryTransformer translationQueryTransformer(ChatClient.Builder builder) {
         return TranslationQueryTransformer.builder()
                 .chatClientBuilder(builder)
@@ -89,7 +89,7 @@ class ChatClientConfig {
                 .build();
     }
 
-    @Bean
+    //@Bean
     MultiQueryExpander multiQueryExpander(ChatClient.Builder builder) {
         return MultiQueryExpander.builder()
                 .chatClientBuilder(builder)
@@ -97,14 +97,14 @@ class ChatClientConfig {
                 .build();
     }
 
-    @Bean
+    //@Bean
     CompressionQueryTransformer compressionQueryTransformer(ChatClient.Builder builder) {
         return CompressionQueryTransformer.builder()
                 .chatClientBuilder(builder)
                 .build();
     }
 
-    @Bean
+    //@Bean
     RetrievalAugmentationAdvisor retrievalAugmentationAdvisor(VectorStoreDocumentRetriever documentRetriever,
                                                               QueryAugmenter queryAugmenter,
                                                               List<QueryTransformer> queryTransformers) {
@@ -139,7 +139,6 @@ class ChatClientConfig {
     Consumer<ChatClient.AdvisorSpec> compositeAdvisorSpecConsumer(List<Consumer<ChatClient.AdvisorSpec>> advisorSpecConsumers) {
         return advisorSpec -> advisorSpecConsumers.forEach(it -> it.accept(advisorSpec));
     }
-
 
     @Bean
     @Primary

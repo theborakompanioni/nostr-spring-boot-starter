@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
+import org.springframework.core.io.Resource;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -26,6 +27,8 @@ public class NostrAgenticExampleApplicationProperties implements Validator {
     private IdentityProperties identity;
 
     private ClientProperties client;
+
+    private Resource document;
 
     public Optional<IdentityProperties> getIdentity() {
         return Optional.ofNullable(identity);
