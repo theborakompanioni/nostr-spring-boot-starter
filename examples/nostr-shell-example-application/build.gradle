@@ -20,7 +20,7 @@ dependencies {
     implementation "fr.acinq.bitcoin:bitcoin-kmp-jvm:${rootProject.ext.acinqBitcoinKmpVersion}"
     implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:${rootProject.ext.acinqSecp256k1KmpVersion}"
 
-    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${rootProject.ext.jacksonJrVersion}"
+    implementation "tools.jackson.jr:jackson-jr-all:${rootProject.ext.jacksonJrVersion}"
 
     implementation 'io.projectreactor:reactor-core'
 

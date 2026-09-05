@@ -1,12 +1,12 @@
 package org.tbk.nostr.nip44;
 
-import com.fasterxml.jackson.jr.ob.JSON;
 import fr.acinq.bitcoin.PrivateKey;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.tbk.nostr.util.MorePublicKeys;
+import tools.jackson.jr.ob.JSON;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;

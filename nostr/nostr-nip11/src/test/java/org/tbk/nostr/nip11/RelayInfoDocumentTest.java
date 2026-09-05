@@ -1,10 +1,9 @@
 package org.tbk.nostr.nip11;
 
-import com.fasterxml.jackson.jr.ob.JSON;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.util.MorePublicKeys;
+import tools.jackson.jr.ob.JSON;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -14,7 +13,7 @@ import static org.hamcrest.Matchers.is;
 class RelayInfoDocumentTest {
 
     @Test
-    void toJson0() throws IOException {
+    void toJson0() {
         RelayInfoDocument sut = RelayInfoDocument.newBuilder().build();
 
         assertThat(JSON.std.anyFrom(sut.toJson()), is(JSON.std.anyFrom("""
@@ -26,7 +25,7 @@ class RelayInfoDocumentTest {
     }
 
     @Test
-    void toJson1() throws IOException {
+    void toJson1() {
         RelayInfoDocument sut = RelayInfoDocument.newBuilder()
                 .name("nostr.land")
                 .description("nostr.land family of relays (us-or-01)")

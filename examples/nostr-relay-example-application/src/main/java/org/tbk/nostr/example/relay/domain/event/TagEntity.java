@@ -1,6 +1,5 @@
 package org.tbk.nostr.example.relay.domain.event;
 
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.google.protobuf.ProtocolStringList;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
@@ -10,9 +9,9 @@ import lombok.Value;
 import org.jmolecules.ddd.types.Entity;
 import org.jmolecules.ddd.types.Identifier;
 import org.tbk.nostr.proto.TagValue;
+import tools.jackson.jr.ob.JSON;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -103,13 +102,9 @@ public class TagEntity implements Entity<EventEntity, TagEntity.TagEntityId> {
             return Collections.emptyList();
         }
 
-        try {
-            @SuppressWarnings("unchecked")
-            List<String> tags = (List<String>) JSON.std.anyFrom(json);
-            return tags;
-        } catch (IOException e) {
-            throw new RuntimeException("Could not deserialize tags", e);
-        }
+        @SuppressWarnings("unchecked")
+        List<String> tags = (List<String>) JSON.std.anyFrom(json);
+        return tags;
     }
 
     private static @Nullable String tagsToJsonArray(List<String> tags) {
@@ -117,12 +112,8 @@ public class TagEntity implements Entity<EventEntity, TagEntity.TagEntityId> {
             return null;
         }
 
-        try {
-            return JSON.std.composeString()
-                    .addObject(tags)
-                    .finish();
-        } catch (IOException e) {
-            throw new RuntimeException("Could not serialize tags", e);
-        }
+        return JSON.std.composeString()
+                .addPOJO(tags)
+                .finish();
     }
 }

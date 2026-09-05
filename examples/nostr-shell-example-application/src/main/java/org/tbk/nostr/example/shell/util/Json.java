@@ -1,6 +1,6 @@
 package org.tbk.nostr.example.shell.util;
 
-import com.fasterxml.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.JSON;
 
 public final class Json {
 

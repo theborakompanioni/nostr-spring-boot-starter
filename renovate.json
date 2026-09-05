@@ -9,9 +9,6 @@
     ],
     "fileFilters": [
       "buildscript-gradle.lockfile",
-      "gradle/verification-metadata.xml",
-      "gradle/verification-keyring.gpg",
-      "gradle/verification-keyring.keys",
       "**/*.lockfile"
     ],
     "installTools": {

@@ -1,12 +1,12 @@
 package org.tbk.nostr.nip11;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-import com.fasterxml.jackson.jr.ob.JSONComposer;
-import com.fasterxml.jackson.jr.ob.comp.ObjectComposer;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import lombok.Singular;
 import lombok.Value;
 import org.tbk.nostr.util.MorePublicKeys;
+import tools.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.JSONComposer;
+import tools.jackson.jr.ob.comp.ObjectComposer;
 
 import javax.annotation.Nullable;
 import java.net.URI;

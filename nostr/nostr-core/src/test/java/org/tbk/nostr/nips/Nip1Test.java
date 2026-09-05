@@ -1,12 +1,12 @@
 package org.tbk.nostr.nips;
 
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.google.protobuf.ByteString;
 import fr.acinq.bitcoin.XonlyPublicKey;
 import org.junit.jupiter.api.Test;
 import org.tbk.nostr.identity.SimpleSigner;
 import org.tbk.nostr.proto.Event;
 import org.tbk.nostr.proto.ProfileMetadata;
+import tools.jackson.jr.ob.JSON;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,7 +32,7 @@ class Nip1Test {
     }
 
     @Test
-    void itShouldCreateMetadata() throws IOException {
+    void itShouldCreateMetadata() {
         Instant now = Instant.now();
         Event event = Nip1.createMetadata(testPubkey, ProfileMetadata.newBuilder()
                         .setName("name")

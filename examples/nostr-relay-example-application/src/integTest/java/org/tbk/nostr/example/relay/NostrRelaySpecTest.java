@@ -1272,7 +1272,7 @@ class NostrRelaySpecTest {
 
         assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
         assertThat(response.getNotice().getMessage(), startsWith("""
-                Error while parsing message: com.fasterxml.jackson.jr.ob.JSONObjectException: No content to map due to end-of-input
+                Error while parsing message: No content to map due to end-of-input
                 """.replace("\n", "")));
     }
 
@@ -1304,7 +1304,7 @@ class NostrRelaySpecTest {
 
         assertThat(response.getKindCase(), is(Response.KindCase.NOTICE));
         assertThat(response.getNotice().getMessage(), startsWith("""
-                Error while parsing message: com.fasterxml.jackson.jr.private_.JsonParseException: Unrecognized token 'GM': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+                Error while parsing message: Unrecognized token 'GM': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
                 """.replace("\n", "")));
     }
 

@@ -49,6 +49,11 @@ contacts {
 }
 
 allprojects {
+    // pin exact version as spring might pull in a different (potentially older) protoc runtime dependency
+    ext['protobuf-java.version'] = "${rootProject.ext.protobufVersion}"
+}
+
+allprojects {
     apply plugin: 'nebula.lint'
 
     group = 'io.github.theborakompanioni'

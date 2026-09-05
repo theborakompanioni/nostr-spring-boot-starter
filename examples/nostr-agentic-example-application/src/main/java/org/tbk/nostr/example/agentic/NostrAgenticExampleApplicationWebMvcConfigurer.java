@@ -1,19 +1,22 @@
 package org.tbk.nostr.example.agentic;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverters;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.*;
 import org.tbk.jackson.datatype.nostr.NostrModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.module.SimpleModule;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 
 @EnableWebMvc
@@ -41,7 +44,6 @@ class NostrAgenticExampleApplicationWebMvcConfigurer implements WebMvcConfigurer
     @Override
     public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
         builder.addCustomConverter(new BufferedImageHttpMessageConverter());
-        builder.withJsonConverter(new MappingJackson2HttpMessageConverter(configureObjectMapper()));
     }
 
     @Override
@@ -49,24 +51,23 @@ class NostrAgenticExampleApplicationWebMvcConfigurer implements WebMvcConfigurer
         configurer.defaultContentType(MediaType.APPLICATION_JSON);
     }
 
-    private static ObjectMapper configureObjectMapper() {
-        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
-
+    @Bean
+    JsonMapperBuilderCustomizer jacksonCustomizer() {
         SimpleModule internalModule = new SimpleModule("AppInternal")
                 .addSerializer(new BigDecimalToStringSerializer());
 
-        return objectMapper
-                .registerModule(internalModule)
-                .registerModule(new NostrModule())
-                .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
-                .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
-                .enable(SerializationFeature.INDENT_OUTPUT)
-                .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
+        return builder -> builder
+                .addModule(internalModule)
+                .addModule(new NostrModule())
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
                 .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
+                .enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    public static final class BigDecimalToStringSerializer extends JsonSerializer<BigDecimal> {
+    public static final class BigDecimalToStringSerializer extends ValueSerializer<BigDecimal> {
 
         @Override
         public Class<BigDecimal> handledType() {
@@ -74,7 +75,7 @@ class NostrAgenticExampleApplicationWebMvcConfigurer implements WebMvcConfigurer
         }
 
         @Override
-        public void serialize(BigDecimal value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        public void serialize(BigDecimal value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
             gen.writeString(value.toPlainString());
         }
     }

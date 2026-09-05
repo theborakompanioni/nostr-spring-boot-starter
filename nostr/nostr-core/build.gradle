@@ -15,5 +15,5 @@ dependencies {
 
     implementation "com.google.guava:guava:${rootProject.ext.guavaVersion}"
 
-    testImplementation "com.fasterxml.jackson.jr:jackson-jr-all:${rootProject.ext.jacksonJrVersion}"
+    testImplementation "tools.jackson.jr:jackson-jr-all:${rootProject.ext.jacksonJrVersion}"
 }

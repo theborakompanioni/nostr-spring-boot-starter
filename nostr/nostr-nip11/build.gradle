@@ -9,5 +9,5 @@ dependencies {
     
     api "fr.acinq.bitcoin:bitcoin-kmp-jvm:${rootProject.ext.acinqBitcoinKmpVersion}"
 
-    implementation "com.fasterxml.jackson.jr:jackson-jr-all:${rootProject.ext.jacksonJrVersion}"
+    implementation "tools.jackson.jr:jackson-jr-all:${rootProject.ext.jacksonJrVersion}"
 }

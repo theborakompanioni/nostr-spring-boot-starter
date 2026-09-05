@@ -6,9 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
-- upgrade: update spring-boot from v3.5.8 to v4.1.0
+- upgrade: update spring-boot from v3.5.8 to v4.1.1
 - upgrade: update spring-shell from v3.4.1 to v4.0.3
-- upgrade: update spring-shell from v1.1.8 to v2.0.0
+- upgrade: update nostr-proto from v0.4.0 to v0.5.0
 
 ## [0.5.0] - 2026-01-02
 ### Changed
