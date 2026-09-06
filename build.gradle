@@ -89,7 +89,7 @@ allprojects {
             // e.g. multiple different versions of the same dependency (group and name are equal)
             failOnVersionConflict()
             force 'com.google.errorprone:error_prone_annotations:2.50.0'
-            force 'io.swagger.core.v3:swagger-annotations-jakarta:2.2.38'
+            force 'io.swagger.core.v3:swagger-annotations-jakarta:2.2.55'
         }
     }
 }
