@@ -2,6 +2,9 @@ package org.tbk.nostr.example.agentic.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.constraints.NotBlank;
@@ -105,11 +108,12 @@ public class AgenticNostrApi {
     }
 
     @Operation(
-            summary = "Generate a nostr event."
+            summary = "Generate a nostr event.",
+            // workaround for swagger-ui loading issues with protobuf classes
+            responses = @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(hidden = true)))
     )
     @PostMapping(value = "/event")
-    // Note: ResponseEntity<?> is used as workaround for swagger-ui loading issues with protobuf classes
-    public ResponseEntity<?> event(@Validated @RequestBody EventApiRequestDto body) {
+    public ResponseEntity<Event> event(@Validated @RequestBody EventApiRequestDto body) {
         ChatOptions options = body.toChatOptions(ollamaChatModel);
         Prompt prompt = new Prompt(body.getContents(), options);
         ChatResponse response = ollamaChatModel.call(prompt);
@@ -124,7 +128,8 @@ public class AgenticNostrApi {
     @Value
     @Builder
     public static class EventWithMetaApiResponseDto {
-        Object event; // Note: Object is used as workaround for swagger-ui loading issues with protobuf classes
+        @Schema(hidden = true) // workaround for swagger-ui loading issues with protobuf classes
+        Event event;
 
         Prompt prompt;
 

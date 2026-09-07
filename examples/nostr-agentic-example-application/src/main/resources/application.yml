@@ -14,7 +14,7 @@ spring.docker.compose:
   enabled: true
   file: ./docker-compose.yml
   start:
-    skip: never # default: if_running
+    skip: if_running # never|if_running; default: if_running
     arguments:
       - '--force-recreate' # prevent "failed to set up container networking: network <id> not found"
   stop:
