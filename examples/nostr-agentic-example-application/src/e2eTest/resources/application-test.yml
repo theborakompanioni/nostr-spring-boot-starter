@@ -9,10 +9,13 @@ spring.docker.compose:
     - ../../docker/regtest/demented/docker-compose.yml
   start:
     skip: never # default: if_running
-    arguments: --force-recreate # prevent "failed to set up container networking: network <id> not found"
+    arguments:
+      - '--force-recreate' # prevent "failed to set up container networking: network <id> not found"
   stop:
     command: DOWN # STOP is default, DOWN stops and removes containers and networks
-    arguments: --remove-orphans
+    arguments:
+      - '--remove-orphans'
+      # - '--volumes' dont remove volumes, keep the downloaded models
   skip.in-tests: false
   profiles.active:
     - 'test' # override the default profile
