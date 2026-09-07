@@ -12,7 +12,7 @@ dependencies {
 
     implementation 'io.projectreactor:reactor-core'
 
-    implementation('org.springframework.boot:spring-boot-starter-web') {
+    implementation('org.springframework.boot:spring-boot-starter-webmvc') {
         //exclude group:'org.springframework.boot', module:'spring-boot-starter-tomcat'
     }
     //implementation 'org.springframework.boot:spring-boot-starter-tomcat'

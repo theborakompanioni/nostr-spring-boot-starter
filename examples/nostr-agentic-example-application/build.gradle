@@ -19,7 +19,7 @@ dependencies {
 
     implementation 'io.projectreactor:reactor-core'
 
-    implementation('org.springframework.boot:spring-boot-starter-web') {
+    implementation('org.springframework.boot:spring-boot-starter-webmvc') {
         //exclude group:'org.springframework.boot', module:'spring-boot-starter-tomcat'
     }
     //implementation 'org.springframework.boot:spring-boot-starter-tomcat'
@@ -34,4 +34,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${rootProject.ext.springdocOpenApiVersion}"
+
+    integTestImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    e2eTestImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 }

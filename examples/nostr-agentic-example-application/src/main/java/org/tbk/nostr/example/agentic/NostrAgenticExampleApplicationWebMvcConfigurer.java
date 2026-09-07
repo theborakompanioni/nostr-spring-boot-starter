@@ -7,7 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverters;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.tbk.jackson.datatype.nostr.NostrModule;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
@@ -19,7 +22,6 @@ import tools.jackson.databind.module.SimpleModule;
 
 import java.math.BigDecimal;
 
-@EnableWebMvc
 @Configuration(proxyBeanMethods = false)
 class NostrAgenticExampleApplicationWebMvcConfigurer implements WebMvcConfigurer {
 

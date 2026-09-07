@@ -10,14 +10,15 @@ logging.config: classpath:logback.xml
 logging.level.org.springframework: INFO
 logging.level.org.tbk.nostr: INFO
 
-# todo: remove after upgrading jackson-datatype-nostr to jackson3
-spring.http.converters:
-  preferred-json-mapper: jackson2
-
 spring.docker.compose:
   enabled: true
   file: ./docker-compose.yml
-  stop.command: DOWN # STOP is default, DOWN stops and removes containers and networks
+  start:
+    skip: never # default: if_running
+    arguments: --force-recreate # prevent "failed to set up container networking: network <id> not found"
+  stop:
+    command: DOWN # STOP is default, DOWN stops and removes containers and networks
+    arguments: --remove-orphans
   profiles.active:
     - 'open-webui'
 
