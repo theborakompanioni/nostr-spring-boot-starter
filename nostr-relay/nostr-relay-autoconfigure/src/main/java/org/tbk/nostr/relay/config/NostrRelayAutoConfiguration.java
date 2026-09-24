@@ -31,7 +31,6 @@ public class NostrRelayAutoConfiguration {
     @NonNull
     private final NostrRelayProperties relayProperties;
 
-
     @Bean
     @ConditionalOnMissingBean(SubscriptionSupport.class)
     SimpleSubscriptionSupport simpleSubscriptionSupport() {

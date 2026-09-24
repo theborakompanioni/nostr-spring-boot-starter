@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr starter package'
+
+dependencies {
+    api project(':nostr:nostr-base')
+    api project(':nostr:nostr-client')
+    api project(':nostr:nostr-core')
+    api project(':nostr:nostr-identity')
+    api project(':nostr:nostr-nip6')
+    api project(':nostr:nostr-nip11')
+    api project(':nostr:nostr-nip18')
+    api project(':nostr:nostr-nip19')
+    api project(':nostr:nostr-nip21')
+    api project(':nostr:nostr-nip44')
+    api project(':nostr:nostr-nip59')
+    api project(':nostr:nostr-persona')
+    api project(':nostr:nostr-template')
+
+    api project(':nostr:nostr-autoconfigure')
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+}

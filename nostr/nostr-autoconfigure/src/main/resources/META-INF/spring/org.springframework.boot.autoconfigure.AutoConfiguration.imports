@@ -1,0 +1,2 @@
+org.tbk.nostr.autoconfigure.NostrAutoConfiguration
+org.tbk.nostr.autoconfigure.template.NostrTemplateAutoConfiguration

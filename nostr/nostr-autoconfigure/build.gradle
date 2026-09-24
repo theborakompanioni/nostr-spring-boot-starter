@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+description = 'nostr autoconfigure package'
+
+dependencies {
+    compileOnly project(':nostr:nostr-base')
+    compileOnly project(':nostr:nostr-client')
+    compileOnly project(':nostr:nostr-core')
+    compileOnly project(':nostr:nostr-identity')
+    compileOnly project(':nostr:nostr-nip6')
+    compileOnly project(':nostr:nostr-nip11')
+    compileOnly project(':nostr:nostr-nip18')
+    compileOnly project(':nostr:nostr-nip19')
+    compileOnly project(':nostr:nostr-nip21')
+    compileOnly project(':nostr:nostr-nip44')
+    compileOnly project(':nostr:nostr-nip59')
+    compileOnly project(':nostr:nostr-persona')
+    compileOnly project(':nostr:nostr-template')
+
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+
+    annotationProcessor 'org.springframework.boot:spring-boot-autoconfigure-processor'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+}

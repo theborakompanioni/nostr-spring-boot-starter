@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - upgrade: update spring-shell from v3.4.1 to v4.0.3
 - upgrade: update nostr-proto from v0.4.0 to v0.5.0
 
+### Added
+- add module 'nostr-starter'
+
 ## [0.5.0] - 2026-01-02
 ### Changed
 - upgrade: update spring-boot from v3.4.4 to v3.5.8
