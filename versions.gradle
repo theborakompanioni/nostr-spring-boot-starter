@@ -1,5 +1,5 @@
 ext {
-    jacksonJrVersion = '3.2.2'
+    jacksonJrVersion = '3.2.3'
     guavaVersion = '33.7.1-jre'
     grpcVersion = '1.84.0'
     protobufVersion = '4.36.1'
